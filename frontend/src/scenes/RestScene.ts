@@ -1,0 +1,98 @@
+import Phaser from 'phaser';
+import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
+import { makeButton, makePanel, makeTitle, makeHpBar } from '../ui/UIManager';
+import { isHeroAlive, healHero } from '../entities/Hero';
+
+const HEAL_AMOUNT = 35;
+const UPGRADE_STAT_BONUS = 8;
+
+export class RestScene extends Phaser.Scene {
+  private selected: string | null = null; // hero instance id for upgrade
+
+  constructor() { super('Rest'); }
+
+  create(): void {
+    const run = window.gameState.runManager.state;
+
+    this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'bg_rest').setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
+    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.5);
+
+    makeTitle(this, GAME_WIDTH / 2, 38, '🏕 REPOS');
+    this.add.text(GAME_WIDTH / 2, 65, 'Choisissez une action', { ...FONTS.body, align: 'center' }).setOrigin(0.5);
+
+    this.drawHeroList();
+    this.drawActions();
+  }
+
+  private drawHeroList(): void {
+    const run = window.gameState.runManager.state;
+    const y = 100;
+    this.add.text(18, y - 8, 'Héros', { ...FONTS.small });
+    run.heroes.forEach((h, i) => {
+      const cx = 20 + i * 65;
+      const cy = y + 35;
+      const alive = isHeroAlive(h);
+      this.add.rectangle(cx + 26, cy, 56, 60, alive ? COLORS.panel : 0x1a1a1a).setStrokeStyle(1, alive ? COLORS.accentLight : 0x444444);
+      this.add.image(cx + 26, cy - 12, `hero_${h.definitionId}`).setDisplaySize(36, 36);
+      this.add.text(cx + 26, cy + 12, h.name.split(' ')[0], { fontSize: '8px', color: '#ffffff' }).setOrigin(0.5);
+      const pct = Math.max(0, h.currentHp / h.maxHp);
+      makeHpBar(this, cx + 26, cy + 25, 52, 5, pct);
+      this.add.text(cx + 26, cy + 35, `${h.currentHp}/${h.maxHp}`, { ...FONTS.small, fontSize: '8px' }).setOrigin(0.5);
+    });
+  }
+
+  private drawActions(): void {
+    // Option 1: heal all
+    makePanel(this, GAME_WIDTH / 2, 238, 330, 72);
+    this.add.text(GAME_WIDTH / 2, 218, '🏥 Soin de groupe', { ...FONTS.body, color: '#44dd88', align: 'center' }).setOrigin(0.5);
+    this.add.text(GAME_WIDTH / 2, 238, `Restaure ${HEAL_AMOUNT} PV à tous les héros vivants.`, { ...FONTS.small, align: 'center' }).setOrigin(0.5);
+    makeButton(this, GAME_WIDTH / 2, 258, 'Soigner l\'équipe', () => this.healAll(), 200, 36, 0x225533);
+
+    // Option 2: upgrade one hero
+    makePanel(this, GAME_WIDTH / 2, 340, 330, 72);
+    this.add.text(GAME_WIDTH / 2, 318, '⚡ Entraînement', { ...FONTS.body, color: '#7744ff', align: 'center' }).setOrigin(0.5);
+    this.add.text(GAME_WIDTH / 2, 338, `Améliore l\'ATK d\'un héros de +${UPGRADE_STAT_BONUS}.`, { ...FONTS.small, align: 'center' }).setOrigin(0.5);
+    makeButton(this, GAME_WIDTH / 2, 358, 'Choisir un héros', () => this.selectHeroForUpgrade(), 200, 36, 0x553377);
+
+    // Leave
+    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 50, 'QUITTER LE CAMP', () => this.leave(), 240, 44, 0x444455);
+  }
+
+  private healAll(): void {
+    const run = window.gameState.runManager.state;
+    run.heroes.filter(isHeroAlive).forEach(h => healHero(h, HEAL_AMOUNT));
+    run.completeRoom({});
+    this.scene.start('RunMap');
+  }
+
+  private selectHeroForUpgrade(): void {
+    const run = window.gameState.runManager.state;
+    const live = run.heroes.filter(isHeroAlive);
+    if (live.length === 0) return;
+
+    // Simple overlay: tap a hero card
+    const overlay = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.7).setInteractive();
+    makePanel(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, 320, 260);
+    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 110, 'Sélectionne un héros', { ...FONTS.body, align: 'center' }).setOrigin(0.5);
+
+    live.forEach((h, i) => {
+      const cx = GAME_WIDTH / 2 - 90 + i * 65;
+      const cy = GAME_HEIGHT / 2 - 30;
+      const bg = this.add.rectangle(cx, cy, 58, 60, COLORS.panel).setStrokeStyle(1, COLORS.accentLight).setInteractive({ useHandCursor: true });
+      this.add.image(cx, cy - 12, `hero_${h.definitionId}`).setDisplaySize(36, 36);
+      this.add.text(cx, cy + 12, h.name.split(' ')[0], { ...FONTS.small, fontSize: '9px' }).setOrigin(0.5);
+      bg.on('pointerdown', () => {
+        h.atk += UPGRADE_STAT_BONUS;
+        overlay.destroy();
+        run.completeRoom({});
+        this.scene.start('RunMap');
+      });
+    });
+  }
+
+  private leave(): void {
+    const run = window.gameState.runManager.state;
+    run.completeRoom({});
+    this.scene.start('RunMap');
+  }
+}

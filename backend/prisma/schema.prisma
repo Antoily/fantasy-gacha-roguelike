@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  progress  Progress?
+  runs      Run[]
+}
+
+model Progress {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  unlockedHeroIds  String[] @default([])
+  ownedRelicIds    String[] @default([])
+  totalGold        Int      @default(0)
+  talentTree       Json     @default("{}")
+  gachaState       Json     @default("{}")
+  bestZones        Int      @default(0)
+  bestRooms        Int      @default(0)
+  updatedAt        DateTime @updatedAt
+}
+
+model Run {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  zonesCleared Int
+  roomsCleared Int
+  victory      Boolean
+  goldEarned   Int
+  heroesUsed   String[]
+  createdAt    DateTime @default(now())
+}
