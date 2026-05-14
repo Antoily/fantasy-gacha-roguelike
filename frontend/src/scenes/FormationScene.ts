@@ -3,6 +3,8 @@ import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
 import { makeButton, makePanel, makeTitle, makeHpBar, rarityColor } from '../ui/UIManager';
 import type { HeroInstance } from '../entities/Hero';
 import { isHeroAlive } from '../entities/Hero';
+import { getEnemyById } from '../data/enemies';
+import type { EnemyFormation } from '../data/enemies';
 
 const CELL_SIZE = 72;
 const CELL_GAP = 6;
@@ -14,8 +16,6 @@ export class FormationScene extends Phaser.Scene {
   private heroCards: Phaser.GameObjects.Container[] = [];
   private gridCells: Phaser.GameObjects.Container[][] = [];
   private placedHeroes: (HeroInstance | null)[][] = [];
-  private enemyInfo: Phaser.GameObjects.Container | null = null;
-
   constructor() { super('Formation'); }
 
   create(): void {
@@ -40,13 +40,12 @@ export class FormationScene extends Phaser.Scene {
     makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 38, 'LANCER LE COMBAT ▶', () => this.startCombat(), 260, 46);
   }
 
-  private drawEnemyPreview(formation: import('../data/enemies').EnemyFormation): void {
+  private drawEnemyPreview(formation: EnemyFormation): void {
     makePanel(this, GAME_WIDTH / 2, 95, 340, 90);
     this.add.text(GAME_WIDTH / 2, 62, `Ennemi : ${formation.name}`, { ...FONTS.body, color: '#ff7777', align: 'center' }).setOrigin(0.5);
     this.add.text(GAME_WIDTH / 2, 80, formation.hint, { ...FONTS.small, align: 'center', wordWrap: { width: 320 } }).setOrigin(0.5);
 
     // Mini enemy grid
-    const { getEnemyById } = require('../data/enemies') as typeof import('../data/enemies');
     const startX = GAME_WIDTH / 2 - 65;
     const startY = 105;
     const miniCell = 22;

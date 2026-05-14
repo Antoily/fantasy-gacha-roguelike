@@ -8,10 +8,10 @@ export class BootScene extends Phaser.Scene {
 
   preload(): void {
     this.createLoadingBar();
-    this.generatePlaceholderTextures();
   }
 
   create(): void {
+    this.generatePlaceholderTextures();
     this.scene.start('MainMenu');
   }
 
@@ -19,10 +19,12 @@ export class BootScene extends Phaser.Scene {
     const cx = GAME_WIDTH / 2;
     const cy = GAME_HEIGHT / 2;
     this.add.rectangle(cx, cy - 20, 300, 8, 0x333344);
-    const bar = this.add.rectangle(cx - 150 + 1, cy - 20, 0, 6, COLORS.accent).setOrigin(0, 0.5);
+    this.add.rectangle(cx - 150 + 1, cy - 20, 0, 6, COLORS.accent).setOrigin(0, 0.5);
     this.add.text(cx, cy + 10, 'Chargement…', { fontFamily: 'Arial', fontSize: '14px', color: '#9999bb' }).setOrigin(0.5);
+  }
 
-    this.load.on('progress', (v: number) => { bar.width = 298 * v; });
+  private g(): Phaser.GameObjects.Graphics {
+    return this.add.graphics();
   }
 
   private generatePlaceholderTextures(): void {
@@ -39,14 +41,14 @@ export class BootScene extends Phaser.Scene {
     };
 
     for (const [id, color] of Object.entries(heroColors)) {
-      const g = this.make.graphics({ x: 0, y: 0, add: false });
-      g.fillStyle(color, 1);
-      g.fillRoundedRect(0, 0, 80, 80, 8);
-      g.fillStyle(0xffffff, 0.15);
-      g.fillCircle(40, 28, 18);
-      g.fillRoundedRect(12, 48, 56, 30, 6);
-      g.generateTexture(`hero_${id}`, 80, 80);
-      g.destroy();
+      const gfx = this.g();
+      gfx.fillStyle(color, 1);
+      gfx.fillRoundedRect(0, 0, 80, 80, 8);
+      gfx.fillStyle(0xffffff, 0.15);
+      gfx.fillCircle(40, 28, 18);
+      gfx.fillRoundedRect(12, 48, 56, 30, 6);
+      gfx.generateTexture(`hero_${id}`, 80, 80);
+      gfx.destroy();
     }
 
     // Enemy textures
@@ -64,13 +66,13 @@ export class BootScene extends Phaser.Scene {
     };
 
     for (const [id, color] of Object.entries(enemyColors)) {
-      const g = this.make.graphics({ x: 0, y: 0, add: false });
-      g.fillStyle(color, 1);
-      g.fillRoundedRect(0, 0, 60, 60, 6);
-      g.fillStyle(0xff3333, 0.6);
-      g.fillCircle(30, 22, 12);
-      g.generateTexture(`enemy_${id}`, 60, 60);
-      g.destroy();
+      const gfx = this.g();
+      gfx.fillStyle(color, 1);
+      gfx.fillRoundedRect(0, 0, 60, 60, 6);
+      gfx.fillStyle(0xff3333, 0.6);
+      gfx.fillCircle(30, 22, 12);
+      gfx.generateTexture(`enemy_${id}`, 60, 60);
+      gfx.destroy();
     }
 
     // Room backgrounds
@@ -82,31 +84,31 @@ export class BootScene extends Phaser.Scene {
       boss: 0x220011,
     };
     for (const [type, color] of Object.entries(bgColors)) {
-      const g = this.make.graphics({ x: 0, y: 0, add: false });
-      g.fillStyle(color, 1);
-      g.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-      g.generateTexture(`bg_${type}`, GAME_WIDTH, GAME_HEIGHT);
-      g.destroy();
+      const gfx = this.g();
+      gfx.fillStyle(color, 1);
+      gfx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+      gfx.generateTexture(`bg_${type}`, GAME_WIDTH, GAME_HEIGHT);
+      gfx.destroy();
     }
 
-    // Relic icons (small squares with glyph feel)
+    // Relic icons
     const relicColors = [0xaaaaaa, 0x4488ff, 0xbb44ff, 0xffaa00, 0x44dd88];
     const relicIds = ['bloodstone_ring','swiftness_boots','war_banner','shadow_cloak','ancient_tome',
                       'iron_fortress','emerald_pendant','void_crystal','gold_idol','dragon_scale',
                       'berserker_heart','amulet_of_focus'];
     relicIds.forEach((id, i) => {
-      const g = this.make.graphics({ x: 0, y: 0, add: false });
+      const gfx = this.g();
       const col = relicColors[i % relicColors.length];
-      g.fillStyle(col, 0.8);
-      g.fillRoundedRect(0, 0, 48, 48, 6);
-      g.fillStyle(0xffffff, 0.3);
-      g.fillCircle(24, 24, 14);
-      g.generateTexture(`relic_${id}`, 48, 48);
-      g.destroy();
+      gfx.fillStyle(col, 0.8);
+      gfx.fillRoundedRect(0, 0, 48, 48, 6);
+      gfx.fillStyle(0xffffff, 0.3);
+      gfx.fillCircle(24, 24, 14);
+      gfx.generateTexture(`relic_${id}`, 48, 48);
+      gfx.destroy();
     });
 
-    // UI elements
-    const cardG = this.make.graphics({ x: 0, y: 0, add: false });
+    // Card frame
+    const cardG = this.g();
     cardG.fillStyle(COLORS.panel, 1);
     cardG.fillRoundedRect(0, 0, 100, 140, 8);
     cardG.lineStyle(2, COLORS.panelBorder);
@@ -114,8 +116,8 @@ export class BootScene extends Phaser.Scene {
     cardG.generateTexture('card_frame', 100, 140);
     cardG.destroy();
 
-    // Grid cell
-    const cellG = this.make.graphics({ x: 0, y: 0, add: false });
+    // Grid cell (normal)
+    const cellG = this.g();
     cellG.fillStyle(0x1e1e3a, 1);
     cellG.fillRoundedRect(0, 0, 80, 80, 6);
     cellG.lineStyle(1, 0x3d3d7a);
@@ -123,7 +125,8 @@ export class BootScene extends Phaser.Scene {
     cellG.generateTexture('grid_cell', 80, 80);
     cellG.destroy();
 
-    const cellHoverG = this.make.graphics({ x: 0, y: 0, add: false });
+    // Grid cell (hovered)
+    const cellHoverG = this.g();
     cellHoverG.fillStyle(0x2a2a5a, 1);
     cellHoverG.fillRoundedRect(0, 0, 80, 80, 6);
     cellHoverG.lineStyle(2, COLORS.accentLight);
@@ -133,5 +136,4 @@ export class BootScene extends Phaser.Scene {
   }
 }
 
-// Re-export COLORS so BootScene consumers don't need a separate import
 export { COLORS };

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
+import { GAME_WIDTH, GAME_HEIGHT, FONTS } from '../config';
 import { makeButton, makePanel, makeTitle } from '../ui/UIManager';
 import { saveProgress } from './MainMenuScene';
 import { apiClient } from '../api/apiClient';

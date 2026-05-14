@@ -7,13 +7,9 @@ const HEAL_AMOUNT = 35;
 const UPGRADE_STAT_BONUS = 8;
 
 export class RestScene extends Phaser.Scene {
-  private selected: string | null = null; // hero instance id for upgrade
-
   constructor() { super('Rest'); }
 
   create(): void {
-    const run = window.gameState.runManager.state;
-
     this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'bg_rest').setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.5);
 
@@ -42,35 +38,33 @@ export class RestScene extends Phaser.Scene {
   }
 
   private drawActions(): void {
-    // Option 1: heal all
     makePanel(this, GAME_WIDTH / 2, 238, 330, 72);
     this.add.text(GAME_WIDTH / 2, 218, '🏥 Soin de groupe', { ...FONTS.body, color: '#44dd88', align: 'center' }).setOrigin(0.5);
     this.add.text(GAME_WIDTH / 2, 238, `Restaure ${HEAL_AMOUNT} PV à tous les héros vivants.`, { ...FONTS.small, align: 'center' }).setOrigin(0.5);
     makeButton(this, GAME_WIDTH / 2, 258, 'Soigner l\'équipe', () => this.healAll(), 200, 36, 0x225533);
 
-    // Option 2: upgrade one hero
     makePanel(this, GAME_WIDTH / 2, 340, 330, 72);
     this.add.text(GAME_WIDTH / 2, 318, '⚡ Entraînement', { ...FONTS.body, color: '#7744ff', align: 'center' }).setOrigin(0.5);
     this.add.text(GAME_WIDTH / 2, 338, `Améliore l\'ATK d\'un héros de +${UPGRADE_STAT_BONUS}.`, { ...FONTS.small, align: 'center' }).setOrigin(0.5);
     makeButton(this, GAME_WIDTH / 2, 358, 'Choisir un héros', () => this.selectHeroForUpgrade(), 200, 36, 0x553377);
 
-    // Leave
     makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 50, 'QUITTER LE CAMP', () => this.leave(), 240, 44, 0x444455);
   }
 
   private healAll(): void {
-    const run = window.gameState.runManager.state;
+    const gs = window.gameState;
+    const run = gs.runManager.state;
     run.heroes.filter(isHeroAlive).forEach(h => healHero(h, HEAL_AMOUNT));
-    run.completeRoom({});
+    gs.runManager.completeRoom({});
     this.scene.start('RunMap');
   }
 
   private selectHeroForUpgrade(): void {
-    const run = window.gameState.runManager.state;
+    const gs = window.gameState;
+    const run = gs.runManager.state;
     const live = run.heroes.filter(isHeroAlive);
     if (live.length === 0) return;
 
-    // Simple overlay: tap a hero card
     const overlay = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.7).setInteractive();
     makePanel(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, 320, 260);
     this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 110, 'Sélectionne un héros', { ...FONTS.body, align: 'center' }).setOrigin(0.5);
@@ -84,15 +78,15 @@ export class RestScene extends Phaser.Scene {
       bg.on('pointerdown', () => {
         h.atk += UPGRADE_STAT_BONUS;
         overlay.destroy();
-        run.completeRoom({});
+        gs.runManager.completeRoom({});
         this.scene.start('RunMap');
       });
     });
   }
 
   private leave(): void {
-    const run = window.gameState.runManager.state;
-    run.completeRoom({});
+    const gs = window.gameState;
+    gs.runManager.completeRoom({});
     this.scene.start('RunMap');
   }
 }

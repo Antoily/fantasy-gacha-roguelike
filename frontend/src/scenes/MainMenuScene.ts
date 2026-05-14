@@ -4,6 +4,8 @@ import { makeButton, makeTitle, makePanel } from '../ui/UIManager';
 import { RunManager } from '../systems/RunManager';
 import { TalentTreeSystem } from '../systems/TalentTree';
 import { GachaSystem } from '../systems/GachaSystem';
+import { RELIC_POOL } from '../data/relics';
+import type { RelicDefinition } from '../data/relics';
 
 // Global game state shared across scenes via scene data / registry
 declare global {
@@ -83,11 +85,9 @@ export class MainMenuScene extends Phaser.Scene {
     const bonuses = gs.talentTree.getBonuses();
     const startRelicIds: string[] = [];
 
-    // Give start relics from talent
+    // Give start relics from talent (common relics only)
     if (bonuses.startRelicCount > 0) {
-      const availableRelics = require('../data/relics').RELIC_POOL.filter(
-        (r: import('../data/relics').RelicDefinition) => r.rarity === 'common'
-      );
+      const availableRelics = RELIC_POOL.filter((r: RelicDefinition) => r.rarity === 'common');
       for (let i = 0; i < bonuses.startRelicCount && i < availableRelics.length; i++) {
         startRelicIds.push(availableRelics[i].id);
       }

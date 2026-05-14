@@ -10,7 +10,7 @@ export function makeButton(
   onClick: () => void,
   width = 200,
   height = 44,
-  color = COLORS.accent,
+  color: number = COLORS.accent,
 ): Phaser.GameObjects.Container {
   const container = scene.add.container(x, y);
   const bg = scene.add.rectangle(0, 0, width, height, color, 1).setInteractive({ useHandCursor: true });

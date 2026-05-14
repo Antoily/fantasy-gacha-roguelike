@@ -7,7 +7,6 @@ import { getHeroById, STARTER_HERO_IDS } from '../data/heroes';
 import { getRelicById } from '../data/relics';
 import { ENEMY_FORMATIONS } from '../data/enemies';
 import { EVENT_POOL } from '../data/events';
-import { RELIC_POOL } from '../data/relics';
 import { shuffle, pickRandom } from '../utils/random';
 
 export type RoomType = 'combat' | 'event' | 'shop' | 'rest' | 'boss';
@@ -33,10 +32,9 @@ export interface RunState {
   runReviveUsed: boolean;
 }
 
-const ROOMS_PER_ZONE = 8;
 const TOTAL_ZONES = 3;
 
-function generateZoneRooms(zoneIdx: number, isFinalZone: boolean): Room[] {
+function generateZoneRooms(_zoneIdx: number, _isFinalZone: boolean): Room[] {
   const roomTypes: RoomType[] = ['combat', 'combat', 'combat', 'combat', 'event', 'shop', 'rest', 'combat'];
   const shuffled = shuffle(roomTypes.slice(0, -1)); // keep last as boss-approach
   const rooms: Room[] = shuffled.map((type) => ({
