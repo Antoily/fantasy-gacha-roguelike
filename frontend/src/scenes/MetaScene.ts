@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
-import { makeButton, makePanel, makeTitle, showToast } from '../ui/UIManager';
+import { makeButton, makeTitle } from '../ui/UIManager';
 import { TALENT_TREE } from '../data/talents';
 import type { TalentNode, TalentTrack } from '../data/talents';
 import { saveProgress } from './MainMenuScene';

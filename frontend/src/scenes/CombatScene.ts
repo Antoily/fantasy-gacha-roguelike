@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
-import { makeButton, makePanel, makeTitle, makeHpBar, showToast } from '../ui/UIManager';
+import { makeButton, makePanel, makeTitle, makeHpBar } from '../ui/UIManager';
 import { resolveCombat, type CombatLogEntry } from '../systems/CombatResolver';
 import { createEnemyInstance } from '../entities/Enemy';
 import { isHeroAlive } from '../entities/Hero';
@@ -8,15 +8,13 @@ import { getEnemyById } from '../data/enemies';
 
 export class CombatScene extends Phaser.Scene {
   private log: CombatLogEntry[] = [];
-  private logIndex = 0;
   private logText!: Phaser.GameObjects.Text;
-  private heroHpBars: Map<string, Phaser.GameObjects.Container> = new Map();
-  private enemyHpBars: Map<string, Phaser.GameObjects.Container> = new Map();
 
   constructor() { super('Combat'); }
 
   create(): void {
-    const run = window.gameState.runManager.state;
+    const gs = window.gameState;
+    const run = gs.runManager.state;
     const room = run.rooms[run.currentRoomIndex];
 
     this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, `bg_${room.isBossRoom ? 'boss' : 'combat'}`).setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
@@ -42,23 +40,22 @@ export class CombatScene extends Phaser.Scene {
       run.heroes,
       enemies,
       run.relics,
-      run.getGoldMultiplier(),
+      gs.runManager.getGoldMultiplier(),
       run.runReviveUsed,
     );
 
     this.log = result.log;
     this.drawHeader(room.formation.name, room.isBossRoom);
-    this.drawGrids(run.heroes.filter(isHeroAlive), enemies);
+    this.drawGrids(run.heroes.filter(isHeroAlive));
     this.drawLogPanel();
-    this.drawResult(result.victory, result.goldReward, enemies);
+    this.drawResult(result.victory, result.goldReward);
   }
 
   private drawHeader(formationName: string, isBoss: boolean): void {
     makeTitle(this, GAME_WIDTH / 2, 22, isBoss ? `⚔ BOSS — ${formationName}` : `⚔ COMBAT — ${formationName}`);
   }
 
-  private drawGrids(heroes: import('../entities/Hero').HeroInstance[], enemies: import('../entities/Enemy').EnemyInstance[]): void {
-    // Hero grid (left side, rows 0-2)
+  private drawGrids(heroes: import('../entities/Hero').HeroInstance[]): void {
     this.add.text(70, 55, 'Votre équipe', { ...FONTS.small, color: '#7777ff', align: 'center' }).setOrigin(0.5);
     heroes.forEach(h => {
       if (h.gridRow === null) return;
@@ -67,20 +64,7 @@ export class CombatScene extends Phaser.Scene {
       this.add.rectangle(x + 16, y + 20, 38, 44, 0x1e2a3a).setStrokeStyle(1, COLORS.accentLight);
       this.add.image(x + 16, y + 14, `hero_${h.definitionId}`).setDisplaySize(32, 32);
       this.add.text(x + 16, y + 32, h.name.split(' ')[0], { fontSize: '7px', color: '#ffffff' }).setOrigin(0.5);
-      const bar = makeHpBar(this, x + 16, y + 42, 36, 4, h.currentHp / h.maxHp);
-      this.heroHpBars.set(h.instanceId, bar);
-    });
-
-    // Enemy grid (right side)
-    this.add.text(GAME_WIDTH - 70, 55, 'Ennemis', { ...FONTS.small, color: '#ff7777', align: 'center' }).setOrigin(0.5);
-    enemies.forEach(e => {
-      const x = GAME_WIDTH - 135 + e.gridCol * 42;
-      const y = 70 + e.gridRow * 50;
-      this.add.rectangle(x + 16, y + 20, 38, 44, 0x2a1e1e).setStrokeStyle(1, 0xcc4444);
-      this.add.image(x + 16, y + 14, `enemy_${e.definitionId}`).setDisplaySize(32, 32);
-      this.add.text(x + 16, y + 32, e.name.split(' ')[0], { fontSize: '7px', color: '#ffaaaa' }).setOrigin(0.5);
-      const bar = makeHpBar(this, x + 16, y + 42, 36, 4, 1);
-      this.enemyHpBars.set(e.instanceId, bar);
+      makeHpBar(this, x + 16, y + 42, 36, 4, h.currentHp / h.maxHp);
     });
   }
 
@@ -93,7 +77,6 @@ export class CombatScene extends Phaser.Scene {
       wordWrap: { width: 320 },
       lineSpacing: 2,
     });
-
     this.showLogEntries();
   }
 
@@ -106,8 +89,8 @@ export class CombatScene extends Phaser.Scene {
     this.logText.setText(entries.join('\n'));
   }
 
-  private drawResult(victory: boolean, goldEarned: number, enemies: import('../entities/Enemy').EnemyInstance[]): void {
-    const run = window.gameState.runManager.state;
+  private drawResult(victory: boolean, goldEarned: number): void {
+    const gs = window.gameState;
     const resultY = 400;
 
     if (victory) {
@@ -116,24 +99,12 @@ export class CombatScene extends Phaser.Scene {
       }).setOrigin(0.5);
       this.add.text(GAME_WIDTH / 2, resultY + 35, `+${goldEarned} 💰`, { ...FONTS.gold, align: 'center' }).setOrigin(0.5);
 
-      // Check for relic drop (25% chance)
-      const relicDrop = Math.random() < 0.25;
-      const rewardText = relicDrop ? 'Relique obtenue !' : '';
-      if (rewardText) {
-        this.add.text(GAME_WIDTH / 2, resultY + 60, rewardText, { ...FONTS.body, color: '#bb44ff', align: 'center' }).setOrigin(0.5);
-      }
-
       makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 55, 'CONTINUER ▶', () => {
-        run.completeRoom({ gold: goldEarned });
-
-        if (run.isOver) {
-          if (run.victory) {
-            this.scene.start('GameOver');
-          } else {
-            this.scene.start('GameOver');
-          }
-        } else if (window.gameState.runManager.heroesAllDead()) {
-          run.endRun(false);
+        gs.runManager.completeRoom({ gold: goldEarned });
+        if (gs.runManager.state.isOver) {
+          this.scene.start('GameOver');
+        } else if (gs.runManager.heroesAllDead()) {
+          gs.runManager.endRun(false);
           this.scene.start('GameOver');
         } else {
           this.scene.start('RunMap');
@@ -146,7 +117,7 @@ export class CombatScene extends Phaser.Scene {
       this.add.text(GAME_WIDTH / 2, resultY + 35, 'Vos héros sont tombés.', { ...FONTS.small, align: 'center' }).setOrigin(0.5);
 
       makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 55, 'FIN DU RUN', () => {
-        run.endRun(false);
+        gs.runManager.endRun(false);
         this.scene.start('GameOver');
       }, 240, 46, 0x881122);
     }

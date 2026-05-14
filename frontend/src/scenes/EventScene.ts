@@ -45,14 +45,15 @@ export class EventScene extends Phaser.Scene {
     if (this.resolved) return;
     this.resolved = true;
 
-    const run = window.gameState.runManager.state;
+    const gs = window.gameState;
+    const run = gs.runManager.state;
     let resultMsg = choice.description;
 
     switch (choice.outcomeType) {
       case 'gain_relic': {
         const relicPool = RELIC_POOL.filter(r => r.rarity === (choice.outcomeRarity ?? 'common'));
         const relic = pickRandom(relicPool);
-        run.applyRelic(relic);
+        gs.runManager.applyRelic(relic);
         resultMsg = `${choice.description} (${relic.name})`;
         if ((choice.outcomeValue ?? 0) < 0) {
           run.heroes.forEach(h => { h.currentHp = Math.max(1, h.currentHp + (choice.outcomeValue ?? 0)); });
@@ -71,7 +72,10 @@ export class EventScene extends Phaser.Scene {
       case 'buff_hero': {
         const hero = pickRandom(run.heroes);
         const stat = pickRandom(['atk', 'def', 'spd'] as const);
-        (hero as Record<string, number>)[stat] = ((hero as Record<string, number>)[stat] ?? 0) + (choice.outcomeValue ?? 10);
+        // Type-safe stat bump
+        if (stat === 'atk') hero.atk += (choice.outcomeValue ?? 10);
+        else if (stat === 'def') hero.def += (choice.outcomeValue ?? 10);
+        else hero.spd += (choice.outcomeValue ?? 10);
         resultMsg = `${hero.name} gagne +${choice.outcomeValue} ${stat.toUpperCase()}`;
         break;
       }
@@ -81,9 +85,9 @@ export class EventScene extends Phaser.Scene {
   }
 
   private showResult(msg: string): void {
-    const run = window.gameState.runManager.state;
+    const gs = window.gameState;
 
-    // Clear choices
+    // Clear choice buttons
     this.children.list
       .filter(c => c.type === 'Container')
       .forEach(c => c.destroy());
@@ -94,8 +98,8 @@ export class EventScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 60, 'CONTINUER', () => {
-      run.completeRoom({});
-      if (run.isOver) {
+      gs.runManager.completeRoom({});
+      if (gs.runManager.state.isOver) {
         this.scene.start('GameOver');
       } else {
         this.scene.start('RunMap');

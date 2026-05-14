@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
-import { makeButton, makePanel, makeTitle, rarityColor, rarityLabel, showToast } from '../ui/UIManager';
+import { makeButton, makePanel, makeTitle, rarityColor, showToast } from '../ui/UIManager';
 import { RELIC_POOL } from '../data/relics';
-import { HERO_POOL, getHeroById } from '../data/heroes';
+import { HERO_POOL } from '../data/heroes';
 import { shuffle } from '../utils/random';
 import type { RelicDefinition } from '../data/relics';
 import type { HeroDefinition } from '../data/heroes';
@@ -56,8 +56,10 @@ export class ShopScene extends Phaser.Scene {
       makePanel(this, GAME_WIDTH / 2, y + 22, 330, 60);
       this.add.rectangle(34, y + 22, 44, 44, COLORS.panel).setStrokeStyle(2, rarityColor(relic.rarity));
       this.add.text(34, y + 22, relic.name.slice(0, 3), { ...FONTS.small, fontSize: '10px' }).setOrigin(0.5);
-
-      this.add.text(60, y + 10, relic.name, { ...FONTS.body, color: `#${rarityColor(relic.rarity).toString(16).padStart(6, '0')}` });
+      this.add.text(60, y + 10, relic.name, {
+        ...FONTS.body,
+        color: `#${rarityColor(relic.rarity).toString(16).padStart(6, '0')}`,
+      });
       this.add.text(60, y + 28, relic.description, { ...FONTS.small, wordWrap: { width: 200 } });
 
       const canAfford = run.gold >= RELIC_PRICE;
@@ -73,7 +75,10 @@ export class ShopScene extends Phaser.Scene {
     this.add.text(20, y - 12, 'Héros à recruter', { ...FONTS.body, color: '#44bbff' });
     makePanel(this, GAME_WIDTH / 2, y + 30, 330, 64);
     this.add.image(36, y + 30, `hero_${this.shopHero.id}`).setDisplaySize(48, 48);
-    this.add.text(65, y + 14, this.shopHero.name, { ...FONTS.body, color: `#${rarityColor(this.shopHero.rarity).toString(16).padStart(6, '0')}` });
+    this.add.text(65, y + 14, this.shopHero.name, {
+      ...FONTS.body,
+      color: `#${rarityColor(this.shopHero.rarity).toString(16).padStart(6, '0')}`,
+    });
     this.add.text(65, y + 32, this.shopHero.ability.description, { ...FONTS.small, wordWrap: { width: 170 } });
 
     const canAfford = run.gold >= HERO_PRICE;
@@ -98,30 +103,32 @@ export class ShopScene extends Phaser.Scene {
   }
 
   private buyRelic(relic: RelicDefinition): void {
-    const run = window.gameState.runManager.state;
+    const gs = window.gameState;
+    const run = gs.runManager.state;
     if (run.gold < RELIC_PRICE) { showToast(this, 'Pas assez d\'or !'); return; }
     run.gold -= RELIC_PRICE;
-    run.applyRelic(relic);
+    gs.runManager.applyRelic(relic);
     showToast(this, `${relic.name} obtenu !`);
     this.updateGold();
-    this.shopRelics = this.shopRelics.filter(r => r.id !== relic.id);
     this.scene.restart();
   }
 
   private buyHero(): void {
-    const run = window.gameState.runManager.state;
+    const gs = window.gameState;
+    const run = gs.runManager.state;
     if (!this.shopHero || run.gold < HERO_PRICE || run.heroes.length >= 5) {
       showToast(this, run.heroes.length >= 5 ? 'Équipe pleine !' : 'Pas assez d\'or !');
       return;
     }
     run.gold -= HERO_PRICE;
-    run.completeRoom({ heroId: this.shopHero.id });
+    gs.runManager.completeRoom({ heroId: this.shopHero.id });
     showToast(this, `${this.shopHero.name} rejoint l\'équipe !`);
     this.scene.start('RunMap');
   }
 
   private buyHeal(): void {
-    const run = window.gameState.runManager.state;
+    const gs = window.gameState;
+    const run = gs.runManager.state;
     if (run.gold < HEAL_PRICE) { showToast(this, 'Pas assez d\'or !'); return; }
     run.gold -= HEAL_PRICE;
     run.heroes.forEach(h => { h.currentHp = Math.min(h.maxHp, h.currentHp + 40); });
@@ -130,8 +137,8 @@ export class ShopScene extends Phaser.Scene {
   }
 
   private leave(): void {
-    const run = window.gameState.runManager.state;
-    run.completeRoom({});
+    const gs = window.gameState;
+    gs.runManager.completeRoom({});
     this.scene.start('RunMap');
   }
 
