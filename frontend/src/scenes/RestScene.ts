@@ -1,15 +1,20 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
-import { makeButton, makePanel, makeTitle, makeHpBar } from '../ui/UIManager';
+import { makeButton, makePanel, makeTitle, makeHpBar, fadeIn, transitionTo, floatText } from '../ui/UIManager';
 import { isHeroAlive, healHero } from '../entities/Hero';
 
 const HEAL_AMOUNT = 35;
 const UPGRADE_STAT_BONUS = 8;
 
 export class RestScene extends Phaser.Scene {
+  // Verrou anti double-clic : completeRoom ne doit s'appliquer qu'une fois
+  private leaving = false;
+
   constructor() { super('Rest'); }
 
   create(): void {
+    this.leaving = false;
+    fadeIn(this);
     this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'bg_rest').setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.5);
 
@@ -52,11 +57,17 @@ export class RestScene extends Phaser.Scene {
   }
 
   private healAll(): void {
+    if (this.leaving) return;
+    this.leaving = true;
     const gs = window.gameState;
     const run = gs.runManager.state;
-    run.heroes.filter(isHeroAlive).forEach(h => healHero(h, HEAL_AMOUNT));
+    run.heroes.filter(isHeroAlive).forEach((h, i) => {
+      healHero(h, HEAL_AMOUNT);
+      // +PV flottant au-dessus de chaque héros avant de quitter le camp
+      floatText(this, 46 + i * 65, 110, `+${HEAL_AMOUNT}`, '#55ff88');
+    });
     gs.runManager.completeRoom({});
-    this.scene.start('RunMap');
+    this.time.delayedCall(550, () => transitionTo(this, 'RunMap'));
   }
 
   private selectHeroForUpgrade(): void {
@@ -65,7 +76,7 @@ export class RestScene extends Phaser.Scene {
     const live = run.heroes.filter(isHeroAlive);
     if (live.length === 0) return;
 
-    const overlay = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.7).setInteractive();
+    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.7).setInteractive();
     makePanel(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, 320, 260);
     this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 110, 'Sélectionne un héros', { ...FONTS.body, align: 'center' }).setOrigin(0.5);
 
@@ -76,17 +87,21 @@ export class RestScene extends Phaser.Scene {
       this.add.image(cx, cy - 12, `hero_${h.definitionId}`).setDisplaySize(36, 36);
       this.add.text(cx, cy + 12, h.name.split(' ')[0], { ...FONTS.small, fontSize: '9px' }).setOrigin(0.5);
       bg.on('pointerdown', () => {
+        if (this.leaving) return;
+        this.leaving = true;
         h.atk += UPGRADE_STAT_BONUS;
-        overlay.destroy();
         gs.runManager.completeRoom({});
-        this.scene.start('RunMap');
+        floatText(this, cx, cy - 30, `+${UPGRADE_STAT_BONUS} ATK`, '#bb88ff');
+        this.time.delayedCall(550, () => transitionTo(this, 'RunMap'));
       });
     });
   }
 
   private leave(): void {
+    if (this.leaving) return;
+    this.leaving = true;
     const gs = window.gameState;
     gs.runManager.completeRoom({});
-    this.scene.start('RunMap');
+    transitionTo(this, 'RunMap');
   }
 }

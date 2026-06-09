@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
-import { makeButton, makePanel, makeTitle, makeHpBar, rarityColor } from '../ui/UIManager';
+import { makeButton, makePanel, makeTitle, makeHpBar, rarityColor, fadeIn, transitionTo } from '../ui/UIManager';
 import type { HeroInstance } from '../entities/Hero';
 import { isHeroAlive } from '../entities/Hero';
 import { getEnemyById } from '../data/enemies';
@@ -25,6 +25,7 @@ export class FormationScene extends Phaser.Scene {
     this.placedHeroes = Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(null));
     this.selectedHero = null;
 
+    fadeIn(this);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x0f0f1e);
     makeTitle(this, GAME_WIDTH / 2, 28, 'FORMATION');
 
@@ -177,6 +178,9 @@ export class FormationScene extends Phaser.Scene {
       const icon = this.add.image(0, -8, `hero_${hero.definitionId}`).setDisplaySize(48, 48);
       const name = this.add.text(0, 26, hero.name.split(' ')[0], { ...FONTS.small, fontSize: '9px', align: 'center' }).setOrigin(0.5);
       container.add([icon, name]);
+      // Pop de placement : feedback immédiat sur la case choisie
+      icon.setScale(icon.scaleX * 1.5).setAlpha(0);
+      this.tweens.add({ targets: icon, scale: icon.scaleX / 1.5, alpha: 1, duration: 180, ease: 'Back.Out' });
     }
   }
 
@@ -200,6 +204,6 @@ export class FormationScene extends Phaser.Scene {
       });
     }
 
-    this.scene.start('Combat');
+    transitionTo(this, 'Combat');
   }
 }

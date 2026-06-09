@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
-import { makeButton, makeTitle, makePanel } from '../ui/UIManager';
+import { makeButton, makeTitle, makePanel, fadeIn, transitionTo, staggerIn, isTransitioning } from '../ui/UIManager';
 import { RunManager } from '../systems/RunManager';
 import { TalentTreeSystem } from '../systems/TalentTree';
 import { GachaSystem } from '../systems/GachaSystem';
@@ -41,6 +41,7 @@ export class MainMenuScene extends Phaser.Scene {
       this.loadProgress();
     }
 
+    fadeIn(this);
     this.drawBackground();
     this.drawTitle();
     this.drawButtons();
@@ -49,27 +50,45 @@ export class MainMenuScene extends Phaser.Scene {
 
   private drawBackground(): void {
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.background);
-    // Stars
+    // Étoiles — une partie scintille pour donner vie au fond sans coût notable
     for (let i = 0; i < 60; i++) {
       const x = Phaser.Math.Between(0, GAME_WIDTH);
       const y = Phaser.Math.Between(0, GAME_HEIGHT);
       const size = Phaser.Math.FloatBetween(0.5, 2);
-      this.add.circle(x, y, size, 0xffffff, Phaser.Math.FloatBetween(0.2, 0.8));
+      const star = this.add.circle(x, y, size, 0xffffff, Phaser.Math.FloatBetween(0.2, 0.8));
+      if (i % 3 === 0) {
+        this.tweens.add({
+          targets: star,
+          alpha: 0.1,
+          duration: Phaser.Math.Between(900, 2200),
+          delay: Phaser.Math.Between(0, 1500),
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.InOut',
+        });
+      }
     }
   }
 
   private drawTitle(): void {
-    makeTitle(this, GAME_WIDTH / 2, 100, 'FANTASY\nROGUELIKE');
-    this.add.text(GAME_WIDTH / 2, 155, 'Tactique · Gacha · Roguelike', {
+    const title = makeTitle(this, GAME_WIDTH / 2, 100, 'FANTASY\nROGUELIKE');
+    const subtitle = this.add.text(GAME_WIDTH / 2, 155, 'Tactique · Gacha · Roguelike', {
       ...FONTS.small, align: 'center',
     }).setOrigin(0.5);
+
+    staggerIn(this, [title, subtitle], 12, 80);
+    // Flottement continu du titre — démarre après l'animation d'entrée pour éviter un conflit de tween sur y
+    this.tweens.add({ targets: title, y: 104, duration: 2200, delay: 600, yoyo: true, repeat: -1, ease: 'Sine.InOut' });
   }
 
   private drawButtons(): void {
-    makeButton(this, GAME_WIDTH / 2, 260, 'LANCER UN RUN', () => this.startRun(), 220, 50);
-    makeButton(this, GAME_WIDTH / 2, 330, 'GACHA', () => this.scene.start('Gacha'), 220, 44, 0x553388);
-    makeButton(this, GAME_WIDTH / 2, 395, 'ARBRE DE TALENTS', () => this.scene.start('Meta'), 220, 44, 0x335566);
-    makeButton(this, GAME_WIDTH / 2, 455, 'COLLECTION', () => this.scene.start('Collection'), 220, 44, 0x335533);
+    const buttons = [
+      makeButton(this, GAME_WIDTH / 2, 260, 'LANCER UN RUN', () => this.startRun(), 220, 50),
+      makeButton(this, GAME_WIDTH / 2, 330, 'GACHA', () => transitionTo(this, 'Gacha'), 220, 44, 0x553388),
+      makeButton(this, GAME_WIDTH / 2, 395, 'ARBRE DE TALENTS', () => transitionTo(this, 'Meta'), 220, 44, 0x335566),
+      makeButton(this, GAME_WIDTH / 2, 455, 'COLLECTION', () => transitionTo(this, 'Collection'), 220, 44, 0x335533),
+    ];
+    staggerIn(this, buttons, 20);
   }
 
   private drawStats(): void {
@@ -81,6 +100,7 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   private startRun(): void {
+    if (isTransitioning(this)) return;
     const gs = window.gameState;
     const bonuses = gs.talentTree.getBonuses();
     const startRelicIds: string[] = [];
@@ -105,7 +125,7 @@ export class MainMenuScene extends Phaser.Scene {
       extraHeroSlot: bonuses.extraHeroSlot,
     });
 
-    this.scene.start('RunMap');
+    transitionTo(this, 'RunMap');
   }
 
   private loadProgress(): void {

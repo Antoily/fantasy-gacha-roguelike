@@ -1,31 +1,73 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
-import { makeButton, makePanel, makeTitle, makeHpBar } from '../ui/UIManager';
-import { resolveCombat, type CombatLogEntry } from '../systems/CombatResolver';
-import { createEnemyInstance } from '../entities/Enemy';
-import { isHeroAlive } from '../entities/Hero';
+import { makeButton, makePanel, makeHpBar, setHpBar, floatText, fadeIn, transitionTo, isTransitioning } from '../ui/UIManager';
+import { resolveCombat, type CombatLogEntry, type CombatEffect } from '../systems/CombatResolver';
+import { createEnemyInstance, type EnemyInstance } from '../entities/Enemy';
+import type { HeroInstance } from '../entities/Hero';
 import { getEnemyById } from '../data/enemies';
+
+const CELL_W = 52;
+const CELL_H = 56;
+const CELL_GAP = 4;
+const GRID_W = 3 * CELL_W + 2 * CELL_GAP;
+const GRID_LEFT = (GAME_WIDTH - GRID_W) / 2 + CELL_W / 2;
+const ENEMY_TOP = 76;   // centre de la rangée arrière ennemie
+const HERO_TOP = 262;   // centre de la rangée avant héros
+const STEP_DELAY = 450; // rythme de base entre deux actions (ms)
+
+// Vue d'une unité sur la grille — le combat est résolu d'avance,
+// la scène ne fait que rejouer le journal en animations.
+interface UnitView {
+  container: Phaser.GameObjects.Container;
+  sprite: Phaser.GameObjects.Image;
+  frame: Phaser.GameObjects.Rectangle;
+  bar: Phaser.GameObjects.Container;
+  maxHp: number;
+  hp: number;
+  side: 'hero' | 'enemy';
+}
 
 export class CombatScene extends Phaser.Scene {
   private log: CombatLogEntry[] = [];
+  private logIndex = 0;
+  private logLines: string[] = [];
   private logText!: Phaser.GameObjects.Text;
+  private units = new Map<string, UnitView>();
+  private speed = 1;
+  private finished = false;
+  private victory = false;
+  private goldReward = 0;
+  private heroesRef: HeroInstance[] = [];
+  private enemiesRef: EnemyInstance[] = [];
+  private skipBtn: Phaser.GameObjects.Container | null = null;
+  private speedBtn: Phaser.GameObjects.Text | null = null;
 
   constructor() { super('Combat'); }
 
   create(): void {
+    // La scène est réutilisée entre les combats : remise à zéro de l'état de playback
+    this.log = [];
+    this.logIndex = 0;
+    this.logLines = [];
+    this.units.clear();
+    this.finished = false;
+    this.skipBtn = null;
+    this.speedBtn = null;
+
     const gs = window.gameState;
     const run = gs.runManager.state;
     const room = run.rooms[run.currentRoomIndex];
-
-    this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, `bg_${room.isBossRoom ? 'boss' : 'combat'}`).setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.3);
 
     if (!room.formation) {
       this.scene.start('RunMap');
       return;
     }
 
-    // Build enemies from formation
+    fadeIn(this);
+    this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, `bg_${room.isBossRoom ? 'boss' : 'combat'}`).setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
+    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.3);
+
+    // Construit les ennemis depuis la formation
     const enemies = room.formation.grid.flatMap((rowArr, r) =>
       rowArr.map((eid, c) => {
         if (!eid) return null;
@@ -35,7 +77,10 @@ export class CombatScene extends Phaser.Scene {
       }).filter((e): e is NonNullable<typeof e> => e !== null)
     );
 
-    // Resolve combat
+    // PV de départ des héros — resolveCombat mute les instances,
+    // le playback doit partir de l'état d'avant combat
+    const heroStartHp = new Map(run.heroes.map(h => [h.instanceId, h.currentHp]));
+
     const result = resolveCombat(
       run.heroes,
       enemies,
@@ -45,81 +90,283 @@ export class CombatScene extends Phaser.Scene {
     );
 
     this.log = result.log;
+    this.victory = result.victory;
+    this.goldReward = result.goldReward;
+    this.heroesRef = run.heroes;
+    this.enemiesRef = enemies;
+
     this.drawHeader(room.formation.name, room.isBossRoom);
-    this.drawGrids(run.heroes.filter(isHeroAlive));
+    this.drawUnits(heroStartHp);
     this.drawLogPanel();
-    this.drawResult(result.victory, result.goldReward);
+    this.drawControls();
+
+    this.time.delayedCall(500, () => this.playNext());
   }
 
   private drawHeader(formationName: string, isBoss: boolean): void {
-    makeTitle(this, GAME_WIDTH / 2, 22, isBoss ? `⚔ BOSS — ${formationName}` : `⚔ COMBAT — ${formationName}`);
+    this.add.text(GAME_WIDTH / 2, 24, isBoss ? `⚔ BOSS — ${formationName}` : `⚔ ${formationName}`, {
+      fontFamily: 'Georgia, serif', fontSize: '18px', color: isBoss ? '#ff6666' : '#ffffff', align: 'center',
+    }).setOrigin(0.5);
   }
 
-  private drawGrids(heroes: import('../entities/Hero').HeroInstance[]): void {
-    this.add.text(70, 55, 'Votre équipe', { ...FONTS.small, color: '#7777ff', align: 'center' }).setOrigin(0.5);
-    heroes.forEach(h => {
-      if (h.gridRow === null) return;
-      const x = 15 + (h.gridCol ?? 0) * 42;
-      const y = 70 + (h.gridRow ?? 0) * 50;
-      this.add.rectangle(x + 16, y + 20, 38, 44, 0x1e2a3a).setStrokeStyle(1, COLORS.accentLight);
-      this.add.image(x + 16, y + 14, `hero_${h.definitionId}`).setDisplaySize(32, 32);
-      this.add.text(x + 16, y + 32, h.name.split(' ')[0], { fontSize: '7px', color: '#ffffff' }).setOrigin(0.5);
-      makeHpBar(this, x + 16, y + 42, 36, 4, h.currentHp / h.maxHp);
+  private drawUnits(heroStartHp: Map<string, number>): void {
+    // Grille ennemie en haut : rangée arrière (2) en haut, front (0) en bas, face aux héros
+    this.enemiesRef.forEach(e => {
+      const x = GRID_LEFT + e.gridCol * (CELL_W + CELL_GAP);
+      const y = ENEMY_TOP + (2 - e.gridRow) * (CELL_H + CELL_GAP);
+      this.addUnit(e.instanceId, e.name, `enemy_${e.definitionId}`, x, y, e.maxHp, e.maxHp, 'enemy', e.isBoss);
     });
+
+    // Séparateur central
+    this.add.text(GAME_WIDTH / 2, (ENEMY_TOP + 2 * (CELL_H + CELL_GAP) + HERO_TOP) / 2, '— VS —', {
+      ...FONTS.small, color: '#555577',
+    }).setOrigin(0.5);
+
+    // Grille héros en bas : front (0) en haut
+    this.heroesRef.forEach(h => {
+      if (h.gridRow === null || h.gridCol === null) return;
+      const startHp = heroStartHp.get(h.instanceId) ?? h.maxHp;
+      if (startHp <= 0) return;
+      const x = GRID_LEFT + h.gridCol * (CELL_W + CELL_GAP);
+      const y = HERO_TOP + h.gridRow * (CELL_H + CELL_GAP);
+      this.addUnit(h.instanceId, h.name, `hero_${h.definitionId}`, x, y, startHp, h.maxHp, 'hero', false);
+    });
+  }
+
+  private addUnit(
+    id: string, name: string, texture: string,
+    x: number, y: number,
+    hp: number, maxHp: number,
+    side: 'hero' | 'enemy', isBoss: boolean,
+  ): void {
+    const frame = this.add.rectangle(0, 0, CELL_W, CELL_H, side === 'hero' ? 0x1e2a3a : 0x2a1a1e, 0.9)
+      .setStrokeStyle(1, side === 'hero' ? COLORS.accentLight : 0x664444);
+    const sprite = this.add.image(0, -8, texture).setDisplaySize(isBoss ? 40 : 32, isBoss ? 40 : 32);
+    const label = this.add.text(0, 12, name.split(' ')[0], { fontSize: '7px', color: '#ffffff', fontFamily: 'Arial' }).setOrigin(0.5);
+    const bar = makeHpBar(this, 0, 22, CELL_W - 8, 4, hp / maxHp);
+    const container = this.add.container(x, y, [frame, sprite, label, bar]);
+
+    // Entrée en scène : les unités surgissent avec un léger pop
+    container.setScale(0);
+    this.tweens.add({ targets: container, scale: 1, duration: 250, delay: Phaser.Math.Between(0, 200), ease: 'Back.Out' });
+
+    this.units.set(id, { container, sprite, frame, bar, maxHp, hp, side });
   }
 
   private drawLogPanel(): void {
-    makePanel(this, GAME_WIDTH / 2, 310, 340, 150);
-    this.add.text(GAME_WIDTH / 2, 244, 'Journal de combat', { ...FONTS.small, align: 'center' }).setOrigin(0.5);
-    this.logText = this.add.text(20, 256, '', {
-      ...FONTS.small,
-      fontSize: '11px',
-      wordWrap: { width: 320 },
-      lineSpacing: 2,
+    makePanel(this, GAME_WIDTH / 2, 487, 340, 92);
+    this.logText = this.add.text(24, 447, '', {
+      ...FONTS.small, fontSize: '10px', lineSpacing: 4, wordWrap: { width: 312 },
     });
-    this.showLogEntries();
   }
 
-  private showLogEntries(): void {
-    const entries = this.log.slice(0, 18).map(e => {
-      if (e.heal > 0) return `${e.actorName} soigne ${e.targetName} (+${e.heal} PV)${e.special ? ` [${e.special}]` : ''}`;
-      if (e.damage > 0) return `${e.actorName} → ${e.targetName} : ${e.damage} dégâts${e.special ? ` [${e.special}]` : ''}`;
-      return `${e.actorName} : ${e.special}`;
-    });
-    this.logText.setText(entries.join('\n'));
+  private drawControls(): void {
+    this.speedBtn = this.add.text(GAME_WIDTH - 16, 24, '▶ ×1', {
+      fontFamily: 'Arial', fontSize: '13px', color: '#9999bb',
+    }).setOrigin(1, 0.5).setInteractive({ useHandCursor: true })
+      .on('pointerdown', () => {
+        this.speed = this.speed >= 4 ? 1 : this.speed * 2;
+        this.speedBtn?.setText(`▶ ×${this.speed}`);
+      });
+
+    this.skipBtn = makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 55, 'PASSER ▶▶', () => this.skipToEnd(), 180, 40, 0x444455);
   }
 
-  private drawResult(victory: boolean, goldEarned: number): void {
-    const gs = window.gameState;
-    const resultY = 400;
+  // ---- Playback ----
 
-    if (victory) {
-      this.add.text(GAME_WIDTH / 2, resultY, '✨ VICTOIRE', {
-        fontFamily: 'Georgia, serif', fontSize: '28px', color: '#ffd700', align: 'center',
-      }).setOrigin(0.5);
-      this.add.text(GAME_WIDTH / 2, resultY + 35, `+${goldEarned} 💰`, { ...FONTS.gold, align: 'center' }).setOrigin(0.5);
+  private playNext(): void {
+    if (this.finished) return;
+    if (this.logIndex >= this.log.length) {
+      this.showResult();
+      return;
+    }
 
-      makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 55, 'CONTINUER ▶', () => {
-        gs.runManager.completeRoom({ gold: goldEarned });
-        if (gs.runManager.state.isOver) {
-          this.scene.start('GameOver');
-        } else if (gs.runManager.heroesAllDead()) {
-          gs.runManager.endRun(false);
-          this.scene.start('GameOver');
-        } else {
-          this.scene.start('RunMap');
+    const entry = this.log[this.logIndex++];
+    this.appendLogLine(entry);
+
+    const actor = this.units.get(entry.actorId);
+    const dur = 150 / this.speed;
+
+    if (actor && actor.hp > 0) {
+      // Élan vers le camp adverse + cadre mis en avant
+      actor.container.setDepth(10);
+      const dy = entry.actorSide === 'hero' ? -12 : 12;
+      this.tweens.add({
+        targets: actor.container,
+        y: actor.container.y + dy,
+        duration: dur,
+        yoyo: true,
+        ease: 'Quad.Out',
+        onComplete: () => actor.container.setDepth(0),
+      });
+    }
+
+    // Les effets tombent au sommet de l'élan
+    this.time.delayedCall(dur, () => {
+      if (this.finished) return;
+      entry.effects.forEach(eff => this.applyEffect(eff));
+    });
+
+    this.time.delayedCall(STEP_DELAY / this.speed, () => this.playNext());
+  }
+
+  private applyEffect(eff: CombatEffect): void {
+    const unit = this.units.get(eff.unitId);
+    if (!unit) return;
+    const { x, y } = unit.container;
+
+    switch (eff.kind) {
+      case 'damage': {
+        floatText(this, x, y - 26, `-${eff.amount}`, '#ff5555', eff.amount >= 35 ? '16px' : '13px');
+        unit.sprite.setTintFill(0xffffff);
+        this.time.delayedCall(70 / this.speed, () => unit.sprite.clearTint());
+        // Tremblement de la cible
+        this.tweens.add({ targets: unit.container, x: x + 4, duration: 40, yoyo: true, repeat: 2, onComplete: () => { unit.container.x = x; } });
+        if (eff.amount >= 35) this.cameras.main.shake(90, 0.005);
+        break;
+      }
+      case 'heal':
+      case 'revive': {
+        floatText(this, x, y - 26, `+${eff.amount}`, '#55ff88');
+        unit.sprite.setTint(0x88ffaa);
+        this.time.delayedCall(180 / this.speed, () => unit.sprite.clearTint());
+        if (eff.kind === 'revive') {
+          unit.container.setAlpha(1);
+          unit.sprite.clearTint();
+          floatText(this, x, y - 40, '✨ Résurrection', '#ffd700', '11px');
         }
-      }, 240, 46);
-    } else {
-      this.add.text(GAME_WIDTH / 2, resultY, '💀 DÉFAITE', {
-        fontFamily: 'Georgia, serif', fontSize: '28px', color: '#cc3333', align: 'center',
-      }).setOrigin(0.5);
-      this.add.text(GAME_WIDTH / 2, resultY + 35, 'Vos héros sont tombés.', { ...FONTS.small, align: 'center' }).setOrigin(0.5);
+        break;
+      }
+      case 'debuff':
+        floatText(this, x, y - 26, `-${eff.amount}% ATK`, '#bb88ff', '11px');
+        break;
+      case 'mark':
+        floatText(this, x, y - 26, '✜ Marqué', '#ffaa44', '11px');
+        break;
+    }
 
-      makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 55, 'FIN DU RUN', () => {
+    unit.hp = eff.hpAfter;
+    setHpBar(this, unit.bar, eff.hpAfter / unit.maxHp, 200 / this.speed);
+
+    if (eff.hpAfter <= 0) this.killUnit(unit);
+  }
+
+  private killUnit(unit: UnitView): void {
+    this.tweens.add({
+      targets: unit.container,
+      alpha: 0.25,
+      angle: unit.side === 'hero' ? -8 : 8,
+      scale: 0.9,
+      duration: 250 / this.speed,
+      ease: 'Quad.In',
+    });
+    unit.sprite.setTint(0x555555);
+  }
+
+  private appendLogLine(entry: CombatLogEntry): void {
+    let line: string;
+    if (entry.heal > 0) line = `${entry.actorName} soigne ${entry.targetName} (+${entry.heal} PV)`;
+    else if (entry.damage > 0) line = `${entry.actorName} → ${entry.targetName} : ${entry.damage}${entry.special ? ` [${entry.special}]` : ''}`;
+    else line = `${entry.actorName} : ${entry.special}`;
+
+    this.logLines.push(line);
+    if (this.logLines.length > 5) this.logLines.shift();
+    this.logText.setText(this.logLines.join('\n'));
+  }
+
+  // Avance directement à l'état final (toutes les animations annulées)
+  private skipToEnd(): void {
+    if (this.finished) return;
+    this.tweens.killAll();
+    this.time.removeAllEvents();
+
+    const finalHp = new Map<string, number>();
+    this.heroesRef.forEach(h => finalHp.set(h.instanceId, h.currentHp));
+    this.enemiesRef.forEach(e => finalHp.set(e.instanceId, e.currentHp));
+
+    this.units.forEach((unit, id) => {
+      const hp = finalHp.get(id) ?? unit.hp;
+      unit.hp = hp;
+      unit.container.setScale(hp > 0 ? 1 : 0.9).setAlpha(hp > 0 ? 1 : 0.25);
+      unit.container.setAngle(hp > 0 ? 0 : (unit.side === 'hero' ? -8 : 8));
+      unit.sprite.clearTint();
+      const fill = unit.bar.getData('fill') as Phaser.GameObjects.Rectangle | undefined;
+      if (fill) {
+        const pct = Phaser.Math.Clamp(hp / unit.maxHp, 0, 1);
+        fill.setScale(pct, 1).setFillStyle(pct > 0.4 ? COLORS.hp : COLORS.hpLow);
+      }
+      if (hp <= 0) unit.sprite.setTint(0x555555);
+    });
+
+    this.showResult();
+  }
+
+  // ---- Résultat ----
+
+  private showResult(): void {
+    if (this.finished) return;
+    this.finished = true;
+    this.skipBtn?.destroy();
+    this.speedBtn?.destroy();
+
+    const gs = window.gameState;
+    const cx = GAME_WIDTH / 2;
+
+    const overlay = this.add.rectangle(cx, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0).setDepth(80);
+    this.tweens.add({ targets: overlay, fillAlpha: 0.55, duration: 300 });
+
+    const banner = this.add.text(cx, 290, this.victory ? '✨ VICTOIRE' : '💀 DÉFAITE', {
+      fontFamily: 'Georgia, serif', fontSize: '32px', color: this.victory ? '#ffd700' : '#cc3333', align: 'center',
+    }).setOrigin(0.5).setDepth(81).setScale(0);
+    this.tweens.add({ targets: banner, scale: 1, duration: 380, ease: 'Back.Out' });
+
+    if (this.victory) {
+      // Pluie d'étincelles dorées autour de la bannière
+      for (let i = 0; i < 14; i++) {
+        const spark = this.add.image(cx + Phaser.Math.Between(-90, 90), 290 + Phaser.Math.Between(-30, 30), 'spark')
+          .setDepth(81).setTint(0xffd700).setAlpha(0).setScale(Phaser.Math.FloatBetween(0.4, 1));
+        this.tweens.add({
+          targets: spark,
+          alpha: { from: 1, to: 0 },
+          y: spark.y - Phaser.Math.Between(20, 50),
+          delay: 200 + i * 60,
+          duration: 700,
+          onComplete: () => spark.destroy(),
+        });
+      }
+
+      const goldText = this.add.text(cx, 335, '+0 💰', { ...FONTS.gold, fontSize: '20px', align: 'center' })
+        .setOrigin(0.5).setDepth(81);
+      const counter = { value: 0 };
+      this.tweens.add({
+        targets: counter,
+        value: this.goldReward,
+        delay: 300,
+        duration: 600,
+        ease: 'Quad.Out',
+        onUpdate: () => goldText.setText(`+${Math.round(counter.value)} 💰`),
+      });
+
+      makeButton(this, cx, GAME_HEIGHT - 55, 'CONTINUER ▶', () => {
+        if (isTransitioning(this)) return;
+        gs.runManager.completeRoom({ gold: this.goldReward });
+        if (gs.runManager.state.isOver || gs.runManager.heroesAllDead()) {
+          if (!gs.runManager.state.isOver) gs.runManager.endRun(false);
+          transitionTo(this, 'GameOver');
+        } else {
+          transitionTo(this, 'RunMap');
+        }
+      }, 240, 46).setDepth(82);
+    } else {
+      this.cameras.main.shake(250, 0.008);
+      this.add.text(cx, 335, 'Vos héros sont tombés.', { ...FONTS.small, align: 'center' })
+        .setOrigin(0.5).setDepth(81);
+
+      makeButton(this, cx, GAME_HEIGHT - 55, 'FIN DU RUN', () => {
+        if (isTransitioning(this)) return;
         gs.runManager.endRun(false);
-        this.scene.start('GameOver');
-      }, 240, 46, 0x881122);
+        transitionTo(this, 'GameOver');
+      }, 240, 46, 0x881122).setDepth(82);
     }
   }
 }

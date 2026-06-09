@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
-import { makeButton, makePanel, makeTitle, rarityColor, rarityLabel } from '../ui/UIManager';
+import { makeButton, makePanel, makeTitle, rarityColor, rarityLabel, fadeIn, transitionTo } from '../ui/UIManager';
 import { HERO_POOL, HeroDefinition } from '../data/heroes';
 
 const CLASS_LABELS: Record<string, string> = {
@@ -18,6 +18,8 @@ export class CollectionScene extends Phaser.Scene {
   create(): void {
     const gs = window.gameState;
 
+    this.modalContainer = null;
+    fadeIn(this);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.background);
     makeTitle(this, GAME_WIDTH / 2, 32, '📚 COLLECTION');
     this.add.text(GAME_WIDTH / 2, 58, `${gs.unlockedHeroIds.length}/${HERO_POOL.length} héros débloqués`, {
@@ -64,7 +66,7 @@ export class CollectionScene extends Phaser.Scene {
       }
     });
 
-    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 38, '← RETOUR', () => this.scene.start('MainMenu'), 200, 40, 0x444455);
+    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 38, '← RETOUR', () => transitionTo(this, 'MainMenu'), 200, 40, 0x444455);
   }
 
   private openModal(hero: HeroDefinition): void {
