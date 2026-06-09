@@ -21,9 +21,12 @@ export class FormationScene extends Phaser.Scene {
   create(): void {
     const run = window.gameState.runManager.state;
 
-    // Initialize empty grid
+    // Initialize empty grid — la scène est réutilisée entre les combats,
+    // heroCards doit être vidé sinon selectHero itère sur des cartes détruites
     this.placedHeroes = Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(null));
     this.selectedHero = null;
+    this.heroCards = [];
+    this.gridCells = [];
 
     fadeIn(this);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x0f0f1e);
@@ -117,6 +120,8 @@ export class FormationScene extends Phaser.Scene {
 
       bg.setInteractive({ useHandCursor: true });
       bg.on('pointerdown', () => this.selectHero(hero, bg));
+      // Rareté mémorisée pour restaurer la bonne couleur de bordure à la désélection
+      container.setData('rarity', hero.rarity);
       this.heroCards.push(container);
 
       // Check if already placed
@@ -130,10 +135,10 @@ export class FormationScene extends Phaser.Scene {
   }
 
   private selectHero(hero: HeroInstance, bg: Phaser.GameObjects.Rectangle): void {
-    // Deselect previous
+    // Deselect previous — chaque carte retrouve la couleur de sa propre rareté
     this.heroCards.forEach(c => {
       const b = c.list[0] as Phaser.GameObjects.Rectangle;
-      b.setStrokeStyle(1, rarityColor(hero.rarity));
+      b.setStrokeStyle(1, rarityColor(c.getData('rarity')));
     });
     this.selectedHero = hero;
     bg.setStrokeStyle(2, 0xffffff);
