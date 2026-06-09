@@ -8,6 +8,7 @@ export class BootScene extends Phaser.Scene {
 
   preload(): void {
     this.createLoadingBar();
+    this.load.image('hero_aldric', 'assets/hero_aldric.png');
   }
 
   create(): void {
@@ -19,8 +20,9 @@ export class BootScene extends Phaser.Scene {
     const cx = GAME_WIDTH / 2;
     const cy = GAME_HEIGHT / 2;
     this.add.rectangle(cx, cy - 20, 300, 8, 0x333344);
-    this.add.rectangle(cx - 150 + 1, cy - 20, 0, 6, COLORS.accent).setOrigin(0, 0.5);
+    const fill = this.add.rectangle(cx - 149, cy - 20, 298, 6, COLORS.accent).setOrigin(0, 0.5).setScale(0, 1);
     this.add.text(cx, cy + 10, 'Chargement…', { fontFamily: 'Arial', fontSize: '14px', color: '#9999bb' }).setOrigin(0.5);
+    this.load.on('progress', (value: number) => fill.setScale(value, 1));
   }
 
   private g(): Phaser.GameObjects.Graphics {
@@ -30,7 +32,6 @@ export class BootScene extends Phaser.Scene {
   private generatePlaceholderTextures(): void {
     // Hero portraits
     const heroColors: Record<string, number> = {
-      aldric: 0x4466cc,
       sylva: 0x44aa44,
       zara: 0xaa44aa,
       finn: 0xddcc44,
@@ -133,6 +134,15 @@ export class BootScene extends Phaser.Scene {
     cellHoverG.strokeRoundedRect(0, 0, 80, 80, 6);
     cellHoverG.generateTexture('grid_cell_hover', 80, 80);
     cellHoverG.destroy();
+
+    // Particule douce pour les effets (impacts, étincelles, lueurs)
+    const sparkG = this.g();
+    sparkG.fillStyle(0xffffff, 0.35);
+    sparkG.fillCircle(8, 8, 8);
+    sparkG.fillStyle(0xffffff, 1);
+    sparkG.fillCircle(8, 8, 4);
+    sparkG.generateTexture('spark', 16, 16);
+    sparkG.destroy();
   }
 }
 

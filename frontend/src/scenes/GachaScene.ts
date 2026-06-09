@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
-import { makeButton, makePanel, makeTitle, rarityColor, rarityLabel, showToast } from '../ui/UIManager';
+import { makeButton, makePanel, makeTitle, rarityColor, rarityLabel, showToast, fadeIn, transitionTo, pulse } from '../ui/UIManager';
 import type { GachaPullResult } from '../systems/GachaSystem';
 import { saveProgress } from './MainMenuScene';
 
@@ -12,14 +12,19 @@ export class GachaScene extends Phaser.Scene {
   create(): void {
     const gs = window.gameState;
 
+    fadeIn(this);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.background);
     for (let i = 0; i < 40; i++) {
-      this.add.star(
+      const star = this.add.star(
         Phaser.Math.Between(0, GAME_WIDTH),
         Phaser.Math.Between(0, GAME_HEIGHT),
         5, 2, Phaser.Math.Between(4, 8),
         COLORS.accent, Phaser.Math.FloatBetween(0.1, 0.4),
       );
+      // Rotation lente d'un tiers des étoiles pour une ambiance mystique
+      if (i % 3 === 0) {
+        this.tweens.add({ targets: star, angle: 360, duration: Phaser.Math.Between(8000, 16000), repeat: -1 });
+      }
     }
 
     makeTitle(this, GAME_WIDTH / 2, 40, '✨ INVOCATION');
@@ -80,11 +85,29 @@ export class GachaScene extends Phaser.Scene {
     }
 
     saveProgress();
-    this.showResults();
+    this.playRevealAnimation();
+  }
+
+  // Flash d'anticipation avant la révélation des résultats
+  private playRevealAnimation(): void {
+    const flash = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0xffffff, 0).setDepth(100);
+    this.tweens.add({
+      targets: flash,
+      fillAlpha: 0.9,
+      duration: 220,
+      ease: 'Quad.In',
+      onComplete: () => {
+        // showResults purge tous les enfants (dont ce flash) — on en recrée un pour le fondu de sortie
+        this.showResults();
+        const fadeOut = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0xffffff, 0.9).setDepth(100);
+        this.tweens.add({ targets: fadeOut, fillAlpha: 0, duration: 350, onComplete: () => fadeOut.destroy() });
+      },
+    });
   }
 
   private showResults(): void {
     // Clear current scene content
+    this.tweens.killAll();
     this.children.list.slice().forEach(c => c.destroy());
 
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.background);
@@ -103,27 +126,54 @@ export class GachaScene extends Phaser.Scene {
       const rarity = r.rarity;
       const color = rarityColor(rarity);
 
-      this.add.rectangle(x, y, cardW, cardH, COLORS.panel).setStrokeStyle(2, color);
+      const parts: Phaser.GameObjects.GameObject[] = [];
+      parts.push(this.add.rectangle(0, 0, cardW, cardH, COLORS.panel).setStrokeStyle(2, color));
 
       if (r.type === 'hero' && r.heroDefinition) {
-        this.add.image(x, y - 14, `hero_${r.heroDefinition.id}`).setDisplaySize(44, 44);
-        this.add.text(x, y + 24, r.heroDefinition.name.split(' ')[0], { ...FONTS.small, fontSize: '9px', align: 'center' }).setOrigin(0.5);
+        parts.push(this.add.image(0, -14, `hero_${r.heroDefinition.id}`).setDisplaySize(44, 44));
+        parts.push(this.add.text(0, 24, r.heroDefinition.name.split(' ')[0], { ...FONTS.small, fontSize: '9px', align: 'center' }).setOrigin(0.5));
       } else if (r.type === 'relic' && r.relicDefinition) {
-        this.add.image(x, y - 14, `relic_${r.relicDefinition.id}`).setDisplaySize(38, 38);
-        this.add.text(x, y + 24, r.relicDefinition.name.split(' ')[0], { ...FONTS.small, fontSize: '9px', align: 'center' }).setOrigin(0.5);
+        parts.push(this.add.image(0, -14, `relic_${r.relicDefinition.id}`).setDisplaySize(38, 38));
+        parts.push(this.add.text(0, 24, r.relicDefinition.name.split(' ')[0], { ...FONTS.small, fontSize: '9px', align: 'center' }).setOrigin(0.5));
       }
 
-      this.add.text(x, y + 38, rarityLabel(rarity), { fontSize: '8px', color: `#${color.toString(16).padStart(6, '0')}`, fontFamily: 'Arial' }).setOrigin(0.5);
+      parts.push(this.add.text(0, 38, rarityLabel(rarity), { fontSize: '8px', color: `#${color.toString(16).padStart(6, '0')}`, fontFamily: 'Arial' }).setOrigin(0.5));
 
       if (r.isPity) {
-        this.add.text(x, y - 40, '★ PITY', { fontSize: '10px', color: '#ffaa00', fontFamily: 'Arial' }).setOrigin(0.5);
+        const pity = this.add.text(0, -40, '★ PITY', { fontSize: '10px', color: '#ffaa00', fontFamily: 'Arial' }).setOrigin(0.5);
+        parts.push(pity);
+        pulse(this, pity, 1.2, 400);
       }
+
+      // Cartes révélées une à une, les hautes raretés claquent davantage
+      const card = this.add.container(x, y, parts).setScale(0);
+      const isHighRarity = rarity === 'epic' || rarity === 'legendary';
+      this.tweens.add({
+        targets: card,
+        scale: 1,
+        delay: i * 90,
+        duration: isHighRarity ? 380 : 250,
+        ease: 'Back.Out',
+        onComplete: () => {
+          if (!isHighRarity) return;
+          // Halo de rareté qui s'étend derrière la carte
+          const halo = this.add.rectangle(x, y, cardW, cardH, color, 0.5);
+          this.tweens.add({
+            targets: halo,
+            scaleX: 1.5, scaleY: 1.5,
+            fillAlpha: 0,
+            duration: 450,
+            onComplete: () => halo.destroy(),
+          });
+          if (rarity === 'legendary') this.cameras.main.shake(120, 0.004);
+        },
+      });
     });
 
-    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 50, 'RETOUR', () => this.scene.start('MainMenu'), 200, 44);
+    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 50, 'RETOUR', () => transitionTo(this, 'MainMenu'), 200, 44);
   }
 
   private drawBackButton(): void {
-    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 50, '← RETOUR', () => this.scene.start('MainMenu'), 200, 44, 0x444455);
+    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 50, '← RETOUR', () => transitionTo(this, 'MainMenu'), 200, 44, 0x444455);
   }
 }

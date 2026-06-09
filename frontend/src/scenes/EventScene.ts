@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
-import { makeButton, makePanel, makeTitle } from '../ui/UIManager';
+import { makeButton, makePanel, makeTitle, fadeIn, transitionTo, isTransitioning } from '../ui/UIManager';
 import { getRandomEvents } from '../data/events';
 import { RELIC_POOL } from '../data/relics';
 import type { EventDefinition, EventChoice } from '../data/events';
@@ -17,7 +17,9 @@ export class EventScene extends Phaser.Scene {
     const room = run.rooms[run.currentRoomIndex];
 
     this.event = room.event ?? getRandomEvents(1)[0];
+    this.resolved = false;
 
+    fadeIn(this);
     this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'bg_event').setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.5);
 
@@ -92,18 +94,21 @@ export class EventScene extends Phaser.Scene {
       .filter(c => c.type === 'Container')
       .forEach(c => c.destroy());
 
-    makePanel(this, GAME_WIDTH / 2, 350, 320, 80);
-    this.add.text(GAME_WIDTH / 2, 350, msg, {
+    const panel = makePanel(this, GAME_WIDTH / 2, 350, 320, 80);
+    const text = this.add.text(GAME_WIDTH / 2, 350, msg, {
       ...FONTS.body, align: 'center', wordWrap: { width: 300 },
     }).setOrigin(0.5);
 
+    // Le résultat surgit pour marquer la conséquence du choix
+    [panel, text].forEach(obj => {
+      obj.setScale(0.8).setAlpha(0);
+      this.tweens.add({ targets: obj, scale: 1, alpha: 1, duration: 220, ease: 'Back.Out' });
+    });
+
     makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 60, 'CONTINUER', () => {
+      if (isTransitioning(this)) return;
       gs.runManager.completeRoom({});
-      if (gs.runManager.state.isOver) {
-        this.scene.start('GameOver');
-      } else {
-        this.scene.start('RunMap');
-      }
+      transitionTo(this, gs.runManager.state.isOver ? 'GameOver' : 'RunMap');
     }, 220, 46);
   }
 }

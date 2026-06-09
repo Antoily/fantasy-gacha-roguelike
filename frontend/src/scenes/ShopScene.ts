@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
-import { makeButton, makePanel, makeTitle, rarityColor, showToast } from '../ui/UIManager';
+import { makeButton, makePanel, makeTitle, rarityColor, showToast, fadeIn, transitionTo, isTransitioning } from '../ui/UIManager';
 import { RELIC_POOL } from '../data/relics';
 import { HERO_POOL } from '../data/heroes';
 import { shuffle } from '../utils/random';
@@ -18,9 +18,11 @@ export class ShopScene extends Phaser.Scene {
 
   constructor() { super('Shop'); }
 
-  create(): void {
+  create(data?: { noFade?: boolean }): void {
     const run = window.gameState.runManager.state;
 
+    // Pas de fondu lors d'un restart (après achat) pour éviter un flash noir
+    if (!data?.noFade) fadeIn(this);
     this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'bg_shop').setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.55);
 
@@ -110,10 +112,11 @@ export class ShopScene extends Phaser.Scene {
     gs.runManager.applyRelic(relic);
     showToast(this, `${relic.name} obtenu !`);
     this.updateGold();
-    this.scene.restart();
+    this.scene.restart({ noFade: true });
   }
 
   private buyHero(): void {
+    if (isTransitioning(this)) return;
     const gs = window.gameState;
     const run = gs.runManager.state;
     if (!this.shopHero || run.gold < HERO_PRICE || run.heroes.length >= 5) {
@@ -123,7 +126,7 @@ export class ShopScene extends Phaser.Scene {
     run.gold -= HERO_PRICE;
     gs.runManager.completeRoom({ heroId: this.shopHero.id });
     showToast(this, `${this.shopHero.name} rejoint l\'équipe !`);
-    this.scene.start('RunMap');
+    transitionTo(this, 'RunMap');
   }
 
   private buyHeal(): void {
@@ -137,9 +140,10 @@ export class ShopScene extends Phaser.Scene {
   }
 
   private leave(): void {
+    if (isTransitioning(this)) return;
     const gs = window.gameState;
     gs.runManager.completeRoom({});
-    this.scene.start('RunMap');
+    transitionTo(this, 'RunMap');
   }
 
   private updateGold(): void {

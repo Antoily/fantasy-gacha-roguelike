@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
-import { makeButton, makeTitle } from '../ui/UIManager';
+import { makeButton, makeTitle, fadeIn, transitionTo } from '../ui/UIManager';
 import { TALENT_TREE } from '../data/talents';
 import type { TalentNode, TalentTrack } from '../data/talents';
 import { saveProgress } from './MainMenuScene';
@@ -20,10 +20,12 @@ const TRACK_LABELS: Record<TalentTrack, string> = {
 export class MetaScene extends Phaser.Scene {
   constructor() { super('Meta'); }
 
-  create(): void {
+  create(data?: { noFade?: boolean }): void {
     const gs = window.gameState;
     const tree = gs.talentTree;
 
+    // Pas de fondu lors d'un restart (déblocage de talent) pour éviter un flash noir
+    if (!data?.noFade) fadeIn(this);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.background);
     makeTitle(this, GAME_WIDTH / 2, 32, 'ARBRE DE TALENTS');
     this.add.text(GAME_WIDTH / 2, 58, `Points disponibles : ${tree.availablePoints}`, { ...FONTS.gold, align: 'center' }).setOrigin(0.5);
@@ -46,7 +48,7 @@ export class MetaScene extends Phaser.Scene {
       });
     });
 
-    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 44, '← RETOUR', () => this.scene.start('MainMenu'), 200, 44, 0x444455);
+    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 44, '← RETOUR', () => transitionTo(this, 'MainMenu'), 200, 44, 0x444455);
   }
 
   private drawNode(node: TalentNode, x: number, y: number, w: number): void {
@@ -79,7 +81,15 @@ export class MetaScene extends Phaser.Scene {
         bg.on('pointerdown', () => {
           if (tree.unlock(node.id)) {
             saveProgress();
-            this.scene.restart();
+            // Flash de déblocage avant le rafraîchissement de l'arbre
+            const flash = this.add.rectangle(bg.x, bg.y, bg.width, bg.height, trackColor, 0.6);
+            this.tweens.add({
+              targets: flash,
+              scaleX: 1.15, scaleY: 1.15,
+              fillAlpha: 0,
+              duration: 250,
+              onComplete: () => this.scene.restart({ noFade: true }),
+            });
           }
         });
         bg.on('pointerover', () => bg.setFillStyle(0x2a2a4a));

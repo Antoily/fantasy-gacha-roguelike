@@ -5,13 +5,25 @@ import { isHeroAlive, healHero } from '../entities/Hero';
 import { isEnemyAlive } from '../entities/Enemy';
 import { randInt } from '../utils/random';
 
+// Effet appliqué à une unité pendant une action — permet à la scène de combat
+// de rejouer le déroulement en animation (barres de PV, dégâts flottants, morts)
+export interface CombatEffect {
+  unitId: string;
+  kind: 'damage' | 'heal' | 'debuff' | 'mark' | 'revive';
+  amount: number;
+  hpAfter: number;
+}
+
 export interface CombatLogEntry {
   turn: number;
+  actorId: string;
+  actorSide: 'hero' | 'enemy';
   actorName: string;
   targetName: string;
   damage: number;
   heal: number;
   special: string;
+  effects: CombatEffect[];
 }
 
 export interface CombatResult {
@@ -25,6 +37,7 @@ interface CombatUnit {
   type: 'hero' | 'enemy';
   hero?: HeroInstance;
   enemy?: EnemyInstance;
+  get id(): string;
   get name(): string;
   get hp(): number;
   get maxHp(): number;
@@ -40,6 +53,7 @@ function wrapHero(h: HeroInstance): CombatUnit {
   return {
     type: 'hero',
     hero: h,
+    get id() { return h.instanceId; },
     get name() { return h.name; },
     get hp() { return h.currentHp; },
     get maxHp() { return h.maxHp; },
@@ -56,6 +70,7 @@ function wrapEnemy(e: EnemyInstance): CombatUnit {
   return {
     type: 'enemy',
     enemy: e,
+    get id() { return e.instanceId; },
     get name() { return e.name; },
     get hp() { return e.currentHp; },
     get maxHp() { return e.maxHp; },
@@ -150,7 +165,17 @@ export function resolveCombat(
       if (lH.length === 0 || lE.length === 0) break;
 
       turn++;
-      const entry: CombatLogEntry = { turn, actorName: actor.name, targetName: '', damage: 0, heal: 0, special: '' };
+      const entry: CombatLogEntry = {
+        turn,
+        actorId: actor.id,
+        actorSide: actor.type,
+        actorName: actor.name,
+        targetName: '',
+        damage: 0,
+        heal: 0,
+        special: '',
+        effects: [],
+      };
 
       if (actor.type === 'hero' && actor.hero) {
         const hero = actor.hero;
@@ -165,6 +190,7 @@ export function resolveCombat(
             entry.targetName = target.name;
             entry.heal = healAmt;
             entry.special = 'Lumière Sacrée';
+            entry.effects.push({ unitId: target.instanceId, kind: 'heal', amount: healAmt, hpAfter: target.currentHp });
             break;
           }
           case 'fireball': {
@@ -172,7 +198,10 @@ export function resolveCombat(
             const targetCol = lE[0].gridCol;
             const colEnemies = lE.filter(e => e.gridCol === targetCol);
             const dmgEach = calcDamage(Math.round(hero.atk * atkMultiplier), lE[0].def);
-            colEnemies.forEach(e => { e.currentHp = Math.max(0, e.currentHp - dmgEach); });
+            colEnemies.forEach(e => {
+              e.currentHp = Math.max(0, e.currentHp - dmgEach);
+              entry.effects.push({ unitId: e.instanceId, kind: 'damage', amount: dmgEach, hpAfter: e.currentHp });
+            });
             entry.targetName = `Colonne ${targetCol}`;
             entry.damage = dmgEach;
             entry.special = 'Boule de Feu';
@@ -189,6 +218,7 @@ export function resolveCombat(
             entry.targetName = target.name;
             entry.damage = dmg;
             entry.special = adjCount === 0 ? 'Backstab (isolé ×1.4)' : 'Backstab';
+            entry.effects.push({ unitId: target.instanceId, kind: 'damage', amount: dmg, hpAfter: target.currentHp });
             break;
           }
           case 'arcane_weave': {
@@ -197,6 +227,7 @@ export function resolveCombat(
             hAtk.atkDebuffPct = Math.min(100, (hAtk.atkDebuffPct ?? 0) + 20);
             entry.targetName = hAtk.name;
             entry.special = 'Tissage Arcane (-20% ATK)';
+            entry.effects.push({ unitId: hAtk.instanceId, kind: 'debuff', amount: 20, hpAfter: hAtk.currentHp });
             break;
           }
           case 'mark': {
@@ -205,19 +236,20 @@ export function resolveCombat(
             hHp.isMarked = true;
             entry.targetName = hHp.name;
             entry.special = 'Marqué (+15% dégâts équipe)';
+            entry.effects.push({ unitId: hHp.instanceId, kind: 'mark', amount: 0, hpAfter: hHp.currentHp });
             break;
           }
           default: {
-            // Standard attack — warrior taunt: prefer Aldric
-            const tauntHero = lH.find(h => h.abilityId === 'iron_shield' && isHeroAlive(h));
-            const target = tauntHero ?? lE[0];
+            // Attaque standard sur le premier ennemi vivant
+            const target = lE[0];
             const defPierce = hero.abilityId === 'piercing_shot' ? 50 : 0;
-            let dmg = calcDamage(Math.round(hero.atk * atkMultiplier), (target as EnemyInstance).def ?? lE[0].def, defPierce);
-            // Mark bonus
-            if ((target as EnemyInstance).isMarked) dmg = Math.round(dmg * 1.15);
-            applyDamage(wrapEnemy(lE.find(e => e.instanceId === (target as EnemyInstance).instanceId) ?? lE[0]), dmg, relics);
-            entry.targetName = (target as EnemyInstance).name ?? lE[0].name;
+            let dmg = calcDamage(Math.round(hero.atk * atkMultiplier), target.def, defPierce);
+            // Bonus de marque (capacité "mark")
+            if (target.isMarked) dmg = Math.round(dmg * 1.15);
+            applyDamage(wrapEnemy(target), dmg, relics);
+            entry.targetName = target.name;
             entry.damage = dmg;
+            entry.effects.push({ unitId: target.instanceId, kind: 'damage', amount: dmg, hpAfter: target.currentHp });
           }
         }
       } else if (actor.type === 'enemy' && actor.enemy) {
@@ -249,14 +281,14 @@ export function resolveCombat(
             }
             const dmgEach = calcDamage(enemy.atk, rowTargets[0]?.def ?? 10);
             rowTargets.forEach(h => {
-              const wrapped = wrapHero(h);
-              applyDamage(wrapped, dmgEach, relics);
+              const finalDmg = applyDamage(wrapHero(h), dmgEach, relics);
+              entry.effects.push({ unitId: h.instanceId, kind: 'damage', amount: finalDmg, hpAfter: h.currentHp });
             });
             entry.targetName = `Rang ${rowTargets[0]?.gridRow ?? 0}`;
             entry.damage = dmgEach;
             entry.special = 'Attaque de zone';
             log.push(entry);
-            checkRevive(heroes, relics, runReviveUsed);
+            checkRevive(heroes, relics, runReviveUsed, log, turn);
             continue;
           }
           case 'cycle_attacks':
@@ -279,10 +311,11 @@ export function resolveCombat(
         if (target.abilityId === 'iron_shield' && target.gridRow === 0) {
           dmg = Math.round(dmg * 0.65);
         }
-        applyDamage(wrapHero(target), dmg, relics);
+        const finalDmg = applyDamage(wrapHero(target), dmg, relics);
         entry.targetName = target.name;
-        entry.damage = dmg;
-        checkRevive(heroes, relics, runReviveUsed);
+        entry.damage = finalDmg;
+        entry.effects.push({ unitId: target.instanceId, kind: 'damage', amount: finalDmg, hpAfter: target.currentHp });
+        checkRevive(heroes, relics, runReviveUsed, log, turn);
       }
 
       log.push(entry);
@@ -334,7 +367,7 @@ function getHeroAtkMultiplier(hero: HeroInstance, relics: RelicDefinition[], liv
   return mult;
 }
 
-function checkRevive(heroes: HeroInstance[], relics: RelicDefinition[], runReviveUsed: boolean): void {
+function checkRevive(heroes: HeroInstance[], relics: RelicDefinition[], runReviveUsed: boolean, log: CombatLogEntry[], turn: number): void {
   if (runReviveUsed) return;
   const crystal = relics.find(r => r.id === 'void_crystal');
   if (!crystal) return;
@@ -342,6 +375,17 @@ function checkRevive(heroes: HeroInstance[], relics: RelicDefinition[], runReviv
     if (h.currentHp <= 0 && !h.reviveUsed) {
       h.currentHp = Math.round(h.maxHp * crystal.effectValue / 100);
       h.reviveUsed = true;
+      log.push({
+        turn,
+        actorId: h.instanceId,
+        actorSide: 'hero',
+        actorName: h.name,
+        targetName: h.name,
+        damage: 0,
+        heal: h.currentHp,
+        special: 'Cristal du Vide — résurrection',
+        effects: [{ unitId: h.instanceId, kind: 'revive', amount: h.currentHp, hpAfter: h.currentHp }],
+      });
       return; // only one revive per crystal activation
     }
   }

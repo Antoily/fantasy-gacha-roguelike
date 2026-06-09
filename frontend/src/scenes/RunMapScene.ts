@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
-import { makeButton, makePanel, makeTitle, makeHpBar } from '../ui/UIManager';
+import { makeButton, makePanel, makeTitle, makeHpBar, fadeIn, transitionTo, staggerIn, pulse } from '../ui/UIManager';
 import type { Room, RoomType } from '../systems/RunManager';
 
 const ROOM_ICONS: Record<RoomType, string> = {
@@ -26,6 +26,7 @@ export class RunMapScene extends Phaser.Scene {
     const gs = window.gameState;
     const run = gs.runManager.state;
 
+    fadeIn(this);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.background);
     makeTitle(this, GAME_WIDTH / 2, 35, `Zone ${run.zoneIndex + 1} — Salle ${run.currentRoomIndex + 1}/${run.rooms.length}`);
     this.add.text(GAME_WIDTH / 2, 62, `💰 ${run.gold} or`, { ...FONTS.gold, align: 'center' }).setOrigin(0.5);
@@ -62,6 +63,8 @@ export class RunMapScene extends Phaser.Scene {
 
     this.add.text(cx, startY - 18, 'Salles', { ...FONTS.small, align: 'center' }).setOrigin(0.5);
 
+    const rows: Phaser.GameObjects.Container[] = [];
+
     run.rooms.forEach((room, i) => {
       const y = startY + i * spacing;
       const isCurrent = i === run.currentRoomIndex;
@@ -70,31 +73,41 @@ export class RunMapScene extends Phaser.Scene {
       const color = isDone ? 0x333355 : (isCurrent ? COLORS.accent : COLORS.panel);
       const border = isCurrent ? COLORS.accentLight : (isDone ? 0x444466 : COLORS.panelBorder);
 
-      const bg = this.add.rectangle(cx, y, 280, 44, color, 0.9).setStrokeStyle(isCurrent ? 2 : 1, border);
+      // Chaque salle est un container : permet l'entrée en cascade et la pulsation
+      const row = this.add.container(cx, y);
+      const bg = this.add.rectangle(0, 0, 280, 44, color, 0.9).setStrokeStyle(isCurrent ? 2 : 1, border);
+      row.add(bg);
 
       if (isCurrent) {
-        this.add.text(cx - 100, y, '▶', { fontSize: '16px', color: '#b47cff' }).setOrigin(0.5);
+        const marker = this.add.text(-100, 0, '▶', { fontSize: '16px', color: '#b47cff' }).setOrigin(0.5);
+        row.add(marker);
+        // Le marqueur oscille pour guider l'œil vers la salle active
+        this.tweens.add({ targets: marker, x: -96, duration: 450, yoyo: true, repeat: -1, ease: 'Sine.InOut' });
       }
 
-      this.add.text(cx - 85, y, ROOM_ICONS[room.type], { fontSize: '18px' }).setOrigin(0.5);
-      this.add.text(cx - 55, y, ROOM_LABELS[room.type], {
+      row.add(this.add.text(-85, 0, ROOM_ICONS[room.type], { fontSize: '18px' }).setOrigin(0.5));
+      row.add(this.add.text(-55, 0, ROOM_LABELS[room.type], {
         ...FONTS.body,
         color: isDone ? '#555577' : '#ffffff',
-      }).setOrigin(0, 0.5);
+      }).setOrigin(0, 0.5));
 
       if (room.type === 'combat' && room.formation) {
-        this.add.text(cx + 60, y, room.formation.name, { ...FONTS.small, color: '#9999bb' }).setOrigin(0, 0.5);
+        row.add(this.add.text(60, 0, room.formation.name, { ...FONTS.small, color: '#9999bb' }).setOrigin(0, 0.5));
       }
 
       if (isDone) {
-        this.add.text(cx + 110, y, '✓', { fontSize: '16px', color: '#44cc44' }).setOrigin(0.5);
+        row.add(this.add.text(110, 0, '✓', { fontSize: '16px', color: '#44cc44' }).setOrigin(0.5));
       }
 
       if (isCurrent) {
         bg.setInteractive({ useHandCursor: true });
         bg.on('pointerdown', () => this.enterRoom(run.rooms[i]));
       }
+
+      rows.push(row);
     });
+
+    staggerIn(this, rows, 14, 45);
   }
 
   private drawRelics(): void {
@@ -120,7 +133,8 @@ export class RunMapScene extends Phaser.Scene {
     else if (room.type === 'shop') label = '🛒 Marchand';
     else if (room.type === 'rest') label = '🏕 Se reposer';
 
-    makeButton(this, GAME_WIDTH / 2, btnY, label, () => this.enterRoom(room), 260, 48, room.isBossRoom ? 0x881122 : COLORS.accent);
+    const btn = makeButton(this, GAME_WIDTH / 2, btnY, label, () => this.enterRoom(room), 260, 48, room.isBossRoom ? 0x881122 : COLORS.accent);
+    if (room.isBossRoom) pulse(this, btn, 1.04, 500);
   }
 
   private enterRoom(room: Room): void {
@@ -131,6 +145,6 @@ export class RunMapScene extends Phaser.Scene {
       rest: 'Rest',
       boss: 'Formation',
     }[room.type];
-    this.scene.start(target);
+    transitionTo(this, target);
   }
 }
