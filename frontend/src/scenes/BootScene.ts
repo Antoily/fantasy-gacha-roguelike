@@ -8,6 +8,7 @@ export class BootScene extends Phaser.Scene {
 
   preload(): void {
     this.createLoadingBar();
+    this.load.image('hero_aldric', 'assets/hero_aldric.png');
   }
 
   create(): void {
@@ -30,7 +31,6 @@ export class BootScene extends Phaser.Scene {
   private generatePlaceholderTextures(): void {
     // Hero portraits
     const heroColors: Record<string, number> = {
-      aldric: 0x4466cc,
       sylva: 0x44aa44,
       zara: 0xaa44aa,
       finn: 0xddcc44,
