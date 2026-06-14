@@ -149,7 +149,7 @@ Run en pilote automatique, lancé depuis le menu (bouton **« 🤖 RUN AUTO (+30
   via `this.time.delayedCall(...)` avec un **choix aléatoire** (`pickRandom`) :
   - `RunMapScene` → entre dans la salle courante · `FormationScene` → auto-placement + combat
   - `CombatScene` → lecture ×2 + « Continuer » automatique · `EventScene` → option au hasard
-  - `ShopScene` → achat aléatoire de relique abordable (60%) sinon sortie · `RestScene` → soin / entraînement / sortie au hasard
+  - `ShopScene` → achats aléatoires en une passe (50% par relique abordable + soin éventuel), **sans `scene.restart`**, puis sortie · `RestScene` → soin / entraînement / sortie au hasard
 - Un badge **« 🤖 AUTO »** est affiché en haut de chaque scène concernée.
 - Le bouton « Abandonner la run » de `RunMapScene` permet d'interrompre un run auto.
 

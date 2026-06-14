@@ -3,7 +3,7 @@ import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
 import { makeButton, makePanel, makeTitle, rarityColor, showToast, fadeIn, transitionTo, isTransitioning } from '../ui/UIManager';
 import { RELIC_POOL } from '../data/relics';
 import { HERO_POOL } from '../data/heroes';
-import { shuffle, pickRandom } from '../utils/random';
+import { shuffle } from '../utils/random';
 import type { RelicDefinition } from '../data/relics';
 import type { HeroDefinition } from '../data/heroes';
 
@@ -43,14 +43,31 @@ export class ShopScene extends Phaser.Scene {
   }
 
   private scheduleAuto(): void {
-    this.time.delayedCall(800, () => {
-      const run = window.gameState.runManager.state;
-      // 60% de chance d'acheter une relique abordable au hasard (le restart relance l'auto), sinon on quitte
-      if (this.shopRelics.length > 0 && run.gold >= RELIC_PRICE && Math.random() < 0.6) {
-        this.buyRelic(pickRandom(this.shopRelics));
-      } else {
-        this.leave();
+    // Achats aléatoires en une seule passe (sans scene.restart pour éviter une boucle
+    // de redémarrages de scène), puis sortie.
+    this.time.delayedCall(900, () => {
+      if (isTransitioning(this)) return;
+      const gs = window.gameState;
+      const run = gs.runManager.state;
+
+      // Chaque relique proposée a 50% de chances d'être achetée tant qu'il reste de l'or
+      this.shopRelics.forEach(relic => {
+        if (run.gold >= RELIC_PRICE && Math.random() < 0.5) {
+          run.gold -= RELIC_PRICE;
+          gs.runManager.applyRelic(relic);
+        }
+      });
+
+      // Soin si des héros sont blessés et qu'il reste de l'or
+      const injured = run.heroes.some(h => h.currentHp < h.maxHp);
+      if (injured && run.gold >= HEAL_PRICE && Math.random() < 0.5) {
+        run.gold -= HEAL_PRICE;
+        run.heroes.forEach(h => { h.currentHp = Math.min(h.maxHp, h.currentHp + 40); });
       }
+
+      this.updateGold();
+      // Court délai pour voir l'or se mettre à jour, puis on quitte le marchand
+      this.time.delayedCall(500, () => this.leave());
     });
   }
 
