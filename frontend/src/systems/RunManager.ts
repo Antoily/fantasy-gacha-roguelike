@@ -30,6 +30,7 @@ export interface RunState {
   victory: boolean;
   talentPointsEarned: number;
   runReviveUsed: boolean;
+  autoMode: boolean;    // run en pilote automatique : choix aléatoires + bonus d'or
 }
 
 const TOTAL_ZONES = 3;
@@ -76,6 +77,7 @@ export class RunManager {
     hasRevivePassive: boolean;
     reviveHpPct: number;
     extraHeroSlot: number;
+    autoMode?: boolean;
   }): RunState {
     const heroIds = STARTER_HERO_IDS.filter(id => opts.unlockedHeroIds.includes(id) || STARTER_HERO_IDS.includes(id));
     const heroes: HeroInstance[] = heroIds.map(id => {
@@ -113,6 +115,7 @@ export class RunManager {
       victory: false,
       talentPointsEarned: 0,
       runReviveUsed: false,
+      autoMode: opts.autoMode ?? false,
     };
 
     return this._state;
@@ -187,6 +190,8 @@ export class RunManager {
     let mult = 1;
     const gold = this.state.relics.find(r => r.id === 'gold_idol');
     if (gold) mult += gold.effectValue / 100;
+    // Mode auto : +30% d'or sur tous les gains de combat
+    if (this.state.autoMode) mult += 0.30;
     return mult;
   }
 }

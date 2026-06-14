@@ -41,6 +41,12 @@ export class RunMapScene extends Phaser.Scene {
     this.drawRoomMap();
     this.drawRelics();
     this.drawAbandonButton();
+
+    // Mode auto : on entre automatiquement dans la salle courante après un court délai
+    if (run.autoMode) {
+      this.add.text(GAME_WIDTH - MARGIN, 30, '🤖 AUTO', { ...FONTS.small, color: '#ffcc55' }).setOrigin(1, 0.5);
+      this.time.delayedCall(700, () => this.enterRoom(run.rooms[run.currentRoomIndex]));
+    }
   }
 
   private drawHeroPanel(): void {

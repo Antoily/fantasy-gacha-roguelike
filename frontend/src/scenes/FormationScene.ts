@@ -42,6 +42,12 @@ export class FormationScene extends Phaser.Scene {
     this.drawLegend();
 
     makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 38, 'LANCER LE COMBAT ▶', () => this.startCombat(), 260, 46);
+
+    // Mode auto : placement automatique (géré par startCombat) puis lancement du combat
+    if (run.autoMode) {
+      this.add.text(GAME_WIDTH - 10, 28, '🤖 AUTO', { ...FONTS.small, color: '#ffcc55' }).setOrigin(1, 0.5);
+      this.time.delayedCall(800, () => this.startCombat());
+    }
   }
 
   private drawEnemyPreview(formation: EnemyFormation): void {

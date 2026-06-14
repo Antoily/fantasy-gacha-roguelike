@@ -83,10 +83,11 @@ export class MainMenuScene extends Phaser.Scene {
 
   private drawButtons(): void {
     const buttons = [
-      makeButton(this, GAME_WIDTH / 2, 260, 'LANCER UN RUN', () => this.startRun(), 220, 50),
-      makeButton(this, GAME_WIDTH / 2, 330, 'GACHA', () => transitionTo(this, 'Gacha'), 220, 44, 0x553388),
-      makeButton(this, GAME_WIDTH / 2, 395, 'ARBRE DE TALENTS', () => transitionTo(this, 'Meta'), 220, 44, 0x335566),
-      makeButton(this, GAME_WIDTH / 2, 455, 'COLLECTION', () => transitionTo(this, 'Collection'), 220, 44, 0x335533),
+      makeButton(this, GAME_WIDTH / 2, 248, 'LANCER UN RUN', () => this.startRun(false), 220, 46),
+      makeButton(this, GAME_WIDTH / 2, 302, '🤖 RUN AUTO (+30% 💰)', () => this.startRun(true), 220, 44, 0x886622),
+      makeButton(this, GAME_WIDTH / 2, 356, 'GACHA', () => transitionTo(this, 'Gacha'), 220, 42, 0x553388),
+      makeButton(this, GAME_WIDTH / 2, 404, 'ARBRE DE TALENTS', () => transitionTo(this, 'Meta'), 220, 42, 0x335566),
+      makeButton(this, GAME_WIDTH / 2, 452, 'COLLECTION', () => transitionTo(this, 'Collection'), 220, 42, 0x335533),
     ];
     staggerIn(this, buttons, 20);
   }
@@ -99,7 +100,7 @@ export class MainMenuScene extends Phaser.Scene {
     this.add.text(GAME_WIDTH / 2, 578, `Meilleur run : Zone ${gs.bestRun.zonesCleared}`, { ...FONTS.small, align: 'center' }).setOrigin(0.5);
   }
 
-  private startRun(): void {
+  private startRun(auto: boolean): void {
     if (isTransitioning(this)) return;
     const gs = window.gameState;
     const bonuses = gs.talentTree.getBonuses();
@@ -123,6 +124,7 @@ export class MainMenuScene extends Phaser.Scene {
       hasRevivePassive: bonuses.hasRevivePassive,
       reviveHpPct: bonuses.reviveHpPct,
       extraHeroSlot: bonuses.extraHeroSlot,
+      autoMode: auto,
     });
 
     transitionTo(this, 'RunMap');
