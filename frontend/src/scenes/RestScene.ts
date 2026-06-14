@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
 import { makeButton, makePanel, makeTitle, makeHpBar, fadeIn, transitionTo, floatText } from '../ui/UIManager';
 import { isHeroAlive, healHero } from '../entities/Hero';
+import { pickRandom } from '../utils/random';
 
 const HEAL_AMOUNT = 35;
 const UPGRADE_STAT_BONUS = 8;
@@ -23,6 +24,34 @@ export class RestScene extends Phaser.Scene {
 
     this.drawHeroList();
     this.drawActions();
+
+    // Mode auto : action de repos choisie au hasard
+    if (window.gameState.runManager.state.autoMode) {
+      this.add.text(GAME_WIDTH - 10, 38, '🤖 AUTO', { ...FONTS.small, color: '#ffcc55' }).setOrigin(1, 0.5);
+      this.scheduleAuto();
+    }
+  }
+
+  private scheduleAuto(): void {
+    this.time.delayedCall(800, () => {
+      const action = pickRandom(['heal', 'upgrade', 'leave'] as const);
+      if (action === 'heal') this.healAll();
+      else if (action === 'upgrade') this.autoUpgrade();
+      else this.leave();
+    });
+  }
+
+  private autoUpgrade(): void {
+    if (this.leaving) return;
+    const gs = window.gameState;
+    const live = gs.runManager.state.heroes.filter(isHeroAlive);
+    if (live.length === 0) { this.leave(); return; }
+    this.leaving = true;
+    const hero = pickRandom(live);
+    hero.atk += UPGRADE_STAT_BONUS;
+    gs.runManager.completeRoom({});
+    floatText(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, `+${UPGRADE_STAT_BONUS} ATK`, '#bb88ff');
+    this.time.delayedCall(550, () => transitionTo(this, 'RunMap'));
   }
 
   private drawHeroList(): void {

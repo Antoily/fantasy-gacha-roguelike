@@ -58,6 +58,9 @@ export class CombatScene extends Phaser.Scene {
     const run = gs.runManager.state;
     const room = run.rooms[run.currentRoomIndex];
 
+    // Mode auto : lecture accélérée du combat (réinitialisée à chaque combat)
+    this.speed = run.autoMode ? 2 : 1;
+
     if (!room.formation) {
       this.scene.start('RunMap');
       return;
@@ -161,7 +164,7 @@ export class CombatScene extends Phaser.Scene {
   }
 
   private drawControls(): void {
-    this.speedBtn = this.add.text(GAME_WIDTH - 16, 24, '▶ ×1', {
+    this.speedBtn = this.add.text(GAME_WIDTH - 16, 24, `▶ ×${this.speed}`, {
       fontFamily: 'Arial', fontSize: '13px', color: '#9999bb',
     }).setOrigin(1, 0.5).setInteractive({ useHandCursor: true })
       .on('pointerdown', () => {
@@ -310,6 +313,7 @@ export class CombatScene extends Phaser.Scene {
     this.speedBtn?.destroy();
 
     const gs = window.gameState;
+    const auto = gs.runManager.state.autoMode;
     const cx = GAME_WIDTH / 2;
 
     const overlay = this.add.rectangle(cx, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0).setDepth(80);
@@ -347,7 +351,7 @@ export class CombatScene extends Phaser.Scene {
         onUpdate: () => goldText.setText(`+${Math.round(counter.value)} 💰`),
       });
 
-      makeButton(this, cx, GAME_HEIGHT - 55, 'CONTINUER ▶', () => {
+      const proceed = () => {
         if (isTransitioning(this)) return;
         gs.runManager.completeRoom({ gold: this.goldReward });
         if (gs.runManager.state.isOver || gs.runManager.heroesAllDead()) {
@@ -356,17 +360,22 @@ export class CombatScene extends Phaser.Scene {
         } else {
           transitionTo(this, 'RunMap');
         }
-      }, 240, 46).setDepth(82);
+      };
+      makeButton(this, cx, GAME_HEIGHT - 55, 'CONTINUER ▶', proceed, 240, 46).setDepth(82);
+      // Mode auto : on enchaîne sans attendre le clic
+      if (auto) this.time.delayedCall(1400, proceed);
     } else {
       this.cameras.main.shake(250, 0.008);
       this.add.text(cx, 335, 'Vos héros sont tombés.', { ...FONTS.small, align: 'center' })
         .setOrigin(0.5).setDepth(81);
 
-      makeButton(this, cx, GAME_HEIGHT - 55, 'FIN DU RUN', () => {
+      const end = () => {
         if (isTransitioning(this)) return;
         gs.runManager.endRun(false);
         transitionTo(this, 'GameOver');
-      }, 240, 46, 0x881122).setDepth(82);
+      };
+      makeButton(this, cx, GAME_HEIGHT - 55, 'FIN DU RUN', end, 240, 46, 0x881122).setDepth(82);
+      if (auto) this.time.delayedCall(1600, end);
     }
   }
 }

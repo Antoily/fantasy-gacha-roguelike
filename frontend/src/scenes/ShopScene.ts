@@ -3,7 +3,7 @@ import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
 import { makeButton, makePanel, makeTitle, rarityColor, showToast, fadeIn, transitionTo, isTransitioning } from '../ui/UIManager';
 import { RELIC_POOL } from '../data/relics';
 import { HERO_POOL } from '../data/heroes';
-import { shuffle } from '../utils/random';
+import { shuffle, pickRandom } from '../utils/random';
 import type { RelicDefinition } from '../data/relics';
 import type { HeroDefinition } from '../data/heroes';
 
@@ -34,6 +34,24 @@ export class ShopScene extends Phaser.Scene {
     this.drawHero();
     this.drawHeal();
     this.drawLeaveButton();
+
+    // Mode auto : achats aléatoires puis sortie
+    if (run.autoMode) {
+      this.add.text(GAME_WIDTH - 10, 20, '🤖 AUTO', { ...FONTS.small, color: '#ffcc55' }).setOrigin(1, 0.5);
+      this.scheduleAuto();
+    }
+  }
+
+  private scheduleAuto(): void {
+    this.time.delayedCall(800, () => {
+      const run = window.gameState.runManager.state;
+      // 60% de chance d'acheter une relique abordable au hasard (le restart relance l'auto), sinon on quitte
+      if (this.shopRelics.length > 0 && run.gold >= RELIC_PRICE && Math.random() < 0.6) {
+        this.buyRelic(pickRandom(this.shopRelics));
+      } else {
+        this.leave();
+      }
+    });
   }
 
   private generateShopItems(): void {

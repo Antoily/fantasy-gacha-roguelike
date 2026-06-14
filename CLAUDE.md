@@ -138,6 +138,21 @@ assets/
 
 ---
 
+## Mode auto (run automatique)
+
+Run en pilote automatique, lancé depuis le menu (bouton **« 🤖 RUN AUTO (+30% 💰) »**).
+
+- Flag `autoMode` dans `RunState` (passé via `RunManager.startRun({ autoMode })`).
+- **Bonus d'or** : `RunManager.getGoldMultiplier()` ajoute `+0.30` quand `autoMode`.
+  Comme l'or de run est reversé à 30% au méta-or en fin de run, le bonus se propage.
+- **Auto-pilotage** : chaque scène de run, si `run.autoMode`, déclenche son action
+  via `this.time.delayedCall(...)` avec un **choix aléatoire** (`pickRandom`) :
+  - `RunMapScene` → entre dans la salle courante · `FormationScene` → auto-placement + combat
+  - `CombatScene` → lecture ×2 + « Continuer » automatique · `EventScene` → option au hasard
+  - `ShopScene` → achat aléatoire de relique abordable (60%) sinon sortie · `RestScene` → soin / entraînement / sortie au hasard
+- Un badge **« 🤖 AUTO »** est affiché en haut de chaque scène concernée.
+- Le bouton « Abandonner la run » de `RunMapScene` permet d'interrompre un run auto.
+
 ## État global du jeu (runtime)
 
 `window.gameState` (défini dans `MainMenuScene.ts`) contient :

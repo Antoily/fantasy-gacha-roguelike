@@ -33,6 +33,12 @@ export class EventScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     this.drawChoices();
+
+    // Mode auto : on choisit une option au hasard
+    if (run.autoMode) {
+      this.add.text(GAME_WIDTH - 10, 22, '🤖 AUTO', { ...FONTS.small, color: '#ffcc55' }).setOrigin(1, 0.5);
+      this.time.delayedCall(900, () => this.applyChoice(pickRandom(this.event.choices)));
+    }
   }
 
   private drawChoices(): void {
@@ -105,10 +111,13 @@ export class EventScene extends Phaser.Scene {
       this.tweens.add({ targets: obj, scale: 1, alpha: 1, duration: 220, ease: 'Back.Out' });
     });
 
-    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 60, 'CONTINUER', () => {
+    const proceed = () => {
       if (isTransitioning(this)) return;
       gs.runManager.completeRoom({});
       transitionTo(this, gs.runManager.state.isOver ? 'GameOver' : 'RunMap');
-    }, 220, 46);
+    };
+    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 60, 'CONTINUER', proceed, 220, 46);
+    // Mode auto : on enchaîne après avoir montré le résultat
+    if (gs.runManager.state.autoMode) this.time.delayedCall(1200, proceed);
   }
 }
