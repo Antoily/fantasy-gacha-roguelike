@@ -1,11 +1,9 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
-import { makeButton, makeTitle, makePanel, fadeIn, transitionTo, staggerIn, isTransitioning } from '../ui/UIManager';
+import { makeButton, makeTitle, makePanel, fadeIn, transitionTo, staggerIn } from '../ui/UIManager';
 import { RunManager } from '../systems/RunManager';
 import { TalentTreeSystem } from '../systems/TalentTree';
 import { GachaSystem } from '../systems/GachaSystem';
-import { RELIC_POOL } from '../data/relics';
-import type { RelicDefinition } from '../data/relics';
 
 // Global game state shared across scenes via scene data / registry
 declare global {
@@ -83,8 +81,8 @@ export class MainMenuScene extends Phaser.Scene {
 
   private drawButtons(): void {
     const buttons = [
-      makeButton(this, GAME_WIDTH / 2, 248, 'LANCER UN RUN', () => this.startRun(false), 220, 46),
-      makeButton(this, GAME_WIDTH / 2, 302, '🤖 RUN AUTO (+30% 💰)', () => this.startRun(true), 220, 44, 0x886622),
+      makeButton(this, GAME_WIDTH / 2, 248, 'LANCER UN RUN', () => transitionTo(this, 'TeamSelect', { auto: false }), 220, 46),
+      makeButton(this, GAME_WIDTH / 2, 302, '🤖 RUN AUTO (+30% 💰)', () => transitionTo(this, 'TeamSelect', { auto: true }), 220, 44, 0x886622),
       makeButton(this, GAME_WIDTH / 2, 356, 'GACHA', () => transitionTo(this, 'Gacha'), 220, 42, 0x553388),
       makeButton(this, GAME_WIDTH / 2, 404, 'ARBRE DE TALENTS', () => transitionTo(this, 'Meta'), 220, 42, 0x335566),
       makeButton(this, GAME_WIDTH / 2, 452, 'COLLECTION', () => transitionTo(this, 'Collection'), 220, 42, 0x335533),
@@ -98,36 +96,6 @@ export class MainMenuScene extends Phaser.Scene {
     this.add.text(GAME_WIDTH / 2, 532, `Or total : ${gs.totalGold}`, { ...FONTS.gold, align: 'center' }).setOrigin(0.5);
     this.add.text(GAME_WIDTH / 2, 558, `Héros débloqués : ${gs.unlockedHeroIds.length}`, { ...FONTS.body, align: 'center' }).setOrigin(0.5);
     this.add.text(GAME_WIDTH / 2, 578, `Meilleur run : Zone ${gs.bestRun.zonesCleared}`, { ...FONTS.small, align: 'center' }).setOrigin(0.5);
-  }
-
-  private startRun(auto: boolean): void {
-    if (isTransitioning(this)) return;
-    const gs = window.gameState;
-    const bonuses = gs.talentTree.getBonuses();
-    const startRelicIds: string[] = [];
-
-    // Give start relics from talent (common relics only)
-    if (bonuses.startRelicCount > 0) {
-      const availableRelics = RELIC_POOL.filter((r: RelicDefinition) => r.rarity === 'common');
-      for (let i = 0; i < bonuses.startRelicCount && i < availableRelics.length; i++) {
-        startRelicIds.push(availableRelics[i].id);
-      }
-    }
-
-    gs.runManager.startRun({
-      unlockedHeroIds: gs.unlockedHeroIds,
-      hpBonus: bonuses.hpBonus,
-      atkPct: bonuses.atkPct,
-      goldBonusPct: bonuses.goldBonusPct,
-      startRelicIds,
-      startGold: bonuses.startGold,
-      hasRevivePassive: bonuses.hasRevivePassive,
-      reviveHpPct: bonuses.reviveHpPct,
-      extraHeroSlot: bonuses.extraHeroSlot,
-      autoMode: auto,
-    });
-
-    transitionTo(this, 'RunMap');
   }
 
   private loadProgress(): void {

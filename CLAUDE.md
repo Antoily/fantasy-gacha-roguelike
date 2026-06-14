@@ -138,6 +138,18 @@ assets/
 
 ---
 
+## Lancement d'un run & composition d'équipe
+
+- Lancer un run passe **toujours** par la scène **`TeamSelect`** (`TeamSelectScene.ts`).
+  Les boutons « LANCER UN RUN » / « RUN AUTO » (menu) et « NOUVEAU RUN » (game over)
+  font `transitionTo(this, 'TeamSelect', { auto })` — ils ne démarrent plus le run directement.
+- `TeamSelect` liste les **héros débloqués** (`gs.unlockedHeroIds`) ; le joueur en choisit
+  jusqu'à **`MAX_TEAM` (= 5)** (exporté par `RunManager.ts`), puis « LANCER ▶ ».
+- `RunManager.startRun({ teamHeroIds, ... })` construit l'équipe à partir de `teamHeroIds`
+  (héros valides uniquement, plafonné à `MAX_TEAM`, repli sur `STARTER_HERO_IDS` si vide).
+  ⚠️ Ne plus filtrer sur `STARTER_HERO_IDS` (ancien bug : seuls les starters étaient jouables).
+- `transitionTo(scene, key, data?, duration?)` accepte un `data` optionnel passé à `scene.start`.
+
 ## Mode auto (run automatique)
 
 Run en pilote automatique, lancé depuis le menu (bouton **« 🤖 RUN AUTO (+30% 💰) »**).
