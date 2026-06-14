@@ -5,6 +5,7 @@ import type { HeroInstance } from '../entities/Hero';
 import { isHeroAlive } from '../entities/Hero';
 import { getEnemyById } from '../data/enemies';
 import type { EnemyFormation } from '../data/enemies';
+import { shuffle } from '../utils/random';
 
 const CELL_SIZE = 72;
 const CELL_GAP = 6;
@@ -43,11 +44,28 @@ export class FormationScene extends Phaser.Scene {
 
     makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 38, 'LANCER LE COMBAT ▶', () => this.startCombat(), 260, 46);
 
-    // Mode auto : placement automatique (géré par startCombat) puis lancement du combat
+    // Mode auto : placement aléatoire visible, puis lancement du combat
     if (run.autoMode) {
       this.add.text(GAME_WIDTH - 10, 28, '🤖 AUTO', { ...FONTS.small, color: '#ffcc55' }).setOrigin(1, 0.5);
-      this.time.delayedCall(800, () => this.startCombat());
+      this.time.delayedCall(600, () => this.autoPlaceHeroes());
+      this.time.delayedCall(1100, () => this.startCombat());
     }
+  }
+
+  // Placement aléatoire des héros vivants sur des cases distinctes (mode auto).
+  // On remplit placedHeroes comme le ferait un clic, sinon startCombat réinitialise tout.
+  private autoPlaceHeroes(): void {
+    const live = window.gameState.runManager.state.heroes.filter(isHeroAlive);
+    const cells = shuffle(Array.from({ length: GRID_ROWS * GRID_COLS }, (_, i) => i));
+    live.forEach((hero, i) => {
+      const cell = cells[i];
+      const row = Math.floor(cell / GRID_COLS);
+      const col = cell % GRID_COLS;
+      this.placedHeroes[row][col] = hero;
+      hero.gridRow = row;
+      hero.gridCol = col;
+      this.refreshCell(row, col);
+    });
   }
 
   private drawEnemyPreview(formation: EnemyFormation): void {

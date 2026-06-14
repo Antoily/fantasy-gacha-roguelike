@@ -147,7 +147,7 @@ Run en pilote automatique, lancé depuis le menu (bouton **« 🤖 RUN AUTO (+30
   Comme l'or de run est reversé à 30% au méta-or en fin de run, le bonus se propage.
 - **Auto-pilotage** : chaque scène de run, si `run.autoMode`, déclenche son action
   via `this.time.delayedCall(...)` avec un **choix aléatoire** (`pickRandom`) :
-  - `RunMapScene` → entre dans la salle courante · `FormationScene` → auto-placement + combat
+  - `RunMapScene` → entre dans la salle courante · `FormationScene` → placement **aléatoire** des héros (cases distinctes) + combat
   - `CombatScene` → lecture ×2 + « Continuer » automatique · `EventScene` → option au hasard
   - `ShopScene` → achats aléatoires en une passe (50% par relique abordable + soin éventuel), **sans `scene.restart`**, puis sortie · `RestScene` → soin / entraînement / sortie au hasard
 - Un badge **« 🤖 AUTO »** est affiché en haut de chaque scène concernée.
