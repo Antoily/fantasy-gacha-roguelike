@@ -4,6 +4,20 @@ Instructions pour Claude Code. À lire entièrement avant toute action sur ce re
 
 ---
 
+## ⚠️ Règle prioritaire — Tenir ce fichier à jour
+
+**À chaque interaction avec l'utilisateur, mettre à jour ce `CLAUDE.md`** dès qu'une
+nouvelle instruction, préférence, convention ou décision durable apparaît :
+
+- Nouvelle consigne de l'utilisateur sur la façon de travailler → l'inscrire ici.
+- Nouvelle convention de code / layout / archi adoptée → la documenter dans la bonne section.
+- Changement de workflow, d'outil ou de priorité → mettre à jour la section concernée.
+
+Ne pas dupliquer ce que le code ou l'historique git disent déjà. Ce fichier est la
+mémoire partagée du projet : il doit refléter l'état réel des règles à tout moment.
+
+---
+
 ## Contexte du projet
 
 Jeu mobile **Fantasy Roguelike Gacha** — runs procéduraux + combat tactique sur grille + gacha héros/reliques.
@@ -152,6 +166,27 @@ Sauvegarde serveur : `apiClient.saveProgress()` — appeler après chaque modifi
 - **Pas de `require()` dynamique** dans les scènes — utiliser les imports statiques en haut de fichier
 - **Commentaires** : en français, expliquer le "pourquoi" pas le "quoi"
 - **Nouvelles données** (héros, reliques, events) : ajouter dans `data/`, jamais hardcodées dans les scènes
+
+### Layout des scènes (écran 360×640)
+
+- **Grille de marge unique** : marge latérale `MARGIN = 16px`, largeur de contenu
+  `CONTENT_W = 328px`. Tous les blocs principaux (panneaux, listes, boutons pleine
+  largeur) partagent cette largeur et cette marge — pas de largeurs ad hoc.
+- **Labels de section** alignés à gauche sur la marge (`x = MARGIN`), suffixe `:`
+  (« Équipe : », « Salles : », « Reliques : »), avec **~9–10px d'écart** entre le
+  label et la boîte qu'il introduit.
+- **Contenu d'une carte/élément** : centrer verticalement dans son conteneur (ne pas
+  coller en haut). Positionner les éléments internes par rapport aux bords du cadre,
+  pas en coordonnées absolues en dur.
+- Noms longs (formations, etc.) : aligner à droite (`setOrigin(1, …)`) pour éviter
+  tout débordement du cadre.
+- `RunMapScene` sert de référence pour ces conventions.
+
+### Quitter une run
+
+`RunMapScene` expose un bouton **« ✕ Abandonner la run »** (modale de confirmation →
+retour à `MainMenu`). Abandonner = run perdu, aucune sauvegarde méta. Toute nouvelle
+scène de run doit offrir un moyen clair de revenir au menu.
 
 ---
 
