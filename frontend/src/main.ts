@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS } from './config';
 import { BootScene } from './scenes/BootScene';
 import { MainMenuScene } from './scenes/MainMenuScene';
+import { TeamSelectScene } from './scenes/TeamSelectScene';
 import { RunMapScene } from './scenes/RunMapScene';
 import { FormationScene } from './scenes/FormationScene';
 import { CombatScene } from './scenes/CombatScene';
@@ -31,6 +32,7 @@ const config: Phaser.Types.Core.GameConfig = {
   scene: [
     BootScene,
     MainMenuScene,
+    TeamSelectScene,
     RunMapScene,
     FormationScene,
     CombatScene,

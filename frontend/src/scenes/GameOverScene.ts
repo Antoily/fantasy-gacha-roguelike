@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, FONTS } from '../config';
-import { makeButton, makePanel, makeTitle, fadeIn, transitionTo, staggerIn, countUp, isTransitioning } from '../ui/UIManager';
+import { makeButton, makePanel, makeTitle, fadeIn, transitionTo, staggerIn, countUp } from '../ui/UIManager';
 import { saveProgress } from './MainMenuScene';
 import { apiClient } from '../api/apiClient';
 
@@ -70,22 +70,8 @@ export class GameOverScene extends Phaser.Scene {
 
     makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 60, 'MENU PRINCIPAL', () => transitionTo(this, 'MainMenu'), 240, 48,
       victory ? 0x335533 : 0x553333);
-    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 108, 'NOUVEAU RUN', () => {
-      if (isTransitioning(this)) return;
-      const bonuses = gs.talentTree.getBonuses();
-      gs.runManager.startRun({
-        unlockedHeroIds: gs.unlockedHeroIds,
-        hpBonus: bonuses.hpBonus,
-        atkPct: bonuses.atkPct,
-        goldBonusPct: bonuses.goldBonusPct,
-        startRelicIds: [],
-        startGold: bonuses.startGold,
-        hasRevivePassive: bonuses.hasRevivePassive,
-        reviveHpPct: bonuses.reviveHpPct,
-        extraHeroSlot: bonuses.extraHeroSlot,
-      });
-      transitionTo(this, 'RunMap');
-    }, 240, 40);
+    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 108, 'NOUVEAU RUN',
+      () => transitionTo(this, 'TeamSelect', { auto: false }), 240, 40);
   }
 
   private drawStats(zones: number, rooms: number, pts: number, gold: number): void {

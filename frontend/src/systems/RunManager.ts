@@ -34,6 +34,7 @@ export interface RunState {
 }
 
 const TOTAL_ZONES = 3;
+export const MAX_TEAM = 5;    // taille maximale d'une équipe de run
 
 function generateZoneRooms(_zoneIdx: number, _isFinalZone: boolean): Room[] {
   const roomTypes: RoomType[] = ['combat', 'combat', 'combat', 'combat', 'event', 'shop', 'rest', 'combat'];
@@ -68,7 +69,7 @@ export class RunManager {
   get isActive(): boolean { return this._state !== null && !this._state.isOver; }
 
   startRun(opts: {
-    unlockedHeroIds: string[];
+    teamHeroIds: string[];
     hpBonus: number;
     atkPct: number;
     goldBonusPct: number;
@@ -79,7 +80,9 @@ export class RunManager {
     extraHeroSlot: number;
     autoMode?: boolean;
   }): RunState {
-    const heroIds = STARTER_HERO_IDS.filter(id => opts.unlockedHeroIds.includes(id) || STARTER_HERO_IDS.includes(id));
+    // Équipe choisie par le joueur (repli sur les starters si vide), héros valides uniquement, plafonnée
+    const wanted = opts.teamHeroIds.length > 0 ? opts.teamHeroIds : STARTER_HERO_IDS;
+    const heroIds = wanted.filter(id => getHeroById(id) !== undefined).slice(0, MAX_TEAM);
     const heroes: HeroInstance[] = heroIds.map(id => {
       const def = getHeroById(id)!;
       return createHeroInstance(def, opts.hpBonus, opts.atkPct, 0);

@@ -22,11 +22,11 @@ export function isTransitioning(scene: Phaser.Scene): boolean {
 
 // Transition vers une autre scène avec fondu de sortie.
 // Ignore les appels pendant un fondu déjà en cours (anti double-clic).
-export function transitionTo(scene: Phaser.Scene, key: string, duration: number = ANIM.sceneFade): void {
+export function transitionTo(scene: Phaser.Scene, key: string, data?: object, duration: number = ANIM.sceneFade): void {
   const cam = scene.cameras.main;
   if (cam.fadeEffect.isRunning) return;
   cam.fadeOut(duration, 13, 13, 26);
-  cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => scene.scene.start(key));
+  cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => scene.scene.start(key, data));
 }
 
 export function makeButton(
