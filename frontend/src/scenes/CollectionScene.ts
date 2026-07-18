@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, FONT_FAMILY, STROKE } from '../config';
-import { makeButton, makePanel, makeTitle, rarityColor, rarityLabel, fadeIn, transitionTo } from '../ui/UIManager';
+import { makeButton, makePanel, makeTitle, makeSortBar, attachScroll, rarityColor, rarityLabel, fadeIn, transitionTo } from '../ui/UIManager';
+import type { ScrollHandle } from '../ui/UIManager';
+import { HERO_SORTS, sortHeroes } from '../data/heroSort';
 import { HERO_POOL, HeroDefinition, ROLE_ICONS, ROLE_LABELS } from '../data/heroes';
 
 const ROW_LABELS: Record<string, string> = {
@@ -9,22 +11,26 @@ const ROW_LABELS: Record<string, string> = {
 
 export class CollectionScene extends Phaser.Scene {
   private modalContainer: Phaser.GameObjects.Container | null = null;
-  // Vrai si le pointeur a glissé : sert à distinguer défilement et clic sur une carte
-  private dragged = false;
+  private scroll: ScrollHandle | null = null;
+  private sortId = HERO_SORTS[0].id;
 
   constructor() { super('Collection'); }
 
-  create(): void {
+  create(data?: { sortId?: string }): void {
     const gs = window.gameState;
 
     this.modalContainer = null;
-    this.dragged = false;
+    this.scroll = null;
+    // La scène se relance au changement de tri : on reprend le critère choisi
+    this.sortId = data?.sortId ?? HERO_SORTS[0].id;
     fadeIn(this);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.background);
     makeTitle(this, GAME_WIDTH / 2, 32, '📚 COLLECTION');
     this.add.text(GAME_WIDTH / 2, 58, `${gs.unlockedHeroIds.length}/${HERO_POOL.length} héros débloqués`, {
       ...FONTS.body, align: 'center',
     }).setOrigin(0.5);
+
+    makeSortBar(this, 84, HERO_SORTS, this.sortId, id => this.scene.restart({ sortId: id }));
 
     const perRow = 3;
     const cardW = 100, cardH = 140;
@@ -33,11 +39,11 @@ export class CollectionScene extends Phaser.Scene {
     // Toutes les cartes vivent dans un conteneur déplaçable verticalement.
     const grid = this.add.container(0, 0);
 
-    HERO_POOL.forEach((hero, i) => {
+    sortHeroes(HERO_POOL, this.sortId).forEach((hero, i) => {
       const col = i % perRow;
       const row = Math.floor(i / perRow);
       const x = padX + col * (cardW + 8);
-      const y = 90 + row * (cardH + 8);
+      const y = 112 + row * (cardH + 8);
       const unlocked = gs.unlockedHeroIds.includes(hero.id);
       const color = rarityColor(hero.rarity);
 
@@ -62,7 +68,10 @@ export class CollectionScene extends Phaser.Scene {
         border.setInteractive({ useHandCursor: true })
           .on('pointerover', () => border.setStrokeStyle(STROKE.thick, COLORS.ink))
           .on('pointerout', () => border.setStrokeStyle(STROKE.base, color))
-          .on('pointerup', () => { if (!this.dragged) this.openModal(hero); });
+          .on('pointerup', (pointer: Phaser.Input.Pointer) => {
+            if (this.scroll?.wasDragged() || !this.scroll?.isInView(pointer.y)) return;
+            this.openModal(hero);
+          });
       } else {
         grid.add(this.add.text(x, y + 55, '?', { fontFamily: FONT_FAMILY, fontSize: '36px', fontStyle: 'bold', color: CSS.textFaint }).setOrigin(0.5));
         grid.add(this.add.text(x, y + 90, '???', { ...FONTS.small, color: CSS.textFaint }).setOrigin(0.5));
@@ -73,47 +82,9 @@ export class CollectionScene extends Phaser.Scene {
     });
 
     const rows = Math.ceil(HERO_POOL.length / perRow);
-    this.setupScroll(grid, 90 + rows * (cardH + 8));
+    this.scroll = attachScroll(this, grid, 100, GAME_HEIGHT - 62, 112 + rows * (cardH + 8));
 
     makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 38, '← RETOUR', () => transitionTo(this, 'MainMenu'), 200, 40, COLORS.btn.neutral);
-  }
-
-  // Défilement vertical : glisser au doigt ou molette, borné au contenu.
-  // Un masque évite que les cartes débordent sur l'en-tête et sur le bouton retour.
-  private setupScroll(grid: Phaser.GameObjects.Container, contentBottom: number): void {
-    const viewTop = 78;
-    const viewBottom = GAME_HEIGHT - 62;
-    const maxScroll = Math.max(0, contentBottom - viewBottom);
-
-    const maskShape = this.make.graphics({});
-    maskShape.fillRect(0, viewTop, GAME_WIDTH, viewBottom - viewTop);
-    grid.setMask(maskShape.createGeometryMask());
-
-    if (maxScroll === 0) return;
-
-    const apply = (y: number) => { grid.y = Phaser.Math.Clamp(y, -maxScroll, 0); };
-
-    this.input.on('wheel', (_p: unknown, _o: unknown, _dx: number, dy: number) => apply(grid.y - dy * 0.6));
-
-    let startPointerY = 0;
-    let startGridY = 0;
-    this.input.on('pointerdown', (p: Phaser.Input.Pointer) => {
-      startPointerY = p.y;
-      startGridY = grid.y;
-      this.dragged = false;
-    });
-    this.input.on('pointermove', (p: Phaser.Input.Pointer) => {
-      if (!p.isDown) return;
-      const delta = p.y - startPointerY;
-      // Seuil : en deçà, c'est un appui sur une carte, pas un défilement
-      if (Math.abs(delta) > 6) this.dragged = true;
-      if (this.dragged) apply(startGridY + delta);
-    });
-
-    // Indice de défilement, visible seulement s'il y a de quoi défiler
-    this.add.text(GAME_WIDTH - 8, viewBottom - 2, '↕', {
-      ...FONTS.small, color: CSS.textFaint, fontSize: '16px',
-    }).setOrigin(1, 1);
   }
 
   private openModal(hero: HeroDefinition): void {

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS } from '../config';
+import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
 import { makeButton, makeTitle, makePanel, fadeIn, transitionTo, staggerIn } from '../ui/UIManager';
 import { RunManager } from '../systems/RunManager';
 import { GachaSystem } from '../systems/GachaSystem';
@@ -89,17 +89,12 @@ export class MainMenuScene extends Phaser.Scene {
   private drawButtons(): void {
     const buttons = [
       makeButton(this, GAME_WIDTH / 2, 248, 'LANCER UN RUN', () => transitionTo(this, 'TeamSelect', { auto: false }), 220, 46),
-      makeButton(this, GAME_WIDTH / 2, 302, '🤖 RUN AUTO (+30% 💰)', () => transitionTo(this, 'TeamSelect', { auto: true }), 220, 44, COLORS.btn.gold),
+      makeButton(this, GAME_WIDTH / 2, 302, 'RUN AUTO (+30% 💰)', () => transitionTo(this, 'TeamSelect', { auto: true }), 220, 50, COLORS.btn.gold, 'Choix aléatoire'),
       makeButton(this, GAME_WIDTH / 2, 356, 'GACHA', () => transitionTo(this, 'Gacha'), 220, 42, COLORS.btn.magic),
       makeButton(this, GAME_WIDTH / 2, 404, 'COLLECTION', () => transitionTo(this, 'Collection'), 220, 42, COLORS.btn.success),
     ];
     staggerIn(this, buttons, 20);
 
-    // Le run auto tranche à notre place, et au hasard : il faut le dire avant
-    // que le joueur lance un run et découvre des choix qu'il n'a pas faits.
-    this.add.text(GAME_WIDTH / 2, 328, 'Le run auto joue seul et fait des choix au hasard', {
-      ...FONTS.small, fontSize: '10px', align: 'center', color: CSS.textDim,
-    }).setOrigin(0.5);
   }
 
   private drawStats(): void {

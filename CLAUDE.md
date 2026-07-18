@@ -298,6 +298,31 @@ couleur francs, **gros contours noirs**, typo arrondie en gras.
   jamais un voile noir : le noir vire au brun sur le fond crème.
 - `makeButton` produit un bouton cerné de noir avec **ombre portée pleine** décalée ;
   `makePanel` un panneau blanc à contour noir. Ne pas redessiner de boutons à la main.
+  Son dernier paramètre optionnel `subtitle` rend une seconde ligne **à l'intérieur**
+  du bouton : une explication qui accompagne un bouton doit tenir dans sa case.
+
+### Listes défilables et tri
+
+Deux écrans servent à comparer des héros (collection, composition d'équipe) et
+partagent leurs briques :
+
+- `attachScroll(scene, container, viewTop, viewBottom, contentBottom)` rend un
+  conteneur défilable (glisser + molette), le masque et renvoie un `ScrollHandle`.
+- `makeSortBar(scene, y, options, activeId, onChange)` affiche les puces de tri.
+  Les critères vivent dans `data/heroSort.ts` (`HERO_SORTS`, `sortHeroes`) —
+  ajouter un tri là, pas dans une scène.
+- Changer de tri **relance la scène** (`scene.restart`) en lui repassant `sortId`
+  (et la sélection en cours pour `TeamSelect`) : ne rien faire perdre au joueur.
+
+⚠️ **Phaser ignore les masques pour la détection des clics.** Une carte sortie du
+cadre par le défilement continue d'intercepter les appuis dans l'en-tête ou le
+pied de page — un clic sur la barre de tri sélectionnait un héros invisible.
+Deux protections, à conserver ensemble :
+1. tout gestionnaire de carte filtre avec `scroll.isInView(pointer.y)` ;
+2. l'UI fixe posée sur la zone défilante (barre de tri) est au-dessus via `setDepth`.
+
+Les cartes réagissent sur **`pointerup`**, jamais `pointerdown` : sinon un
+glissement de défilement déclenche une sélection au passage.
 
 ### Layout des scènes (écran 360×640)
 

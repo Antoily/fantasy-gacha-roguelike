@@ -51,6 +51,8 @@ export function makeButton(
   width = 200,
   height = 44,
   color: number = COLORS.accent,
+  // Ligne secondaire rendue À L'INTÉRIEUR du bouton, sous le libellé
+  subtitle?: string,
 ): Phaser.GameObjects.Container {
   const container = scene.add.container(x, y);
   // Ombre pleine décalée : donne le relief « autocollant » du style BD
@@ -58,8 +60,14 @@ export function makeButton(
   const bg = scene.add.rectangle(0, 0, width, height, color, 1)
     .setStrokeStyle(STROKE.base, COLORS.ink)
     .setInteractive({ useHandCursor: true });
-  const text = scene.add.text(0, 0, label, { ...FONTS.button, align: 'center' }).setOrigin(0.5);
+  const text = scene.add.text(0, subtitle ? -8 : 0, label, { ...FONTS.button, align: 'center' }).setOrigin(0.5);
   container.add([shadow, bg, text]);
+
+  if (subtitle) {
+    container.add(scene.add.text(0, 11, subtitle, {
+      ...FONTS.button, fontSize: '11px', strokeThickness: 3, align: 'center',
+    }).setOrigin(0.5));
+  }
 
   bg.on('pointerover', () => {
     bg.setFillStyle(lighten(color));
@@ -85,6 +93,93 @@ export function makeButton(
   bg.on('pointerup', () => bg.setFillStyle(color));
 
   return container;
+}
+
+// Rend un conteneur défilable verticalement (glisser au doigt + molette), borné
+// au contenu et masqué à la zone visible. Utilisé partout où une liste de héros
+// dépasse l'écran — collection et composition d'équipe.
+export interface ScrollHandle {
+  // Vrai si le dernier appui était un glissement : à tester avant d'ouvrir une
+  // fiche sur 'pointerup', sinon chaque défilement déclenche un clic.
+  wasDragged: () => boolean;
+  // Phaser ne tient PAS compte du masque pour la détection des clics : une carte
+  // défilée hors du cadre continue d'intercepter les appuis dans l'en-tête ou le
+  // pied de page. Tout gestionnaire de carte doit filtrer avec ceci.
+  isInView: (y: number) => boolean;
+}
+
+export function attachScroll(
+  scene: Phaser.Scene,
+  container: Phaser.GameObjects.Container,
+  viewTop: number,
+  viewBottom: number,
+  contentBottom: number,
+): ScrollHandle {
+  const maskShape = scene.make.graphics({});
+  maskShape.fillRect(0, viewTop, GAME_WIDTH, viewBottom - viewTop);
+  container.setMask(maskShape.createGeometryMask());
+
+  const isInView = (y: number) => y >= viewTop && y <= viewBottom;
+  const maxScroll = Math.max(0, contentBottom - viewBottom);
+  let dragged = false;
+  if (maxScroll === 0) return { wasDragged: () => false, isInView };
+
+  const apply = (y: number) => { container.y = Phaser.Math.Clamp(y, -maxScroll, 0); };
+
+  scene.input.on('wheel', (_p: unknown, _o: unknown, _dx: number, dy: number) => apply(container.y - dy * 0.6));
+
+  let startPointerY = 0;
+  let startY = 0;
+  scene.input.on('pointerdown', (p: Phaser.Input.Pointer) => {
+    startPointerY = p.y;
+    startY = container.y;
+    dragged = false;
+  });
+  scene.input.on('pointermove', (p: Phaser.Input.Pointer) => {
+    if (!p.isDown) return;
+    const delta = p.y - startPointerY;
+    // Seuil : en deçà, c'est un appui sur une carte, pas un défilement
+    if (Math.abs(delta) > 6) dragged = true;
+    if (dragged) apply(startY + delta);
+  });
+
+  scene.add.text(GAME_WIDTH - 6, viewBottom - 2, '↕', {
+    ...FONTS.small, color: CSS.textFaint, fontSize: '16px',
+  }).setOrigin(1, 1).setDepth(5);
+
+  return { wasDragged: () => dragged, isInView };
+}
+
+// Au-dessus des cartes défilables : sans ça, une carte sortie du cadre par le
+// défilement capte le clic à la place de la puce de tri.
+const SORT_BAR_DEPTH = 20;
+
+// Barre de tri : une puce par critère, la puce active est pleine.
+// Rappelle `onChange` avec l'id choisi.
+export function makeSortBar(
+  scene: Phaser.Scene,
+  y: number,
+  options: { id: string; label: string }[],
+  activeId: string,
+  onChange: (id: string) => void,
+): void {
+  const MARGIN = 16;
+  const gap = 6;
+  const w = (GAME_WIDTH - MARGIN * 2 - gap * (options.length - 1)) / options.length;
+
+  options.forEach((opt, i) => {
+    const x = MARGIN + w / 2 + i * (w + gap);
+    const active = opt.id === activeId;
+    const bg = scene.add.rectangle(x, y, w, 26, active ? COLORS.accent : COLORS.panel)
+      .setStrokeStyle(STROKE.thin, COLORS.ink)
+      .setDepth(SORT_BAR_DEPTH)
+      .setInteractive({ useHandCursor: true });
+    scene.add.text(x, y, opt.label, {
+      ...FONTS.small, fontSize: '11px',
+      color: active ? CSS.textLight : CSS.text,
+    }).setOrigin(0.5).setDepth(SORT_BAR_DEPTH);
+    if (!active) bg.on('pointerup', () => onChange(opt.id));
+  });
 }
 
 export function makePanel(
