@@ -1,18 +1,17 @@
 import type { HeroDefinition, Rarity } from '../data/heroes';
-import type { RelicDefinition } from '../data/relics';
 import { HERO_POOL, getHeroesByRarity } from '../data/heroes';
-import { RELIC_POOL, getRelicsByRarity } from '../data/relics';
 import { weightedPick } from '../utils/random';
 
 export const PITY_THRESHOLD = 80;
 
-export type GachaPullType = 'hero' | 'relic';
-
+// Le gacha ne distribue que des héros : c'est la seule progression méta du jeu,
+// et le seul endroit d'où vient la puissance (via de meilleurs personnages).
 export interface GachaPullResult {
-  type: GachaPullType;
   rarity: Rarity;
-  heroDefinition?: HeroDefinition;
-  relicDefinition?: RelicDefinition;
+  heroDefinition: HeroDefinition;
+  // Vrai si le héros était déjà débloqué — le tirage est alors converti en or
+  isDuplicate: boolean;
+  goldRefund: number;
   isPity: boolean;
 }
 
@@ -25,6 +24,15 @@ const RARITY_WEIGHTS: Record<Rarity, number> = {
 
 const RARITY_ORDER: Rarity[] = ['common', 'rare', 'epic', 'legendary'];
 
+// Un doublon ne doit pas être une déception sèche : il rend de l'or,
+// donc il rapproche du prochain tirage.
+const DUPLICATE_REFUND: Record<Rarity, number> = {
+  common: 10,
+  rare: 20,
+  epic: 40,
+  legendary: 80,
+};
+
 export class GachaSystem {
   private pullCount = 0;
   private pityCap: number;
@@ -36,7 +44,7 @@ export class GachaSystem {
   get currentPullCount(): number { return this.pullCount; }
   get pullsUntilPity(): number { return this.pityCap - this.pullCount; }
 
-  pull(unlockedHeroIds: string[], ownedRelicIds: string[]): GachaPullResult {
+  pull(unlockedHeroIds: string[]): GachaPullResult {
     this.pullCount++;
     const isPity = this.pullCount >= this.pityCap;
     const rarity: Rarity = isPity
@@ -45,30 +53,31 @@ export class GachaSystem {
 
     if (isPity) this.pullCount = 0;
 
-    // 50/50 hero vs relic, but prefer heroes if not all unlocked
-    const allHeroes = getHeroesByRarity(rarity);
-    const allRelics = getRelicsByRarity(rarity);
-    const availableHeroes = allHeroes.filter(h => !unlockedHeroIds.includes(h.id));
-    const availableRelics = allRelics.filter(r => !ownedRelicIds.includes(r.id));
+    const all = getHeroesByRarity(rarity);
+    const locked = all.filter(h => !unlockedHeroIds.includes(h.id));
+    // On privilégie toujours un héros non débloqué : le joueur doit sentir
+    // que tirer élargit vraiment son choix d'équipe.
+    const pool = locked.length > 0 ? locked : all;
+    const hero = pool[Math.floor(Math.random() * pool.length)];
+    const isDuplicate = locked.length === 0;
 
-    // Force hero if there are still unacquired heroes
-    const forceHero = availableHeroes.length > 0 && Math.random() < 0.5;
-
-    if (forceHero || availableRelics.length === 0) {
-      const pool = availableHeroes.length > 0 ? availableHeroes : allHeroes;
-      const hero = pool[Math.floor(Math.random() * pool.length)];
-      return { type: 'hero', rarity, heroDefinition: hero, isPity };
-    } else {
-      const pool = availableRelics.length > 0 ? availableRelics : allRelics;
-      const relic = pool[Math.floor(Math.random() * pool.length)];
-      return { type: 'relic', rarity, relicDefinition: relic, isPity };
-    }
+    return {
+      rarity,
+      heroDefinition: hero,
+      isDuplicate,
+      goldRefund: isDuplicate ? DUPLICATE_REFUND[rarity] : 0,
+      isPity,
+    };
   }
 
-  pullMulti(count: number, unlockedHeroIds: string[], ownedRelicIds: string[]): GachaPullResult[] {
+  pullMulti(count: number, unlockedHeroIds: string[]): GachaPullResult[] {
     const results: GachaPullResult[] = [];
+    // Copie locale : deux tirages d'une même salve ne doivent pas rendre le même héros
+    const unlocked = [...unlockedHeroIds];
     for (let i = 0; i < count; i++) {
-      results.push(this.pull(unlockedHeroIds, ownedRelicIds));
+      const r = this.pull(unlocked);
+      if (!r.isDuplicate) unlocked.push(r.heroDefinition.id);
+      results.push(r);
     }
     return results;
   }
@@ -86,4 +95,4 @@ export class GachaSystem {
   }
 }
 
-export { HERO_POOL, RELIC_POOL };
+export { HERO_POOL };

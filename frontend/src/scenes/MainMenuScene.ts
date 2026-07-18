@@ -2,8 +2,8 @@ import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
 import { makeButton, makeTitle, makePanel, fadeIn, transitionTo, staggerIn } from '../ui/UIManager';
 import { RunManager } from '../systems/RunManager';
-import { TalentTreeSystem } from '../systems/TalentTree';
 import { GachaSystem } from '../systems/GachaSystem';
+import { STARTER_HERO_IDS } from '../data/heroes';
 
 // Global game state shared across scenes via scene data / registry
 declare global {
@@ -14,10 +14,8 @@ declare global {
 
 export interface GameState {
   runManager: RunManager;
-  talentTree: TalentTreeSystem;
   gacha: GachaSystem;
   unlockedHeroIds: string[];
-  ownedRelicIds: string[];
   totalGold: number;  // persistent gold (separate from run gold)
   bestRun: { zonesCleared: number; roomsCleared: number };
 }
@@ -29,10 +27,8 @@ export class MainMenuScene extends Phaser.Scene {
     if (!window.gameState) {
       window.gameState = {
         runManager: new RunManager(),
-        talentTree: new TalentTreeSystem(),
         gacha: new GachaSystem(),
-        unlockedHeroIds: ['aldric', 'sylva'],
-        ownedRelicIds: [],
+        unlockedHeroIds: [...STARTER_HERO_IDS],
         totalGold: 0,
         bestRun: { zonesCleared: 0, roomsCleared: 0 },
       };
@@ -94,8 +90,7 @@ export class MainMenuScene extends Phaser.Scene {
       makeButton(this, GAME_WIDTH / 2, 248, 'LANCER UN RUN', () => transitionTo(this, 'TeamSelect', { auto: false }), 220, 46),
       makeButton(this, GAME_WIDTH / 2, 302, '🤖 RUN AUTO (+30% 💰)', () => transitionTo(this, 'TeamSelect', { auto: true }), 220, 44, COLORS.btn.gold),
       makeButton(this, GAME_WIDTH / 2, 356, 'GACHA', () => transitionTo(this, 'Gacha'), 220, 42, COLORS.btn.magic),
-      makeButton(this, GAME_WIDTH / 2, 404, 'ARBRE DE TALENTS', () => transitionTo(this, 'Meta'), 220, 42, COLORS.btn.secondary),
-      makeButton(this, GAME_WIDTH / 2, 452, 'COLLECTION', () => transitionTo(this, 'Collection'), 220, 42, COLORS.btn.success),
+      makeButton(this, GAME_WIDTH / 2, 404, 'COLLECTION', () => transitionTo(this, 'Collection'), 220, 42, COLORS.btn.success),
     ];
     staggerIn(this, buttons, 20);
   }
@@ -115,10 +110,8 @@ export class MainMenuScene extends Phaser.Scene {
       const save = JSON.parse(raw);
       const gs = window.gameState;
       if (save.unlockedHeroIds) gs.unlockedHeroIds = save.unlockedHeroIds;
-      if (save.ownedRelicIds) gs.ownedRelicIds = save.ownedRelicIds;
       if (save.totalGold !== undefined) gs.totalGold = save.totalGold;
       if (save.bestRun) gs.bestRun = save.bestRun;
-      if (save.talentTree) gs.talentTree.load(save.talentTree);
       if (save.gacha) gs.gacha.load(save.gacha);
     } catch { /* fresh start */ }
   }
@@ -129,10 +122,8 @@ export function saveProgress(): void {
     const gs = window.gameState;
     const save = {
       unlockedHeroIds: gs.unlockedHeroIds,
-      ownedRelicIds: gs.ownedRelicIds,
       totalGold: gs.totalGold,
       bestRun: gs.bestRun,
-      talentTree: gs.talentTree.serialize(),
       gacha: gs.gacha.serialize(),
     };
     localStorage.setItem('fantasy_roguelike_save', JSON.stringify(save));

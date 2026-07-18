@@ -1,9 +1,8 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, FONT_FAMILY, STROKE } from '../config';
 import { makeButton, makeTitle, rarityColor, fadeIn, transitionTo, isTransitioning, showToast } from '../ui/UIManager';
-import { getHeroById, STARTER_HERO_IDS } from '../data/heroes';
+import { getHeroById, STARTER_HERO_IDS, ROLE_ICONS } from '../data/heroes';
 import { MAX_TEAM } from '../systems/RunManager';
-import { RELIC_POOL } from '../data/relics';
 
 interface HeroCard {
   id: string;
@@ -57,8 +56,8 @@ export class TeamSelectScene extends Phaser.Scene {
       const card = this.add.container(x, y);
       const bg = this.add.rectangle(0, 0, 100, 92, COLORS.panel, 1).setStrokeStyle(STROKE.base, rarityColor(hero.rarity));
       const icon = this.add.image(0, -14, `hero_${id}`).setDisplaySize(46, 46);
-      const name = this.add.text(0, 20, hero.name.split(' ')[0], { ...FONTS.small, fontSize: '10px', color: CSS.text }).setOrigin(0.5);
-      const cls = this.add.text(0, 34, hero.class, { ...FONTS.small, fontSize: '8px' }).setOrigin(0.5);
+      const name = this.add.text(0, 20, hero.short, { ...FONTS.small, fontSize: '10px', color: CSS.text }).setOrigin(0.5);
+      const cls = this.add.text(0, 34, `${ROLE_ICONS[hero.role]} ${hero.atk} ATK`, { ...FONTS.small, fontSize: '8px' }).setOrigin(0.5);
       // Pastille d'ordre de sélection (1..5), masquée tant que le héros n'est pas pris
       const badge = this.add.text(40, -38, '', {
         fontFamily: FONT_FAMILY, fontSize: '13px', fontStyle: 'bold', color: CSS.textLight, backgroundColor: CSS.accent,
@@ -104,27 +103,7 @@ export class TeamSelectScene extends Phaser.Scene {
     if (this.selected.length === 0) { showToast(this, 'Choisis au moins un héros'); return; }
 
     const gs = window.gameState;
-    const bonuses = gs.talentTree.getBonuses();
-    const startRelicIds: string[] = [];
-    if (bonuses.startRelicCount > 0) {
-      const commonRelics = RELIC_POOL.filter(r => r.rarity === 'common');
-      for (let i = 0; i < bonuses.startRelicCount && i < commonRelics.length; i++) {
-        startRelicIds.push(commonRelics[i].id);
-      }
-    }
-
-    gs.runManager.startRun({
-      teamHeroIds: this.selected,
-      hpBonus: bonuses.hpBonus,
-      atkPct: bonuses.atkPct,
-      goldBonusPct: bonuses.goldBonusPct,
-      startRelicIds,
-      startGold: bonuses.startGold,
-      hasRevivePassive: bonuses.hasRevivePassive,
-      reviveHpPct: bonuses.reviveHpPct,
-      extraHeroSlot: bonuses.extraHeroSlot,
-      autoMode: this.auto,
-    });
+    gs.runManager.startRun({ teamHeroIds: this.selected, autoMode: this.auto });
 
     transitionTo(this, 'RunMap');
   }

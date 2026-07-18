@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, FONT_FAMILY, STROKE } from '../config';
-import { makeButton, makePanel, makeTitle, rarityColor, rarityLabel, showToast, fadeIn, transitionTo, pulse } from '../ui/UIManager';
+import { makeButton, makePanel, makeTitle, rarityColor, showToast, fadeIn, transitionTo, pulse } from '../ui/UIManager';
 import type { GachaPullResult } from '../systems/GachaSystem';
 import { saveProgress } from './MainMenuScene';
 
@@ -52,7 +52,7 @@ export class GachaScene extends Phaser.Scene {
       const y = 158 + Math.floor(i / 2) * 28;
       this.add.text(x, y, `${r.label} : ${r.rate}`, { ...FONTS.small, color: r.color });
     });
-    this.add.text(GAME_WIDTH / 2, 228, '🛡 Héros ou Relique à chaque tirage', { ...FONTS.small, align: 'center' }).setOrigin(0.5);
+    this.add.text(GAME_WIDTH / 2, 228, '🛡 Un héros à chaque tirage', { ...FONTS.small, align: 'center' }).setOrigin(0.5);
   }
 
   private drawPullButtons(): void {
@@ -72,15 +72,14 @@ export class GachaScene extends Phaser.Scene {
     if (gs.totalGold < cost) { showToast(this, 'Pas assez d\'or !'); return; }
 
     gs.totalGold -= cost;
-    this.results = gs.gacha.pullMulti(count, gs.unlockedHeroIds, gs.ownedRelicIds);
+    this.results = gs.gacha.pullMulti(count, gs.unlockedHeroIds);
 
-    // Apply results
+    // Application : un héros inédit rejoint la collection, un doublon rend de l'or
     for (const r of this.results) {
-      if (r.type === 'hero' && r.heroDefinition && !gs.unlockedHeroIds.includes(r.heroDefinition.id)) {
+      if (!r.isDuplicate) {
         gs.unlockedHeroIds.push(r.heroDefinition.id);
-      }
-      if (r.type === 'relic' && r.relicDefinition && !gs.ownedRelicIds.includes(r.relicDefinition.id)) {
-        gs.ownedRelicIds.push(r.relicDefinition.id);
+      } else {
+        gs.totalGold += r.goldRefund;
       }
     }
 
@@ -129,15 +128,13 @@ export class GachaScene extends Phaser.Scene {
       const parts: Phaser.GameObjects.GameObject[] = [];
       parts.push(this.add.rectangle(0, 0, cardW, cardH, COLORS.panel).setStrokeStyle(STROKE.base, color));
 
-      if (r.type === 'hero' && r.heroDefinition) {
-        parts.push(this.add.image(0, -14, `hero_${r.heroDefinition.id}`).setDisplaySize(44, 44));
-        parts.push(this.add.text(0, 24, r.heroDefinition.name.split(' ')[0], { ...FONTS.small, fontSize: '9px', align: 'center' }).setOrigin(0.5));
-      } else if (r.type === 'relic' && r.relicDefinition) {
-        parts.push(this.add.image(0, -14, `relic_${r.relicDefinition.id}`).setDisplaySize(38, 38));
-        parts.push(this.add.text(0, 24, r.relicDefinition.name.split(' ')[0], { ...FONTS.small, fontSize: '9px', align: 'center' }).setOrigin(0.5));
+      const hero = r.heroDefinition;
+      parts.push(this.add.image(0, -14, `hero_${hero.id}`).setDisplaySize(44, 44));
+      parts.push(this.add.text(0, 22, hero.short, { ...FONTS.small, fontSize: '9px', align: 'center' }).setOrigin(0.5));
+      if (r.isDuplicate) {
+        parts.push(this.add.text(0, 36, `+${r.goldRefund} 💰`, { ...FONTS.small, fontSize: '8px', color: CSS.gold }).setOrigin(0.5));
       }
 
-      parts.push(this.add.text(0, 38, rarityLabel(rarity), { fontSize: '8px', color: `#${color.toString(16).padStart(6, '0')}`, fontFamily: FONT_FAMILY, fontStyle: 'bold' }).setOrigin(0.5));
 
       if (r.isPity) {
         const pity = this.add.text(0, -40, '★ PITY', { fontSize: '10px', color: CSS.rarity.legendary, fontFamily: FONT_FAMILY, fontStyle: 'bold' }).setOrigin(0.5);

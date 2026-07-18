@@ -84,17 +84,12 @@ export class CombatScene extends Phaser.Scene {
     // le playback doit partir de l'état d'avant combat
     const heroStartHp = new Map(run.heroes.map(h => [h.instanceId, h.currentHp]));
 
-    const result = resolveCombat(
-      run.heroes,
-      enemies,
-      run.relics,
-      gs.runManager.getGoldMultiplier(),
-      run.runReviveUsed,
-    );
+    const result = resolveCombat(run.heroes, enemies);
 
     this.log = result.log;
     this.victory = result.victory;
-    this.goldReward = result.goldReward;
+    // Le bonus d'or du mode auto s'applique ici, le résolveur ne le connaît pas
+    this.goldReward = Math.round(result.goldReward * gs.runManager.getGoldMultiplier());
     this.heroesRef = run.heroes;
     this.enemiesRef = enemies;
 
@@ -133,7 +128,7 @@ export class CombatScene extends Phaser.Scene {
       if (startHp <= 0) return;
       const x = GRID_LEFT + h.gridCol * (CELL_W + CELL_GAP);
       const y = HERO_TOP + h.gridRow * (CELL_H + CELL_GAP);
-      this.addUnit(h.instanceId, h.name, `hero_${h.definitionId}`, x, y, startHp, h.maxHp, 'hero', false);
+      this.addUnit(h.instanceId, h.short, `hero_${h.definitionId}`, x, y, startHp, h.maxHp, 'hero', false);
     });
   }
 
@@ -229,23 +224,14 @@ export class CombatScene extends Phaser.Scene {
         if (eff.amount >= 35) this.cameras.main.shake(90, 0.005);
         break;
       }
-      case 'heal':
-      case 'revive': {
+      case 'heal': {
         floatText(this, x, y - 26, `+${eff.amount}`, CSS.hp);
         unit.sprite.setTint(COLORS.hp);
         this.time.delayedCall(180 / this.speed, () => unit.sprite.clearTint());
-        if (eff.kind === 'revive') {
-          unit.container.setAlpha(1);
-          unit.sprite.clearTint();
-          floatText(this, x, y - 40, '✨ Résurrection', CSS.gold, '11px');
-        }
         break;
       }
       case 'debuff':
         floatText(this, x, y - 26, `-${eff.amount}% ATK`, CSS.magic, '11px');
-        break;
-      case 'mark':
-        floatText(this, x, y - 26, '✜ Marqué', CSS.accent, '11px');
         break;
     }
 

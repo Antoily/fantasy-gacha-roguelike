@@ -48,11 +48,16 @@ export class BootScene extends Phaser.Scene {
   private generatePlaceholderTextures(): void {
     // Portraits de héros — aplats saturés, tête et buste cernés
     const heroColors: Record<string, number> = {
+      thane: 0x7f9ec4,
+      brann: 0x9e8f6b,
       sylva: 0x5cc85c,
       zara: 0xc45cd6,
       finn: 0xffd95c,
+      sora: 0xffe9a8,
       shade: 0x6b6f9e,
       gorvak: 0xff7a4d,
+      kael: 0xd6674d,
+      nix: 0x4dd6c4,
       lyra: 0x4ecdc4,
       vex: 0xffa63d,
     };
@@ -97,8 +102,7 @@ export class BootScene extends Phaser.Scene {
     // Fonds de salle — nuances de papier teinté, jamais de fond sombre
     const bgColors: Record<string, number> = {
       combat: 0xf6ded2,
-      event: 0xdcefe0,
-      shop: 0xf7ecc9,
+      recruit: 0xdcefe0,
       rest: 0xdde8f5,
       boss: 0xf2d3d8,
     };
@@ -109,23 +113,6 @@ export class BootScene extends Phaser.Scene {
       gfx.generateTexture(`bg_${type}`, GAME_WIDTH, GAME_HEIGHT);
       gfx.destroy();
     }
-
-    // Icônes de reliques
-    const relicColors = [COLORS.accent, COLORS.secondary, COLORS.btn.magic, COLORS.gold, COLORS.hp];
-    const relicIds = ['bloodstone_ring','swiftness_boots','war_banner','shadow_cloak','ancient_tome',
-                      'iron_fortress','emerald_pendant','void_crystal','gold_idol','dragon_scale',
-                      'berserker_heart','amulet_of_focus'];
-    relicIds.forEach((id, i) => {
-      const gfx = this.g();
-      const col = relicColors[i % relicColors.length];
-      this.outlinedRect(gfx, 48, 48, col, 8, STROKE.base);
-      gfx.fillStyle(COLORS.textLight, 0.85);
-      gfx.lineStyle(STROKE.thin, COLORS.ink, 1);
-      gfx.fillCircle(24, 24, 11);
-      gfx.strokeCircle(24, 24, 11);
-      gfx.generateTexture(`relic_${id}`, 48, 48);
-      gfx.destroy();
-    });
 
     // Cadre de carte
     const cardG = this.g();

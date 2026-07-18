@@ -2,20 +2,19 @@ import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, STROKE } from '../config';
 import { makeButton, makePanel, makeTitle, makeHpBar, fadeIn, transitionTo, staggerIn, pulse, isTransitioning } from '../ui/UIManager';
 import type { Room, RoomType } from '../systems/RunManager';
+import { ROLE_ICONS } from '../data/heroes';
 
 const ROOM_ICONS: Record<RoomType, string> = {
   combat: '⚔',
-  event: '❓',
-  shop: '🛒',
+  recruit: '⚑',
   rest: '🏕',
   boss: '💀',
 };
 
 const ROOM_LABELS: Record<RoomType, string> = {
   combat: 'Combat',
-  event: 'Événement',
-  shop: 'Marchand',
-  rest: 'Repos',
+  recruit: 'Renfort',
+  rest: 'Campement',
   boss: 'Boss',
 };
 
@@ -39,7 +38,6 @@ export class RunMapScene extends Phaser.Scene {
 
     this.drawHeroPanel();
     this.drawRoomMap();
-    this.drawRelics();
     this.drawAbandonButton();
 
     // Mode auto : on entre automatiquement dans la salle courante après un court délai
@@ -62,8 +60,8 @@ export class RunMapScene extends Phaser.Scene {
       // Carte (92–138) centrée dans le panneau : icône en haut, nom en bas, barre de vie dessous.
       this.add.rectangle(cx, 115, 46, 46, alive ? COLORS.panel : COLORS.backgroundAlt, 1)
         .setStrokeStyle(STROKE.thin, alive ? COLORS.ink : COLORS.textFaint);
-      this.add.text(cx, 109, alive ? ROOM_ICONS.combat : '💀', { fontSize: '18px' }).setOrigin(0.5);
-      this.add.text(cx, 129, h.name.split(' ')[0], { ...FONTS.small, fontSize: '9px' }).setOrigin(0.5);
+      this.add.text(cx, 109, alive ? ROLE_ICONS[h.role] : '💀', { fontSize: '18px' }).setOrigin(0.5);
+      this.add.text(cx, 129, h.short, { ...FONTS.small, fontSize: '9px' }).setOrigin(0.5);
       const pct = h.currentHp / h.maxHp;
       makeHpBar(this, cx, 146, 44, 6, Math.max(0, pct));
     });
@@ -133,21 +131,9 @@ export class RunMapScene extends Phaser.Scene {
     staggerIn(this, rows, 14, 45);
   }
 
-  private drawRelics(): void {
-    const run = window.gameState.runManager.state;
-    if (run.relics.length === 0) return;
-    // Label à 530 (bas ≈536), boîtes à 566 (haut ≈546) : ~10px d'écart.
-    this.add.text(MARGIN, 530, 'Reliques :', { ...FONTS.small }).setOrigin(0, 0.5);
-    run.relics.slice(0, 6).forEach((r, i) => {
-      const rx = MARGIN + 20 + i * 48;
-      this.add.rectangle(rx, 566, 40, 40, COLORS.panel).setStrokeStyle(STROKE.base, COLORS.rarity[r.rarity]);
-      this.add.text(rx, 566, r.name.slice(0, 4), { ...FONTS.small, fontSize: '9px' }).setOrigin(0.5);
-    });
-  }
-
   private drawAbandonButton(): void {
     // Bouton pleine largeur de contenu, aligné sur la même grille que le reste
-    makeButton(this, CX, 614, '✕ Abandonner la run', () => this.confirmAbandon(), CONTENT_W, 38, COLORS.btn.danger);
+    makeButton(this, CX, 600, '✕ Abandonner la run', () => this.confirmAbandon(), CONTENT_W, 38, COLORS.btn.danger);
   }
 
   private confirmAbandon(): void {
@@ -173,13 +159,12 @@ export class RunMapScene extends Phaser.Scene {
 
   private enterRoom(room: Room): void {
     if (isTransitioning(this)) return;
-    const target = {
-      combat: 'Formation',
-      event: 'Event',
-      shop: 'Shop',
+    const target: Record<RoomType, string> = {
+      combat: 'Combat',
+      recruit: 'Recruit',
       rest: 'Rest',
-      boss: 'Formation',
-    }[room.type];
-    transitionTo(this, target);
+      boss: 'Combat',
+    };
+    transitionTo(this, target[room.type]);
   }
 }

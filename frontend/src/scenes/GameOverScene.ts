@@ -37,9 +37,6 @@ export class GameOverScene extends Phaser.Scene {
       }
     }
 
-    // Add talent points to tree
-    gs.talentTree.addPoints(run.talentPointsEarned);
-
     // Update best run
     const zonesCleared = run.zoneIndex + (victory ? 1 : 0);
     const roomsCleared = run.rooms.filter(r => r.completed).length;
@@ -49,7 +46,7 @@ export class GameOverScene extends Phaser.Scene {
     }
 
     // Carry over run gold to meta gold
-    gs.totalGold += Math.floor(run.gold * 0.3);
+    gs.totalGold += run.gold;
 
     saveProgress();
     this.reportRun(zonesCleared, roomsCleared, victory, run.gold);
@@ -65,7 +62,7 @@ export class GameOverScene extends Phaser.Scene {
       ...FONTS.body, align: 'center', wordWrap: { width: 300 },
     }).setOrigin(0.5);
 
-    this.drawStats(zonesCleared, roomsCleared, run.talentPointsEarned, run.gold);
+    this.drawStats(zonesCleared, roomsCleared, run.gold);
     this.drawHeroSummary();
 
     makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 60, 'MENU PRINCIPAL', () => transitionTo(this, 'MainMenu'), 240, 48,
@@ -74,20 +71,19 @@ export class GameOverScene extends Phaser.Scene {
       () => transitionTo(this, 'TeamSelect', { auto: false }), 240, 40);
   }
 
-  private drawStats(zones: number, rooms: number, pts: number, gold: number): void {
+  private drawStats(zones: number, rooms: number, gold: number): void {
     makePanel(this, GAME_WIDTH / 2, 240, 320, 130);
-    const goldRecovered = Math.floor(gold * 0.3);
+    const goldRecovered = gold;
     const lines = [
       `Zones traversées : ${zones}`,
       `Salles terminées : ${rooms}`,
-      `Points de talent gagnés : ${pts}`,
     ];
     const texts = lines.map((l, i) =>
       this.add.text(GAME_WIDTH / 2, 192 + i * 28, l, { ...FONTS.body, align: 'center' }).setOrigin(0.5)
     );
-    const goldText = this.add.text(GAME_WIDTH / 2, 192 + 3 * 28, `Or récupéré (30%) : 0 💰`, { ...FONTS.body, align: 'center' }).setOrigin(0.5);
+    const goldText = this.add.text(GAME_WIDTH / 2, 192 + 3 * 28, `Or gagné : 0 💰`, { ...FONTS.body, align: 'center' }).setOrigin(0.5);
     staggerIn(this, [...texts, goldText], 10, 90);
-    countUp(this, goldText, 0, goldRecovered, n => `Or récupéré (30%) : ${n} 💰`, 800);
+    countUp(this, goldText, 0, goldRecovered, n => `Or gagné : ${n} 💰`, 800);
   }
 
   private drawHeroSummary(): void {
@@ -100,7 +96,7 @@ export class GameOverScene extends Phaser.Scene {
       this.add.rectangle(cx + 26, y + 32, 52, 44, COLORS.panel)
         .setStrokeStyle(STROKE.thin, alive ? COLORS.hp : COLORS.btn.danger);
       this.add.text(cx + 26, y + 22, alive ? '✓' : '✗', { fontSize: '18px', color: alive ? CSS.hp : CSS.danger, fontFamily: FONT_FAMILY, fontStyle: 'bold' }).setOrigin(0.5);
-      this.add.text(cx + 26, y + 42, h.name.split(' ')[0], { fontSize: '8px', color: CSS.textDim, fontFamily: FONT_FAMILY, fontStyle: 'bold' }).setOrigin(0.5);
+      this.add.text(cx + 26, y + 42, h.short, { fontSize: '8px', color: CSS.textDim, fontFamily: FONT_FAMILY, fontStyle: 'bold' }).setOrigin(0.5);
     });
   }
 

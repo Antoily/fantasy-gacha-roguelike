@@ -20,7 +20,8 @@ mémoire partagée du projet : il doit refléter l'état réel des règles à to
 
 ## Contexte du projet
 
-Jeu mobile **Fantasy Roguelike Gacha** — runs procéduraux + combat tactique sur grille + gacha héros/reliques.
+Jeu mobile **Fantasy Roguelike Gacha** — runs procéduraux + combat automatique sur grille + gacha de héros.
+Le joueur ne décide que d'une chose : **quels personnages composent son équipe**.
 
 - **Repo** : https://github.com/Antoily/fantasy-gacha-roguelike
 - **Stack** : Phaser.js (TypeScript) + Capacitor (Android) | Node.js + Express + PostgreSQL + Prisma
@@ -100,9 +101,9 @@ renvoie du vide, il faut utiliser `page.screenshot()`.
 
 ```
 frontend/src/
-  data/          # Données statiques (heroes, enemies, relics, events, talents)
+  data/          # Données statiques (heroes, enemies)
   entities/      # Hero.ts, Enemy.ts — instances runtime
-  systems/       # RunManager, CombatResolver, GachaSystem, TalentTree
+  systems/       # RunManager, CombatResolver, GachaSystem
   scenes/        # Scènes Phaser (une scène = un écran)
   ui/            # UIManager (helpers Phaser réutilisables)
   api/           # apiClient.ts (fetch vers le backend)
@@ -122,68 +123,106 @@ assets/
 
 ---
 
+## Principe de game design — à ne pas perdre de vue
+
+**La seule chose qui demande de l'attention au joueur, c'est le choix de ses personnages.**
+Tout le reste doit se résoudre sans décision. Conséquences, à respecter pour toute
+nouvelle fonctionnalité :
+
+- **La puissance vient uniquement des héros.** Pas de reliques, pas d'objets,
+  pas d'arbre de talents, pas d'amélioration de statistiques. Si une idée rend le
+  joueur plus fort autrement que par « un meilleur personnage dans l'équipe »,
+  elle est hors sujet.
+- **Un héros = 3 statistiques et UN effet**, énonçable en une phrase. Deux phrases
+  = trop compliqué. Le joueur doit pouvoir comparer deux héros d'un coup d'œil.
+- **Le joueur ne place personne** sur la grille : `autoPlaceHeroes()` positionne
+  selon le champ `row` du héros (`front` / `back`).
+- Une salle ne propose **qu'un seul type de décision, et elle porte sur des
+  personnages** : recruter, remplacer, soigner.
+
+---
+
 ## Données du jeu — IDs à connaître
 
-### Héros (fichier `frontend/src/data/heroes.ts`)
-| id | Nom | Classe | Rareté |
-|----|-----|--------|--------|
-| `aldric` | Aldric le Rempart | warrior | legendary |
-| `sylva` | Sylva l'Œil-d'Aigle | ranger | epic |
-| `zara` | Zara la Flamme Noire | mage | epic |
-| `finn` | Frère Finn | priest | rare |
-| `shade` | Shade l'Ombre | assassin | epic |
-| `gorvak` | Gorvak le Briseur | warrior | rare |
-| `lyra` | Lyra la Tisseuse | mage | rare |
-| `vex` | Vex la Chasseuse | ranger | rare |
+### Héros (`frontend/src/data/heroes.ts`)
 
-### Reliques (fichier `frontend/src/data/relics.ts`)
-`bloodstone_ring` · `swiftness_boots` · `war_banner` · `shadow_cloak` · `ancient_tome` · `iron_fortress` · `emerald_pendant` · `void_crystal` · `gold_idol` · `dragon_scale` · `berserker_heart` · `amulet_of_focus`
+13 héros, 3 stats (`hp` / `atk` / `spd`), un rôle, une rangée, une compétence.
+
+| id | Nom court | Rôle | Rangée | Rareté | Compétence (`ability.id`) |
+|----|-----------|------|--------|--------|---------------------------|
+| `aldric` | Aldric | tank | front | legendary | `taunt` — attaqué en priorité |
+| `thane` | Thane | tank | front | epic | `aegis` — équipe -25% dégâts |
+| `brann` | Brann | tank | front | rare | `thorns` — renvoie 30% |
+| `gorvak` | Gorvak | dps | front | rare | `cleave` — frappe le rang avant |
+| `kael` | Kael | dps | front | common | `riposte` — +4 ATK par kill |
+| `shade` | Shade | dps | back | epic | `execute` — cible le plus blessé |
+| `zara` | Zara | dps | back | epic | `column` — frappe une colonne |
+| `sylva` | Sylva | dps | back | epic | `double_shot` — attaque 2× |
+| `vex` | Vex | dps | back | rare | `ambush` — +50% sur cible intacte |
+| `nix` | Nix | dps | back | rare | `first_strike` — joue en premier |
+| `finn` | Finn | heal | back | rare | `heal_one` — +50 PV au plus blessé |
+| `sora` | Sora | heal | back | epic | `heal_all` — +20 PV à l'équipe |
+| `lyra` | Lyra | support | back | rare | `weaken` — -50% ATK au plus fort |
+
+Starters (`STARTER_HERO_IDS`) : `aldric`, `sylva`, `finn` — trois pour une équipe
+de quatre, pour que le manque se fasse sentir dès la première partie.
 
 ### Formations ennemies (`frontend/src/data/enemies.ts`)
 `spear_rush` · `arrow_rain` · `shield_wall` · `spread_assault` · `death_squad`
 
-### Talents (`frontend/src/data/talents.ts`)
-3 tracks : `survival` / `power` / `fortune` — 3 nœuds par track (tier 1→3)
+Les ennemis ont eux aussi 3 stats (plus de `def`).
 
 ---
 
 ## Système de combat — logique clé
 
-- Grille **3×3** : row 0 = front, row 2 = back
-- Tour trié par **SPD décroissant**
-- Dégâts = `max(1, ATK - DEF*0.5) × [0.85–1.15]`
-- Pity gacha = **80 tirages** (configurable via `GachaSystem(pityCap)`)
-- Le `CombatResolver` importe les reliques et les applique inline
-- `RunManager.completeRoom()` fait avancer la progression ET applique `emerald_pendant`
+- Grille **3×3**, remplie automatiquement : `front` → rang 0, `back` → rang 1.
+- Tour trié par **VIT décroissante**. `first_strike` passe devant tout le monde.
+- **Dégâts = ATK × [0.85–1.15]**. Il n'y a pas de défense : ce qu'un héros encaisse
+  se lit dans ses PV, ce qu'il inflige dans son ATK. Rien à calculer pour le joueur.
+- Ciblage : `taunt` prime sur tous les autres patterns ennemis.
+- `resolveCombat(heroes, enemies)` résout tout le combat d'avance ; `CombatScene`
+  ne fait que rejouer le journal en animations.
+- Le multiplicateur d'or du mode auto est appliqué **par la scène**, pas par le
+  résolveur.
 
 ---
 
-## Lancement d'un run & composition d'équipe
+## Boucle de run
 
-- Lancer un run passe **toujours** par la scène **`TeamSelect`** (`TeamSelectScene.ts`).
-  Les boutons « LANCER UN RUN » / « RUN AUTO » (menu) et « NOUVEAU RUN » (game over)
-  font `transitionTo(this, 'TeamSelect', { auto })` — ils ne démarrent plus le run directement.
-- `TeamSelect` liste les **héros débloqués** (`gs.unlockedHeroIds`) ; le joueur en choisit
-  jusqu'à **`MAX_TEAM` (= 5)** (exporté par `RunManager.ts`), puis « LANCER ▶ ».
-- `RunManager.startRun({ teamHeroIds, ... })` construit l'équipe à partir de `teamHeroIds`
-  (héros valides uniquement, plafonné à `MAX_TEAM`, repli sur `STARTER_HERO_IDS` si vide).
-  ⚠️ Ne plus filtrer sur `STARTER_HERO_IDS` (ancien bug : seuls les starters étaient jouables).
-- `transitionTo(scene, key, data?, duration?)` accepte un `data` optionnel passé à `scene.start`.
+`TeamSelect` → `RunMap` → salles → `GameOver`.
+
+- **Équipe de `MAX_TEAM` (= 4)** héros, exporté par `RunManager.ts`.
+- Une zone = 8 salles : `combat` ×4, `recruit` ×2, `rest` ×1, puis `boss`.
+  3 zones pour gagner (`TOTAL_ZONES`).
+- **`recruit` (`RecruitScene`)** : 3 héros proposés (tirés à la génération de la
+  zone, donc stables). Équipe pleine → modale « qui laisse sa place ». Passer
+  soigne l'équipe de 40 PV.
+- **`rest` (`RestScene`)** : choisir UN héros à soigner à fond, ou à relever s'il
+  est tombé (50% de ses PV).
+- Un héros tombé reste à 0 PV : on le relève au campement, ou on le remplace au
+  renfort. C'est la seule façon de se rattraper — et c'est un choix de personnage.
+- L'or d'un run est reversé **en totalité** au méta-or en fin de run.
 
 ## Mode auto (run automatique)
 
-Run en pilote automatique, lancé depuis le menu (bouton **« 🤖 RUN AUTO (+30% 💰) »**).
+Run en pilote automatique (bouton « 🤖 RUN AUTO (+30% 💰) »).
 
-- Flag `autoMode` dans `RunState` (passé via `RunManager.startRun({ autoMode })`).
-- **Bonus d'or** : `RunManager.getGoldMultiplier()` ajoute `+0.30` quand `autoMode`.
-  Comme l'or de run est reversé à 30% au méta-or en fin de run, le bonus se propage.
-- **Auto-pilotage** : chaque scène de run, si `run.autoMode`, déclenche son action
-  via `this.time.delayedCall(...)` avec un **choix aléatoire** (`pickRandom`) :
-  - `RunMapScene` → entre dans la salle courante · `FormationScene` → placement **aléatoire** des héros (cases distinctes) + combat
-  - `CombatScene` → lecture ×2 + « Continuer » automatique · `EventScene` → option au hasard
-  - `ShopScene` → achats aléatoires en une passe (50% par relique abordable + soin éventuel), **sans `scene.restart`**, puis sortie · `RestScene` → soin / entraînement / sortie au hasard
-- Un badge **« 🤖 AUTO »** est affiché en haut de chaque scène concernée.
-- Le bouton « Abandonner la run » de `RunMapScene` permet d'interrompre un run auto.
+- Flag `autoMode` dans `RunState` · bonus d'or via `RunManager.getGoldMultiplier()`.
+- Chaque scène de run, si `run.autoMode`, déclenche son action via
+  `this.time.delayedCall(...)` avec un choix aléatoire (`pickRandom`).
+- Un badge « 🤖 AUTO » est affiché en haut de chaque scène concernée.
+
+## Progression méta
+
+La **seule** progression entre les runs est le déblocage de héros :
+
+- L'or gagné en run alimente le **gacha** (`GachaSystem`), qui ne distribue que des
+  héros. Un doublon est converti en or (`DUPLICATE_REFUND`).
+- Pity à **80 tirages** (configurable via `GachaSystem(pityCap)`).
+- Plus de héros débloqués = plus de choix à la composition. C'est tout le jeu.
+
+---
 
 ## État global du jeu (runtime)
 
@@ -191,10 +230,8 @@ Run en pilote automatique, lancé depuis le menu (bouton **« 🤖 RUN AUTO (+30
 ```ts
 {
   runManager: RunManager,      // état du run en cours
-  talentTree: TalentTreeSystem,
   gacha: GachaSystem,
-  unlockedHeroIds: string[],   // héros débloqués (persistant)
-  ownedRelicIds: string[],     // reliques gacha (persistant)
+  unlockedHeroIds: string[],   // héros débloqués (persistant) — la seule progression
   totalGold: number,           // or méta (persistant)
   bestRun: { zonesCleared, roomsCleared }
 }
@@ -244,7 +281,7 @@ couleur francs, **gros contours noirs**, typo arrondie en gras.
   `CONTENT_W = 328px`. Tous les blocs principaux (panneaux, listes, boutons pleine
   largeur) partagent cette largeur et cette marge — pas de largeurs ad hoc.
 - **Labels de section** alignés à gauche sur la marge (`x = MARGIN`), suffixe `:`
-  (« Équipe : », « Salles : », « Reliques : »), avec **~9–10px d'écart** entre le
+  (« Équipe : », « Salles : », « Ton équipe : »), avec **~9–10px d'écart** entre le
   label et la boîte qu'il introduit.
 - **Contenu d'une carte/élément** : centrer verticalement dans son conteneur (ne pas
   coller en haut). Positionner les éléments internes par rapport aux bords du cadre,
@@ -263,18 +300,12 @@ scène de run doit offrir un moyen clair de revenir au menu.
 
 ## Ajouter un héros — checklist
 
-1. `frontend/src/data/heroes.ts` → ajouter dans `HERO_POOL`
-2. `frontend/src/scenes/BootScene.ts` → ajouter couleur dans `heroColors`
-3. `assets/ASSET_PROMPTS.md` → ajouter le prompt portrait
-4. Si l'ability est nouvelle → gérer dans `CombatResolver.ts` switch cases
-
-## Ajouter une relique — checklist
-
-1. `frontend/src/data/relics.ts` → ajouter dans `RELIC_POOL`
-2. `frontend/src/systems/CombatResolver.ts` → gérer l'effet si combat
-3. `frontend/src/systems/RunManager.ts` → gérer l'effet si persistant (run)
-4. `frontend/src/scenes/BootScene.ts` → ajouter dans `relicIds`
-5. `assets/ASSET_PROMPTS.md` → ajouter le prompt icône
+1. `frontend/src/data/heroes.ts` → ajouter dans `HERO_POOL` (3 stats, `short`,
+   `role`, `row`, et **une** compétence énonçable en une phrase)
+2. `frontend/src/systems/CombatResolver.ts` → ajouter le `case` dans `heroAction`
+   (sans `case`, le héros fait une attaque simple — c'est un défaut valable)
+3. `frontend/src/scenes/BootScene.ts` → ajouter une couleur dans `heroColors`
+4. `assets/ASSET_PROMPTS.md` → ajouter le prompt portrait
 
 ---
 
@@ -300,7 +331,7 @@ Migration DB au premier déploiement : `npx prisma migrate deploy`
 1. ✅ Prototype jouable (boucle run complète)
 2. ✅ Système grille + combat auto
 3. ✅ 8 héros, 12 reliques, gacha avec pity
-4. ✅ Méta-progression (arbre de talents)
+4. ✅ Méta-progression (déblocage de héros via gacha)
 5. ✅ Backend auth + save + leaderboard
 6. 🔲 Assets IA réels (remplacer les placeholders de `BootScene.ts`) — **style BD claire**,
    contours noirs épais, aplats francs (voir `assets/ASSET_PROMPTS.md` à réaligner)

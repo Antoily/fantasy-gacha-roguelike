@@ -1,49 +1,44 @@
-import type { HeroDefinition, Rarity, HeroClass } from '../data/heroes';
+import type { HeroDefinition, Rarity, HeroRole, HeroRow } from '../data/heroes';
 
 export interface HeroInstance {
   instanceId: string;
   definitionId: string;
   name: string;
-  class: HeroClass;
+  short: string;
+  role: HeroRole;
   rarity: Rarity;
+  row: HeroRow;
   abilityId: string;
-  // Current combat stats (modified by relics/talents/abilities)
   maxHp: number;
   currentHp: number;
   atk: number;
-  def: number;
   spd: number;
-  // Grid position during combat (row 0=front, 2=back; col 0-2)
+  // Position sur la grille, assignée automatiquement au début du combat
   gridRow: number | null;
   gridCol: number | null;
-  // Temporary combat flags
-  isMarked: boolean;
+  // Drapeaux de combat, remis à zéro à chaque combat
   atkDebuffPct: number; // 0-100
-  reviveUsed: boolean;
 }
 
 let _instanceCounter = 0;
 
-export function createHeroInstance(def: HeroDefinition, bonusHp = 0, bonusAtkPct = 0, bonusDef = 0): HeroInstance {
-  const hp = def.baseHp + bonusHp;
-  const atk = Math.round(def.baseAtk * (1 + bonusAtkPct / 100));
+export function createHeroInstance(def: HeroDefinition): HeroInstance {
   return {
     instanceId: `hero_${++_instanceCounter}_${def.id}`,
     definitionId: def.id,
     name: def.name,
-    class: def.class,
+    short: def.short,
+    role: def.role,
     rarity: def.rarity,
+    row: def.row,
     abilityId: def.ability.id,
-    maxHp: hp,
-    currentHp: hp,
-    atk,
-    def: def.baseDef + bonusDef,
-    spd: def.baseSpd,
+    maxHp: def.hp,
+    currentHp: def.hp,
+    atk: def.atk,
+    spd: def.spd,
     gridRow: null,
     gridCol: null,
-    isMarked: false,
     atkDebuffPct: 0,
-    reviveUsed: false,
   };
 }
 

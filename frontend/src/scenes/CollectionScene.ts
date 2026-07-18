@@ -1,13 +1,10 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, FONT_FAMILY, STROKE } from '../config';
 import { makeButton, makePanel, makeTitle, rarityColor, rarityLabel, fadeIn, transitionTo } from '../ui/UIManager';
-import { HERO_POOL, HeroDefinition } from '../data/heroes';
+import { HERO_POOL, HeroDefinition, ROLE_ICONS, ROLE_LABELS } from '../data/heroes';
 
-const CLASS_LABELS: Record<string, string> = {
-  warrior: 'Guerrier', ranger: 'Archer', mage: 'Mage', priest: 'Prêtre', assassin: 'Assassin',
-};
 const ROW_LABELS: Record<string, string> = {
-  front: 'Avant', mid: 'Milieu', back: 'Arrière', any: 'Libre',
+  front: 'Rang avant', back: 'Rang arrière',
 };
 
 export class CollectionScene extends Phaser.Scene {
@@ -50,7 +47,7 @@ export class CollectionScene extends Phaser.Scene {
         this.add.text(x, y + 104, rarityLabel(hero.rarity), {
           fontSize: '9px', color: `#${color.toString(16).padStart(6, '0')}`, fontFamily: FONT_FAMILY, fontStyle: 'bold', align: 'center',
         }).setOrigin(0.5);
-        this.add.text(x, y + 122, hero.ability.name, {
+        this.add.text(x, y + 122, `${ROLE_ICONS[hero.role]} ${hero.ability.name}`, {
           fontSize: '9px', color: CSS.textDim, fontFamily: FONT_FAMILY, fontStyle: 'bold',
           align: 'center', wordWrap: { width: cardW - 10 },
         }).setOrigin(0.5);
@@ -99,7 +96,7 @@ export class CollectionScene extends Phaser.Scene {
       fontFamily: FONT_FAMILY, fontSize: '11px', fontStyle: 'bold', color: colorHex,
     }).setOrigin(0.5);
 
-    const classRow = this.add.text(cx, cy - 28, `${CLASS_LABELS[hero.class]}  ·  Rang : ${ROW_LABELS[hero.preferredRow]}`, {
+    const classRow = this.add.text(cx, cy - 28, `${ROLE_ICONS[hero.role]} ${ROLE_LABELS[hero.role]}  ·  ${ROW_LABELS[hero.row]}`, {
       fontFamily: FONT_FAMILY, fontSize: '10px', fontStyle: 'bold', color: CSS.textDim,
     }).setOrigin(0.5);
 
@@ -108,9 +105,9 @@ export class CollectionScene extends Phaser.Scene {
 
     // Stats
     const statsY = cy - 4;
-    const statLabels = [`❤ ${hero.baseHp}`, `⚔ ${hero.baseAtk}`, `🛡 ${hero.baseDef}`, `⚡ ${hero.baseSpd}`];
-    const statColors = [CSS.hpLow, CSS.accent, CSS.rarity.rare, CSS.hp];
-    const statSpacing = (panelW - 40) / 4;
+    const statLabels = [`❤ ${hero.hp}`, `⚔ ${hero.atk}`, `⚡ ${hero.spd}`];
+    const statColors = [CSS.hpLow, CSS.accent, CSS.rarity.rare];
+    const statSpacing = (panelW - 40) / 3;
     const statsTexts = statLabels.map((label, idx) =>
       this.add.text(cx - (panelW - 40) / 2 + statSpacing * idx + statSpacing / 2, statsY, label, {
         fontFamily: FONT_FAMILY, fontSize: '10px', fontStyle: 'bold', color: statColors[idx],
@@ -120,12 +117,11 @@ export class CollectionScene extends Phaser.Scene {
     const sep2 = this.add.rectangle(cx, cy + 14, panelW - 40, 2, COLORS.ink);
 
     // Capacité
-    const abilityTypeLabel = hero.ability.type === 'active' ? '[Actif]' : '[Passif]';
-    const abilityTitle = this.add.text(cx, cy + 26, `${hero.ability.name}  ${abilityTypeLabel}`, {
+    const abilityTitle = this.add.text(cx, cy + 26, hero.ability.name, {
       fontFamily: FONT_FAMILY, fontSize: '11px', fontStyle: 'bold', color: CSS.magic, align: 'center',
     }).setOrigin(0.5);
 
-    const abilityDesc = this.add.text(cx, cy + 52, hero.ability.description, {
+    const abilityDesc = this.add.text(cx, cy + 52, hero.ability.text, {
       fontFamily: FONT_FAMILY, fontSize: '9px', color: CSS.textDim, align: 'center',
       wordWrap: { width: panelW - 30 },
     }).setOrigin(0.5);
