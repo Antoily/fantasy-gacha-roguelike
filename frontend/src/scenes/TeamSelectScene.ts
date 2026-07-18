@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
+import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, FONT_FAMILY, STROKE } from '../config';
 import { makeButton, makeTitle, rarityColor, fadeIn, transitionTo, isTransitioning, showToast } from '../ui/UIManager';
 import { getHeroById, STARTER_HERO_IDS } from '../data/heroes';
 import { MAX_TEAM } from '../systems/RunManager';
@@ -38,7 +38,7 @@ export class TeamSelectScene extends Phaser.Scene {
     this.drawHeroGrid(unlocked);
 
     this.counterText = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 108, '', { ...FONTS.body, align: 'center' }).setOrigin(0.5);
-    makeButton(this, 96, GAME_HEIGHT - 54, '← Menu', () => transitionTo(this, 'MainMenu'), 130, 44, 0x444455);
+    makeButton(this, 96, GAME_HEIGHT - 54, '← Menu', () => transitionTo(this, 'MainMenu'), 130, 44, COLORS.btn.neutral);
     makeButton(this, 254, GAME_HEIGHT - 54, 'LANCER ▶', () => this.begin(), 170, 46);
 
     this.refreshAll();
@@ -55,13 +55,13 @@ export class TeamSelectScene extends Phaser.Scene {
       const y = startY + Math.floor(i / 3) * rowH;
 
       const card = this.add.container(x, y);
-      const bg = this.add.rectangle(0, 0, 100, 92, COLORS.panel, 0.9).setStrokeStyle(2, rarityColor(hero.rarity));
+      const bg = this.add.rectangle(0, 0, 100, 92, COLORS.panel, 1).setStrokeStyle(STROKE.base, rarityColor(hero.rarity));
       const icon = this.add.image(0, -14, `hero_${id}`).setDisplaySize(46, 46);
-      const name = this.add.text(0, 20, hero.name.split(' ')[0], { ...FONTS.small, fontSize: '10px', color: '#ffffff' }).setOrigin(0.5);
+      const name = this.add.text(0, 20, hero.name.split(' ')[0], { ...FONTS.small, fontSize: '10px', color: CSS.text }).setOrigin(0.5);
       const cls = this.add.text(0, 34, hero.class, { ...FONTS.small, fontSize: '8px' }).setOrigin(0.5);
       // Pastille d'ordre de sélection (1..5), masquée tant que le héros n'est pas pris
       const badge = this.add.text(40, -38, '', {
-        fontFamily: 'Arial', fontSize: '13px', color: '#ffffff', backgroundColor: '#7c4dff',
+        fontFamily: FONT_FAMILY, fontSize: '13px', fontStyle: 'bold', color: CSS.textLight, backgroundColor: CSS.accent,
         padding: { x: 5, y: 2 },
       }).setOrigin(0.5).setVisible(false);
       card.add([bg, icon, name, cls, badge]);
@@ -88,10 +88,11 @@ export class TeamSelectScene extends Phaser.Scene {
     this.cards.forEach(c => {
       const order = this.selected.indexOf(c.id);
       if (order >= 0) {
-        c.bg.setStrokeStyle(3, 0xffffff);
+        // Sélection = gros cerne noir (le blanc serait invisible sur le panneau clair)
+        c.bg.setStrokeStyle(STROKE.thick, COLORS.ink);
         c.badge.setText(`${order + 1}`).setVisible(true);
       } else {
-        c.bg.setStrokeStyle(2, rarityColor(getHeroById(c.id)!.rarity));
+        c.bg.setStrokeStyle(STROKE.base, rarityColor(getHeroById(c.id)!.rarity));
         c.badge.setVisible(false);
       }
     });

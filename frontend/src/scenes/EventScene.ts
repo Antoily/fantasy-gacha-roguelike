@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
+import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS } from '../config';
 import { makeButton, makePanel, makeTitle, fadeIn, transitionTo, isTransitioning } from '../ui/UIManager';
 import { getRandomEvents } from '../data/events';
 import { RELIC_POOL } from '../data/relics';
@@ -21,7 +21,7 @@ export class EventScene extends Phaser.Scene {
 
     fadeIn(this);
     this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'bg_event').setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.5);
+    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.background, 0.35);
 
     makeTitle(this, GAME_WIDTH / 2, 50, this.event.title);
     makePanel(this, GAME_WIDTH / 2, 160, 330, 120);
@@ -36,7 +36,7 @@ export class EventScene extends Phaser.Scene {
 
     // Mode auto : on choisit une option au hasard
     if (run.autoMode) {
-      this.add.text(GAME_WIDTH - 10, 22, '🤖 AUTO', { ...FONTS.small, color: '#ffcc55' }).setOrigin(1, 0.5);
+      this.add.text(GAME_WIDTH - 10, 22, '🤖 AUTO', { ...FONTS.small, color: CSS.accent }).setOrigin(1, 0.5);
       this.time.delayedCall(900, () => this.applyChoice(pickRandom(this.event.choices)));
     }
   }
@@ -45,7 +45,7 @@ export class EventScene extends Phaser.Scene {
     this.event.choices.forEach((choice, i) => {
       const y = 280 + i * 70;
       makeButton(this, GAME_WIDTH / 2, y, choice.label, () => this.applyChoice(choice), 280, 48,
-        choice.outcomeType === 'nothing' ? 0x444455 : COLORS.accent);
+        choice.outcomeType === 'nothing' ? COLORS.btn.neutral : COLORS.accent);
     });
   }
 

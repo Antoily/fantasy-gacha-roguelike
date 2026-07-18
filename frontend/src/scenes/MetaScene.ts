@@ -1,15 +1,11 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
+import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, FONT_FAMILY, STROKE } from '../config';
 import { makeButton, makeTitle, fadeIn, transitionTo } from '../ui/UIManager';
 import { TALENT_TREE } from '../data/talents';
 import type { TalentNode, TalentTrack } from '../data/talents';
 import { saveProgress } from './MainMenuScene';
 
-const TRACK_COLORS: Record<TalentTrack, number> = {
-  survival: 0x44dd88,
-  power: 0xff6644,
-  fortune: 0xffd700,
-};
+const TRACK_COLORS: Record<TalentTrack, number> = COLORS.track;
 
 const TRACK_LABELS: Record<TalentTrack, string> = {
   survival: '🛡 Survie',
@@ -32,10 +28,13 @@ export class MetaScene extends Phaser.Scene {
 
     const tracks: TalentTrack[] = ['survival', 'power', 'fortune'];
     const trackW = 110;
-    const startX = GAME_WIDTH / 2 - trackW - 6;
+    const trackGap = 6;
+    // Le groupe des 3 tracks est centré sur l'écran : l'ancien calcul centrait le
+    // bord gauche de la track du milieu, ce qui faisait sortir « Fortune » de l'écran.
+    const startX = GAME_WIDTH / 2 - (3 * trackW + 2 * trackGap) / 2;
 
     tracks.forEach((track, ti) => {
-      const x = startX + ti * (trackW + 6);
+      const x = startX + ti * (trackW + trackGap);
       const nodes = TALENT_TREE.filter(n => n.track === track).sort((a, b) => a.tier - b.tier);
 
       this.add.text(x + trackW / 2, 82, TRACK_LABELS[track], {
@@ -48,7 +47,7 @@ export class MetaScene extends Phaser.Scene {
       });
     });
 
-    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 44, '← RETOUR', () => transitionTo(this, 'MainMenu'), 200, 44, 0x444455);
+    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 44, '← RETOUR', () => transitionTo(this, 'MainMenu'), 200, 44, COLORS.btn.neutral);
   }
 
   private drawNode(node: TalentNode, x: number, y: number, w: number): void {
@@ -58,23 +57,26 @@ export class MetaScene extends Phaser.Scene {
     const canUnlock = tree.canUnlock(node.id);
     const trackColor = TRACK_COLORS[node.track];
 
-    const border = unlocked ? trackColor : (canUnlock ? 0x666688 : 0x333344);
-    const fill = unlocked ? 0x1a2a1a : (canUnlock ? 0x1a1a2a : 0x111122);
+    // Un nœud verrouillé se lit à son fond terne, pas à un contour pâle :
+    // le trait reste noir partout pour garder le style BD.
+    const border = unlocked ? trackColor : (canUnlock ? COLORS.ink : COLORS.textFaint);
+    const fill = canUnlock || unlocked ? COLORS.panel : COLORS.backgroundAlt;
 
-    const bg = this.add.rectangle(x + w / 2, y + 50, w - 4, 112, fill, 0.95).setStrokeStyle(unlocked ? 2 : 1, border);
+    const bg = this.add.rectangle(x + w / 2, y + 50, w - 4, 112, fill, 1).setStrokeStyle(unlocked ? STROKE.thick : STROKE.thin, border);
     this.add.text(x + w / 2, y + 12, node.name, {
       ...FONTS.small, fontSize: '10px', align: 'center', wordWrap: { width: w - 12 },
-      color: unlocked ? '#ffffff' : (canUnlock ? '#9999bb' : '#555566'),
+      color: canUnlock || unlocked ? CSS.text : CSS.textDim,
     }).setOrigin(0.5);
     this.add.text(x + w / 2, y + 50, node.description, {
-      fontSize: '8px', color: '#888899', fontFamily: 'Arial', align: 'center', wordWrap: { width: w - 12 },
+      fontSize: '8px', color: CSS.textDim, fontFamily: FONT_FAMILY, fontStyle: 'bold', align: 'center', wordWrap: { width: w - 12 },
     }).setOrigin(0.5);
 
     if (unlocked) {
-      this.add.text(x + w / 2, y + 88, '✓ Débloqué', { fontSize: '9px', color: '#44dd88', fontFamily: 'Arial' }).setOrigin(0.5);
+      this.add.text(x + w / 2, y + 88, '✓ Débloqué', { fontSize: '9px', color: CSS.hp, fontFamily: FONT_FAMILY, fontStyle: 'bold' }).setOrigin(0.5);
     } else {
-      const costColor = canUnlock ? '#ffd700' : '#555555';
-      this.add.text(x + w / 2, y + 88, `${node.cost} pts`, { fontSize: '9px', color: costColor, fontFamily: 'Arial' }).setOrigin(0.5);
+      // L'or serait illisible sur le panneau blanc : l'accent porte le coût payable
+      const costColor = canUnlock ? CSS.accent : CSS.textFaint;
+      this.add.text(x + w / 2, y + 88, `${node.cost} pts`, { fontSize: '9px', color: costColor, fontFamily: FONT_FAMILY, fontStyle: 'bold' }).setOrigin(0.5);
 
       if (canUnlock) {
         bg.setInteractive({ useHandCursor: true });
@@ -92,7 +94,7 @@ export class MetaScene extends Phaser.Scene {
             });
           }
         });
-        bg.on('pointerover', () => bg.setFillStyle(0x2a2a4a));
+        bg.on('pointerover', () => bg.setFillStyle(COLORS.backgroundAlt));
         bg.on('pointerout', () => bg.setFillStyle(fill));
       }
     }

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
+import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, STROKE } from '../config';
 import { makeButton, makePanel, makeTitle, makeHpBar, rarityColor, fadeIn, transitionTo } from '../ui/UIManager';
 import type { HeroInstance } from '../entities/Hero';
 import { isHeroAlive } from '../entities/Hero';
@@ -30,7 +30,7 @@ export class FormationScene extends Phaser.Scene {
     this.gridCells = [];
 
     fadeIn(this);
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x0f0f1e);
+    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.background);
     makeTitle(this, GAME_WIDTH / 2, 28, 'FORMATION');
 
     const room = run.rooms[run.currentRoomIndex];
@@ -46,7 +46,7 @@ export class FormationScene extends Phaser.Scene {
 
     // Mode auto : placement aléatoire visible, puis lancement du combat
     if (run.autoMode) {
-      this.add.text(GAME_WIDTH - 10, 28, '🤖 AUTO', { ...FONTS.small, color: '#ffcc55' }).setOrigin(1, 0.5);
+      this.add.text(GAME_WIDTH - 10, 28, '🤖 AUTO', { ...FONTS.small, color: CSS.accent }).setOrigin(1, 0.5);
       this.time.delayedCall(600, () => this.autoPlaceHeroes());
       this.time.delayedCall(1100, () => this.startCombat());
     }
@@ -70,7 +70,7 @@ export class FormationScene extends Phaser.Scene {
 
   private drawEnemyPreview(formation: EnemyFormation): void {
     makePanel(this, GAME_WIDTH / 2, 95, 340, 90);
-    this.add.text(GAME_WIDTH / 2, 62, `Ennemi : ${formation.name}`, { ...FONTS.body, color: '#ff7777', align: 'center' }).setOrigin(0.5);
+    this.add.text(GAME_WIDTH / 2, 62, `Ennemi : ${formation.name}`, { ...FONTS.body, color: CSS.danger, align: 'center' }).setOrigin(0.5);
     this.add.text(GAME_WIDTH / 2, 80, formation.hint, { ...FONTS.small, align: 'center', wordWrap: { width: 320 } }).setOrigin(0.5);
 
     // Mini enemy grid
@@ -83,12 +83,12 @@ export class FormationScene extends Phaser.Scene {
         const x = startX + c * (miniCell + 2);
         const y = startY + r * (miniCell + 2);
         const eid = formation.grid[r]?.[c];
-        const color = eid ? 0x552222 : 0x1e1e2e;
-        this.add.rectangle(x + miniCell / 2, y + miniCell / 2, miniCell, miniCell, color).setStrokeStyle(1, 0x443333);
+        const color = eid ? COLORS.side.enemy : COLORS.panel;
+        this.add.rectangle(x + miniCell / 2, y + miniCell / 2, miniCell, miniCell, color).setStrokeStyle(STROKE.thin, COLORS.ink);
         if (eid) {
           const edef = getEnemyById(eid);
           this.add.text(x + miniCell / 2, y + miniCell / 2, edef?.name.slice(0, 3) ?? '?', {
-            fontSize: '7px', color: '#ffaaaa',
+            fontSize: '7px', color: CSS.text,
           }).setOrigin(0.5);
         }
       }
@@ -136,7 +136,7 @@ export class FormationScene extends Phaser.Scene {
       const x = 20 + i * 68;
       const y = startY;
       const container = this.add.container(x, y);
-      const bg = this.add.rectangle(28, 28, 56, 56, COLORS.panel).setStrokeStyle(1, rarityColor(hero.rarity));
+      const bg = this.add.rectangle(28, 28, 56, 56, COLORS.panel).setStrokeStyle(STROKE.base, rarityColor(hero.rarity));
       const icon = this.add.image(28, 20, `hero_${hero.definitionId}`).setDisplaySize(40, 40);
       const name = this.add.text(28, 44, hero.name.split(' ')[0], { ...FONTS.small, fontSize: '9px', align: 'center' }).setOrigin(0.5);
       const hpBar = makeHpBar(this, 28, 56, 50, 5, hero.currentHp / hero.maxHp);
@@ -150,22 +150,23 @@ export class FormationScene extends Phaser.Scene {
 
       // Check if already placed
       const isPlaced = this.placedHeroes.flat().some(h => h?.instanceId === hero.instanceId);
-      if (isPlaced) bg.setFillStyle(0x2a2a4a);
+      if (isPlaced) bg.setFillStyle(COLORS.backgroundAlt);
     });
   }
 
   private drawLegend(): void {
-    this.add.text(GAME_WIDTH / 2, 420, '💡 Sélectionne un héros puis une case', { ...FONTS.small, align: 'center', color: '#777799' }).setOrigin(0.5);
+    this.add.text(GAME_WIDTH / 2, 420, '💡 Sélectionne un héros puis une case', { ...FONTS.small, align: 'center', color: CSS.textDim }).setOrigin(0.5);
   }
 
   private selectHero(hero: HeroInstance, bg: Phaser.GameObjects.Rectangle): void {
     // Deselect previous — chaque carte retrouve la couleur de sa propre rareté
     this.heroCards.forEach(c => {
       const b = c.list[0] as Phaser.GameObjects.Rectangle;
-      b.setStrokeStyle(1, rarityColor(c.getData('rarity')));
+      b.setStrokeStyle(STROKE.base, rarityColor(c.getData('rarity')));
     });
     this.selectedHero = hero;
-    bg.setStrokeStyle(2, 0xffffff);
+    // Héros sélectionné : cerne noir épais, lisible sur le papier
+    bg.setStrokeStyle(STROKE.thick, COLORS.ink);
   }
 
   private onCellClick(row: number, col: number): void {

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
+import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, STROKE } from '../config';
 import { makeButton, makePanel, makeTitle, rarityColor, showToast, fadeIn, transitionTo, isTransitioning } from '../ui/UIManager';
 import { RELIC_POOL } from '../data/relics';
 import { HERO_POOL } from '../data/heroes';
@@ -24,7 +24,7 @@ export class ShopScene extends Phaser.Scene {
     // Pas de fondu lors d'un restart (après achat) pour éviter un flash noir
     if (!data?.noFade) fadeIn(this);
     this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'bg_shop').setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.55);
+    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.background, 0.35);
 
     makeTitle(this, GAME_WIDTH / 2, 38, '🛒 MARCHAND');
     this.goldText = this.add.text(GAME_WIDTH / 2, 65, `💰 ${run.gold} or`, { ...FONTS.gold, align: 'center' }).setOrigin(0.5);
@@ -37,7 +37,7 @@ export class ShopScene extends Phaser.Scene {
 
     // Mode auto : achats aléatoires puis sortie
     if (run.autoMode) {
-      this.add.text(GAME_WIDTH - 10, 20, '🤖 AUTO', { ...FONTS.small, color: '#ffcc55' }).setOrigin(1, 0.5);
+      this.add.text(GAME_WIDTH - 10, 20, '🤖 AUTO', { ...FONTS.small, color: CSS.accent }).setOrigin(1, 0.5);
       this.scheduleAuto();
     }
   }
@@ -86,12 +86,12 @@ export class ShopScene extends Phaser.Scene {
 
   private drawRelics(): void {
     const run = window.gameState.runManager.state;
-    this.add.text(20, 90, 'Reliques', { ...FONTS.body, color: '#bb44ff' });
+    this.add.text(20, 90, 'Reliques', { ...FONTS.body, color: CSS.magic });
 
     this.shopRelics.forEach((relic, i) => {
       const y = 115 + i * 70;
       makePanel(this, GAME_WIDTH / 2, y + 22, 330, 60);
-      this.add.rectangle(34, y + 22, 44, 44, COLORS.panel).setStrokeStyle(2, rarityColor(relic.rarity));
+      this.add.rectangle(34, y + 22, 44, 44, COLORS.panel).setStrokeStyle(STROKE.base, rarityColor(relic.rarity));
       this.add.text(34, y + 22, relic.name.slice(0, 3), { ...FONTS.small, fontSize: '10px' }).setOrigin(0.5);
       this.add.text(60, y + 10, relic.name, {
         ...FONTS.body,
@@ -101,7 +101,7 @@ export class ShopScene extends Phaser.Scene {
 
       const canAfford = run.gold >= RELIC_PRICE;
       makeButton(this, GAME_WIDTH - 46, y + 22, `${RELIC_PRICE}💰`, () => this.buyRelic(relic), 80, 34,
-        canAfford ? 0x553388 : 0x333333);
+        canAfford ? COLORS.btn.magic : COLORS.btn.disabled);
     });
   }
 
@@ -109,7 +109,7 @@ export class ShopScene extends Phaser.Scene {
     if (!this.shopHero) return;
     const run = window.gameState.runManager.state;
     const y = 340;
-    this.add.text(20, y - 12, 'Héros à recruter', { ...FONTS.body, color: '#44bbff' });
+    this.add.text(20, y - 12, 'Héros à recruter', { ...FONTS.body, color: CSS.secondary });
     makePanel(this, GAME_WIDTH / 2, y + 30, 330, 64);
     this.add.image(36, y + 30, `hero_${this.shopHero.id}`).setDisplaySize(48, 48);
     this.add.text(65, y + 14, this.shopHero.name, {
@@ -122,7 +122,7 @@ export class ShopScene extends Phaser.Scene {
     const atMax = run.heroes.length >= 5;
     const label = atMax ? 'Équipe pleine' : `${HERO_PRICE}💰`;
     makeButton(this, GAME_WIDTH - 46, y + 30, label, () => this.buyHero(), 90, 34,
-      (canAfford && !atMax) ? 0x335566 : 0x333333);
+      (canAfford && !atMax) ? COLORS.btn.secondary : COLORS.btn.disabled);
   }
 
   private drawHeal(): void {
@@ -132,11 +132,11 @@ export class ShopScene extends Phaser.Scene {
     this.add.text(20, y + 10, '🏥 Soins — Récupère 40 PV à tous', { ...FONTS.body });
     const canAfford = run.gold >= HEAL_PRICE;
     makeButton(this, GAME_WIDTH - 46, y + 22, `${HEAL_PRICE}💰`, () => this.buyHeal(), 80, 34,
-      canAfford ? 0x335533 : 0x333333);
+      canAfford ? COLORS.btn.success : COLORS.btn.disabled);
   }
 
   private drawLeaveButton(): void {
-    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 44, 'QUITTER LE MARCHAND', () => this.leave(), 260, 44, 0x444455);
+    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 44, 'QUITTER LE MARCHAND', () => this.leave(), 260, 44, COLORS.btn.neutral);
   }
 
   private buyRelic(relic: RelicDefinition): void {

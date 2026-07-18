@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
+import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, FONT_FAMILY, STROKE } from '../config';
 import { makeButton, makePanel, makeTitle, rarityColor, rarityLabel, showToast, fadeIn, transitionTo, pulse } from '../ui/UIManager';
 import type { GachaPullResult } from '../systems/GachaSystem';
 import { saveProgress } from './MainMenuScene';
@@ -40,12 +40,12 @@ export class GachaScene extends Phaser.Scene {
 
   private drawInfoPanel(): void {
     makePanel(this, GAME_WIDTH / 2, 180, 330, 120);
-    this.add.text(GAME_WIDTH / 2, 136, 'Taux de tirage', { ...FONTS.body, color: '#9999bb', align: 'center' }).setOrigin(0.5);
+    this.add.text(GAME_WIDTH / 2, 136, 'Taux de tirage', { ...FONTS.body, color: CSS.textDim, align: 'center' }).setOrigin(0.5);
     const rates = [
-      { label: 'Légendaire', rate: '3%', color: '#ffaa00' },
-      { label: 'Épique', rate: '12%', color: '#bb44ff' },
-      { label: 'Rare', rate: '25%', color: '#4488ff' },
-      { label: 'Commun', rate: '60%', color: '#aaaaaa' },
+      { label: 'Légendaire', rate: '3%', color: CSS.rarity.legendary },
+      { label: 'Épique', rate: '12%', color: CSS.rarity.epic },
+      { label: 'Rare', rate: '25%', color: CSS.rarity.rare },
+      { label: 'Commun', rate: '60%', color: CSS.rarity.common },
     ];
     rates.forEach((r, i) => {
       const x = 34 + (i % 2) * 160;
@@ -61,9 +61,9 @@ export class GachaScene extends Phaser.Scene {
     const cost10 = gs.gacha.costFor(10);
 
     makeButton(this, GAME_WIDTH / 2, 300, `Tirer ×1 — ${cost1} 💰`, () => this.pull(1), 280, 50,
-      gs.totalGold >= cost1 ? COLORS.accent : 0x333333);
+      gs.totalGold >= cost1 ? COLORS.accent : COLORS.btn.disabled);
     makeButton(this, GAME_WIDTH / 2, 368, `Tirer ×10 — ${cost10} 💰`, () => this.pull(10), 280, 50,
-      gs.totalGold >= cost10 ? 0x553388 : 0x333333);
+      gs.totalGold >= cost10 ? COLORS.btn.magic : COLORS.btn.disabled);
   }
 
   private pull(count: number): void {
@@ -90,7 +90,7 @@ export class GachaScene extends Phaser.Scene {
 
   // Flash d'anticipation avant la révélation des résultats
   private playRevealAnimation(): void {
-    const flash = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0xffffff, 0).setDepth(100);
+    const flash = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.panel, 0).setDepth(100);
     this.tweens.add({
       targets: flash,
       fillAlpha: 0.9,
@@ -99,7 +99,7 @@ export class GachaScene extends Phaser.Scene {
       onComplete: () => {
         // showResults purge tous les enfants (dont ce flash) — on en recrée un pour le fondu de sortie
         this.showResults();
-        const fadeOut = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0xffffff, 0.9).setDepth(100);
+        const fadeOut = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.panel, 0.9).setDepth(100);
         this.tweens.add({ targets: fadeOut, fillAlpha: 0, duration: 350, onComplete: () => fadeOut.destroy() });
       },
     });
@@ -127,7 +127,7 @@ export class GachaScene extends Phaser.Scene {
       const color = rarityColor(rarity);
 
       const parts: Phaser.GameObjects.GameObject[] = [];
-      parts.push(this.add.rectangle(0, 0, cardW, cardH, COLORS.panel).setStrokeStyle(2, color));
+      parts.push(this.add.rectangle(0, 0, cardW, cardH, COLORS.panel).setStrokeStyle(STROKE.base, color));
 
       if (r.type === 'hero' && r.heroDefinition) {
         parts.push(this.add.image(0, -14, `hero_${r.heroDefinition.id}`).setDisplaySize(44, 44));
@@ -137,10 +137,10 @@ export class GachaScene extends Phaser.Scene {
         parts.push(this.add.text(0, 24, r.relicDefinition.name.split(' ')[0], { ...FONTS.small, fontSize: '9px', align: 'center' }).setOrigin(0.5));
       }
 
-      parts.push(this.add.text(0, 38, rarityLabel(rarity), { fontSize: '8px', color: `#${color.toString(16).padStart(6, '0')}`, fontFamily: 'Arial' }).setOrigin(0.5));
+      parts.push(this.add.text(0, 38, rarityLabel(rarity), { fontSize: '8px', color: `#${color.toString(16).padStart(6, '0')}`, fontFamily: FONT_FAMILY, fontStyle: 'bold' }).setOrigin(0.5));
 
       if (r.isPity) {
-        const pity = this.add.text(0, -40, '★ PITY', { fontSize: '10px', color: '#ffaa00', fontFamily: 'Arial' }).setOrigin(0.5);
+        const pity = this.add.text(0, -40, '★ PITY', { fontSize: '10px', color: CSS.rarity.legendary, fontFamily: FONT_FAMILY, fontStyle: 'bold' }).setOrigin(0.5);
         parts.push(pity);
         pulse(this, pity, 1.2, 400);
       }
@@ -174,6 +174,6 @@ export class GachaScene extends Phaser.Scene {
   }
 
   private drawBackButton(): void {
-    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 50, '← RETOUR', () => transitionTo(this, 'MainMenu'), 200, 44, 0x444455);
+    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 50, '← RETOUR', () => transitionTo(this, 'MainMenu'), 200, 44, COLORS.btn.neutral);
   }
 }

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, FONTS } from '../config';
+import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, FONT_FAMILY, STROKE } from '../config';
 import { makeButton, makePanel, makeTitle, fadeIn, transitionTo, staggerIn, countUp } from '../ui/UIManager';
 import { saveProgress } from './MainMenuScene';
 import { apiClient } from '../api/apiClient';
@@ -13,7 +13,7 @@ export class GameOverScene extends Phaser.Scene {
     const victory = run.victory;
 
     fadeIn(this, 300);
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, victory ? 0x0a1a0a : 0x1a0a0a);
+    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, victory ? COLORS.result.win : COLORS.result.lose);
 
     // Braises / étoiles qui dérivent lentement vers le haut
     for (let i = 0; i < 30; i++) {
@@ -21,7 +21,7 @@ export class GameOverScene extends Phaser.Scene {
         Phaser.Math.Between(0, GAME_WIDTH),
         Phaser.Math.Between(0, GAME_HEIGHT),
         Phaser.Math.FloatBetween(1, 3),
-        victory ? 0xffd700 : 0xff4422,
+        victory ? COLORS.gold : COLORS.btn.danger,
         Phaser.Math.FloatBetween(0.2, 0.7),
       );
       if (i % 2 === 0) {
@@ -69,7 +69,7 @@ export class GameOverScene extends Phaser.Scene {
     this.drawHeroSummary();
 
     makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 60, 'MENU PRINCIPAL', () => transitionTo(this, 'MainMenu'), 240, 48,
-      victory ? 0x335533 : 0x553333);
+      victory ? COLORS.btn.success : COLORS.btn.danger);
     makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 108, 'NOUVEAU RUN',
       () => transitionTo(this, 'TeamSelect', { auto: false }), 240, 40);
   }
@@ -97,9 +97,10 @@ export class GameOverScene extends Phaser.Scene {
     run.heroes.forEach((h, i) => {
       const cx = 20 + i * 68;
       const alive = h.currentHp > 0;
-      this.add.rectangle(cx + 26, y + 32, 52, 44, alive ? 0x1e2a1e : 0x2a1e1e).setStrokeStyle(1, alive ? 0x44cc44 : 0xcc4444);
-      this.add.text(cx + 26, y + 22, alive ? '✓' : '✗', { fontSize: '18px', color: alive ? '#44cc44' : '#cc4444' }).setOrigin(0.5);
-      this.add.text(cx + 26, y + 42, h.name.split(' ')[0], { fontSize: '8px', color: '#888899' }).setOrigin(0.5);
+      this.add.rectangle(cx + 26, y + 32, 52, 44, COLORS.panel)
+        .setStrokeStyle(STROKE.thin, alive ? COLORS.hp : COLORS.btn.danger);
+      this.add.text(cx + 26, y + 22, alive ? '✓' : '✗', { fontSize: '18px', color: alive ? CSS.hp : CSS.danger, fontFamily: FONT_FAMILY, fontStyle: 'bold' }).setOrigin(0.5);
+      this.add.text(cx + 26, y + 42, h.name.split(' ')[0], { fontSize: '8px', color: CSS.textDim, fontFamily: FONT_FAMILY, fontStyle: 'bold' }).setOrigin(0.5);
     });
   }
 

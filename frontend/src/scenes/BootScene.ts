@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, COLORS } from '../config';
+import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONT_FAMILY, STROKE } from '../config';
 
 // Generates colored placeholder rectangles for all game assets.
 // Replace with real AI-generated images by loading them in preload() with the same keys.
@@ -19,9 +19,9 @@ export class BootScene extends Phaser.Scene {
   private createLoadingBar(): void {
     const cx = GAME_WIDTH / 2;
     const cy = GAME_HEIGHT / 2;
-    this.add.rectangle(cx, cy - 20, 300, 8, 0x333344);
-    const fill = this.add.rectangle(cx - 149, cy - 20, 298, 6, COLORS.accent).setOrigin(0, 0.5).setScale(0, 1);
-    this.add.text(cx, cy + 10, 'Chargement…', { fontFamily: 'Arial', fontSize: '14px', color: '#9999bb' }).setOrigin(0.5);
+    this.add.rectangle(cx, cy - 20, 300, 14, COLORS.panel).setStrokeStyle(STROKE.base, COLORS.ink);
+    const fill = this.add.rectangle(cx - 147, cy - 20, 294, 8, COLORS.accent).setOrigin(0, 0.5).setScale(0, 1);
+    this.add.text(cx, cy + 14, 'Chargement…', { fontFamily: FONT_FAMILY, fontSize: '14px', color: CSS.textDim, fontStyle: 'bold' }).setOrigin(0.5);
     this.load.on('progress', (value: number) => fill.setScale(value, 1));
   }
 
@@ -29,60 +29,78 @@ export class BootScene extends Phaser.Scene {
     return this.add.graphics();
   }
 
+  // Pastille cernée de noir : la brique de base du style BD.
+  // Le tracé est rentré de lw/2 car generateTexture coupe tout ce qui déborde de 0..w.
+  private outlinedRect(
+    gfx: Phaser.GameObjects.Graphics,
+    w: number, h: number,
+    fill: number,
+    radius = 8,
+    lw: number = STROKE.base,
+  ): void {
+    const i = lw / 2;
+    gfx.fillStyle(fill, 1);
+    gfx.fillRoundedRect(i, i, w - lw, h - lw, radius);
+    gfx.lineStyle(lw, COLORS.ink, 1);
+    gfx.strokeRoundedRect(i, i, w - lw, h - lw, radius);
+  }
+
   private generatePlaceholderTextures(): void {
-    // Hero portraits
+    // Portraits de héros — aplats saturés, tête et buste cernés
     const heroColors: Record<string, number> = {
-      sylva: 0x44aa44,
-      zara: 0xaa44aa,
-      finn: 0xddcc44,
-      shade: 0x444466,
-      gorvak: 0xcc6644,
-      lyra: 0x44ccaa,
-      vex: 0xcc8844,
+      sylva: 0x5cc85c,
+      zara: 0xc45cd6,
+      finn: 0xffd95c,
+      shade: 0x6b6f9e,
+      gorvak: 0xff7a4d,
+      lyra: 0x4ecdc4,
+      vex: 0xffa63d,
     };
 
     for (const [id, color] of Object.entries(heroColors)) {
       const gfx = this.g();
-      gfx.fillStyle(color, 1);
-      gfx.fillRoundedRect(0, 0, 80, 80, 8);
-      gfx.fillStyle(0xffffff, 0.15);
-      gfx.fillCircle(40, 28, 18);
-      gfx.fillRoundedRect(12, 48, 56, 30, 6);
+      this.outlinedRect(gfx, 80, 80, color, 10, STROKE.thick);
+      gfx.fillStyle(COLORS.textLight, 0.9);
+      gfx.lineStyle(STROKE.thin, COLORS.ink, 1);
+      gfx.fillCircle(40, 28, 15);
+      gfx.strokeCircle(40, 28, 15);
+      gfx.fillRoundedRect(16, 50, 48, 24, 8);
+      gfx.strokeRoundedRect(16, 50, 48, 24, 8);
       gfx.generateTexture(`hero_${id}`, 80, 80);
       gfx.destroy();
     }
 
-    // Enemy textures
+    // Ennemis — même grammaire, teintes plus froides/acides pour les distinguer
     const enemyColors: Record<string, number> = {
-      goblin_grunt: 0x667733,
-      orc_berserker: 0x884422,
-      dark_archer: 0x334455,
-      skeleton_mage: 0x889999,
-      stone_golem: 0x778877,
-      shadow_assassin: 0x222233,
-      cursed_knight: 0x553366,
-      forest_witch: 0x336633,
-      dungeon_lord: 0x993311,
-      corrupted_ancient: 0x551166,
+      goblin_grunt: 0x8fbc3f,
+      orc_berserker: 0xc8703f,
+      dark_archer: 0x5b7f9e,
+      skeleton_mage: 0xd6d6c4,
+      stone_golem: 0x9e9e8f,
+      shadow_assassin: 0x5c5c7a,
+      cursed_knight: 0x8f5cb0,
+      forest_witch: 0x4fa36b,
+      dungeon_lord: 0xd6453f,
+      corrupted_ancient: 0xa03fd6,
     };
 
     for (const [id, color] of Object.entries(enemyColors)) {
       const gfx = this.g();
-      gfx.fillStyle(color, 1);
-      gfx.fillRoundedRect(0, 0, 60, 60, 6);
-      gfx.fillStyle(0xff3333, 0.6);
-      gfx.fillCircle(30, 22, 12);
+      this.outlinedRect(gfx, 60, 60, color, 8, STROKE.base);
+      gfx.fillStyle(COLORS.ink, 1);
+      gfx.fillCircle(23, 24, 4);
+      gfx.fillCircle(37, 24, 4);
       gfx.generateTexture(`enemy_${id}`, 60, 60);
       gfx.destroy();
     }
 
-    // Room backgrounds
+    // Fonds de salle — nuances de papier teinté, jamais de fond sombre
     const bgColors: Record<string, number> = {
-      combat: 0x1a0a0a,
-      event: 0x0a1a0a,
-      shop: 0x1a1a0a,
-      rest: 0x0a0a1a,
-      boss: 0x220011,
+      combat: 0xf6ded2,
+      event: 0xdcefe0,
+      shop: 0xf7ecc9,
+      rest: 0xdde8f5,
+      boss: 0xf2d3d8,
     };
     for (const [type, color] of Object.entries(bgColors)) {
       const gfx = this.g();
@@ -92,55 +110,47 @@ export class BootScene extends Phaser.Scene {
       gfx.destroy();
     }
 
-    // Relic icons
-    const relicColors = [0xaaaaaa, 0x4488ff, 0xbb44ff, 0xffaa00, 0x44dd88];
+    // Icônes de reliques
+    const relicColors = [COLORS.accent, COLORS.secondary, COLORS.btn.magic, COLORS.gold, COLORS.hp];
     const relicIds = ['bloodstone_ring','swiftness_boots','war_banner','shadow_cloak','ancient_tome',
                       'iron_fortress','emerald_pendant','void_crystal','gold_idol','dragon_scale',
                       'berserker_heart','amulet_of_focus'];
     relicIds.forEach((id, i) => {
       const gfx = this.g();
       const col = relicColors[i % relicColors.length];
-      gfx.fillStyle(col, 0.8);
-      gfx.fillRoundedRect(0, 0, 48, 48, 6);
-      gfx.fillStyle(0xffffff, 0.3);
-      gfx.fillCircle(24, 24, 14);
+      this.outlinedRect(gfx, 48, 48, col, 8, STROKE.base);
+      gfx.fillStyle(COLORS.textLight, 0.85);
+      gfx.lineStyle(STROKE.thin, COLORS.ink, 1);
+      gfx.fillCircle(24, 24, 11);
+      gfx.strokeCircle(24, 24, 11);
       gfx.generateTexture(`relic_${id}`, 48, 48);
       gfx.destroy();
     });
 
-    // Card frame
+    // Cadre de carte
     const cardG = this.g();
-    cardG.fillStyle(COLORS.panel, 1);
-    cardG.fillRoundedRect(0, 0, 100, 140, 8);
-    cardG.lineStyle(2, COLORS.panelBorder);
-    cardG.strokeRoundedRect(0, 0, 100, 140, 8);
+    this.outlinedRect(cardG, 100, 140, COLORS.panel, 10, STROKE.base);
     cardG.generateTexture('card_frame', 100, 140);
     cardG.destroy();
 
-    // Grid cell (normal)
+    // Case de grille (normale)
     const cellG = this.g();
-    cellG.fillStyle(0x1e1e3a, 1);
-    cellG.fillRoundedRect(0, 0, 80, 80, 6);
-    cellG.lineStyle(1, 0x3d3d7a);
-    cellG.strokeRoundedRect(0, 0, 80, 80, 6);
+    this.outlinedRect(cellG, 80, 80, COLORS.panel, 8, STROKE.base);
     cellG.generateTexture('grid_cell', 80, 80);
     cellG.destroy();
 
-    // Grid cell (hovered)
+    // Case de grille (survolée) — l'accent remplit la case, le contour reste noir
     const cellHoverG = this.g();
-    cellHoverG.fillStyle(0x2a2a5a, 1);
-    cellHoverG.fillRoundedRect(0, 0, 80, 80, 6);
-    cellHoverG.lineStyle(2, COLORS.accentLight);
-    cellHoverG.strokeRoundedRect(0, 0, 80, 80, 6);
+    this.outlinedRect(cellHoverG, 80, 80, COLORS.accentLight, 8, STROKE.thick);
     cellHoverG.generateTexture('grid_cell_hover', 80, 80);
     cellHoverG.destroy();
 
-    // Particule douce pour les effets (impacts, étincelles, lueurs)
+    // Particule d'impact — un rond franc cerné, pas une lueur diffuse
     const sparkG = this.g();
-    sparkG.fillStyle(0xffffff, 0.35);
-    sparkG.fillCircle(8, 8, 8);
-    sparkG.fillStyle(0xffffff, 1);
-    sparkG.fillCircle(8, 8, 4);
+    sparkG.fillStyle(COLORS.gold, 1);
+    sparkG.fillCircle(8, 8, 6);
+    sparkG.lineStyle(2, COLORS.ink, 1);
+    sparkG.strokeCircle(8, 8, 6);
     sparkG.generateTexture('spark', 16, 16);
     sparkG.destroy();
   }

@@ -76,6 +76,26 @@ cd frontend && npm install && cd ../backend && npm install
 
 ---
 
+## Vérifier le rendu à l'écran
+
+⚠️ **Le serveur de dev (`npm run dev`) peut servir du JS obsolète au navigateur** même
+après modification des sources et purge de `node_modules/.vite` — observé sur WSL2 :
+`curl` renvoyait le code à jour pendant que la page rendait l'ancien. Une capture d'écran
+prise via le serveur de dev peut donc valider du code qui n'est pas celui du disque.
+
+Pour vérifier un changement visuel, **passer par le build statique** :
+```bash
+cd frontend && npm run build && npx serve -s dist -l 4173
+```
+puis piloter `http://localhost:4173/` (Playwright, viewport 360×640 → canvas 1:1).
+Le canvas est en WebGL sans `preserveDrawingBuffer` : le lire via `getImageData`
+renvoie du vide, il faut utiliser `page.screenshot()`.
+
+⚠️ `tsconfig.json` ne définit pas `noEmit` : un `tsc` sans `--noEmit` compile des `.js`
+à côté de chaque `.ts` dans `src/`. Ne jamais les committer.
+
+---
+
 ## Structure des fichiers — où tout se trouve
 
 ```
@@ -194,6 +214,30 @@ Sauvegarde serveur : `apiClient.saveProgress()` — appeler après chaque modifi
 - **Commentaires** : en français, expliquer le "pourquoi" pas le "quoi"
 - **Nouvelles données** (héros, reliques, events) : ajouter dans `data/`, jamais hardcodées dans les scènes
 
+### Thème visuel — BD claire (cartoon)
+
+Le jeu utilise un thème **bande dessinée claire** : fond papier crème, aplats de
+couleur francs, **gros contours noirs**, typo arrondie en gras.
+
+- **Toutes les couleurs viennent de `config.ts`.** Aucune valeur `0x…` ou `#…` en
+  dur dans les scènes (seule exception : la conversion `rarityColor(...).toString(16)`).
+  Un changement de thème doit rester un chantier d'un seul fichier.
+- Tokens disponibles : `COLORS` (nombres, pour Phaser) et `CSS` (chaînes, pour les
+  styles de texte) — les deux sont maintenus en parallèle et doivent rester synchrones.
+  Familles : `background` / `panel` / `ink` / `accent` / `secondary` / `gold` / `hp`,
+  textes (`text`, `textLight`, `textDim`, `textFaint`), `rarity.*`, `btn.*`
+  (`primary`, `secondary`, `success`, `danger`, `magic`, `gold`, `neutral`, `disabled`),
+  `track.*`, `side.*`, `result.*`, `scrim`.
+- **Choisir un token par intention, pas par teinte** : `COLORS.btn.danger`, pas « le rouge ».
+- Contours : `STROKE.thin | base | thick` (2/3/4 px). Le trait est **noir** (`COLORS.ink`)
+  partout ; c'est lui qui porte le style, pas la couleur du contour.
+- Typo : `FONTS.*` ou `FONT_FAMILY` (pile Comic Sans → Comic Neue → Chalkboard →
+  Trebuchet). Toujours `fontStyle: 'bold'`. Jamais `'Arial'` ni `'Georgia'` en dur.
+- Les **voiles** (modales, écrans de résultat) utilisent `COLORS.scrim` (papier, ~0.82),
+  jamais un voile noir : le noir vire au brun sur le fond crème.
+- `makeButton` produit un bouton cerné de noir avec **ombre portée pleine** décalée ;
+  `makePanel` un panneau blanc à contour noir. Ne pas redessiner de boutons à la main.
+
 ### Layout des scènes (écran 360×640)
 
 - **Grille de marge unique** : marge latérale `MARGIN = 16px`, largeur de contenu
@@ -258,7 +302,8 @@ Migration DB au premier déploiement : `npx prisma migrate deploy`
 3. ✅ 8 héros, 12 reliques, gacha avec pity
 4. ✅ Méta-progression (arbre de talents)
 5. ✅ Backend auth + save + leaderboard
-6. 🔲 Assets IA réels (remplacer les placeholders de `BootScene.ts`)
+6. 🔲 Assets IA réels (remplacer les placeholders de `BootScene.ts`) — **style BD claire**,
+   contours noirs épais, aplats francs (voir `assets/ASSET_PROMPTS.md` à réaligner)
 7. 🔲 Animations (idle/attaque) via spritesheets
 8. 🔲 Son et musique
 9. 🔲 Export Android (Capacitor)
