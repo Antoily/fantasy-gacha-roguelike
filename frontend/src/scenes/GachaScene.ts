@@ -1,8 +1,21 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, FONT_FAMILY, STROKE } from '../config';
-import { makeButton, makePanel, makeTitle, rarityColor, showToast, fadeIn, transitionTo, pulse } from '../ui/UIManager';
+import { makeButton, makePanel, makeTitle, rarityColor, rarityLabel, showToast, fadeIn, transitionTo, pulse } from '../ui/UIManager';
 import type { GachaPullResult } from '../systems/GachaSystem';
+import type { Rarity } from '../data/heroes';
 import { saveProgress } from './MainMenuScene';
+
+// Hiérarchie des raretés : sert à choisir l'animation d'une salve (la meilleure gagne)
+const RARITY_RANK: Record<Rarity, number> = { common: 0, rare: 1, epic: 2, legendary: 3 };
+
+// Intensité de l'annonce par rareté. `hold` est la durée avant la révélation :
+// une légendaire se fait attendre, une commune ne fait pas perdre de temps.
+const RARITY_FX: Record<Rarity, { rays: number; sparks: number; shake: number; hold: number }> = {
+  common:    { rays: 0,  sparks: 6,  shake: 0,   hold: 700 },
+  rare:      { rays: 0,  sparks: 12, shake: 0,   hold: 950 },
+  epic:      { rays: 8,  sparks: 20, shake: 120, hold: 1300 },
+  legendary: { rays: 14, sparks: 32, shake: 260, hold: 1750 },
+};
 
 export class GachaScene extends Phaser.Scene {
   private results: GachaPullResult[] = [];
@@ -87,20 +100,95 @@ export class GachaScene extends Phaser.Scene {
     this.playRevealAnimation();
   }
 
-  // Flash d'anticipation avant la révélation des résultats
+  // L'animation annonce la rareté AVANT de montrer les cartes : c'est le moment
+  // de tension du gacha. Sur une salve, c'est la meilleure rareté qui la dicte.
   private playRevealAnimation(): void {
-    const flash = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.panel, 0).setDepth(100);
-    this.tweens.add({
-      targets: flash,
-      fillAlpha: 0.9,
-      duration: 220,
-      ease: 'Quad.In',
-      onComplete: () => {
-        // showResults purge tous les enfants (dont ce flash) — on en recrée un pour le fondu de sortie
-        this.showResults();
-        const fadeOut = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.panel, 0.9).setDepth(100);
-        this.tweens.add({ targets: fadeOut, fillAlpha: 0, duration: 350, onComplete: () => fadeOut.destroy() });
-      },
+    const best = this.results.reduce((max, r) =>
+      RARITY_RANK[r.rarity] > RARITY_RANK[max.rarity] ? r : max, this.results[0]);
+
+    this.playRarityIntro(best.rarity, () => {
+      this.showResults();
+      const fadeOut = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.panel, 0.9).setDepth(100);
+      this.tweens.add({ targets: fadeOut, fillAlpha: 0, duration: 350, onComplete: () => fadeOut.destroy() });
+    });
+  }
+
+  // Plus la rareté est haute, plus l'annonce est longue et spectaculaire :
+  // anneaux, rayons, étincelles et secousse s'ajoutent par paliers.
+  private playRarityIntro(rarity: Rarity, onDone: () => void): void {
+    const cx = GAME_WIDTH / 2;
+    const cy = GAME_HEIGHT / 2;
+    const color = rarityColor(rarity);
+    const rank = RARITY_RANK[rarity];
+    const cfg = RARITY_FX[rarity];
+
+    const layer = this.add.container(0, 0).setDepth(100);
+    const veil = this.add.rectangle(cx, cy, GAME_WIDTH, GAME_HEIGHT, COLORS.scrim, 0).setDepth(99);
+    this.tweens.add({ targets: veil, fillAlpha: 0.94, duration: 180 });
+
+    // Rayons pour épique et légendaire
+    if (rank >= 2) {
+      for (let i = 0; i < cfg.rays; i++) {
+        const angle = (i / cfg.rays) * Math.PI * 2;
+        const ray = this.add.rectangle(cx, cy, 4, 260, color, 0.75)
+          .setOrigin(0.5, 0)
+          .setRotation(angle)
+          .setScale(1, 0);
+        layer.add(ray);
+        this.tweens.add({ targets: ray, scaleY: 1, duration: 420, delay: 120 + i * 20, ease: 'Quad.Out' });
+        this.tweens.add({ targets: ray, alpha: 0, duration: 380, delay: 620 + i * 20 });
+      }
+    }
+
+    // Anneaux concentriques : un par palier de rareté
+    for (let i = 0; i <= rank; i++) {
+      const ring = this.add.circle(cx, cy, 30, undefined, 0)
+        .setStrokeStyle(STROKE.thick, color, 1);
+      layer.add(ring);
+      this.tweens.add({
+        targets: ring,
+        scale: 4 + i,
+        alpha: 0,
+        duration: 620,
+        delay: i * 130,
+        ease: 'Quad.Out',
+      });
+    }
+
+    // Étincelles projetées
+    for (let i = 0; i < cfg.sparks; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const d = 60 + Math.random() * 110;
+      const spark = this.add.image(cx, cy, 'spark')
+        .setTint(color)
+        .setScale(Phaser.Math.FloatBetween(0.5, 1.2));
+      layer.add(spark);
+      this.tweens.add({
+        targets: spark,
+        x: cx + Math.cos(a) * d,
+        y: cy + Math.sin(a) * d,
+        alpha: 0,
+        duration: 700,
+        delay: 200 + Math.random() * 200,
+        ease: 'Quad.Out',
+      });
+    }
+
+    // Nom de la rareté, cerné de noir comme le reste du thème
+    const label = this.add.text(cx, cy, rarityLabel(rarity).toUpperCase(), {
+      fontFamily: FONT_FAMILY, fontSize: rank >= 2 ? '30px' : '22px', fontStyle: 'bold',
+      color: `#${color.toString(16).padStart(6, '0')}`,
+      stroke: CSS.ink, strokeThickness: 6, align: 'center',
+    }).setOrigin(0.5).setScale(0);
+    layer.add(label);
+    this.tweens.add({ targets: label, scale: 1, duration: 380, delay: 150, ease: 'Back.Out' });
+
+    if (cfg.shake > 0) this.time.delayedCall(200, () => this.cameras.main.shake(cfg.shake, 0.006));
+
+    this.time.delayedCall(cfg.hold, () => {
+      layer.destroy();
+      veil.destroy();
+      onDone();
     });
   }
 
@@ -120,7 +208,7 @@ export class GachaScene extends Phaser.Scene {
       const col = i % perRow;
       const row = Math.floor(i / perRow);
       const x = padX + col * (cardW + 6);
-      const y = 70 + row * (cardH + 10);
+      const y = 100 + row * (cardH + 10);
 
       const rarity = r.rarity;
       const color = rarityColor(rarity);

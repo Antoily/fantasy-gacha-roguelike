@@ -18,6 +18,8 @@ export interface HeroInstance {
   gridCol: number | null;
   // Drapeaux de combat, remis à zéro à chaque combat
   atkDebuffPct: number; // 0-100
+  parryUsed: boolean;   // « Parade » : la première attaque a déjà été ignorée
+  reviveUsed: boolean;  // « Rappel » : le relèvement a déjà servi ce combat
 }
 
 let _instanceCounter = 0;
@@ -39,6 +41,8 @@ export function createHeroInstance(def: HeroDefinition): HeroInstance {
     gridRow: null,
     gridCol: null,
     atkDebuffPct: 0,
+    parryUsed: false,
+    reviveUsed: false,
   };
 }
 

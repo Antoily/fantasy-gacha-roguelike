@@ -146,7 +146,7 @@ nouvelle fonctionnalité :
 
 ### Héros (`frontend/src/data/heroes.ts`)
 
-13 héros, 3 stats (`hp` / `atk` / `spd`), un rôle, une rangée, une compétence.
+20 héros, 3 stats (`hp` / `atk` / `spd`), un rôle, une rangée, une compétence.
 
 | id | Nom court | Rôle | Rangée | Rareté | Compétence (`ability.id`) |
 |----|-----------|------|--------|--------|---------------------------|
@@ -163,6 +163,13 @@ nouvelle fonctionnalité :
 | `finn` | Finn | heal | back | rare | `heal_one` — +50 PV au plus blessé |
 | `sora` | Sora | heal | back | epic | `heal_all` — +20 PV à l'équipe |
 | `lyra` | Lyra | support | back | rare | `weaken` — -50% ATK au plus fort |
+| `ourg` | Ourg | tank | front | common | `parry` — ignore la 1re attaque reçue |
+| `ysolde` | Ysolde | tank | front | epic | `regen` — +10 PV à chaque coup reçu |
+| `corvus` | Corvus | dps | back | rare | `snipe` — cible la plus forte ATK |
+| `ignis` | Ignis | dps | back | epic | `splash` — cible + voisins |
+| `aubepine` | Aubépine | heal | back | legendary | `revive` — relève un allié, 1×/combat |
+| `orin` | Orin | support | back | rare | `rally` — équipe +15% ATK |
+| `sibylle` | Sibylle | support | back | epic | `slow` — ennemis -25% VIT |
 
 Starters (`STARTER_HERO_IDS`) : `aldric`, `sylva`, `finn` — trois pour une équipe
 de quatre, pour que le manque se fasse sentir dès la première partie.
@@ -212,6 +219,23 @@ Run en pilote automatique (bouton « 🤖 RUN AUTO (+30% 💰) »).
 - Chaque scène de run, si `run.autoMode`, déclenche son action via
   `this.time.delayedCall(...)` avec un choix aléatoire (`pickRandom`).
 - Un badge « 🤖 AUTO » est affiché en haut de chaque scène concernée.
+
+## Gacha — animation de tirage
+
+`GachaScene.playRarityIntro(rarity, onDone)` annonce la rareté **avant** de révéler
+les cartes. L'intensité (rayons, étincelles, secousse, durée) vient de `RARITY_FX`.
+Sur un tirage ×10, c'est la **meilleure** rareté de la salve qui dicte l'animation
+(`RARITY_RANK`).
+
+---
+
+## ⚠️ Or de test
+
+`MainMenuScene.ts` expose `DEBUG_GOLD` (actuellement `9_999_999`), appliqué au
+chargement par `applyDebugGold()`. **Il écrase l'or à chaque rechargement de page.**
+Le remettre à `0` avant toute publication ou test d'équilibrage de l'économie.
+
+---
 
 ## Progression méta
 

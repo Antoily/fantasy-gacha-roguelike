@@ -113,7 +113,17 @@ export class RecruitScene extends Phaser.Scene {
       return;
     }
 
-    // Équipe pleine : il faut choisir qui part
+    // Équipe pleine : il faut choisir qui part. En mode auto, personne n'est là
+    // pour répondre — on tire au sort, sinon le run reste figé sur la modale.
+    if (run.autoMode) {
+      this.resolved = true;
+      const leaving = pickRandom(run.heroes);
+      gs.runManager.recruitHero(hero.id, leaving.instanceId);
+      showToast(this, `${hero.name} remplace ${leaving.short}`);
+      this.finish();
+      return;
+    }
+
     this.askWhoLeaves(hero);
   }
 

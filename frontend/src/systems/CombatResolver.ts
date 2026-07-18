@@ -8,7 +8,7 @@ import { randInt } from '../utils/random';
 // de rejouer le déroulement en animation (barres de PV, dégâts flottants, morts)
 export interface CombatEffect {
   unitId: string;
-  kind: 'damage' | 'heal' | 'debuff';
+  kind: 'damage' | 'heal' | 'debuff' | 'revive';
   amount: number;
   hpAfter: number;
 }
@@ -42,6 +42,18 @@ function rollDamage(atk: number): number {
 
 function effectiveAtk(unit: { atk: number; atkDebuffPct: number }): number {
   return Math.max(1, Math.round(unit.atk * (1 - unit.atkDebuffPct / 100)));
+}
+
+// « Refrain » : +15% d'ATK à toute l'équipe tant que le barde tient debout
+function rallyBonus(heroes: HeroInstance[]): number {
+  return heroes.some(h => h.abilityId === 'rally' && isHeroAlive(h)) ? 1.15 : 1;
+}
+
+// Voisins orthogonaux sur la grille — utilisé par « Déflagration »
+function neighbours(target: EnemyInstance, pool: EnemyInstance[]): EnemyInstance[] {
+  return pool.filter(e =>
+    e.instanceId !== target.instanceId &&
+    Math.abs(e.gridRow - target.gridRow) + Math.abs(e.gridCol - target.gridCol) === 1);
 }
 
 // Place les héros automatiquement : tanks et bagarreurs devant, le reste derrière.
@@ -94,6 +106,14 @@ function damageHero(
   entry: CombatLogEntry,
   attacker?: EnemyInstance,
 ): void {
+  // « Parade » : la toute première attaque du combat ne fait rien
+  if (target.abilityId === 'parry' && !target.parryUsed) {
+    target.parryUsed = true;
+    entry.special = 'Parade';
+    entry.effects.push({ unitId: target.instanceId, kind: 'damage', amount: 0, hpAfter: target.currentHp });
+    return;
+  }
+
   let dmg = raw;
 
   // « Égide » : réduction d'équipe tant que le gardien est en vie
@@ -103,6 +123,12 @@ function damageHero(
   target.currentHp = Math.max(0, target.currentHp - dmg);
   entry.effects.push({ unitId: target.instanceId, kind: 'damage', amount: dmg, hpAfter: target.currentHp });
   entry.damage = dmg;
+
+  // « Second Souffle » : chaque coup encaissé rend un peu de vie
+  if (target.abilityId === 'regen' && target.currentHp > 0) {
+    healHero(target, 10);
+    entry.effects.push({ unitId: target.instanceId, kind: 'heal', amount: 10, hpAfter: target.currentHp });
+  }
 
   // « Carapace » : renvoie une part des dégâts à l'attaquant
   if (target.abilityId === 'thorns' && attacker && isEnemyAlive(attacker)) {
@@ -128,7 +154,7 @@ function damageEnemy(target: EnemyInstance, dmg: number, entry: CombatLogEntry, 
 function heroAction(hero: HeroInstance, heroes: HeroInstance[], enemies: EnemyInstance[], entry: CombatLogEntry): void {
   const live = enemies.filter(isEnemyAlive);
   if (live.length === 0) return;
-  const atk = effectiveAtk(hero);
+  const atk = Math.round(effectiveAtk(hero) * rallyBonus(heroes));
 
   switch (hero.abilityId) {
     case 'heal_one': {
@@ -190,6 +216,44 @@ function heroAction(hero: HeroInstance, heroes: HeroInstance[], enemies: EnemyIn
       entry.targetName = t1.name;
       entry.damage = dmg1;
       entry.special = 'Tir Double';
+      return;
+    }
+    case 'revive': {
+      const fallen = heroes.find(h => h.currentHp <= 0);
+      if (fallen && !hero.reviveUsed) {
+        hero.reviveUsed = true;
+        fallen.currentHp = Math.max(1, Math.round(fallen.maxHp * 0.4));
+        entry.targetName = fallen.name;
+        entry.heal = fallen.currentHp;
+        entry.special = 'Rappel';
+        entry.effects.push({ unitId: fallen.instanceId, kind: 'revive', amount: fallen.currentHp, hpAfter: fallen.currentHp });
+        return;
+      }
+      // Personne à relever : elle frappe, faute de mieux
+      const t = live[0];
+      const d = rollDamage(atk);
+      damageEnemy(t, d, entry, hero);
+      entry.targetName = t.name;
+      entry.damage = d;
+      return;
+    }
+    case 'snipe': {
+      const target = live.reduce((max, e) => (effectiveAtk(e) > effectiveAtk(max) ? e : max), live[0]);
+      const dmg = rollDamage(atk);
+      damageEnemy(target, dmg, entry, hero);
+      entry.targetName = target.name;
+      entry.damage = dmg;
+      entry.special = 'Tir de Précision';
+      return;
+    }
+    case 'splash': {
+      const target = live[0];
+      const hit = [target, ...neighbours(target, live)];
+      const dmg = rollDamage(atk);
+      hit.forEach(e => damageEnemy(e, dmg, entry, hero));
+      entry.targetName = `${hit.length} ennemi(s)`;
+      entry.damage = dmg;
+      entry.special = 'Déflagration';
       return;
     }
     case 'execute': {
@@ -262,9 +326,14 @@ export function resolveCombat(heroes: HeroInstance[], enemies: EnemyInstance[]):
   const maxTurns = 200;
 
   autoPlaceHeroes(heroes);
-  // Les affaiblissements ne survivent pas d'un combat à l'autre
-  heroes.forEach(h => { h.atkDebuffPct = 0; });
+  // Rien ne survit d'un combat à l'autre : affaiblissements et jetons à usage unique
+  heroes.forEach(h => { h.atkDebuffPct = 0; h.parryUsed = false; h.reviveUsed = false; });
   enemies.forEach(e => { e.atkDebuffPct = 0; });
+
+  // « Présage » : ralentit tout le camp adverse pour la durée du combat
+  if (heroes.some(h => h.abilityId === 'slow' && isHeroAlive(h))) {
+    enemies.forEach(e => { e.spd = Math.max(1, Math.round(e.spd * 0.75)); });
+  }
 
   while (turn < maxTurns) {
     if (heroes.every(h => !isHeroAlive(h)) || enemies.every(e => !isEnemyAlive(e))) break;

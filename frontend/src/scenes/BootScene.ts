@@ -60,6 +60,13 @@ export class BootScene extends Phaser.Scene {
       nix: 0x4dd6c4,
       lyra: 0x4ecdc4,
       vex: 0xffa63d,
+      ourg: 0xb0a27f,
+      ysolde: 0xd68fb0,
+      corvus: 0x6b8fb0,
+      ignis: 0xff8f3d,
+      aubepine: 0xa8d68f,
+      orin: 0xd6c46b,
+      sibylle: 0xb08fd6,
     };
 
     for (const [id, color] of Object.entries(heroColors)) {

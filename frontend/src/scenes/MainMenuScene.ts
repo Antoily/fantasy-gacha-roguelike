@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
+import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS } from '../config';
 import { makeButton, makeTitle, makePanel, fadeIn, transitionTo, staggerIn } from '../ui/UIManager';
 import { RunManager } from '../systems/RunManager';
 import { GachaSystem } from '../systems/GachaSystem';
@@ -33,6 +33,7 @@ export class MainMenuScene extends Phaser.Scene {
         bestRun: { zonesCleared: 0, roomsCleared: 0 },
       };
       this.loadProgress();
+      applyDebugGold();
     }
 
     fadeIn(this);
@@ -93,6 +94,12 @@ export class MainMenuScene extends Phaser.Scene {
       makeButton(this, GAME_WIDTH / 2, 404, 'COLLECTION', () => transitionTo(this, 'Collection'), 220, 42, COLORS.btn.success),
     ];
     staggerIn(this, buttons, 20);
+
+    // Le run auto tranche à notre place, et au hasard : il faut le dire avant
+    // que le joueur lance un run et découvre des choix qu'il n'a pas faits.
+    this.add.text(GAME_WIDTH / 2, 328, 'Le run auto joue seul et fait des choix au hasard', {
+      ...FONTS.small, fontSize: '10px', align: 'center', color: CSS.textDim,
+    }).setOrigin(0.5);
   }
 
   private drawStats(): void {
@@ -115,6 +122,16 @@ export class MainMenuScene extends Phaser.Scene {
       if (save.gacha) gs.gacha.load(save.gacha);
     } catch { /* fresh start */ }
   }
+}
+
+// ⚠️ TEMPORAIRE — or de test pour explorer le gacha sans farmer.
+// Mettre DEBUG_GOLD à 0 (ou supprimer l'appel dans create()) avant toute publication.
+export const DEBUG_GOLD = 9_999_999;
+
+function applyDebugGold(): void {
+  if (DEBUG_GOLD <= 0) return;
+  window.gameState.totalGold = DEBUG_GOLD;
+  saveProgress();
 }
 
 export function saveProgress(): void {

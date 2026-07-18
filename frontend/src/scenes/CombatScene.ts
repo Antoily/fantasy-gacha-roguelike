@@ -224,10 +224,17 @@ export class CombatScene extends Phaser.Scene {
         if (eff.amount >= 35) this.cameras.main.shake(90, 0.005);
         break;
       }
+      case 'revive':
       case 'heal': {
         floatText(this, x, y - 26, `+${eff.amount}`, CSS.hp);
         unit.sprite.setTint(COLORS.hp);
         this.time.delayedCall(180 / this.speed, () => unit.sprite.clearTint());
+        if (eff.kind === 'revive') {
+          // L'unité était grisée et couchée : on la remet debout
+          unit.container.setAlpha(1).setAngle(0).setScale(1);
+          unit.sprite.clearTint();
+          floatText(this, x, y - 42, '✨ Debout !', CSS.gold, '12px');
+        }
         break;
       }
       case 'debuff':
