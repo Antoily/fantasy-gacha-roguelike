@@ -18,6 +18,9 @@ export interface GameState {
   unlockedHeroIds: string[];
   totalGold: number;  // persistent gold (separate from run gold)
   bestRun: { zonesCleared: number; roomsCleared: number };
+  // Vitesse de lecture des combats (1 / 2 / 4) — préférence du joueur, elle
+  // doit survivre d'un combat à l'autre et d'une session à l'autre.
+  combatSpeed: number;
 }
 
 export class MainMenuScene extends Phaser.Scene {
@@ -31,6 +34,7 @@ export class MainMenuScene extends Phaser.Scene {
         unlockedHeroIds: [...STARTER_HERO_IDS],
         totalGold: 0,
         bestRun: { zonesCleared: 0, roomsCleared: 0 },
+        combatSpeed: 1,
       };
       this.loadProgress();
       applyDebugGold();
@@ -114,6 +118,7 @@ export class MainMenuScene extends Phaser.Scene {
       if (save.unlockedHeroIds) gs.unlockedHeroIds = save.unlockedHeroIds;
       if (save.totalGold !== undefined) gs.totalGold = save.totalGold;
       if (save.bestRun) gs.bestRun = save.bestRun;
+      if (save.combatSpeed) gs.combatSpeed = save.combatSpeed;
       if (save.gacha) gs.gacha.load(save.gacha);
     } catch { /* fresh start */ }
   }
@@ -136,6 +141,7 @@ export function saveProgress(): void {
       unlockedHeroIds: gs.unlockedHeroIds,
       totalGold: gs.totalGold,
       bestRun: gs.bestRun,
+      combatSpeed: gs.combatSpeed,
       gacha: gs.gacha.serialize(),
     };
     localStorage.setItem('fantasy_roguelike_save', JSON.stringify(save));

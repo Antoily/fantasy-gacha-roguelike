@@ -5,6 +5,7 @@ import { resolveCombat, type CombatLogEntry, type CombatEffect } from '../system
 import { createEnemyInstance, type EnemyInstance } from '../entities/Enemy';
 import type { HeroInstance } from '../entities/Hero';
 import { getEnemyById } from '../data/enemies';
+import { saveProgress } from './MainMenuScene';
 
 const CELL_W = 52;
 const CELL_H = 56;
@@ -58,8 +59,9 @@ export class CombatScene extends Phaser.Scene {
     const run = gs.runManager.state;
     const room = run.rooms[run.currentRoomIndex];
 
-    // Mode auto : lecture accélérée du combat (réinitialisée à chaque combat)
-    this.speed = run.autoMode ? 2 : 1;
+    // La vitesse est une préférence du joueur : on la reprend telle quelle,
+    // sans la réinitialiser ni la forcer en mode auto.
+    this.speed = gs.combatSpeed;
 
     if (!room.formation) {
       this.scene.start('RunMap');
@@ -166,6 +168,8 @@ export class CombatScene extends Phaser.Scene {
       .on('pointerdown', () => {
         this.speed = this.speed >= 4 ? 1 : this.speed * 2;
         this.speedBtn?.setText(`▶ ×${this.speed}`);
+        window.gameState.combatSpeed = this.speed;
+        saveProgress();
       });
 
     this.skipBtn = makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 55, 'PASSER ▶▶', () => this.skipToEnd(), 180, 40, COLORS.btn.neutral);
