@@ -42,7 +42,10 @@ export class RunMapScene extends Phaser.Scene {
 
     // Mode auto : on entre automatiquement dans la salle courante après un court délai
     if (run.autoMode) {
-      this.add.text(GAME_WIDTH - MARGIN, 30, '🤖 AUTO', { ...FONTS.small, color: CSS.accent }).setOrigin(1, 0.5);
+      // Sur la ligne de l'or, pas sur celle du titre : le titre est en 28px et
+      // s'étale jusque sous le badge dès que le numéro de salle passe à deux
+      // chiffres (« Zone 1 — Salle 8/8 » chevauchait « 🤖 AUTO »).
+      this.add.text(GAME_WIDTH - MARGIN, 54, '🤖 AUTO', { ...FONTS.small, color: CSS.accent }).setOrigin(1, 0.5);
       this.time.delayedCall(700, () => this.enterRoom(run.rooms[run.currentRoomIndex]));
     }
   }
