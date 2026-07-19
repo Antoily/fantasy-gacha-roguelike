@@ -75,6 +75,13 @@ cd frontend && npm install && cd ../backend && npm install
 
 **Fix CI cassée** : toujours ouvrir une PR (`fix/ci-...`), ne pas patcher directement sur main.
 
+**Lint** : config ESLint legacy (`.eslintrc.json`) dans `frontend/` et `backend/`,
+format imposé par ESLint 8.57 + typescript-eslint 7 épinglés. Ne pas migrer vers
+`eslint.config.js` sans monter ESLint en v9+. `no-explicit-any` est en **erreur** ;
+`no-non-null-assertion` est désactivé (le `!` est délibéré : `getHeroById(id)!`,
+`req.userId!`, `slot.enemy!`). Lancer `npm run lint` dans chaque package avant de
+committer — la CI l'exécute désormais réellement.
+
 ---
 
 ## Vérifier le rendu à l'écran
@@ -93,7 +100,12 @@ Le canvas est en WebGL sans `preserveDrawingBuffer` : le lire via `getImageData`
 renvoie du vide, il faut utiliser `page.screenshot()`.
 
 ⚠️ `tsconfig.json` ne définit pas `noEmit` : un `tsc` sans `--noEmit` compile des `.js`
-à côté de chaque `.ts` dans `src/`. Ne jamais les committer.
+à côté de chaque `.ts` dans `src/`. Ne jamais les committer. (`npm run build` et
+`npm run type-check` passent bien `--noEmit`.)
+
+**Vérification headless sur WSL2** : le WebGL par défaut échoue
+(« Framebuffer Unsupported »). Lancer Chromium avec
+`--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader`.
 
 ---
 
@@ -229,11 +241,12 @@ Sur un tirage ×10, c'est la **meilleure** rareté de la salve qui dicte l'anima
 
 ---
 
-## ⚠️ Or de test
+## Or de test
 
-`MainMenuScene.ts` expose `DEBUG_GOLD` (actuellement `9_999_999`), appliqué au
-chargement par `applyDebugGold()`. **Il écrase l'or à chaque rechargement de page.**
-Le remettre à `0` avant toute publication ou test d'équilibrage de l'économie.
+`MainMenuScene.ts` expose `DEBUG_GOLD`, appliqué au chargement par
+`applyDebugGold()`. **Valeur par défaut : `0` (désactivé) — c'est l'état à
+conserver.** Toute valeur > 0 écrase l'or du joueur à chaque rechargement de
+page, ce qui rend l'économie intestable. Le remettre à `0` après usage.
 
 ---
 
@@ -262,7 +275,13 @@ La **seule** progression entre les runs est le déblocage de héros :
 ```
 
 Sauvegarde locale : `localStorage` clé `fantasy_roguelike_save` via `saveProgress()` dans `MainMenuScene.ts`.  
-Sauvegarde serveur : `apiClient.saveProgress()` — appeler après chaque modification persistante.
+Sauvegarde serveur : **non branchée**. `apiClient` expose `saveProgress()`,
+`login()`, `register()`, `loadProgress()`, `getLeaderboard()`, `setToken()` et
+`clearToken()`, mais aucun n'a d'appelant : il n'y a pas d'écran de connexion.
+Seuls `isAuthenticated()` et `saveRun()` sont utilisés (dans `GameOverScene`),
+et `isAuthenticated()` est toujours faux tant que rien n'appelle `setToken()`.
+La progression est donc **locale uniquement**. Ne pas supposer que le backend
+reçoit quoi que ce soit.
 
 ---
 
@@ -274,6 +293,21 @@ Sauvegarde serveur : `apiClient.saveProgress()` — appeler après chaque modifi
 - **Pas de `require()` dynamique** dans les scènes — utiliser les imports statiques en haut de fichier
 - **Commentaires** : en français, expliquer le "pourquoi" pas le "quoi"
 - **Nouvelles données** (héros, reliques, events) : ajouter dans `data/`, jamais hardcodées dans les scènes
+
+### Backend — règles non négociables
+
+- **Un seul client Prisma** : importer `prisma` depuis `src/db.ts`. Ne jamais
+  faire `new PrismaClient()` dans un fichier de routes — c'est un pool de
+  connexions supplémentaire vers la même base.
+- **Toute route `async` passe par `asyncHandler`** (`middleware/asyncHandler.ts`).
+  Express 4 n'attrape pas les promesses rejetées : sans lui, une erreur Prisma
+  laisse la requête pendre jusqu'au timeout et lève un `unhandledRejection`.
+- **Les variables d'environnement obligatoires sont lues dans `src/config.ts`**,
+  via `required()` qui fait échouer le démarrage si elles manquent. Ne jamais
+  écrire `process.env.X ?? ''` pour un secret : ça transforme une config absente
+  en faille silencieuse (avec `JWT_SECRET` vide, tous les tokens étaient
+  forgeables).
+- `errorHandler` doit rester le **dernier** `app.use` d'`index.ts`.
 
 ### Thème visuel — BD claire (cartoon)
 
@@ -288,7 +322,7 @@ couleur francs, **gros contours noirs**, typo arrondie en gras.
   Familles : `background` / `panel` / `ink` / `accent` / `secondary` / `gold` / `hp`,
   textes (`text`, `textLight`, `textDim`, `textFaint`), `rarity.*`, `btn.*`
   (`primary`, `secondary`, `success`, `danger`, `magic`, `gold`, `neutral`, `disabled`),
-  `track.*`, `side.*`, `result.*`, `scrim`.
+  `side.*`, `result.*`, `scrim`.
 - **Choisir un token par intention, pas par teinte** : `COLORS.btn.danger`, pas « le rouge ».
 - Contours : `STROKE.thin | base | thick` (2/3/4 px). Le trait est **noir** (`COLORS.ink`)
   partout ; c'est lui qui porte le style, pas la couleur du contour.
