@@ -1,44 +1,13 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
 import { makeButton, makeTitle, makePanel, fadeIn, transitionTo, staggerIn } from '../ui/UIManager';
-import { RunManager } from '../systems/RunManager';
-import { GachaSystem } from '../systems/GachaSystem';
-import { STARTER_HERO_IDS } from '../data/heroes';
-
-// Global game state shared across scenes via scene data / registry
-declare global {
-  interface Window {
-    gameState: GameState;
-  }
-}
-
-export interface GameState {
-  runManager: RunManager;
-  gacha: GachaSystem;
-  unlockedHeroIds: string[];
-  totalGold: number;  // persistent gold (separate from run gold)
-  bestRun: { zonesCleared: number; roomsCleared: number };
-  // Vitesse de lecture des combats (1 / 2 / 4) — préférence du joueur, elle
-  // doit survivre d'un combat à l'autre et d'une session à l'autre.
-  combatSpeed: number;
-}
+import { initGameState } from '../state/gameState';
 
 export class MainMenuScene extends Phaser.Scene {
   constructor() { super('MainMenu'); }
 
   create(): void {
-    if (!window.gameState) {
-      window.gameState = {
-        runManager: new RunManager(),
-        gacha: new GachaSystem(),
-        unlockedHeroIds: [...STARTER_HERO_IDS],
-        totalGold: 0,
-        bestRun: { zonesCleared: 0, roomsCleared: 0 },
-        combatSpeed: 1,
-      };
-      this.loadProgress();
-      applyDebugGold();
-    }
+    initGameState();
 
     fadeIn(this);
     this.drawBackground();
@@ -108,42 +77,4 @@ export class MainMenuScene extends Phaser.Scene {
     this.add.text(GAME_WIDTH / 2, 558, `Héros débloqués : ${gs.unlockedHeroIds.length}`, { ...FONTS.body, align: 'center' }).setOrigin(0.5);
     this.add.text(GAME_WIDTH / 2, 578, `Meilleur run : Zone ${gs.bestRun.zonesCleared}`, { ...FONTS.small, align: 'center' }).setOrigin(0.5);
   }
-
-  private loadProgress(): void {
-    try {
-      const raw = localStorage.getItem('fantasy_roguelike_save');
-      if (!raw) return;
-      const save = JSON.parse(raw);
-      const gs = window.gameState;
-      if (save.unlockedHeroIds) gs.unlockedHeroIds = save.unlockedHeroIds;
-      if (save.totalGold !== undefined) gs.totalGold = save.totalGold;
-      if (save.bestRun) gs.bestRun = save.bestRun;
-      if (save.combatSpeed) gs.combatSpeed = save.combatSpeed;
-      if (save.gacha) gs.gacha.load(save.gacha);
-    } catch { /* fresh start */ }
-  }
-}
-
-// ⚠️ TEMPORAIRE — or de test pour explorer le gacha sans farmer.
-// Mettre DEBUG_GOLD à 0 (ou supprimer l'appel dans create()) avant toute publication.
-export const DEBUG_GOLD = 9_999_999;
-
-function applyDebugGold(): void {
-  if (DEBUG_GOLD <= 0) return;
-  window.gameState.totalGold = DEBUG_GOLD;
-  saveProgress();
-}
-
-export function saveProgress(): void {
-  try {
-    const gs = window.gameState;
-    const save = {
-      unlockedHeroIds: gs.unlockedHeroIds,
-      totalGold: gs.totalGold,
-      bestRun: gs.bestRun,
-      combatSpeed: gs.combatSpeed,
-      gacha: gs.gacha.serialize(),
-    };
-    localStorage.setItem('fantasy_roguelike_save', JSON.stringify(save));
-  } catch { /* storage not available */ }
 }

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { COLORS, CSS, FONTS, FONT_FAMILY, STROKE, GAME_WIDTH } from '../config';
+import { COLORS, CSS, FONTS, FONT_FAMILY, STROKE, GAME_WIDTH, GAME_HEIGHT } from '../config';
 import type { Rarity } from '../data/heroes';
 
 // Décalage de l'ombre portée pleine des éléments BD (pas de flou, un simple aplat noir)
@@ -154,6 +154,9 @@ export function attachScroll(
 // défilement capte le clic à la place de la puce de tri.
 const SORT_BAR_DEPTH = 20;
 
+// Au-dessus de tout le reste, barre de tri comprise.
+const MODAL_DEPTH = 1000;
+
 // Barre de tri : une puce par critère, la puce active est pleine.
 // Rappelle `onChange` avec l'id choisi.
 export function makeSortBar(
@@ -192,6 +195,45 @@ export function makePanel(
 
 export function rarityColor(rarity: Rarity): number {
   return COLORS.rarity[rarity];
+}
+
+// Version chaîne d'une couleur Phaser, pour les styles de texte.
+// `padStart` est indispensable : sans lui, une couleur dont l'octet de poids
+// fort est faible (0x0abcde) produirait '#abcde', que Phaser lit de travers.
+export function toCssColor(color: number): string {
+  return `#${color.toString(16).padStart(6, '0')}`;
+}
+
+// Couleur CSS d'une rareté — pendant de `rarityColor` pour les textes.
+export function rarityCss(rarity: Rarity): string {
+  return toCssColor(COLORS.rarity[rarity]);
+}
+
+// Modale plein écran : voile bloquant + contenu, au-dessus de tout le reste.
+// Renvoie un conteneur auquel ajouter le contenu, et sa fermeture.
+// Le voile intercepte les clics : sans lui, on interagit avec l'écran derrière.
+export interface Modal {
+  container: Phaser.GameObjects.Container;
+  close: () => void;
+}
+
+export function makeModal(
+  scene: Phaser.Scene,
+  // Action au clic sur le voile. Omis = le voile absorbe le clic sans rien
+  // faire, pour les modales qui exigent une réponse explicite (choisir qui
+  // quitte l'équipe, confirmer un abandon). Une fermeture animée passe son
+  // propre callback plutôt que `close`.
+  onScrimClick?: () => void,
+): Modal {
+  const container = scene.add.container(0, 0).setDepth(MODAL_DEPTH);
+  const scrim = scene.add
+    .rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.scrim, 0.82)
+    .setInteractive();
+  container.add(scrim);
+
+  if (onScrimClick) scrim.on('pointerdown', onScrimClick);
+
+  return { container, close: () => container.destroy() };
 }
 
 export function rarityLabel(rarity: Rarity): string {

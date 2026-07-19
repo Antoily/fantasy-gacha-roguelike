@@ -1,8 +1,7 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, FONT_FAMILY, STROKE } from '../config';
 import { makeButton, makePanel, makeTitle, fadeIn, transitionTo, staggerIn, countUp } from '../ui/UIManager';
-import { saveProgress } from './MainMenuScene';
-import { apiClient } from '../api/apiClient';
+import { saveProgress } from '../state/gameState';
 
 export class GameOverScene extends Phaser.Scene {
   constructor() { super('GameOver'); }
@@ -49,7 +48,6 @@ export class GameOverScene extends Phaser.Scene {
     gs.totalGold += run.gold;
 
     saveProgress();
-    this.reportRun(zonesCleared, roomsCleared, victory, run.gold);
 
     const title = makeTitle(this, GAME_WIDTH / 2, 70, victory ? '🏆 VICTOIRE !' : '💀 DÉFAITE');
     title.setScale(0);
@@ -75,7 +73,6 @@ export class GameOverScene extends Phaser.Scene {
 
   private drawStats(zones: number, rooms: number, gold: number): void {
     makePanel(this, GAME_WIDTH / 2, 240, 320, 130);
-    const goldRecovered = gold;
     const lines = [
       `Zones traversées : ${zones}`,
       `Salles terminées : ${rooms}`,
@@ -83,9 +80,11 @@ export class GameOverScene extends Phaser.Scene {
     const texts = lines.map((l, i) =>
       this.add.text(GAME_WIDTH / 2, 192 + i * 28, l, { ...FONTS.body, align: 'center' }).setOrigin(0.5)
     );
-    const goldText = this.add.text(GAME_WIDTH / 2, 192 + 3 * 28, `Or gagné : 0 💰`, { ...FONTS.body, align: 'center' }).setOrigin(0.5);
+    // Troisième ligne du bloc : l'index 2 suit les deux précédentes, sinon le
+    // panneau garde un trou de 28px au milieu.
+    const goldText = this.add.text(GAME_WIDTH / 2, 192 + 2 * 28, 'Or gagné : 0 💰', { ...FONTS.body, align: 'center' }).setOrigin(0.5);
     staggerIn(this, [...texts, goldText], 10, 90);
-    countUp(this, goldText, 0, goldRecovered, n => `Or gagné : ${n} 💰`, 800);
+    countUp(this, goldText, 0, gold, n => `Or gagné : ${n} 💰`, 800);
   }
 
   private drawHeroSummary(): void {
@@ -100,17 +99,5 @@ export class GameOverScene extends Phaser.Scene {
       this.add.text(cx + 26, y + 22, alive ? '✓' : '✗', { fontSize: '18px', color: alive ? CSS.hp : CSS.danger, fontFamily: FONT_FAMILY, fontStyle: 'bold' }).setOrigin(0.5);
       this.add.text(cx + 26, y + 42, h.short, { fontSize: '8px', color: CSS.textDim, fontFamily: FONT_FAMILY, fontStyle: 'bold' }).setOrigin(0.5);
     });
-  }
-
-  private reportRun(zones: number, rooms: number, victory: boolean, gold: number): void {
-    const run = window.gameState.runManager.state;
-    if (!apiClient.isAuthenticated()) return;
-    apiClient.saveRun({
-      zonesCleared: zones,
-      roomsCleared: rooms,
-      victory,
-      goldEarned: gold,
-      heroesUsed: run.heroes.map(h => h.definitionId),
-    }).catch(() => { /* offline, no-op */ });
   }
 }

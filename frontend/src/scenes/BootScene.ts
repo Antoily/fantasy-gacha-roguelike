@@ -121,24 +121,6 @@ export class BootScene extends Phaser.Scene {
       gfx.destroy();
     }
 
-    // Cadre de carte
-    const cardG = this.g();
-    this.outlinedRect(cardG, 100, 140, COLORS.panel, 10, STROKE.base);
-    cardG.generateTexture('card_frame', 100, 140);
-    cardG.destroy();
-
-    // Case de grille (normale)
-    const cellG = this.g();
-    this.outlinedRect(cellG, 80, 80, COLORS.panel, 8, STROKE.base);
-    cellG.generateTexture('grid_cell', 80, 80);
-    cellG.destroy();
-
-    // Case de grille (survolée) — l'accent remplit la case, le contour reste noir
-    const cellHoverG = this.g();
-    this.outlinedRect(cellHoverG, 80, 80, COLORS.accentLight, 8, STROKE.thick);
-    cellHoverG.generateTexture('grid_cell_hover', 80, 80);
-    cellHoverG.destroy();
-
     // Particule d'impact — un rond franc cerné, pas une lueur diffuse
     const sparkG = this.g();
     sparkG.fillStyle(COLORS.gold, 1);
@@ -149,5 +131,3 @@ export class BootScene extends Phaser.Scene {
     sparkG.destroy();
   }
 }
-
-export { COLORS };

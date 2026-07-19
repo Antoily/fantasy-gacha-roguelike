@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, STROKE } from '../config';
-import { makeButton, makePanel, makeTitle, makeHpBar, fadeIn, transitionTo, staggerIn, pulse, isTransitioning } from '../ui/UIManager';
+import { makeButton, makePanel, makeTitle, makeHpBar, makeModal, fadeIn, transitionTo, staggerIn, pulse, isTransitioning } from '../ui/UIManager';
 import type { Room, RoomType } from '../systems/RunManager';
 import { ROLE_ICONS } from '../data/heroes';
 
@@ -140,10 +140,10 @@ export class RunMapScene extends Phaser.Scene {
     if (isTransitioning(this)) return;
 
     const cy = GAME_HEIGHT / 2;
-    const overlay = this.add.container(0, 0).setDepth(1000);
+    // Pas de fermeture au clic sur le voile : abandonner un run demande une
+    // réponse explicite.
+    const { container: overlay, close } = makeModal(this);
 
-    // Voile bloquant : empêche d'interagir avec la carte derrière la modale
-    const blocker = this.add.rectangle(CX, cy, GAME_WIDTH, GAME_HEIGHT, COLORS.scrim, 0.82).setInteractive();
     const panel = makePanel(this, CX, cy, 300, 176);
     const title = this.add.text(CX, cy - 56, 'Abandonner la run en cours ?', {
       ...FONTS.body, align: 'center', wordWrap: { width: 260 },
@@ -152,9 +152,9 @@ export class RunMapScene extends Phaser.Scene {
       ...FONTS.small, align: 'center', wordWrap: { width: 260 },
     }).setOrigin(0.5);
     const yes = makeButton(this, CX, cy + 20, 'Oui, quitter', () => transitionTo(this, 'MainMenu'), 220, 40, COLORS.btn.danger);
-    const no = makeButton(this, CX, cy + 68, 'Annuler', () => overlay.destroy(), 220, 38, COLORS.accent);
+    const no = makeButton(this, CX, cy + 68, 'Annuler', close, 220, 38, COLORS.accent);
 
-    overlay.add([blocker, panel, title, sub, yes, no]);
+    overlay.add([panel, title, sub, yes, no]);
   }
 
   private enterRoom(room: Room): void {

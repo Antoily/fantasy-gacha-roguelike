@@ -1,10 +1,10 @@
 import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../db';
+import { asyncHandler } from '../middleware/asyncHandler';
 
 const router = Router();
-const prisma = new PrismaClient();
 
-router.get('/', async (_req: Request, res: Response) => {
+router.get('/', asyncHandler(async (_req: Request, res: Response) => {
   // Top 20 by best zones cleared, then rooms cleared
   const topProgress = await prisma.progress.findMany({
     orderBy: [{ bestZones: 'desc' }, { bestRooms: 'desc' }],
@@ -20,6 +20,6 @@ router.get('/', async (_req: Request, res: Response) => {
   }));
 
   res.json({ entries });
-});
+}));
 
 export default router;

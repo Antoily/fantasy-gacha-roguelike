@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, FONT_FAMILY, STROKE } from '../config';
-import { makeButton, makePanel, makeTitle, rarityColor, rarityLabel, showToast, fadeIn, transitionTo, pulse } from '../ui/UIManager';
+import { makeButton, makePanel, makeTitle, rarityColor, rarityCss, rarityLabel, showToast, fadeIn, transitionTo, pulse } from '../ui/UIManager';
 import type { GachaPullResult } from '../systems/GachaSystem';
 import type { Rarity } from '../data/heroes';
-import { saveProgress } from './MainMenuScene';
+import { saveProgress } from '../state/gameState';
 
 // Hiérarchie des raretés : sert à choisir l'animation d'une salve (la meilleure gagne)
 const RARITY_RANK: Record<Rarity, number> = { common: 0, rare: 1, epic: 2, legendary: 3 };
@@ -177,7 +177,7 @@ export class GachaScene extends Phaser.Scene {
     // Nom de la rareté, cerné de noir comme le reste du thème
     const label = this.add.text(cx, cy, rarityLabel(rarity).toUpperCase(), {
       fontFamily: FONT_FAMILY, fontSize: rank >= 2 ? '30px' : '22px', fontStyle: 'bold',
-      color: `#${color.toString(16).padStart(6, '0')}`,
+      color: rarityCss(rarity),
       stroke: CSS.ink, strokeThickness: 6, align: 'center',
     }).setOrigin(0.5).setScale(0);
     layer.add(label);
