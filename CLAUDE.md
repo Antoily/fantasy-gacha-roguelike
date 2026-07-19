@@ -116,6 +116,7 @@ frontend/src/
   data/          # Données statiques (heroes, enemies)
   entities/      # Hero.ts, Enemy.ts — instances runtime
   systems/       # RunManager, CombatResolver, GachaSystem
+  state/         # gameState.ts — état global + sauvegarde (jamais dans une scène)
   scenes/        # Scènes Phaser (une scène = un écran)
   ui/            # UIManager (helpers Phaser réutilisables)
   api/           # apiClient.ts (fetch vers le backend)
@@ -124,7 +125,9 @@ frontend/src/
 
 backend/src/
   routes/        # auth.ts, progress.ts, runs.ts, leaderboard.ts
-  middleware/    # auth.ts (JWT requireAuth)
+  middleware/    # auth.ts (requireAuth), asyncHandler.ts, errorHandler.ts
+  config.ts      # Variables d'env obligatoires (échec au démarrage si absentes)
+  db.ts          # Client Prisma unique — ne jamais en instancier un autre
   index.ts       # Express app
 backend/prisma/
   schema.prisma  # Modèles User, Progress, Run
@@ -243,8 +246,7 @@ Sur un tirage ×10, c'est la **meilleure** rareté de la salve qui dicte l'anima
 
 ## Or de test
 
-`MainMenuScene.ts` expose `DEBUG_GOLD`, appliqué au chargement par
-`applyDebugGold()`. **Valeur par défaut : `0` (désactivé) — c'est l'état à
+`state/gameState.ts` expose `DEBUG_GOLD`, appliqué au premier `initGameState()`. **Valeur par défaut : `0` (désactivé) — c'est l'état à
 conserver.** Toute valeur > 0 écrase l'or du joueur à chaque rechargement de
 page, ce qui rend l'économie intestable. Le remettre à `0` après usage.
 
@@ -263,7 +265,7 @@ La **seule** progression entre les runs est le déblocage de héros :
 
 ## État global du jeu (runtime)
 
-`window.gameState` (défini dans `MainMenuScene.ts`) contient :
+`window.gameState` (défini dans `state/gameState.ts`) contient :
 ```ts
 {
   runManager: RunManager,      // état du run en cours
@@ -274,7 +276,10 @@ La **seule** progression entre les runs est le déblocage de héros :
 }
 ```
 
-Sauvegarde locale : `localStorage` clé `fantasy_roguelike_save` via `saveProgress()` dans `MainMenuScene.ts`.  
+Sauvegarde locale : `localStorage` clé `fantasy_roguelike_save` via `saveProgress()`
+dans `state/gameState.ts`. **L'état global ne vit pas dans une scène** : une scène
+qui a besoin de sauvegarder importe `state/gameState`, jamais `scenes/MainMenuScene`.
+`initGameState()` est idempotent — un retour au menu ne réinitialise rien.  
 Sauvegarde serveur : **non branchée**. `apiClient` expose `saveProgress()`,
 `login()`, `register()`, `loadProgress()`, `getLeaderboard()`, `setToken()` et
 `clearToken()`, mais aucun n'a d'appelant : il n'y a pas d'écran de connexion.
@@ -332,6 +337,13 @@ couleur francs, **gros contours noirs**, typo arrondie en gras.
   jamais un voile noir : le noir vire au brun sur le fond crème.
 - `makeButton` produit un bouton cerné de noir avec **ombre portée pleine** décalée ;
   `makePanel` un panneau blanc à contour noir. Ne pas redessiner de boutons à la main.
+  `makeModal(scene, onScrimClick?)` produit le voile bloquant des modales : ne pas
+  reconstruire un `rectangle(..., COLORS.scrim, 0.82).setInteractive()` à la main.
+  Omettre `onScrimClick` quand la modale exige une réponse explicite ; passer son
+  propre callback pour une fermeture animée.
+  Couleur d'une rareté : `rarityColor()` (nombre, Phaser) ou `rarityCss()` (chaîne,
+  styles de texte). Ne plus écrire `\`#${color.toString(16).padStart(6, '0')}\`` —
+  la conversion vit dans `toCssColor()`.
   Son dernier paramètre optionnel `subtitle` rend une seconde ligne **à l'intérieur**
   du bouton : une explication qui accompagne un bouton doit tenir dans sa case.
 
@@ -369,6 +381,10 @@ glissement de défilement déclenche une sélection au passage.
 - **Contenu d'une carte/élément** : centrer verticalement dans son conteneur (ne pas
   coller en haut). Positionner les éléments internes par rapport aux bords du cadre,
   pas en coordonnées absolues en dur.
+- **Un panneau dont le contenu varie se dimensionne à partir de ce contenu**, jamais
+  en hauteur fixe. La modale « qui laisse sa place » était figée à 260px : avec une
+  équipe pleine, le bouton « Annuler » chevauchait la 4e ligne. Sa géométrie dérive
+  désormais de `run.heroes.length`.
 - Noms longs (formations, etc.) : aligner à droite (`setOrigin(1, …)`) pour éviter
   tout débordement du cadre.
 - `RunMapScene` sert de référence pour ces conventions.
