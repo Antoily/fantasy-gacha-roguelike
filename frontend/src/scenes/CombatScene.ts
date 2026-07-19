@@ -5,7 +5,7 @@ import { resolveCombat, type CombatLogEntry, type CombatEffect } from '../system
 import { createEnemyInstance, type EnemyInstance } from '../entities/Enemy';
 import type { HeroInstance } from '../entities/Hero';
 import { getEnemyById } from '../data/enemies';
-import { saveProgress } from './MainMenuScene';
+import { saveProgress } from '../state/gameState';
 
 const CELL_W = 52;
 const CELL_H = 56;

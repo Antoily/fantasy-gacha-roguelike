@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, STROKE } from '../config';
-import { makeButton, makePanel, makeTitle, makeHpBar, rarityColor, fadeIn, transitionTo, isTransitioning, showToast, staggerIn } from '../ui/UIManager';
+import { makeButton, makePanel, makeTitle, makeHpBar, makeModal, rarityColor, fadeIn, transitionTo, isTransitioning, showToast, staggerIn } from '../ui/UIManager';
 import { getHeroById, ROLE_ICONS, ROLE_LABELS } from '../data/heroes';
 import type { HeroDefinition } from '../data/heroes';
 import { MAX_TEAM } from '../systems/RunManager';
@@ -131,18 +131,31 @@ export class RecruitScene extends Phaser.Scene {
     const run = window.gameState.runManager.state;
     const cx = GAME_WIDTH / 2;
     const cy = GAME_HEIGHT / 2;
-    const overlay = this.add.container(0, 0).setDepth(1000);
+    // Pas de fermeture au clic sur le voile : il faut désigner qui part,
+    // ou annuler explicitement.
+    const { container: overlay, close } = makeModal(this);
 
-    const blocker = this.add.rectangle(cx, cy, GAME_WIDTH, GAME_HEIGHT, COLORS.scrim, 0.82).setInteractive();
-    const panel = makePanel(this, cx, cy, 320, 260);
-    const title = this.add.text(cx, cy - 106, `Qui laisse sa place à\n${hero.name} ?`, {
+    // Géométrie dérivée du nombre de héros : avec une équipe pleine, la hauteur
+    // fixe de 260px faisait chevaucher le bouton « Annuler » sur la 4e ligne.
+    const ROW_H = 46;
+    const PAD = 16;
+    const TITLE_H = 44;   // le titre tient sur deux lignes
+    const CANCEL_H = 36;
+    const rowsH = run.heroes.length * ROW_H;
+    const panelH = PAD + TITLE_H + 8 + rowsH + PAD + CANCEL_H + PAD;
+    const top = cy - panelH / 2;
+    const firstRowY = top + PAD + TITLE_H + 8 + ROW_H / 2;
+    const cancelY = firstRowY + (run.heroes.length - 1) * ROW_H + ROW_H / 2 + PAD + CANCEL_H / 2;
+
+    const panel = makePanel(this, cx, cy, 320, panelH);
+    const title = this.add.text(cx, top + PAD + TITLE_H / 2, `Qui laisse sa place à\n${hero.name} ?`, {
       ...FONTS.body, align: 'center', wordWrap: { width: 280 },
     }).setOrigin(0.5);
 
-    overlay.add([blocker, panel, title]);
+    overlay.add([panel, title]);
 
     run.heroes.forEach((h, i) => {
-      const y = cy - 56 + i * 46;
+      const y = firstRowY + i * ROW_H;
       const row = this.add.rectangle(cx, y, 280, 40, COLORS.panel)
         .setStrokeStyle(STROKE.thin, COLORS.ink)
         .setInteractive({ useHandCursor: true });
@@ -158,14 +171,14 @@ export class RecruitScene extends Phaser.Scene {
         this.resolved = true;
         window.gameState.runManager.recruitHero(hero.id, h.instanceId);
         showToast(this, `${hero.name} remplace ${h.name}`);
-        overlay.destroy();
+        close();
         this.finish();
       });
 
       overlay.add([row, label, hp]);
     });
 
-    const cancel = makeButton(this, cx, cy + 104, 'Annuler', () => overlay.destroy(), 220, 36, COLORS.btn.neutral);
+    const cancel = makeButton(this, cx, cancelY, 'Annuler', close, 220, CANCEL_H, COLORS.btn.neutral);
     overlay.add(cancel);
   }
 

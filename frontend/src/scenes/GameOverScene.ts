@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, FONT_FAMILY, STROKE } from '../config';
 import { makeButton, makePanel, makeTitle, fadeIn, transitionTo, staggerIn, countUp } from '../ui/UIManager';
-import { saveProgress } from './MainMenuScene';
+import { saveProgress } from '../state/gameState';
 import { apiClient } from '../api/apiClient';
 
 export class GameOverScene extends Phaser.Scene {
