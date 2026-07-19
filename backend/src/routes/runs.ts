@@ -1,11 +1,11 @@
 import { Router, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../db';
 import { requireAuth, type AuthRequest } from '../middleware/auth';
+import { asyncHandler } from '../middleware/asyncHandler';
 
 const router = Router();
-const prisma = new PrismaClient();
 
-router.post('/', requireAuth, async (req: AuthRequest, res: Response) => {
+router.post('/', requireAuth, asyncHandler(async (req: AuthRequest, res: Response) => {
   const { zonesCleared, roomsCleared, victory, goldEarned, heroesUsed } = req.body as {
     zonesCleared?: number;
     roomsCleared?: number;
@@ -30,15 +30,15 @@ router.post('/', requireAuth, async (req: AuthRequest, res: Response) => {
     },
   });
   res.status(201).json({ run });
-});
+}));
 
-router.get('/me', requireAuth, async (req: AuthRequest, res: Response) => {
+router.get('/me', requireAuth, asyncHandler(async (req: AuthRequest, res: Response) => {
   const runs = await prisma.run.findMany({
-    where: { userId: req.userId },
+    where: { userId: req.userId! },
     orderBy: { createdAt: 'desc' },
     take: 20,
   });
   res.json({ runs });
-});
+}));
 
 export default router;
