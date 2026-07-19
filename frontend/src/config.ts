@@ -11,7 +11,6 @@ export const COLORS = {
   panelBorder: 0x1a1a1a,  // le contour est noir, c'est la signature du style
   ink: 0x1a1a1a,          // noir d'encre — contours et texte principal
   accent: 0xff6b35,       // orange vif
-  accentLight: 0xffa06b,
   secondary: 0x4ecdc4,    // turquoise
   gold: 0xffc93c,
   hp: 0x3ec46d,
@@ -49,12 +48,6 @@ export const COLORS = {
   side: {
     hero: 0xdde8f5,   // bleu pâle
     enemy: 0xf6ded2,  // rose pâle
-  },
-  // Tracks de l'arbre de talents
-  track: {
-    survival: 0x3ec46d,
-    power: 0xff6b35,
-    fortune: 0xffc93c,
   },
 } as const;
 

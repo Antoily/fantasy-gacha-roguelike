@@ -124,9 +124,10 @@ export class MainMenuScene extends Phaser.Scene {
   }
 }
 
-// ⚠️ TEMPORAIRE — or de test pour explorer le gacha sans farmer.
-// Mettre DEBUG_GOLD à 0 (ou supprimer l'appel dans create()) avant toute publication.
-export const DEBUG_GOLD = 9_999_999;
+// Or de test pour explorer le gacha sans farmer. À 0 = désactivé, ce qui doit
+// rester l'état par défaut : toute valeur > 0 écrase l'or du joueur à CHAQUE
+// rechargement de page, ce qui rend l'économie intestable.
+export const DEBUG_GOLD = 0;
 
 function applyDebugGold(): void {
   if (DEBUG_GOLD <= 0) return;

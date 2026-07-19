@@ -75,7 +75,6 @@ export class GameOverScene extends Phaser.Scene {
 
   private drawStats(zones: number, rooms: number, gold: number): void {
     makePanel(this, GAME_WIDTH / 2, 240, 320, 130);
-    const goldRecovered = gold;
     const lines = [
       `Zones traversées : ${zones}`,
       `Salles terminées : ${rooms}`,
@@ -83,9 +82,11 @@ export class GameOverScene extends Phaser.Scene {
     const texts = lines.map((l, i) =>
       this.add.text(GAME_WIDTH / 2, 192 + i * 28, l, { ...FONTS.body, align: 'center' }).setOrigin(0.5)
     );
-    const goldText = this.add.text(GAME_WIDTH / 2, 192 + 3 * 28, `Or gagné : 0 💰`, { ...FONTS.body, align: 'center' }).setOrigin(0.5);
+    // Troisième ligne du bloc : l'index 2 suit les deux précédentes, sinon le
+    // panneau garde un trou de 28px au milieu.
+    const goldText = this.add.text(GAME_WIDTH / 2, 192 + 2 * 28, 'Or gagné : 0 💰', { ...FONTS.body, align: 'center' }).setOrigin(0.5);
     staggerIn(this, [...texts, goldText], 10, 90);
-    countUp(this, goldText, 0, goldRecovered, n => `Or gagné : ${n} 💰`, 800);
+    countUp(this, goldText, 0, gold, n => `Or gagné : ${n} 💰`, 800);
   }
 
   private drawHeroSummary(): void {

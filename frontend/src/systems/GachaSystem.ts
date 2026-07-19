@@ -1,5 +1,5 @@
 import type { HeroDefinition, Rarity } from '../data/heroes';
-import { HERO_POOL, getHeroesByRarity } from '../data/heroes';
+import { getHeroesByRarity } from '../data/heroes';
 import { weightedPick } from '../utils/random';
 
 export const PITY_THRESHOLD = 80;
@@ -41,7 +41,6 @@ export class GachaSystem {
     this.pityCap = pityCap;
   }
 
-  get currentPullCount(): number { return this.pullCount; }
   get pullsUntilPity(): number { return this.pityCap - this.pullCount; }
 
   pull(unlockedHeroIds: string[]): GachaPullResult {
@@ -94,5 +93,3 @@ export class GachaSystem {
     this.pullCount = data.pullCount;
   }
 }
-
-export { HERO_POOL };

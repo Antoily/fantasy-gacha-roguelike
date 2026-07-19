@@ -29,7 +29,6 @@ export interface CombatResult {
   victory: boolean;
   log: CombatLogEntry[];
   goldReward: number;
-  survivingHeroes: HeroInstance[];
 }
 
 const GRID_COLS = 3;
@@ -373,5 +372,5 @@ export function resolveCombat(heroes: HeroInstance[], enemies: EnemyInstance[]):
   const victory = enemies.every(e => !isEnemyAlive(e));
   const goldReward = victory ? (enemies.some(e => e.isBoss) ? randInt(80, 120) : randInt(20, 40)) : 0;
 
-  return { victory, log, goldReward, survivingHeroes: heroes.filter(isHeroAlive) };
+  return { victory, log, goldReward };
 }
