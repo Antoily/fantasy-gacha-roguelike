@@ -128,7 +128,6 @@ frontend/src/
   state/         # gameState.ts — état global + sauvegarde (jamais dans une scène)
   scenes/        # Scènes Phaser (une scène = un écran)
   ui/            # UIManager (helpers Phaser réutilisables)
-  api/           # apiClient.ts (fetch vers le backend)
   config.ts      # Constantes globales (couleurs, fonts, taille écran)
   main.ts        # Point d'entrée Phaser
 
@@ -289,13 +288,16 @@ Sauvegarde locale : `localStorage` clé `fantasy_roguelike_save` via `saveProgre
 dans `state/gameState.ts`. **L'état global ne vit pas dans une scène** : une scène
 qui a besoin de sauvegarder importe `state/gameState`, jamais `scenes/MainMenuScene`.
 `initGameState()` est idempotent — un retour au menu ne réinitialise rien.  
-Sauvegarde serveur : **non branchée**. `apiClient` expose `saveProgress()`,
-`login()`, `register()`, `loadProgress()`, `getLeaderboard()`, `setToken()` et
-`clearToken()`, mais aucun n'a d'appelant : il n'y a pas d'écran de connexion.
-Seuls `isAuthenticated()` et `saveRun()` sont utilisés (dans `GameOverScene`),
-et `isAuthenticated()` est toujours faux tant que rien n'appelle `setToken()`.
-La progression est donc **locale uniquement**. Ne pas supposer que le backend
-reçoit quoi que ce soit.
+Sauvegarde serveur : **le frontend n'appelle plus le backend du tout.**
+`apiClient` a été supprimé : ses 8 méthodes n'avaient aucun appelant utile
+(sans écran de connexion, `setToken()` n'était jamais appelé, donc
+`isAuthenticated()` restait faux et `saveRun()` ne partait jamais). Le jeu est
+**local-only** et assumé comme tel.
+
+Le backend (auth, progress, runs, leaderboard) reste développé et déployable,
+mais **aucun client ne le consomme**. Rebrancher la synchronisation = écrire
+une scène de connexion + un client HTTP, c'est un chantier de feature, pas une
+remise en service.
 
 ---
 
@@ -465,6 +467,18 @@ Sur le VPS, structure attendue :
 
 Migration DB au premier déploiement : `npx prisma migrate deploy`
 
+⚠️ **Le repo ne contient aucune migration Prisma** — `prisma/` ne contient que
+`schema.prisma`. `migrate deploy` n'a donc rien à appliquer en l'état : la base
+a forcément été créée autrement (`prisma db push`), ou n'existe pas encore.
+Créer la migration initiale avant tout déploiement réel.
+
+⚠️ **`Progress.ownedRelicIds` et `Progress.talentTree` sont morts** : reliques et
+arbre de talents sont hors design, et l'API `/progress` ne les accepte plus. Les
+colonnes restent en base **volontairement** — les supprimer demande une migration
+destructive, et l'état de la base de production est inconnu. Elles gardent leurs
+valeurs par défaut et ne coûtent rien. Ne pas les « nettoyer » sans avoir vérifié
+qu'aucune donnée de production n'en dépend.
+
 ---
 
 ## Priorités de développement (ordre)
@@ -473,7 +487,8 @@ Migration DB au premier déploiement : `npx prisma migrate deploy`
 2. ✅ Système grille + combat auto
 3. ✅ 8 héros, 12 reliques, gacha avec pity
 4. ✅ Méta-progression (déblocage de héros via gacha)
-5. ✅ Backend auth + save + leaderboard
+5. ✅ Backend auth + save + leaderboard (déployable, mais **non consommé** :
+   le jeu est local-only, cf. « État global du jeu »)
 6. 🔲 Assets IA réels (remplacer les placeholders de `BootScene.ts`) — **style BD claire**,
    contours noirs épais, aplats francs (voir `assets/ASSET_PROMPTS.md` à réaligner)
 7. 🔲 Animations (idle/attaque) via spritesheets
