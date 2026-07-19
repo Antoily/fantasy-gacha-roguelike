@@ -2,7 +2,6 @@ import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, FONT_FAMILY, STROKE } from '../config';
 import { makeButton, makePanel, makeTitle, fadeIn, transitionTo, staggerIn, countUp } from '../ui/UIManager';
 import { saveProgress } from '../state/gameState';
-import { apiClient } from '../api/apiClient';
 
 export class GameOverScene extends Phaser.Scene {
   constructor() { super('GameOver'); }
@@ -49,7 +48,6 @@ export class GameOverScene extends Phaser.Scene {
     gs.totalGold += run.gold;
 
     saveProgress();
-    this.reportRun(zonesCleared, roomsCleared, victory, run.gold);
 
     const title = makeTitle(this, GAME_WIDTH / 2, 70, victory ? '🏆 VICTOIRE !' : '💀 DÉFAITE');
     title.setScale(0);
@@ -101,17 +99,5 @@ export class GameOverScene extends Phaser.Scene {
       this.add.text(cx + 26, y + 22, alive ? '✓' : '✗', { fontSize: '18px', color: alive ? CSS.hp : CSS.danger, fontFamily: FONT_FAMILY, fontStyle: 'bold' }).setOrigin(0.5);
       this.add.text(cx + 26, y + 42, h.short, { fontSize: '8px', color: CSS.textDim, fontFamily: FONT_FAMILY, fontStyle: 'bold' }).setOrigin(0.5);
     });
-  }
-
-  private reportRun(zones: number, rooms: number, victory: boolean, gold: number): void {
-    const run = window.gameState.runManager.state;
-    if (!apiClient.isAuthenticated()) return;
-    apiClient.saveRun({
-      zonesCleared: zones,
-      roomsCleared: rooms,
-      victory,
-      goldEarned: gold,
-      heroesUsed: run.heroes.map(h => h.definitionId),
-    }).catch(() => { /* offline, no-op */ });
   }
 }

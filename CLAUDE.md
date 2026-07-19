@@ -63,10 +63,15 @@ git remote set-url origin https://github.com/Antoily/fantasy-gacha-roguelike.git
 
 ## CI/CD
 
-3 workflows GitHub Actions :
-- **`ci.yml`** : lint + typecheck + build sur chaque push/PR → `frontend/` et `backend/`
-- **`pr-checks.yml`** : validation typecheck sur chaque PR + commentaire auto
+2 workflows GitHub Actions :
+- **`ci.yml`** : lint + typecheck + tests + build → `frontend/` et `backend/`.
+  Se déclenche sur **toutes** les PRs, pas seulement celles qui visent `main` :
+  une PR empilée sur une autre branche doit être vérifiée elle aussi, sinon les
+  contrôles n'arrivent qu'au dernier merge, trop tard pour servir.
 - **`deploy-backend.yml`** : deploy VPS via SSH sur push `main` (nécessite secrets `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`)
+
+(`pr-checks.yml` a été supprimé : il ne faisait qu'un typecheck que `ci.yml`
+couvre déjà, en réinstallant les deux packages une seconde fois à chaque PR.)
 
 **Prérequis CI** : les `package-lock.json` doivent exister. Les générer avec :
 ```bash
@@ -74,6 +79,10 @@ cd frontend && npm install && cd ../backend && npm install
 ```
 
 **Fix CI cassée** : toujours ouvrir une PR (`fix/ci-...`), ne pas patcher directement sur main.
+
+**Tests** : Vitest, côté `frontend/` uniquement (`npm test`, `npm run test:watch`).
+**Rester en Vitest 2.x** tant que la machine de dev est en Node 18 : la v4 exige
+Node ≥ 20 et ne démarre même pas (`styleText` absent de `node:util`).
 
 **Lint** : config ESLint legacy (`.eslintrc.json`) dans `frontend/` et `backend/`,
 format imposé par ESLint 8.57 + typescript-eslint 7 épinglés. Ne pas migrer vers
@@ -119,7 +128,6 @@ frontend/src/
   state/         # gameState.ts — état global + sauvegarde (jamais dans une scène)
   scenes/        # Scènes Phaser (une scène = un écran)
   ui/            # UIManager (helpers Phaser réutilisables)
-  api/           # apiClient.ts (fetch vers le backend)
   config.ts      # Constantes globales (couleurs, fonts, taille écran)
   main.ts        # Point d'entrée Phaser
 
@@ -280,13 +288,43 @@ Sauvegarde locale : `localStorage` clé `fantasy_roguelike_save` via `saveProgre
 dans `state/gameState.ts`. **L'état global ne vit pas dans une scène** : une scène
 qui a besoin de sauvegarder importe `state/gameState`, jamais `scenes/MainMenuScene`.
 `initGameState()` est idempotent — un retour au menu ne réinitialise rien.  
-Sauvegarde serveur : **non branchée**. `apiClient` expose `saveProgress()`,
-`login()`, `register()`, `loadProgress()`, `getLeaderboard()`, `setToken()` et
-`clearToken()`, mais aucun n'a d'appelant : il n'y a pas d'écran de connexion.
-Seuls `isAuthenticated()` et `saveRun()` sont utilisés (dans `GameOverScene`),
-et `isAuthenticated()` est toujours faux tant que rien n'appelle `setToken()`.
-La progression est donc **locale uniquement**. Ne pas supposer que le backend
-reçoit quoi que ce soit.
+Sauvegarde serveur : **le frontend n'appelle plus le backend du tout.**
+`apiClient` a été supprimé : ses 8 méthodes n'avaient aucun appelant utile
+(sans écran de connexion, `setToken()` n'était jamais appelé, donc
+`isAuthenticated()` restait faux et `saveRun()` ne partait jamais). Le jeu est
+**local-only** et assumé comme tel.
+
+Le backend (auth, progress, runs, leaderboard) reste développé et déployable,
+mais **aucun client ne le consomme**. Rebrancher la synchronisation = écrire
+une scène de connexion + un client HTTP, c'est un chantier de feature, pas une
+remise en service.
+
+---
+
+## Tests — écrire des tests qui mordent
+
+`CombatResolver.ts` est la seule logique pure du jeu (pas de Phaser, pas d'I/O)
+et le cœur du gameplay : c'est là que vivent les tests. `Math.random` est figé
+via `vi.spyOn` pour rendre les combats reproductibles.
+
+⚠️ **Un test vert ne prouve rien tant qu'on ne l'a pas vu échouer.** Trois des
+premiers tests écrits passaient sans rien vérifier :
+
+- le test de `taunt` mettait Sylva dans l'équipe : son tir double tuait l'archer
+  **avant qu'il ne joue**, donc aucun ciblage n'était exercé ;
+- le test de `first_strike` opposait Nix (26 VIT, le plus rapide du jeu) à un
+  ennemi plus lent : il passait premier de toute façon ;
+- le test de `heal_one` vérifiait `entry.heal`, une constante écrite à part dans
+  le journal, qui reste à 50 même si le soin ne rend plus aucun PV.
+
+Règle qui en découle : **valider chaque test par mutation** — casser la règle
+dans le résolveur, vérifier que la suite rougit, restaurer. Et faire porter les
+assertions sur l'**effet réel** (PV, cibles des actions du journal), jamais sur
+un champ descriptif recopié à côté.
+
+Quand une équipe de test doit laisser l'ennemi agir, la composer avec des héros
+peu offensifs (Ourg 16 ATK, Finn qui ne fait que soigner) plutôt qu'avec les
+gros attaquants.
 
 ---
 
@@ -410,6 +448,12 @@ scène de run doit offrir un moyen clair de revenir au menu.
 
 ## Backend — déploiement VPS
 
+Variables d'environnement obligatoires en production (le serveur **refuse de
+démarrer** si elles manquent, cf. `backend/src/config.ts`) :
+- `JWT_SECRET` — secret de signature des tokens
+- `CORS_ORIGIN` — origines autorisées, séparées par des virgules
+  (`https://mon-domaine.fr,https://www.mon-domaine.fr`)
+
 Variables à configurer dans GitHub → Settings → Variables/Secrets :
 - `VPS_HOST` (variable) : IP ou domaine du VPS
 - `VPS_USER` (variable) : utilisateur SSH (ex: `ubuntu`)
@@ -423,6 +467,18 @@ Sur le VPS, structure attendue :
 
 Migration DB au premier déploiement : `npx prisma migrate deploy`
 
+⚠️ **Le repo ne contient aucune migration Prisma** — `prisma/` ne contient que
+`schema.prisma`. `migrate deploy` n'a donc rien à appliquer en l'état : la base
+a forcément été créée autrement (`prisma db push`), ou n'existe pas encore.
+Créer la migration initiale avant tout déploiement réel.
+
+⚠️ **`Progress.ownedRelicIds` et `Progress.talentTree` sont morts** : reliques et
+arbre de talents sont hors design, et l'API `/progress` ne les accepte plus. Les
+colonnes restent en base **volontairement** — les supprimer demande une migration
+destructive, et l'état de la base de production est inconnu. Elles gardent leurs
+valeurs par défaut et ne coûtent rien. Ne pas les « nettoyer » sans avoir vérifié
+qu'aucune donnée de production n'en dépend.
+
 ---
 
 ## Priorités de développement (ordre)
@@ -431,7 +487,8 @@ Migration DB au premier déploiement : `npx prisma migrate deploy`
 2. ✅ Système grille + combat auto
 3. ✅ 8 héros, 12 reliques, gacha avec pity
 4. ✅ Méta-progression (déblocage de héros via gacha)
-5. ✅ Backend auth + save + leaderboard
+5. ✅ Backend auth + save + leaderboard (déployable, mais **non consommé** :
+   le jeu est local-only, cf. « État global du jeu »)
 6. 🔲 Assets IA réels (remplacer les placeholders de `BootScene.ts`) — **style BD claire**,
    contours noirs épais, aplats francs (voir `assets/ASSET_PROMPTS.md` à réaligner)
 7. 🔲 Animations (idle/attaque) via spritesheets
