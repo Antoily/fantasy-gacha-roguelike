@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, FONT_FAMILY, STROKE } from '../config';
-import { makeButton, makePanel, makeTitle, makeSortBar, attachScroll, rarityColor, rarityLabel, fadeIn, transitionTo } from '../ui/UIManager';
+import { makeButton, makePanel, makeTitle, makeSortBar, makeModal, attachScroll, rarityColor, rarityCss, rarityLabel, fadeIn, transitionTo } from '../ui/UIManager';
 import type { ScrollHandle } from '../ui/UIManager';
 import { HERO_SORTS, sortHeroes } from '../data/heroSort';
 import { HERO_POOL, HeroDefinition, ROLE_ICONS, ROLE_LABELS } from '../data/heroes';
@@ -58,7 +58,7 @@ export class CollectionScene extends Phaser.Scene {
         grid.add(this.add.image(x, y + 34, `hero_${hero.id}`).setDisplaySize(56, 56));
         grid.add(this.add.text(x, y + 76, hero.name, { ...FONTS.small, align: 'center', wordWrap: { width: cardW - 10 } }).setOrigin(0.5));
         grid.add(this.add.text(x, y + 104, rarityLabel(hero.rarity), {
-          fontSize: '9px', color: `#${color.toString(16).padStart(6, '0')}`, fontFamily: FONT_FAMILY, fontStyle: 'bold', align: 'center',
+          fontSize: '9px', color: rarityCss(hero.rarity), fontFamily: FONT_FAMILY, fontStyle: 'bold', align: 'center',
         }).setOrigin(0.5));
         grid.add(this.add.text(x, y + 122, `${ROLE_ICONS[hero.role]} ${hero.ability.name}`, {
           fontSize: '9px', color: CSS.textDim, fontFamily: FONT_FAMILY, fontStyle: 'bold',
@@ -76,7 +76,7 @@ export class CollectionScene extends Phaser.Scene {
         grid.add(this.add.text(x, y + 55, '?', { fontFamily: FONT_FAMILY, fontSize: '36px', fontStyle: 'bold', color: CSS.textFaint }).setOrigin(0.5));
         grid.add(this.add.text(x, y + 90, '???', { ...FONTS.small, color: CSS.textFaint }).setOrigin(0.5));
         grid.add(this.add.text(x, y + 110, rarityLabel(hero.rarity), {
-          fontSize: '9px', color: `#${color.toString(16).padStart(6, '0')}`, fontFamily: FONT_FAMILY, fontStyle: 'bold',
+          fontSize: '9px', color: rarityCss(hero.rarity), fontFamily: FONT_FAMILY, fontStyle: 'bold',
         }).setOrigin(0.5));
       }
     });
@@ -94,11 +94,10 @@ export class CollectionScene extends Phaser.Scene {
     const cy = GAME_HEIGHT / 2;
     const panelW = 280, panelH = 400;
     const color = rarityColor(hero.rarity);
-    const colorHex = `#${color.toString(16).padStart(6, '0')}`;
+    const colorHex = rarityCss(hero.rarity);
 
-    const overlay = this.add.rectangle(cx, cy, GAME_WIDTH, GAME_HEIGHT, COLORS.scrim, 0.82)
-      .setInteractive()
-      .on('pointerdown', () => this.closeModal());
+    // Fermeture animée : on passe `closeModal` plutôt que le `close` sec de la modale.
+    const { container: modal } = makeModal(this, () => this.closeModal());
 
     const panel = this.add.rectangle(cx, cy, panelW, panelH, COLORS.panel)
       .setStrokeStyle(STROKE.thick, color);
@@ -161,10 +160,11 @@ export class CollectionScene extends Phaser.Scene {
       .on('pointerout', function(this: Phaser.GameObjects.Text) { this.setColor(CSS.textDim); })
       .on('pointerdown', () => this.closeModal());
 
-    this.modalContainer = this.add.container(0, 0, [
-      overlay, panel, portrait, nameText, rarityText, classRow,
+    modal.add([
+      panel, portrait, nameText, rarityText, classRow,
       sep1, ...statsTexts, sep2, abilityTitle, abilityDesc, sep3, loreText, closeBtn,
     ]);
+    this.modalContainer = modal;
 
     // Animation d'ouverture
     this.modalContainer.setAlpha(0);

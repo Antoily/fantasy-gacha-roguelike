@@ -63,10 +63,15 @@ git remote set-url origin https://github.com/Antoily/fantasy-gacha-roguelike.git
 
 ## CI/CD
 
-3 workflows GitHub Actions :
-- **`ci.yml`** : lint + typecheck + build sur chaque push/PR → `frontend/` et `backend/`
-- **`pr-checks.yml`** : validation typecheck sur chaque PR + commentaire auto
+2 workflows GitHub Actions :
+- **`ci.yml`** : lint + typecheck + tests + build → `frontend/` et `backend/`.
+  Se déclenche sur **toutes** les PRs, pas seulement celles qui visent `main` :
+  une PR empilée sur une autre branche doit être vérifiée elle aussi, sinon les
+  contrôles n'arrivent qu'au dernier merge, trop tard pour servir.
 - **`deploy-backend.yml`** : deploy VPS via SSH sur push `main` (nécessite secrets `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`)
+
+(`pr-checks.yml` a été supprimé : il ne faisait qu'un typecheck que `ci.yml`
+couvre déjà, en réinstallant les deux packages une seconde fois à chaque PR.)
 
 **Prérequis CI** : les `package-lock.json` doivent exister. Les générer avec :
 ```bash
@@ -74,6 +79,10 @@ cd frontend && npm install && cd ../backend && npm install
 ```
 
 **Fix CI cassée** : toujours ouvrir une PR (`fix/ci-...`), ne pas patcher directement sur main.
+
+**Tests** : Vitest, côté `frontend/` uniquement (`npm test`, `npm run test:watch`).
+**Rester en Vitest 2.x** tant que la machine de dev est en Node 18 : la v4 exige
+Node ≥ 20 et ne démarre même pas (`styleText` absent de `node:util`).
 
 **Lint** : config ESLint legacy (`.eslintrc.json`) dans `frontend/` et `backend/`,
 format imposé par ESLint 8.57 + typescript-eslint 7 épinglés. Ne pas migrer vers
@@ -116,15 +125,17 @@ frontend/src/
   data/          # Données statiques (heroes, enemies)
   entities/      # Hero.ts, Enemy.ts — instances runtime
   systems/       # RunManager, CombatResolver, GachaSystem
+  state/         # gameState.ts — état global + sauvegarde (jamais dans une scène)
   scenes/        # Scènes Phaser (une scène = un écran)
   ui/            # UIManager (helpers Phaser réutilisables)
-  api/           # apiClient.ts (fetch vers le backend)
   config.ts      # Constantes globales (couleurs, fonts, taille écran)
   main.ts        # Point d'entrée Phaser
 
 backend/src/
   routes/        # auth.ts, progress.ts, runs.ts, leaderboard.ts
-  middleware/    # auth.ts (JWT requireAuth)
+  middleware/    # auth.ts (requireAuth), asyncHandler.ts, errorHandler.ts
+  config.ts      # Variables d'env obligatoires (échec au démarrage si absentes)
+  db.ts          # Client Prisma unique — ne jamais en instancier un autre
   index.ts       # Express app
 backend/prisma/
   schema.prisma  # Modèles User, Progress, Run
@@ -243,8 +254,7 @@ Sur un tirage ×10, c'est la **meilleure** rareté de la salve qui dicte l'anima
 
 ## Or de test
 
-`MainMenuScene.ts` expose `DEBUG_GOLD`, appliqué au chargement par
-`applyDebugGold()`. **Valeur par défaut : `0` (désactivé) — c'est l'état à
+`state/gameState.ts` expose `DEBUG_GOLD`, appliqué au premier `initGameState()`. **Valeur par défaut : `0` (désactivé) — c'est l'état à
 conserver.** Toute valeur > 0 écrase l'or du joueur à chaque rechargement de
 page, ce qui rend l'économie intestable. Le remettre à `0` après usage.
 
@@ -263,7 +273,7 @@ La **seule** progression entre les runs est le déblocage de héros :
 
 ## État global du jeu (runtime)
 
-`window.gameState` (défini dans `MainMenuScene.ts`) contient :
+`window.gameState` (défini dans `state/gameState.ts`) contient :
 ```ts
 {
   runManager: RunManager,      // état du run en cours
@@ -274,14 +284,47 @@ La **seule** progression entre les runs est le déblocage de héros :
 }
 ```
 
-Sauvegarde locale : `localStorage` clé `fantasy_roguelike_save` via `saveProgress()` dans `MainMenuScene.ts`.  
-Sauvegarde serveur : **non branchée**. `apiClient` expose `saveProgress()`,
-`login()`, `register()`, `loadProgress()`, `getLeaderboard()`, `setToken()` et
-`clearToken()`, mais aucun n'a d'appelant : il n'y a pas d'écran de connexion.
-Seuls `isAuthenticated()` et `saveRun()` sont utilisés (dans `GameOverScene`),
-et `isAuthenticated()` est toujours faux tant que rien n'appelle `setToken()`.
-La progression est donc **locale uniquement**. Ne pas supposer que le backend
-reçoit quoi que ce soit.
+Sauvegarde locale : `localStorage` clé `fantasy_roguelike_save` via `saveProgress()`
+dans `state/gameState.ts`. **L'état global ne vit pas dans une scène** : une scène
+qui a besoin de sauvegarder importe `state/gameState`, jamais `scenes/MainMenuScene`.
+`initGameState()` est idempotent — un retour au menu ne réinitialise rien.  
+Sauvegarde serveur : **le frontend n'appelle plus le backend du tout.**
+`apiClient` a été supprimé : ses 8 méthodes n'avaient aucun appelant utile
+(sans écran de connexion, `setToken()` n'était jamais appelé, donc
+`isAuthenticated()` restait faux et `saveRun()` ne partait jamais). Le jeu est
+**local-only** et assumé comme tel.
+
+Le backend (auth, progress, runs, leaderboard) reste développé et déployable,
+mais **aucun client ne le consomme**. Rebrancher la synchronisation = écrire
+une scène de connexion + un client HTTP, c'est un chantier de feature, pas une
+remise en service.
+
+---
+
+## Tests — écrire des tests qui mordent
+
+`CombatResolver.ts` est la seule logique pure du jeu (pas de Phaser, pas d'I/O)
+et le cœur du gameplay : c'est là que vivent les tests. `Math.random` est figé
+via `vi.spyOn` pour rendre les combats reproductibles.
+
+⚠️ **Un test vert ne prouve rien tant qu'on ne l'a pas vu échouer.** Trois des
+premiers tests écrits passaient sans rien vérifier :
+
+- le test de `taunt` mettait Sylva dans l'équipe : son tir double tuait l'archer
+  **avant qu'il ne joue**, donc aucun ciblage n'était exercé ;
+- le test de `first_strike` opposait Nix (26 VIT, le plus rapide du jeu) à un
+  ennemi plus lent : il passait premier de toute façon ;
+- le test de `heal_one` vérifiait `entry.heal`, une constante écrite à part dans
+  le journal, qui reste à 50 même si le soin ne rend plus aucun PV.
+
+Règle qui en découle : **valider chaque test par mutation** — casser la règle
+dans le résolveur, vérifier que la suite rougit, restaurer. Et faire porter les
+assertions sur l'**effet réel** (PV, cibles des actions du journal), jamais sur
+un champ descriptif recopié à côté.
+
+Quand une équipe de test doit laisser l'ennemi agir, la composer avec des héros
+peu offensifs (Ourg 16 ATK, Finn qui ne fait que soigner) plutôt qu'avec les
+gros attaquants.
 
 ---
 
@@ -332,6 +375,13 @@ couleur francs, **gros contours noirs**, typo arrondie en gras.
   jamais un voile noir : le noir vire au brun sur le fond crème.
 - `makeButton` produit un bouton cerné de noir avec **ombre portée pleine** décalée ;
   `makePanel` un panneau blanc à contour noir. Ne pas redessiner de boutons à la main.
+  `makeModal(scene, onScrimClick?)` produit le voile bloquant des modales : ne pas
+  reconstruire un `rectangle(..., COLORS.scrim, 0.82).setInteractive()` à la main.
+  Omettre `onScrimClick` quand la modale exige une réponse explicite ; passer son
+  propre callback pour une fermeture animée.
+  Couleur d'une rareté : `rarityColor()` (nombre, Phaser) ou `rarityCss()` (chaîne,
+  styles de texte). Ne plus écrire `\`#${color.toString(16).padStart(6, '0')}\`` —
+  la conversion vit dans `toCssColor()`.
   Son dernier paramètre optionnel `subtitle` rend une seconde ligne **à l'intérieur**
   du bouton : une explication qui accompagne un bouton doit tenir dans sa case.
 
@@ -369,6 +419,10 @@ glissement de défilement déclenche une sélection au passage.
 - **Contenu d'une carte/élément** : centrer verticalement dans son conteneur (ne pas
   coller en haut). Positionner les éléments internes par rapport aux bords du cadre,
   pas en coordonnées absolues en dur.
+- **Un panneau dont le contenu varie se dimensionne à partir de ce contenu**, jamais
+  en hauteur fixe. La modale « qui laisse sa place » était figée à 260px : avec une
+  équipe pleine, le bouton « Annuler » chevauchait la 4e ligne. Sa géométrie dérive
+  désormais de `run.heroes.length`.
 - Noms longs (formations, etc.) : aligner à droite (`setOrigin(1, …)`) pour éviter
   tout débordement du cadre.
 - `RunMapScene` sert de référence pour ces conventions.
@@ -394,6 +448,12 @@ scène de run doit offrir un moyen clair de revenir au menu.
 
 ## Backend — déploiement VPS
 
+Variables d'environnement obligatoires en production (le serveur **refuse de
+démarrer** si elles manquent, cf. `backend/src/config.ts`) :
+- `JWT_SECRET` — secret de signature des tokens
+- `CORS_ORIGIN` — origines autorisées, séparées par des virgules
+  (`https://mon-domaine.fr,https://www.mon-domaine.fr`)
+
 Variables à configurer dans GitHub → Settings → Variables/Secrets :
 - `VPS_HOST` (variable) : IP ou domaine du VPS
 - `VPS_USER` (variable) : utilisateur SSH (ex: `ubuntu`)
@@ -407,6 +467,18 @@ Sur le VPS, structure attendue :
 
 Migration DB au premier déploiement : `npx prisma migrate deploy`
 
+⚠️ **Le repo ne contient aucune migration Prisma** — `prisma/` ne contient que
+`schema.prisma`. `migrate deploy` n'a donc rien à appliquer en l'état : la base
+a forcément été créée autrement (`prisma db push`), ou n'existe pas encore.
+Créer la migration initiale avant tout déploiement réel.
+
+⚠️ **`Progress.ownedRelicIds` et `Progress.talentTree` sont morts** : reliques et
+arbre de talents sont hors design, et l'API `/progress` ne les accepte plus. Les
+colonnes restent en base **volontairement** — les supprimer demande une migration
+destructive, et l'état de la base de production est inconnu. Elles gardent leurs
+valeurs par défaut et ne coûtent rien. Ne pas les « nettoyer » sans avoir vérifié
+qu'aucune donnée de production n'en dépend.
+
 ---
 
 ## Priorités de développement (ordre)
@@ -415,7 +487,8 @@ Migration DB au premier déploiement : `npx prisma migrate deploy`
 2. ✅ Système grille + combat auto
 3. ✅ 8 héros, 12 reliques, gacha avec pity
 4. ✅ Méta-progression (déblocage de héros via gacha)
-5. ✅ Backend auth + save + leaderboard
+5. ✅ Backend auth + save + leaderboard (déployable, mais **non consommé** :
+   le jeu est local-only, cf. « État global du jeu »)
 6. 🔲 Assets IA réels (remplacer les placeholders de `BootScene.ts`) — **style BD claire**,
    contours noirs épais, aplats francs (voir `assets/ASSET_PROMPTS.md` à réaligner)
 7. 🔲 Animations (idle/attaque) via spritesheets

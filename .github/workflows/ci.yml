@@ -3,8 +3,10 @@ name: CI
 on:
   push:
     branches: [main, develop]
+  # Sur TOUTES les PRs, pas seulement celles qui visent `main` : une PR empilée
+  # sur une autre branche doit être vérifiée elle aussi, sinon le lint et les
+  # tests n'arrivent qu'au dernier merge, quand il est trop tard pour être utile.
   pull_request:
-    branches: [main]
 
 jobs:
   frontend:
@@ -31,6 +33,9 @@ jobs:
 
       - name: Type-check
         run: npm run type-check
+
+      - name: Test
+        run: npm test
 
       - name: Build
         run: npm run build
