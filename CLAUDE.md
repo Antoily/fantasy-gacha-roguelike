@@ -20,7 +20,8 @@ mémoire partagée du projet : il doit refléter l'état réel des règles à to
 
 ## Contexte du projet
 
-Jeu mobile **Fantasy Roguelike Gacha** — runs procéduraux + combat tactique sur grille + gacha héros/reliques.
+Jeu mobile **Fantasy Roguelike Gacha** — runs procéduraux + combat automatique sur grille + gacha de héros.
+Le joueur ne décide que d'une chose : **quels personnages composent son équipe**.
 
 - **Repo** : https://github.com/Antoily/fantasy-gacha-roguelike
 - **Stack** : Phaser.js (TypeScript) + Capacitor (Android) | Node.js + Express + PostgreSQL + Prisma
@@ -62,10 +63,15 @@ git remote set-url origin https://github.com/Antoily/fantasy-gacha-roguelike.git
 
 ## CI/CD
 
-3 workflows GitHub Actions :
-- **`ci.yml`** : lint + typecheck + build sur chaque push/PR → `frontend/` et `backend/`
-- **`pr-checks.yml`** : validation typecheck sur chaque PR + commentaire auto
+2 workflows GitHub Actions :
+- **`ci.yml`** : lint + typecheck + tests + build → `frontend/` et `backend/`.
+  Se déclenche sur **toutes** les PRs, pas seulement celles qui visent `main` :
+  une PR empilée sur une autre branche doit être vérifiée elle aussi, sinon les
+  contrôles n'arrivent qu'au dernier merge, trop tard pour servir.
 - **`deploy-backend.yml`** : deploy VPS via SSH sur push `main` (nécessite secrets `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`)
+
+(`pr-checks.yml` a été supprimé : il ne faisait qu'un typecheck que `ci.yml`
+couvre déjà, en réinstallant les deux packages une seconde fois à chaque PR.)
 
 **Prérequis CI** : les `package-lock.json` doivent exister. Les générer avec :
 ```bash
@@ -74,24 +80,62 @@ cd frontend && npm install && cd ../backend && npm install
 
 **Fix CI cassée** : toujours ouvrir une PR (`fix/ci-...`), ne pas patcher directement sur main.
 
+**Tests** : Vitest, côté `frontend/` uniquement (`npm test`, `npm run test:watch`).
+**Rester en Vitest 2.x** tant que la machine de dev est en Node 18 : la v4 exige
+Node ≥ 20 et ne démarre même pas (`styleText` absent de `node:util`).
+
+**Lint** : config ESLint legacy (`.eslintrc.json`) dans `frontend/` et `backend/`,
+format imposé par ESLint 8.57 + typescript-eslint 7 épinglés. Ne pas migrer vers
+`eslint.config.js` sans monter ESLint en v9+. `no-explicit-any` est en **erreur** ;
+`no-non-null-assertion` est désactivé (le `!` est délibéré : `getHeroById(id)!`,
+`req.userId!`, `slot.enemy!`). Lancer `npm run lint` dans chaque package avant de
+committer — la CI l'exécute désormais réellement.
+
+---
+
+## Vérifier le rendu à l'écran
+
+⚠️ **Le serveur de dev (`npm run dev`) peut servir du JS obsolète au navigateur** même
+après modification des sources et purge de `node_modules/.vite` — observé sur WSL2 :
+`curl` renvoyait le code à jour pendant que la page rendait l'ancien. Une capture d'écran
+prise via le serveur de dev peut donc valider du code qui n'est pas celui du disque.
+
+Pour vérifier un changement visuel, **passer par le build statique** :
+```bash
+cd frontend && npm run build && npx serve -s dist -l 4173
+```
+puis piloter `http://localhost:4173/` (Playwright, viewport 360×640 → canvas 1:1).
+Le canvas est en WebGL sans `preserveDrawingBuffer` : le lire via `getImageData`
+renvoie du vide, il faut utiliser `page.screenshot()`.
+
+⚠️ `tsconfig.json` ne définit pas `noEmit` : un `tsc` sans `--noEmit` compile des `.js`
+à côté de chaque `.ts` dans `src/`. Ne jamais les committer. (`npm run build` et
+`npm run type-check` passent bien `--noEmit`.)
+
+**Vérification headless sur WSL2** : le WebGL par défaut échoue
+(« Framebuffer Unsupported »). Lancer Chromium avec
+`--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader`.
+
 ---
 
 ## Structure des fichiers — où tout se trouve
 
 ```
 frontend/src/
-  data/          # Données statiques (heroes, enemies, relics, events, talents)
+  data/          # Données statiques (heroes, enemies)
   entities/      # Hero.ts, Enemy.ts — instances runtime
-  systems/       # RunManager, CombatResolver, GachaSystem, TalentTree
+  systems/       # RunManager, CombatResolver, GachaSystem
+  state/         # gameState.ts — état global + sauvegarde (jamais dans une scène)
   scenes/        # Scènes Phaser (une scène = un écran)
   ui/            # UIManager (helpers Phaser réutilisables)
-  api/           # apiClient.ts (fetch vers le backend)
   config.ts      # Constantes globales (couleurs, fonts, taille écran)
   main.ts        # Point d'entrée Phaser
 
 backend/src/
   routes/        # auth.ts, progress.ts, runs.ts, leaderboard.ts
-  middleware/    # auth.ts (JWT requireAuth)
+  middleware/    # auth.ts (requireAuth), asyncHandler.ts, errorHandler.ts
+  config.ts      # Variables d'env obligatoires (échec au démarrage si absentes)
+  db.ts          # Client Prisma unique — ne jamais en instancier un autre
   index.ts       # Express app
 backend/prisma/
   schema.prisma  # Modèles User, Progress, Run
@@ -102,86 +146,185 @@ assets/
 
 ---
 
+## Principe de game design — à ne pas perdre de vue
+
+**La seule chose qui demande de l'attention au joueur, c'est le choix de ses personnages.**
+Tout le reste doit se résoudre sans décision. Conséquences, à respecter pour toute
+nouvelle fonctionnalité :
+
+- **La puissance vient uniquement des héros.** Pas de reliques, pas d'objets,
+  pas d'arbre de talents, pas d'amélioration de statistiques. Si une idée rend le
+  joueur plus fort autrement que par « un meilleur personnage dans l'équipe »,
+  elle est hors sujet.
+- **Un héros = 3 statistiques et UN effet**, énonçable en une phrase. Deux phrases
+  = trop compliqué. Le joueur doit pouvoir comparer deux héros d'un coup d'œil.
+- **Le joueur ne place personne** sur la grille : `autoPlaceHeroes()` positionne
+  selon le champ `row` du héros (`front` / `back`).
+- Une salle ne propose **qu'un seul type de décision, et elle porte sur des
+  personnages** : recruter, remplacer, soigner.
+
+---
+
 ## Données du jeu — IDs à connaître
 
-### Héros (fichier `frontend/src/data/heroes.ts`)
-| id | Nom | Classe | Rareté |
-|----|-----|--------|--------|
-| `aldric` | Aldric le Rempart | warrior | legendary |
-| `sylva` | Sylva l'Œil-d'Aigle | ranger | epic |
-| `zara` | Zara la Flamme Noire | mage | epic |
-| `finn` | Frère Finn | priest | rare |
-| `shade` | Shade l'Ombre | assassin | epic |
-| `gorvak` | Gorvak le Briseur | warrior | rare |
-| `lyra` | Lyra la Tisseuse | mage | rare |
-| `vex` | Vex la Chasseuse | ranger | rare |
+### Héros (`frontend/src/data/heroes.ts`)
 
-### Reliques (fichier `frontend/src/data/relics.ts`)
-`bloodstone_ring` · `swiftness_boots` · `war_banner` · `shadow_cloak` · `ancient_tome` · `iron_fortress` · `emerald_pendant` · `void_crystal` · `gold_idol` · `dragon_scale` · `berserker_heart` · `amulet_of_focus`
+20 héros, 3 stats (`hp` / `atk` / `spd`), un rôle, une rangée, une compétence.
+
+| id | Nom court | Rôle | Rangée | Rareté | Compétence (`ability.id`) |
+|----|-----------|------|--------|--------|---------------------------|
+| `aldric` | Aldric | tank | front | legendary | `taunt` — attaqué en priorité |
+| `thane` | Thane | tank | front | epic | `aegis` — équipe -25% dégâts |
+| `brann` | Brann | tank | front | rare | `thorns` — renvoie 30% |
+| `gorvak` | Gorvak | dps | front | rare | `cleave` — frappe le rang avant |
+| `kael` | Kael | dps | front | common | `riposte` — +4 ATK par kill |
+| `shade` | Shade | dps | back | epic | `execute` — cible le plus blessé |
+| `zara` | Zara | dps | back | epic | `column` — frappe une colonne |
+| `sylva` | Sylva | dps | back | epic | `double_shot` — attaque 2× |
+| `vex` | Vex | dps | back | rare | `ambush` — +50% sur cible intacte |
+| `nix` | Nix | dps | back | rare | `first_strike` — joue en premier |
+| `finn` | Finn | heal | back | rare | `heal_one` — +50 PV au plus blessé |
+| `sora` | Sora | heal | back | epic | `heal_all` — +20 PV à l'équipe |
+| `lyra` | Lyra | support | back | rare | `weaken` — -50% ATK au plus fort |
+| `ourg` | Ourg | tank | front | common | `parry` — ignore la 1re attaque reçue |
+| `ysolde` | Ysolde | tank | front | epic | `regen` — +10 PV à chaque coup reçu |
+| `corvus` | Corvus | dps | back | rare | `snipe` — cible la plus forte ATK |
+| `ignis` | Ignis | dps | back | epic | `splash` — cible + voisins |
+| `aubepine` | Aubépine | heal | back | legendary | `revive` — relève un allié, 1×/combat |
+| `orin` | Orin | support | back | rare | `rally` — équipe +15% ATK |
+| `sibylle` | Sibylle | support | back | epic | `slow` — ennemis -25% VIT |
+
+Starters (`STARTER_HERO_IDS`) : `aldric`, `sylva`, `finn` — trois pour une équipe
+de quatre, pour que le manque se fasse sentir dès la première partie.
 
 ### Formations ennemies (`frontend/src/data/enemies.ts`)
 `spear_rush` · `arrow_rain` · `shield_wall` · `spread_assault` · `death_squad`
 
-### Talents (`frontend/src/data/talents.ts`)
-3 tracks : `survival` / `power` / `fortune` — 3 nœuds par track (tier 1→3)
+Les ennemis ont eux aussi 3 stats (plus de `def`).
 
 ---
 
 ## Système de combat — logique clé
 
-- Grille **3×3** : row 0 = front, row 2 = back
-- Tour trié par **SPD décroissant**
-- Dégâts = `max(1, ATK - DEF*0.5) × [0.85–1.15]`
-- Pity gacha = **80 tirages** (configurable via `GachaSystem(pityCap)`)
-- Le `CombatResolver` importe les reliques et les applique inline
-- `RunManager.completeRoom()` fait avancer la progression ET applique `emerald_pendant`
+- Grille **3×3**, remplie automatiquement : `front` → rang 0, `back` → rang 1.
+- Tour trié par **VIT décroissante**. `first_strike` passe devant tout le monde.
+- **Dégâts = ATK × [0.85–1.15]**. Il n'y a pas de défense : ce qu'un héros encaisse
+  se lit dans ses PV, ce qu'il inflige dans son ATK. Rien à calculer pour le joueur.
+- Ciblage : `taunt` prime sur tous les autres patterns ennemis.
+- `resolveCombat(heroes, enemies)` résout tout le combat d'avance ; `CombatScene`
+  ne fait que rejouer le journal en animations.
+- Le multiplicateur d'or du mode auto est appliqué **par la scène**, pas par le
+  résolveur.
 
 ---
 
-## Lancement d'un run & composition d'équipe
+## Boucle de run
 
-- Lancer un run passe **toujours** par la scène **`TeamSelect`** (`TeamSelectScene.ts`).
-  Les boutons « LANCER UN RUN » / « RUN AUTO » (menu) et « NOUVEAU RUN » (game over)
-  font `transitionTo(this, 'TeamSelect', { auto })` — ils ne démarrent plus le run directement.
-- `TeamSelect` liste les **héros débloqués** (`gs.unlockedHeroIds`) ; le joueur en choisit
-  jusqu'à **`MAX_TEAM` (= 5)** (exporté par `RunManager.ts`), puis « LANCER ▶ ».
-- `RunManager.startRun({ teamHeroIds, ... })` construit l'équipe à partir de `teamHeroIds`
-  (héros valides uniquement, plafonné à `MAX_TEAM`, repli sur `STARTER_HERO_IDS` si vide).
-  ⚠️ Ne plus filtrer sur `STARTER_HERO_IDS` (ancien bug : seuls les starters étaient jouables).
-- `transitionTo(scene, key, data?, duration?)` accepte un `data` optionnel passé à `scene.start`.
+`TeamSelect` → `RunMap` → salles → `GameOver`.
+
+- **Équipe de `MAX_TEAM` (= 4)** héros, exporté par `RunManager.ts`.
+- Une zone = 8 salles : `combat` ×4, `recruit` ×2, `rest` ×1, puis `boss`.
+  3 zones pour gagner (`TOTAL_ZONES`).
+- **`recruit` (`RecruitScene`)** : 3 héros proposés (tirés à la génération de la
+  zone, donc stables). Équipe pleine → modale « qui laisse sa place ». Passer
+  soigne l'équipe de 40 PV.
+- **`rest` (`RestScene`)** : choisir UN héros à soigner à fond, ou à relever s'il
+  est tombé (50% de ses PV).
+- Un héros tombé reste à 0 PV : on le relève au campement, ou on le remplace au
+  renfort. C'est la seule façon de se rattraper — et c'est un choix de personnage.
+- L'or d'un run est reversé **en totalité** au méta-or en fin de run.
 
 ## Mode auto (run automatique)
 
-Run en pilote automatique, lancé depuis le menu (bouton **« 🤖 RUN AUTO (+30% 💰) »**).
+Run en pilote automatique (bouton « 🤖 RUN AUTO (+30% 💰) »).
 
-- Flag `autoMode` dans `RunState` (passé via `RunManager.startRun({ autoMode })`).
-- **Bonus d'or** : `RunManager.getGoldMultiplier()` ajoute `+0.30` quand `autoMode`.
-  Comme l'or de run est reversé à 30% au méta-or en fin de run, le bonus se propage.
-- **Auto-pilotage** : chaque scène de run, si `run.autoMode`, déclenche son action
-  via `this.time.delayedCall(...)` avec un **choix aléatoire** (`pickRandom`) :
-  - `RunMapScene` → entre dans la salle courante · `FormationScene` → placement **aléatoire** des héros (cases distinctes) + combat
-  - `CombatScene` → lecture ×2 + « Continuer » automatique · `EventScene` → option au hasard
-  - `ShopScene` → achats aléatoires en une passe (50% par relique abordable + soin éventuel), **sans `scene.restart`**, puis sortie · `RestScene` → soin / entraînement / sortie au hasard
-- Un badge **« 🤖 AUTO »** est affiché en haut de chaque scène concernée.
-- Le bouton « Abandonner la run » de `RunMapScene` permet d'interrompre un run auto.
+- Flag `autoMode` dans `RunState` · bonus d'or via `RunManager.getGoldMultiplier()`.
+- Chaque scène de run, si `run.autoMode`, déclenche son action via
+  `this.time.delayedCall(...)` avec un choix aléatoire (`pickRandom`).
+- Un badge « 🤖 AUTO » est affiché en haut de chaque scène concernée.
+
+## Gacha — animation de tirage
+
+`GachaScene.playRarityIntro(rarity, onDone)` annonce la rareté **avant** de révéler
+les cartes. L'intensité (rayons, étincelles, secousse, durée) vient de `RARITY_FX`.
+Sur un tirage ×10, c'est la **meilleure** rareté de la salve qui dicte l'animation
+(`RARITY_RANK`).
+
+---
+
+## Or de test
+
+`state/gameState.ts` expose `DEBUG_GOLD`, appliqué au premier `initGameState()`. **Valeur par défaut : `0` (désactivé) — c'est l'état à
+conserver.** Toute valeur > 0 écrase l'or du joueur à chaque rechargement de
+page, ce qui rend l'économie intestable. Le remettre à `0` après usage.
+
+---
+
+## Progression méta
+
+La **seule** progression entre les runs est le déblocage de héros :
+
+- L'or gagné en run alimente le **gacha** (`GachaSystem`), qui ne distribue que des
+  héros. Un doublon est converti en or (`DUPLICATE_REFUND`).
+- Pity à **80 tirages** (configurable via `GachaSystem(pityCap)`).
+- Plus de héros débloqués = plus de choix à la composition. C'est tout le jeu.
+
+---
 
 ## État global du jeu (runtime)
 
-`window.gameState` (défini dans `MainMenuScene.ts`) contient :
+`window.gameState` (défini dans `state/gameState.ts`) contient :
 ```ts
 {
   runManager: RunManager,      // état du run en cours
-  talentTree: TalentTreeSystem,
   gacha: GachaSystem,
-  unlockedHeroIds: string[],   // héros débloqués (persistant)
-  ownedRelicIds: string[],     // reliques gacha (persistant)
+  unlockedHeroIds: string[],   // héros débloqués (persistant) — la seule progression
   totalGold: number,           // or méta (persistant)
   bestRun: { zonesCleared, roomsCleared }
 }
 ```
 
-Sauvegarde locale : `localStorage` clé `fantasy_roguelike_save` via `saveProgress()` dans `MainMenuScene.ts`.  
-Sauvegarde serveur : `apiClient.saveProgress()` — appeler après chaque modification persistante.
+Sauvegarde locale : `localStorage` clé `fantasy_roguelike_save` via `saveProgress()`
+dans `state/gameState.ts`. **L'état global ne vit pas dans une scène** : une scène
+qui a besoin de sauvegarder importe `state/gameState`, jamais `scenes/MainMenuScene`.
+`initGameState()` est idempotent — un retour au menu ne réinitialise rien.  
+Sauvegarde serveur : **le frontend n'appelle plus le backend du tout.**
+`apiClient` a été supprimé : ses 8 méthodes n'avaient aucun appelant utile
+(sans écran de connexion, `setToken()` n'était jamais appelé, donc
+`isAuthenticated()` restait faux et `saveRun()` ne partait jamais). Le jeu est
+**local-only** et assumé comme tel.
+
+Le backend (auth, progress, runs, leaderboard) reste développé et déployable,
+mais **aucun client ne le consomme**. Rebrancher la synchronisation = écrire
+une scène de connexion + un client HTTP, c'est un chantier de feature, pas une
+remise en service.
+
+---
+
+## Tests — écrire des tests qui mordent
+
+`CombatResolver.ts` est la seule logique pure du jeu (pas de Phaser, pas d'I/O)
+et le cœur du gameplay : c'est là que vivent les tests. `Math.random` est figé
+via `vi.spyOn` pour rendre les combats reproductibles.
+
+⚠️ **Un test vert ne prouve rien tant qu'on ne l'a pas vu échouer.** Trois des
+premiers tests écrits passaient sans rien vérifier :
+
+- le test de `taunt` mettait Sylva dans l'équipe : son tir double tuait l'archer
+  **avant qu'il ne joue**, donc aucun ciblage n'était exercé ;
+- le test de `first_strike` opposait Nix (26 VIT, le plus rapide du jeu) à un
+  ennemi plus lent : il passait premier de toute façon ;
+- le test de `heal_one` vérifiait `entry.heal`, une constante écrite à part dans
+  le journal, qui reste à 50 même si le soin ne rend plus aucun PV.
+
+Règle qui en découle : **valider chaque test par mutation** — casser la règle
+dans le résolveur, vérifier que la suite rougit, restaurer. Et faire porter les
+assertions sur l'**effet réel** (PV, cibles des actions du journal), jamais sur
+un champ descriptif recopié à côté.
+
+Quand une équipe de test doit laisser l'ennemi agir, la composer avec des héros
+peu offensifs (Ourg 16 ATK, Finn qui ne fait que soigner) plutôt qu'avec les
+gros attaquants.
 
 ---
 
@@ -194,17 +337,92 @@ Sauvegarde serveur : `apiClient.saveProgress()` — appeler après chaque modifi
 - **Commentaires** : en français, expliquer le "pourquoi" pas le "quoi"
 - **Nouvelles données** (héros, reliques, events) : ajouter dans `data/`, jamais hardcodées dans les scènes
 
+### Backend — règles non négociables
+
+- **Un seul client Prisma** : importer `prisma` depuis `src/db.ts`. Ne jamais
+  faire `new PrismaClient()` dans un fichier de routes — c'est un pool de
+  connexions supplémentaire vers la même base.
+- **Toute route `async` passe par `asyncHandler`** (`middleware/asyncHandler.ts`).
+  Express 4 n'attrape pas les promesses rejetées : sans lui, une erreur Prisma
+  laisse la requête pendre jusqu'au timeout et lève un `unhandledRejection`.
+- **Les variables d'environnement obligatoires sont lues dans `src/config.ts`**,
+  via `required()` qui fait échouer le démarrage si elles manquent. Ne jamais
+  écrire `process.env.X ?? ''` pour un secret : ça transforme une config absente
+  en faille silencieuse (avec `JWT_SECRET` vide, tous les tokens étaient
+  forgeables).
+- `errorHandler` doit rester le **dernier** `app.use` d'`index.ts`.
+
+### Thème visuel — BD claire (cartoon)
+
+Le jeu utilise un thème **bande dessinée claire** : fond papier crème, aplats de
+couleur francs, **gros contours noirs**, typo arrondie en gras.
+
+- **Toutes les couleurs viennent de `config.ts`.** Aucune valeur `0x…` ou `#…` en
+  dur dans les scènes (seule exception : la conversion `rarityColor(...).toString(16)`).
+  Un changement de thème doit rester un chantier d'un seul fichier.
+- Tokens disponibles : `COLORS` (nombres, pour Phaser) et `CSS` (chaînes, pour les
+  styles de texte) — les deux sont maintenus en parallèle et doivent rester synchrones.
+  Familles : `background` / `panel` / `ink` / `accent` / `secondary` / `gold` / `hp`,
+  textes (`text`, `textLight`, `textDim`, `textFaint`), `rarity.*`, `btn.*`
+  (`primary`, `secondary`, `success`, `danger`, `magic`, `gold`, `neutral`, `disabled`),
+  `side.*`, `result.*`, `scrim`.
+- **Choisir un token par intention, pas par teinte** : `COLORS.btn.danger`, pas « le rouge ».
+- Contours : `STROKE.thin | base | thick` (2/3/4 px). Le trait est **noir** (`COLORS.ink`)
+  partout ; c'est lui qui porte le style, pas la couleur du contour.
+- Typo : `FONTS.*` ou `FONT_FAMILY` (pile Comic Sans → Comic Neue → Chalkboard →
+  Trebuchet). Toujours `fontStyle: 'bold'`. Jamais `'Arial'` ni `'Georgia'` en dur.
+- Les **voiles** (modales, écrans de résultat) utilisent `COLORS.scrim` (papier, ~0.82),
+  jamais un voile noir : le noir vire au brun sur le fond crème.
+- `makeButton` produit un bouton cerné de noir avec **ombre portée pleine** décalée ;
+  `makePanel` un panneau blanc à contour noir. Ne pas redessiner de boutons à la main.
+  `makeModal(scene, onScrimClick?)` produit le voile bloquant des modales : ne pas
+  reconstruire un `rectangle(..., COLORS.scrim, 0.82).setInteractive()` à la main.
+  Omettre `onScrimClick` quand la modale exige une réponse explicite ; passer son
+  propre callback pour une fermeture animée.
+  Couleur d'une rareté : `rarityColor()` (nombre, Phaser) ou `rarityCss()` (chaîne,
+  styles de texte). Ne plus écrire `\`#${color.toString(16).padStart(6, '0')}\`` —
+  la conversion vit dans `toCssColor()`.
+  Son dernier paramètre optionnel `subtitle` rend une seconde ligne **à l'intérieur**
+  du bouton : une explication qui accompagne un bouton doit tenir dans sa case.
+
+### Listes défilables et tri
+
+Deux écrans servent à comparer des héros (collection, composition d'équipe) et
+partagent leurs briques :
+
+- `attachScroll(scene, container, viewTop, viewBottom, contentBottom)` rend un
+  conteneur défilable (glisser + molette), le masque et renvoie un `ScrollHandle`.
+- `makeSortBar(scene, y, options, activeId, onChange)` affiche les puces de tri.
+  Les critères vivent dans `data/heroSort.ts` (`HERO_SORTS`, `sortHeroes`) —
+  ajouter un tri là, pas dans une scène.
+- Changer de tri **relance la scène** (`scene.restart`) en lui repassant `sortId`
+  (et la sélection en cours pour `TeamSelect`) : ne rien faire perdre au joueur.
+
+⚠️ **Phaser ignore les masques pour la détection des clics.** Une carte sortie du
+cadre par le défilement continue d'intercepter les appuis dans l'en-tête ou le
+pied de page — un clic sur la barre de tri sélectionnait un héros invisible.
+Deux protections, à conserver ensemble :
+1. tout gestionnaire de carte filtre avec `scroll.isInView(pointer.y)` ;
+2. l'UI fixe posée sur la zone défilante (barre de tri) est au-dessus via `setDepth`.
+
+Les cartes réagissent sur **`pointerup`**, jamais `pointerdown` : sinon un
+glissement de défilement déclenche une sélection au passage.
+
 ### Layout des scènes (écran 360×640)
 
 - **Grille de marge unique** : marge latérale `MARGIN = 16px`, largeur de contenu
   `CONTENT_W = 328px`. Tous les blocs principaux (panneaux, listes, boutons pleine
   largeur) partagent cette largeur et cette marge — pas de largeurs ad hoc.
 - **Labels de section** alignés à gauche sur la marge (`x = MARGIN`), suffixe `:`
-  (« Équipe : », « Salles : », « Reliques : »), avec **~9–10px d'écart** entre le
+  (« Équipe : », « Salles : », « Ton équipe : »), avec **~9–10px d'écart** entre le
   label et la boîte qu'il introduit.
 - **Contenu d'une carte/élément** : centrer verticalement dans son conteneur (ne pas
   coller en haut). Positionner les éléments internes par rapport aux bords du cadre,
   pas en coordonnées absolues en dur.
+- **Un panneau dont le contenu varie se dimensionne à partir de ce contenu**, jamais
+  en hauteur fixe. La modale « qui laisse sa place » était figée à 260px : avec une
+  équipe pleine, le bouton « Annuler » chevauchait la 4e ligne. Sa géométrie dérive
+  désormais de `run.heroes.length`.
 - Noms longs (formations, etc.) : aligner à droite (`setOrigin(1, …)`) pour éviter
   tout débordement du cadre.
 - `RunMapScene` sert de référence pour ces conventions.
@@ -219,22 +437,22 @@ scène de run doit offrir un moyen clair de revenir au menu.
 
 ## Ajouter un héros — checklist
 
-1. `frontend/src/data/heroes.ts` → ajouter dans `HERO_POOL`
-2. `frontend/src/scenes/BootScene.ts` → ajouter couleur dans `heroColors`
-3. `assets/ASSET_PROMPTS.md` → ajouter le prompt portrait
-4. Si l'ability est nouvelle → gérer dans `CombatResolver.ts` switch cases
-
-## Ajouter une relique — checklist
-
-1. `frontend/src/data/relics.ts` → ajouter dans `RELIC_POOL`
-2. `frontend/src/systems/CombatResolver.ts` → gérer l'effet si combat
-3. `frontend/src/systems/RunManager.ts` → gérer l'effet si persistant (run)
-4. `frontend/src/scenes/BootScene.ts` → ajouter dans `relicIds`
-5. `assets/ASSET_PROMPTS.md` → ajouter le prompt icône
+1. `frontend/src/data/heroes.ts` → ajouter dans `HERO_POOL` (3 stats, `short`,
+   `role`, `row`, et **une** compétence énonçable en une phrase)
+2. `frontend/src/systems/CombatResolver.ts` → ajouter le `case` dans `heroAction`
+   (sans `case`, le héros fait une attaque simple — c'est un défaut valable)
+3. `frontend/src/scenes/BootScene.ts` → ajouter une couleur dans `heroColors`
+4. `assets/ASSET_PROMPTS.md` → ajouter le prompt portrait
 
 ---
 
 ## Backend — déploiement VPS
+
+Variables d'environnement obligatoires en production (le serveur **refuse de
+démarrer** si elles manquent, cf. `backend/src/config.ts`) :
+- `JWT_SECRET` — secret de signature des tokens
+- `CORS_ORIGIN` — origines autorisées, séparées par des virgules
+  (`https://mon-domaine.fr,https://www.mon-domaine.fr`)
 
 Variables à configurer dans GitHub → Settings → Variables/Secrets :
 - `VPS_HOST` (variable) : IP ou domaine du VPS
@@ -249,6 +467,18 @@ Sur le VPS, structure attendue :
 
 Migration DB au premier déploiement : `npx prisma migrate deploy`
 
+⚠️ **Le repo ne contient aucune migration Prisma** — `prisma/` ne contient que
+`schema.prisma`. `migrate deploy` n'a donc rien à appliquer en l'état : la base
+a forcément été créée autrement (`prisma db push`), ou n'existe pas encore.
+Créer la migration initiale avant tout déploiement réel.
+
+⚠️ **`Progress.ownedRelicIds` et `Progress.talentTree` sont morts** : reliques et
+arbre de talents sont hors design, et l'API `/progress` ne les accepte plus. Les
+colonnes restent en base **volontairement** — les supprimer demande une migration
+destructive, et l'état de la base de production est inconnu. Elles gardent leurs
+valeurs par défaut et ne coûtent rien. Ne pas les « nettoyer » sans avoir vérifié
+qu'aucune donnée de production n'en dépend.
+
 ---
 
 ## Priorités de développement (ordre)
@@ -256,9 +486,11 @@ Migration DB au premier déploiement : `npx prisma migrate deploy`
 1. ✅ Prototype jouable (boucle run complète)
 2. ✅ Système grille + combat auto
 3. ✅ 8 héros, 12 reliques, gacha avec pity
-4. ✅ Méta-progression (arbre de talents)
-5. ✅ Backend auth + save + leaderboard
-6. 🔲 Assets IA réels (remplacer les placeholders de `BootScene.ts`)
+4. ✅ Méta-progression (déblocage de héros via gacha)
+5. ✅ Backend auth + save + leaderboard (déployable, mais **non consommé** :
+   le jeu est local-only, cf. « État global du jeu »)
+6. 🔲 Assets IA réels (remplacer les placeholders de `BootScene.ts`) — **style BD claire**,
+   contours noirs épais, aplats francs (voir `assets/ASSET_PROMPTS.md` à réaligner)
 7. 🔲 Animations (idle/attaque) via spritesheets
 8. 🔲 Son et musique
 9. 🔲 Export Android (Capacitor)

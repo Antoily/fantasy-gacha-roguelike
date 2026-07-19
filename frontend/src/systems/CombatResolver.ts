@@ -1,6 +1,5 @@
 import type { HeroInstance } from '../entities/Hero';
 import type { EnemyInstance } from '../entities/Enemy';
-import type { RelicDefinition } from '../data/relics';
 import { isHeroAlive, healHero } from '../entities/Hero';
 import { isEnemyAlive } from '../entities/Enemy';
 import { randInt } from '../utils/random';
@@ -9,7 +8,7 @@ import { randInt } from '../utils/random';
 // de rejouer le déroulement en animation (barres de PV, dégâts flottants, morts)
 export interface CombatEffect {
   unitId: string;
-  kind: 'damage' | 'heal' | 'debuff' | 'mark' | 'revive';
+  kind: 'damage' | 'heal' | 'debuff' | 'revive';
   amount: number;
   hpAfter: number;
 }
@@ -30,145 +29,331 @@ export interface CombatResult {
   victory: boolean;
   log: CombatLogEntry[];
   goldReward: number;
-  survivingHeroes: HeroInstance[];
 }
 
-interface CombatUnit {
-  type: 'hero' | 'enemy';
-  hero?: HeroInstance;
-  enemy?: EnemyInstance;
-  get id(): string;
-  get name(): string;
-  get hp(): number;
-  get maxHp(): number;
-  get atk(): number;
-  get def(): number;
-  get spd(): number;
-  get row(): number;
-  get col(): number;
-  get alive(): boolean;
+const GRID_COLS = 3;
+
+// Dégâts = ATK × aléa. Il n'y a pas de défense : ce qu'un héros encaisse se lit
+// dans ses PV, ce qu'il inflige se lit dans son ATK. Rien à calculer pour le joueur.
+function rollDamage(atk: number): number {
+  return Math.max(1, randInt(Math.floor(atk * 0.85), Math.floor(atk * 1.15)));
 }
 
-function wrapHero(h: HeroInstance): CombatUnit {
-  return {
-    type: 'hero',
-    hero: h,
-    get id() { return h.instanceId; },
-    get name() { return h.name; },
-    get hp() { return h.currentHp; },
-    get maxHp() { return h.maxHp; },
-    get atk() { return Math.round(h.atk * (1 - (h.atkDebuffPct ?? 0) / 100)); },
-    get def() { return h.def; },
-    get spd() { return h.spd; },
-    get row() { return h.gridRow ?? 0; },
-    get col() { return h.gridCol ?? 0; },
-    get alive() { return isHeroAlive(h); },
-  };
+function effectiveAtk(unit: { atk: number; atkDebuffPct: number }): number {
+  return Math.max(1, Math.round(unit.atk * (1 - unit.atkDebuffPct / 100)));
 }
 
-function wrapEnemy(e: EnemyInstance): CombatUnit {
-  return {
-    type: 'enemy',
-    enemy: e,
-    get id() { return e.instanceId; },
-    get name() { return e.name; },
-    get hp() { return e.currentHp; },
-    get maxHp() { return e.maxHp; },
-    get atk() { return Math.round(e.atk * (1 - (e.atkDebuffPct ?? 0) / 100)); },
-    get def() { return e.def; },
-    get spd() { return e.spd; },
-    get row() { return e.gridRow; },
-    get col() { return e.gridCol; },
-    get alive() { return isEnemyAlive(e); },
-  };
+// « Refrain » : +15% d'ATK à toute l'équipe tant que le barde tient debout
+function rallyBonus(heroes: HeroInstance[]): number {
+  return heroes.some(h => h.abilityId === 'rally' && isHeroAlive(h)) ? 1.15 : 1;
 }
 
-function calcDamage(atk: number, def: number, defPiercePct = 0): number {
-  const effectiveDef = def * (1 - defPiercePct / 100);
-  const base = Math.max(1, atk - effectiveDef * 0.5);
-  return randInt(Math.floor(base * 0.85), Math.floor(base * 1.15));
+// Voisins orthogonaux sur la grille — utilisé par « Déflagration »
+function neighbours(target: EnemyInstance, pool: EnemyInstance[]): EnemyInstance[] {
+  return pool.filter(e =>
+    e.instanceId !== target.instanceId &&
+    Math.abs(e.gridRow - target.gridRow) + Math.abs(e.gridCol - target.gridCol) === 1);
 }
 
-function applyDamage(unit: CombatUnit, dmg: number, relics: RelicDefinition[]): number {
-  let finalDmg = dmg;
-  if (unit.type === 'hero' && unit.hero) {
-    // Warrior relic reduction
-    const fortress = relics.find(r => r.id === 'iron_fortress');
-    if (fortress && unit.hero.class === 'warrior') {
-      finalDmg = Math.round(finalDmg * (1 + fortress.effectValue / 100)); // effectValue is negative
-    }
-    unit.hero.currentHp = Math.max(0, unit.hero.currentHp - finalDmg);
-  } else if (unit.type === 'enemy' && unit.enemy) {
-    unit.enemy.currentHp = Math.max(0, unit.enemy.currentHp - finalDmg);
+// Place les héros automatiquement : tanks et bagarreurs devant, le reste derrière.
+// Le joueur ne place jamais personne — c'est le rôle du héros qui décide.
+export function autoPlaceHeroes(heroes: HeroInstance[]): void {
+  const front = heroes.filter(h => h.row === 'front');
+  const back = heroes.filter(h => h.row === 'back');
+
+  front.forEach((h, i) => {
+    h.gridRow = 0;
+    h.gridCol = i % GRID_COLS;
+  });
+  // Rang 1 et non 2 : les héros n'occupent jamais que deux rangées, les coller
+  // évite un trou visuel au milieu de la grille de combat.
+  back.forEach((h, i) => {
+    h.gridRow = i < GRID_COLS ? 1 : 2;
+    h.gridCol = i % GRID_COLS;
+  });
+}
+
+// ---- Ciblage ----
+
+function pickHeroTarget(heroes: HeroInstance[], prefer: 'front' | 'back' | 'weakest' | 'any'): HeroInstance {
+  const live = heroes.filter(isHeroAlive);
+
+  // « Provocation » prime sur tout le reste : c'est le seul effet de ciblage
+  // dont le joueur doit se souvenir.
+  const taunt = live.find(h => h.abilityId === 'taunt');
+  if (taunt) return taunt;
+
+  if (prefer === 'weakest') {
+    return live.reduce((min, h) => (h.currentHp < min.currentHp ? h : min), live[0]);
   }
-  return finalDmg;
+  if (prefer === 'front') {
+    return live.find(h => h.row === 'front') ?? live[0];
+  }
+  if (prefer === 'back') {
+    return live.find(h => h.row === 'back') ?? live[0];
+  }
+  return live[0];
 }
 
-// Returns heroes adjacent (orthogonally) to a given position
-function adjacentHeroes(row: number, col: number, heroes: HeroInstance[]): HeroInstance[] {
-  return heroes.filter(h =>
-    isHeroAlive(h) &&
-    h.gridRow !== null && h.gridCol !== null &&
-    ((Math.abs((h.gridRow ?? 0) - row) === 1 && h.gridCol === col) ||
-     (Math.abs((h.gridCol ?? 0) - col) === 1 && h.gridRow === row))
-  );
-}
+// ---- Application des dégâts ----
 
-function adjacentEnemies(row: number, col: number, enemies: EnemyInstance[]): EnemyInstance[] {
-  return enemies.filter(e =>
-    isEnemyAlive(e) &&
-    ((Math.abs(e.gridRow - row) === 1 && e.gridCol === col) ||
-     (Math.abs(e.gridCol - col) === 1 && e.gridRow === row))
-  );
-}
-
-export function resolveCombat(
+// Renvoie les dégâts réellement infligés, après les réductions d'équipe.
+function damageHero(
+  target: HeroInstance,
+  raw: number,
   heroes: HeroInstance[],
-  enemies: EnemyInstance[],
-  relics: RelicDefinition[],
-  goldMultiplier = 1,
-  runReviveUsed = false,
-): CombatResult {
+  entry: CombatLogEntry,
+  attacker?: EnemyInstance,
+): void {
+  // « Parade » : la toute première attaque du combat ne fait rien
+  if (target.abilityId === 'parry' && !target.parryUsed) {
+    target.parryUsed = true;
+    entry.special = 'Parade';
+    entry.effects.push({ unitId: target.instanceId, kind: 'damage', amount: 0, hpAfter: target.currentHp });
+    return;
+  }
+
+  let dmg = raw;
+
+  // « Égide » : réduction d'équipe tant que le gardien est en vie
+  const aegis = heroes.find(h => h.abilityId === 'aegis' && isHeroAlive(h));
+  if (aegis) dmg = Math.max(1, Math.round(dmg * 0.75));
+
+  target.currentHp = Math.max(0, target.currentHp - dmg);
+  entry.effects.push({ unitId: target.instanceId, kind: 'damage', amount: dmg, hpAfter: target.currentHp });
+  entry.damage = dmg;
+
+  // « Second Souffle » : chaque coup encaissé rend un peu de vie
+  if (target.abilityId === 'regen' && target.currentHp > 0) {
+    healHero(target, 10);
+    entry.effects.push({ unitId: target.instanceId, kind: 'heal', amount: 10, hpAfter: target.currentHp });
+  }
+
+  // « Carapace » : renvoie une part des dégâts à l'attaquant
+  if (target.abilityId === 'thorns' && attacker && isEnemyAlive(attacker)) {
+    const reflected = Math.max(1, Math.round(dmg * 0.30));
+    attacker.currentHp = Math.max(0, attacker.currentHp - reflected);
+    entry.effects.push({ unitId: attacker.instanceId, kind: 'damage', amount: reflected, hpAfter: attacker.currentHp });
+    entry.special = 'Carapace';
+  }
+}
+
+function damageEnemy(target: EnemyInstance, dmg: number, entry: CombatLogEntry, attacker?: HeroInstance): void {
+  target.currentHp = Math.max(0, target.currentHp - dmg);
+  entry.effects.push({ unitId: target.instanceId, kind: 'damage', amount: dmg, hpAfter: target.currentHp });
+
+  // « Riposte » : le duelliste se renforce à chaque ennemi qu'il achève
+  if (attacker?.abilityId === 'riposte' && target.currentHp <= 0) {
+    attacker.atk += 4;
+  }
+}
+
+// ---- Tour d'un héros ----
+
+function heroAction(hero: HeroInstance, heroes: HeroInstance[], enemies: EnemyInstance[], entry: CombatLogEntry): void {
+  const live = enemies.filter(isEnemyAlive);
+  if (live.length === 0) return;
+  const atk = Math.round(effectiveAtk(hero) * rallyBonus(heroes));
+
+  switch (hero.abilityId) {
+    case 'heal_one': {
+      const wounded = heroes.filter(isHeroAlive).reduce((min, h) => (h.currentHp / h.maxHp < min.currentHp / min.maxHp ? h : min));
+      healHero(wounded, 50);
+      entry.targetName = wounded.name;
+      entry.heal = 50;
+      entry.special = 'Lumière';
+      entry.effects.push({ unitId: wounded.instanceId, kind: 'heal', amount: 50, hpAfter: wounded.currentHp });
+      return;
+    }
+    case 'heal_all': {
+      heroes.filter(isHeroAlive).forEach(h => {
+        healHero(h, 20);
+        entry.effects.push({ unitId: h.instanceId, kind: 'heal', amount: 20, hpAfter: h.currentHp });
+      });
+      entry.targetName = 'toute l\'équipe';
+      entry.heal = 20;
+      entry.special = 'Aube';
+      return;
+    }
+    case 'weaken': {
+      const strongest = live.reduce((max, e) => (effectiveAtk(e) > effectiveAtk(max) ? e : max), live[0]);
+      strongest.atkDebuffPct = Math.min(50, strongest.atkDebuffPct + 50);
+      entry.targetName = strongest.name;
+      entry.special = 'Entrave';
+      entry.effects.push({ unitId: strongest.instanceId, kind: 'debuff', amount: 50, hpAfter: strongest.currentHp });
+      return;
+    }
+    case 'cleave': {
+      // Tous les ennemis de la rangée la plus avancée encore occupée
+      const frontRow = [0, 1, 2].map(r => live.filter(e => e.gridRow === r)).find(g => g.length > 0) ?? [live[0]];
+      const dmg = rollDamage(atk);
+      frontRow.forEach(e => damageEnemy(e, dmg, entry, hero));
+      entry.targetName = `${frontRow.length} ennemi(s)`;
+      entry.damage = dmg;
+      entry.special = 'Fendoir';
+      return;
+    }
+    case 'column': {
+      const col = live[0].gridCol;
+      const colEnemies = live.filter(e => e.gridCol === col);
+      const dmg = rollDamage(atk);
+      colEnemies.forEach(e => damageEnemy(e, dmg, entry, hero));
+      entry.targetName = `colonne de ${colEnemies.length}`;
+      entry.damage = dmg;
+      entry.special = 'Brasier';
+      return;
+    }
+    case 'double_shot': {
+      const dmg1 = rollDamage(atk);
+      const t1 = live[0];
+      damageEnemy(t1, dmg1, entry, hero);
+      const stillLive = enemies.filter(isEnemyAlive);
+      if (stillLive.length > 0) {
+        const t2 = stillLive[0];
+        damageEnemy(t2, rollDamage(atk), entry, hero);
+      }
+      entry.targetName = t1.name;
+      entry.damage = dmg1;
+      entry.special = 'Tir Double';
+      return;
+    }
+    case 'revive': {
+      const fallen = heroes.find(h => h.currentHp <= 0);
+      if (fallen && !hero.reviveUsed) {
+        hero.reviveUsed = true;
+        fallen.currentHp = Math.max(1, Math.round(fallen.maxHp * 0.4));
+        entry.targetName = fallen.name;
+        entry.heal = fallen.currentHp;
+        entry.special = 'Rappel';
+        entry.effects.push({ unitId: fallen.instanceId, kind: 'revive', amount: fallen.currentHp, hpAfter: fallen.currentHp });
+        return;
+      }
+      // Personne à relever : elle frappe, faute de mieux
+      const t = live[0];
+      const d = rollDamage(atk);
+      damageEnemy(t, d, entry, hero);
+      entry.targetName = t.name;
+      entry.damage = d;
+      return;
+    }
+    case 'snipe': {
+      const target = live.reduce((max, e) => (effectiveAtk(e) > effectiveAtk(max) ? e : max), live[0]);
+      const dmg = rollDamage(atk);
+      damageEnemy(target, dmg, entry, hero);
+      entry.targetName = target.name;
+      entry.damage = dmg;
+      entry.special = 'Tir de Précision';
+      return;
+    }
+    case 'splash': {
+      const target = live[0];
+      const hit = [target, ...neighbours(target, live)];
+      const dmg = rollDamage(atk);
+      hit.forEach(e => damageEnemy(e, dmg, entry, hero));
+      entry.targetName = `${hit.length} ennemi(s)`;
+      entry.damage = dmg;
+      entry.special = 'Déflagration';
+      return;
+    }
+    case 'execute': {
+      const target = live.reduce((min, e) => (e.currentHp < min.currentHp ? e : min), live[0]);
+      const dmg = rollDamage(atk);
+      damageEnemy(target, dmg, entry, hero);
+      entry.targetName = target.name;
+      entry.damage = dmg;
+      entry.special = 'Curée';
+      return;
+    }
+    case 'ambush': {
+      const target = live[0];
+      const intact = target.currentHp >= target.maxHp;
+      const dmg = rollDamage(Math.round(atk * (intact ? 1.5 : 1)));
+      damageEnemy(target, dmg, entry, hero);
+      entry.targetName = target.name;
+      entry.damage = dmg;
+      if (intact) entry.special = 'Embuscade';
+      return;
+    }
+    default: {
+      // Attaque simple — tanks, Nix, Kael
+      const target = live[0];
+      const dmg = rollDamage(atk);
+      damageEnemy(target, dmg, entry, hero);
+      entry.targetName = target.name;
+      entry.damage = dmg;
+    }
+  }
+}
+
+// ---- Tour d'un ennemi ----
+
+function enemyAction(enemy: EnemyInstance, heroes: HeroInstance[], entry: CombatLogEntry): void {
+  const live = heroes.filter(isHeroAlive);
+  if (live.length === 0) return;
+  const atk = effectiveAtk(enemy);
+
+  if (enemy.pattern === 'aoe_row') {
+    // Frappe toute la rangée avant des héros
+    const targets = live.filter(h => h.row === 'front');
+    const hit = targets.length > 0 ? targets : [live[0]];
+    const dmg = rollDamage(atk);
+    hit.forEach(h => damageHero(h, dmg, heroes, entry, enemy));
+    entry.targetName = `${hit.length} héros`;
+    entry.special = 'Attaque de zone';
+    return;
+  }
+
+  let prefer: 'front' | 'back' | 'weakest' | 'any' = 'front';
+  if (enemy.pattern === 'target_back') prefer = 'back';
+  else if (enemy.pattern === 'target_lowest_hp') prefer = 'weakest';
+  else if (enemy.pattern === 'cycle_attacks') {
+    // Boss : alterne front / arrière / plus faible
+    enemy.cycleIndex = (enemy.cycleIndex + 1) % 3;
+    prefer = (['front', 'back', 'weakest'] as const)[enemy.cycleIndex];
+  }
+
+  const target = pickHeroTarget(heroes, prefer);
+  damageHero(target, rollDamage(atk), heroes, entry, enemy);
+  entry.targetName = target.name;
+}
+
+// ---- Boucle principale ----
+
+export function resolveCombat(heroes: HeroInstance[], enemies: EnemyInstance[]): CombatResult {
   const log: CombatLogEntry[] = [];
   let turn = 0;
-  const maxTurns = 60;
+  const maxTurns = 200;
 
-  // Apply passive abilities at combat start
-  heroes.forEach(h => {
-    // Ranger: +20% ATK in back row
-    if (h.abilityId === 'piercing_shot' && h.gridRow === 2) {
-      h.atk = Math.round(h.atk * 1.20);
-    }
-    // Priest: adjacent allies +5 DEF
-    if (h.abilityId === 'holy_light') {
-      const adj = adjacentHeroes(h.gridRow ?? 0, h.gridCol ?? 0, heroes);
-      adj.forEach(a => { a.def += 5; });
-    }
-    // Warrior taunt: handled in targeting
-  });
+  autoPlaceHeroes(heroes);
+  // Rien ne survit d'un combat à l'autre : affaiblissements et jetons à usage unique
+  heroes.forEach(h => { h.atkDebuffPct = 0; h.parryUsed = false; h.reviveUsed = false; });
+  enemies.forEach(e => { e.atkDebuffPct = 0; });
+
+  // « Présage » : ralentit tout le camp adverse pour la durée du combat
+  if (heroes.some(h => h.abilityId === 'slow' && isHeroAlive(h))) {
+    enemies.forEach(e => { e.spd = Math.max(1, Math.round(e.spd * 0.75)); });
+  }
 
   while (turn < maxTurns) {
-    const livingHeroes = heroes.filter(isHeroAlive);
-    const livingEnemies = enemies.filter(isEnemyAlive);
-    if (livingHeroes.length === 0 || livingEnemies.length === 0) break;
+    if (heroes.every(h => !isHeroAlive(h)) || enemies.every(e => !isEnemyAlive(e))) break;
 
-    // Build turn order sorted by SPD desc
-    const allUnits: CombatUnit[] = [
-      ...livingHeroes.map(wrapHero),
-      ...livingEnemies.map(wrapEnemy),
+    // Ordre du tour : VIT décroissante. « Fulgurance » passe devant tout le monde.
+    const order: Array<{ hero?: HeroInstance; enemy?: EnemyInstance; spd: number }> = [
+      ...heroes.filter(isHeroAlive).map(h => ({ hero: h, spd: h.abilityId === 'first_strike' ? Infinity : h.spd })),
+      ...enemies.filter(isEnemyAlive).map(e => ({ enemy: e, spd: e.spd })),
     ].sort((a, b) => b.spd - a.spd);
 
-    for (const actor of allUnits) {
-      if (!actor.alive) continue;
-      const lH = heroes.filter(isHeroAlive);
-      const lE = enemies.filter(isEnemyAlive);
-      if (lH.length === 0 || lE.length === 0) break;
+    for (const slot of order) {
+      const actor = slot.hero ?? slot.enemy!;
+      const alive = slot.hero ? isHeroAlive(slot.hero) : isEnemyAlive(slot.enemy!);
+      if (!alive) continue;
+      if (heroes.every(h => !isHeroAlive(h)) || enemies.every(e => !isEnemyAlive(e))) break;
 
       turn++;
       const entry: CombatLogEntry = {
         turn,
-        actorId: actor.id,
-        actorSide: actor.type,
+        actorId: actor.instanceId,
+        actorSide: slot.hero ? 'hero' : 'enemy',
         actorName: actor.name,
         targetName: '',
         damage: 0,
@@ -177,216 +362,15 @@ export function resolveCombat(
         effects: [],
       };
 
-      if (actor.type === 'hero' && actor.hero) {
-        const hero = actor.hero;
-        const atkMultiplier = getHeroAtkMultiplier(hero, relics, lH);
-
-        switch (hero.abilityId) {
-          case 'holy_light': {
-            // Heal lowest HP ally
-            const target = lH.reduce((min, h) => h.currentHp < min.currentHp ? h : min, lH[0]);
-            const healAmt = 45;
-            healHero(target, healAmt);
-            entry.targetName = target.name;
-            entry.heal = healAmt;
-            entry.special = 'Lumière Sacrée';
-            entry.effects.push({ unitId: target.instanceId, kind: 'heal', amount: healAmt, hpAfter: target.currentHp });
-            break;
-          }
-          case 'fireball': {
-            // AOE column attack
-            const targetCol = lE[0].gridCol;
-            const colEnemies = lE.filter(e => e.gridCol === targetCol);
-            const dmgEach = calcDamage(Math.round(hero.atk * atkMultiplier), lE[0].def);
-            colEnemies.forEach(e => {
-              e.currentHp = Math.max(0, e.currentHp - dmgEach);
-              entry.effects.push({ unitId: e.instanceId, kind: 'damage', amount: dmgEach, hpAfter: e.currentHp });
-            });
-            entry.targetName = `Colonne ${targetCol}`;
-            entry.damage = dmgEach;
-            entry.special = 'Boule de Feu';
-            break;
-          }
-          case 'backstab': {
-            // Target back row enemies, bonus if isolated
-            const backRow = lE.filter(e => e.gridRow === 2);
-            const target = backRow.length > 0 ? backRow[0] : lE[0];
-            const adjCount = adjacentEnemies(target.gridRow, target.gridCol, lE).length;
-            const bonus = adjCount === 0 ? 1.40 : 1.0;
-            const dmg = calcDamage(Math.round(hero.atk * atkMultiplier * bonus), target.def);
-            applyDamage(wrapEnemy(target), dmg, relics);
-            entry.targetName = target.name;
-            entry.damage = dmg;
-            entry.special = adjCount === 0 ? 'Backstab (isolé ×1.4)' : 'Backstab';
-            entry.effects.push({ unitId: target.instanceId, kind: 'damage', amount: dmg, hpAfter: target.currentHp });
-            break;
-          }
-          case 'arcane_weave': {
-            // Debuff highest ATK enemy
-            const hAtk = lE.reduce((max, e) => e.atk > max.atk ? e : max, lE[0]);
-            hAtk.atkDebuffPct = Math.min(100, (hAtk.atkDebuffPct ?? 0) + 20);
-            entry.targetName = hAtk.name;
-            entry.special = 'Tissage Arcane (-20% ATK)';
-            entry.effects.push({ unitId: hAtk.instanceId, kind: 'debuff', amount: 20, hpAfter: hAtk.currentHp });
-            break;
-          }
-          case 'mark': {
-            // Mark highest HP enemy
-            const hHp = lE.reduce((max, e) => e.currentHp > max.currentHp ? e : max, lE[0]);
-            hHp.isMarked = true;
-            entry.targetName = hHp.name;
-            entry.special = 'Marqué (+15% dégâts équipe)';
-            entry.effects.push({ unitId: hHp.instanceId, kind: 'mark', amount: 0, hpAfter: hHp.currentHp });
-            break;
-          }
-          default: {
-            // Attaque standard sur le premier ennemi vivant
-            const target = lE[0];
-            const defPierce = hero.abilityId === 'piercing_shot' ? 50 : 0;
-            let dmg = calcDamage(Math.round(hero.atk * atkMultiplier), target.def, defPierce);
-            // Bonus de marque (capacité "mark")
-            if (target.isMarked) dmg = Math.round(dmg * 1.15);
-            applyDamage(wrapEnemy(target), dmg, relics);
-            entry.targetName = target.name;
-            entry.damage = dmg;
-            entry.effects.push({ unitId: target.instanceId, kind: 'damage', amount: dmg, hpAfter: target.currentHp });
-          }
-        }
-      } else if (actor.type === 'enemy' && actor.enemy) {
-        const enemy = actor.enemy;
-        const lH2 = heroes.filter(isHeroAlive);
-        if (lH2.length === 0) break;
-
-        let target: HeroInstance;
-        switch (enemy.pattern) {
-          case 'rush_front':
-            target = lH2.find(h => h.gridRow === 0) ?? lH2[0];
-            break;
-          case 'target_back':
-            target = lH2.reduce((back, h) => (h.gridRow ?? 0) > (back.gridRow ?? 0) ? h : back, lH2[0]);
-            break;
-          case 'target_lowest_hp':
-            target = lH2.reduce((min, h) => h.currentHp < min.currentHp ? h : min, lH2[0]);
-            break;
-          case 'front_tank':
-            target = lH2.find(h => h.gridRow === 0) ?? lH2[0];
-            break;
-          case 'aoe_row': {
-            // Hit first row that has heroes
-            const rows = [0, 1, 2];
-            let rowTargets: HeroInstance[] = [];
-            for (const r of rows) {
-              rowTargets = lH2.filter(h => h.gridRow === r);
-              if (rowTargets.length > 0) break;
-            }
-            const dmgEach = calcDamage(enemy.atk, rowTargets[0]?.def ?? 10);
-            rowTargets.forEach(h => {
-              const finalDmg = applyDamage(wrapHero(h), dmgEach, relics);
-              entry.effects.push({ unitId: h.instanceId, kind: 'damage', amount: finalDmg, hpAfter: h.currentHp });
-            });
-            entry.targetName = `Rang ${rowTargets[0]?.gridRow ?? 0}`;
-            entry.damage = dmgEach;
-            entry.special = 'Attaque de zone';
-            log.push(entry);
-            checkRevive(heroes, relics, runReviveUsed, log, turn);
-            continue;
-          }
-          case 'cycle_attacks':
-            // Boss: cycle between rush_front, aoe_row, target_back
-            enemy.cycleIndex = (enemy.cycleIndex + 1) % 3;
-            if (enemy.cycleIndex === 1) {
-              target = lH2.find(h => h.gridRow === 0) ?? lH2[0];
-            } else if (enemy.cycleIndex === 2) {
-              target = lH2.reduce((back, h) => (h.gridRow ?? 0) > (back.gridRow ?? 0) ? h : back, lH2[0]);
-            } else {
-              target = lH2.reduce((min, h) => h.currentHp < min.currentHp ? h : min, lH2[0]);
-            }
-            break;
-          default:
-            target = lH2[0];
-        }
-
-        // Warrior iron shield: reduce dmg by 35% if in front
-        let dmg = calcDamage(enemy.atk, target.def);
-        if (target.abilityId === 'iron_shield' && target.gridRow === 0) {
-          dmg = Math.round(dmg * 0.65);
-        }
-        const finalDmg = applyDamage(wrapHero(target), dmg, relics);
-        entry.targetName = target.name;
-        entry.damage = finalDmg;
-        entry.effects.push({ unitId: target.instanceId, kind: 'damage', amount: finalDmg, hpAfter: target.currentHp });
-        checkRevive(heroes, relics, runReviveUsed, log, turn);
-      }
+      if (slot.hero) heroAction(slot.hero, heroes, enemies, entry);
+      else enemyAction(slot.enemy!, heroes, entry);
 
       log.push(entry);
     }
   }
 
   const victory = enemies.every(e => !isEnemyAlive(e));
-  const baseGold = victory ? (enemies.some(e => e.isBoss) ? randInt(80, 120) : randInt(20, 40)) : 0;
-  const gold = Math.round(baseGold * goldMultiplier);
+  const goldReward = victory ? (enemies.some(e => e.isBoss) ? randInt(80, 120) : randInt(20, 40)) : 0;
 
-  return {
-    victory,
-    log,
-    goldReward: gold,
-    survivingHeroes: heroes.filter(isHeroAlive),
-  };
-}
-
-function getHeroAtkMultiplier(hero: HeroInstance, relics: RelicDefinition[], liveHeroes: HeroInstance[]): number {
-  let mult = 1;
-
-  // War banner: +12% if 3+ alive
-  const banner = relics.find(r => r.id === 'war_banner');
-  if (banner && liveHeroes.length >= 3) mult += 0.12;
-
-  // Class relics
-  const shadow = relics.find(r => r.id === 'shadow_cloak');
-  if (shadow && hero.class === 'assassin') mult += shadow.effectValue / 100;
-
-  const tome = relics.find(r => r.id === 'ancient_tome');
-  if (tome && hero.class === 'mage') mult += tome.effectValue / 100;
-
-  // Amulet: global +6%
-  const amulet = relics.find(r => r.id === 'amulet_of_focus');
-  if (amulet) mult += amulet.effectValue / 100;
-
-  // Berserker heart: +8% per dead (max 3 stacks, handled elsewhere)
-  const dead = 5 - liveHeroes.length;
-  const bHeart = relics.find(r => r.id === 'berserker_heart');
-  if (bHeart) mult += Math.min(dead, 3) * (bHeart.effectValue / 100);
-
-  // Berserker rage ability
-  if (hero.abilityId === 'berserker_rage') {
-    const lostPct = 1 - hero.currentHp / hero.maxHp;
-    const stacks = Math.floor(lostPct / 0.2);
-    mult += stacks * 0.05;
-  }
-
-  return mult;
-}
-
-function checkRevive(heroes: HeroInstance[], relics: RelicDefinition[], runReviveUsed: boolean, log: CombatLogEntry[], turn: number): void {
-  if (runReviveUsed) return;
-  const crystal = relics.find(r => r.id === 'void_crystal');
-  if (!crystal) return;
-  for (const h of heroes) {
-    if (h.currentHp <= 0 && !h.reviveUsed) {
-      h.currentHp = Math.round(h.maxHp * crystal.effectValue / 100);
-      h.reviveUsed = true;
-      log.push({
-        turn,
-        actorId: h.instanceId,
-        actorSide: 'hero',
-        actorName: h.name,
-        targetName: h.name,
-        damage: 0,
-        heal: h.currentHp,
-        special: 'Cristal du Vide — résurrection',
-        effects: [{ unitId: h.instanceId, kind: 'revive', amount: h.currentHp, hpAfter: h.currentHp }],
-      });
-      return; // only one revive per crystal activation
-    }
-  }
+  return { victory, log, goldReward };
 }

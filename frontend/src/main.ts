@@ -4,14 +4,11 @@ import { BootScene } from './scenes/BootScene';
 import { MainMenuScene } from './scenes/MainMenuScene';
 import { TeamSelectScene } from './scenes/TeamSelectScene';
 import { RunMapScene } from './scenes/RunMapScene';
-import { FormationScene } from './scenes/FormationScene';
 import { CombatScene } from './scenes/CombatScene';
-import { EventScene } from './scenes/EventScene';
-import { ShopScene } from './scenes/ShopScene';
+import { RecruitScene } from './scenes/RecruitScene';
 import { RestScene } from './scenes/RestScene';
 import { GameOverScene } from './scenes/GameOverScene';
 import { GachaScene } from './scenes/GachaScene';
-import { MetaScene } from './scenes/MetaScene';
 import { CollectionScene } from './scenes/CollectionScene';
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -34,14 +31,11 @@ const config: Phaser.Types.Core.GameConfig = {
     MainMenuScene,
     TeamSelectScene,
     RunMapScene,
-    FormationScene,
     CombatScene,
-    EventScene,
-    ShopScene,
+    RecruitScene,
     RestScene,
     GameOverScene,
     GachaScene,
-    MetaScene,
     CollectionScene,
   ],
 };

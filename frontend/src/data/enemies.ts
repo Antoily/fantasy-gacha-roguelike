@@ -3,7 +3,7 @@ export type EnemyPattern =
   | 'target_back'      // archers/mages aim back row
   | 'target_lowest_hp' // predator, hunts weakest
   | 'aoe_row'          // hits entire row
-  | 'front_tank'       // stays front, high DEF
+  | 'front_tank'       // reste devant, encaisse
   | 'cycle_attacks';   // boss rotates abilities
 
 export interface EnemyDefinition {
@@ -11,7 +11,6 @@ export interface EnemyDefinition {
   name: string;
   hp: number;
   atk: number;
-  def: number;
   spd: number;
   pattern: EnemyPattern;
   isBoss: boolean;
@@ -22,7 +21,7 @@ export const ENEMY_POOL: EnemyDefinition[] = [
   {
     id: 'goblin_grunt',
     name: 'Gobelin Soldat',
-    hp: 45, atk: 14, def: 4, spd: 13,
+    hp: 55, atk: 12, spd: 13,
     pattern: 'rush_front',
     isBoss: false,
     lore: 'Petit, rapide, et mortel en meute.',
@@ -30,7 +29,7 @@ export const ENEMY_POOL: EnemyDefinition[] = [
   {
     id: 'orc_berserker',
     name: 'Berserker Orc',
-    hp: 90, atk: 38, def: 8, spd: 8,
+    hp: 100, atk: 30, spd: 8,
     pattern: 'rush_front',
     isBoss: false,
     lore: 'La rage lui tient lieu de stratégie.',
@@ -38,7 +37,7 @@ export const ENEMY_POOL: EnemyDefinition[] = [
   {
     id: 'dark_archer',
     name: 'Archer des Ombres',
-    hp: 40, atk: 22, def: 4, spd: 15,
+    hp: 50, atk: 20, spd: 15,
     pattern: 'target_back',
     isBoss: false,
     lore: 'Il vise toujours les mages et prêtres en premier.',
@@ -46,7 +45,7 @@ export const ENEMY_POOL: EnemyDefinition[] = [
   {
     id: 'skeleton_mage',
     name: 'Mage Squelette',
-    hp: 50, atk: 32, def: 4, spd: 11,
+    hp: 60, atk: 24, spd: 11,
     pattern: 'aoe_row',
     isBoss: false,
     lore: 'Ses sortilèges balaient toute une rangée d\'alliés.',
@@ -54,7 +53,7 @@ export const ENEMY_POOL: EnemyDefinition[] = [
   {
     id: 'stone_golem',
     name: 'Golem de Pierre',
-    hp: 170, atk: 22, def: 28, spd: 5,
+    hp: 230, atk: 24, spd: 5,
     pattern: 'front_tank',
     isBoss: false,
     lore: 'Presque indestructible. Presque.',
@@ -62,7 +61,7 @@ export const ENEMY_POOL: EnemyDefinition[] = [
   {
     id: 'shadow_assassin',
     name: 'Assassin des Ombres',
-    hp: 65, atk: 52, def: 3, spd: 24,
+    hp: 70, atk: 40, spd: 24,
     pattern: 'target_lowest_hp',
     isBoss: false,
     lore: 'Il choisit sa proie avec soin.',
@@ -70,7 +69,7 @@ export const ENEMY_POOL: EnemyDefinition[] = [
   {
     id: 'cursed_knight',
     name: 'Chevalier Maudit',
-    hp: 120, atk: 30, def: 18, spd: 10,
+    hp: 155, atk: 28, spd: 10,
     pattern: 'rush_front',
     isBoss: false,
     lore: 'Autrefois un héros. Désormais une lame au service des ténèbres.',
@@ -78,7 +77,7 @@ export const ENEMY_POOL: EnemyDefinition[] = [
   {
     id: 'forest_witch',
     name: 'Sorcière de la Forêt',
-    hp: 70, atk: 40, def: 6, spd: 12,
+    hp: 85, atk: 30, spd: 12,
     pattern: 'aoe_row',
     isBoss: false,
     lore: 'Ses malédictions s\'étendent comme des racines.',
@@ -87,7 +86,7 @@ export const ENEMY_POOL: EnemyDefinition[] = [
   {
     id: 'dungeon_lord',
     name: 'Seigneur du Donjon',
-    hp: 350, atk: 42, def: 20, spd: 10,
+    hp: 430, atk: 36, spd: 10,
     pattern: 'cycle_attacks',
     isBoss: true,
     lore: 'Il gouverne ces profondeurs depuis des siècles.',
@@ -95,7 +94,7 @@ export const ENEMY_POOL: EnemyDefinition[] = [
   {
     id: 'corrupted_ancient',
     name: 'Ancien Corrompu',
-    hp: 500, atk: 55, def: 25, spd: 8,
+    hp: 620, atk: 46, spd: 8,
     pattern: 'cycle_attacks',
     isBoss: true,
     lore: 'Ce qui fut jadis un gardien sacré est désormais une source de corruption.',
@@ -137,8 +136,8 @@ export const ENEMY_FORMATIONS: EnemyFormation[] = [
   {
     id: 'shield_wall',
     name: 'Mur de Boucliers',
-    description: 'Ligne de tanks qui absorbent tout',
-    hint: 'Haute DEF en front. Armes perçantes ou magie de zone conseillées.',
+    description: 'Ligne de brutes qui encaissent tout',
+    hint: 'Beaucoup de PV en front. Un soigneur aide à tenir la durée.',
     grid: [
       ['stone_golem', 'cursed_knight', 'stone_golem'],
       [null, null, null],

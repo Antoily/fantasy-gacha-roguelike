@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
+import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, FONT_FAMILY, STROKE } from '../config';
 import { makeButton, makePanel, makeHpBar, setHpBar, floatText, fadeIn, transitionTo, isTransitioning } from '../ui/UIManager';
 import { resolveCombat, type CombatLogEntry, type CombatEffect } from '../systems/CombatResolver';
 import { createEnemyInstance, type EnemyInstance } from '../entities/Enemy';
 import type { HeroInstance } from '../entities/Hero';
 import { getEnemyById } from '../data/enemies';
+import { saveProgress } from '../state/gameState';
 
 const CELL_W = 52;
 const CELL_H = 56;
@@ -58,8 +59,9 @@ export class CombatScene extends Phaser.Scene {
     const run = gs.runManager.state;
     const room = run.rooms[run.currentRoomIndex];
 
-    // Mode auto : lecture accélérée du combat (réinitialisée à chaque combat)
-    this.speed = run.autoMode ? 2 : 1;
+    // La vitesse est une préférence du joueur : on la reprend telle quelle,
+    // sans la réinitialiser ni la forcer en mode auto.
+    this.speed = gs.combatSpeed;
 
     if (!room.formation) {
       this.scene.start('RunMap');
@@ -68,7 +70,7 @@ export class CombatScene extends Phaser.Scene {
 
     fadeIn(this);
     this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, `bg_${room.isBossRoom ? 'boss' : 'combat'}`).setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.3);
+    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.background, 0.25);
 
     // Construit les ennemis depuis la formation
     const enemies = room.formation.grid.flatMap((rowArr, r) =>
@@ -84,17 +86,12 @@ export class CombatScene extends Phaser.Scene {
     // le playback doit partir de l'état d'avant combat
     const heroStartHp = new Map(run.heroes.map(h => [h.instanceId, h.currentHp]));
 
-    const result = resolveCombat(
-      run.heroes,
-      enemies,
-      run.relics,
-      gs.runManager.getGoldMultiplier(),
-      run.runReviveUsed,
-    );
+    const result = resolveCombat(run.heroes, enemies);
 
     this.log = result.log;
     this.victory = result.victory;
-    this.goldReward = result.goldReward;
+    // Le bonus d'or du mode auto s'applique ici, le résolveur ne le connaît pas
+    this.goldReward = Math.round(result.goldReward * gs.runManager.getGoldMultiplier());
     this.heroesRef = run.heroes;
     this.enemiesRef = enemies;
 
@@ -108,7 +105,8 @@ export class CombatScene extends Phaser.Scene {
 
   private drawHeader(formationName: string, isBoss: boolean): void {
     this.add.text(GAME_WIDTH / 2, 24, isBoss ? `⚔ BOSS — ${formationName}` : `⚔ ${formationName}`, {
-      fontFamily: 'Georgia, serif', fontSize: '18px', color: isBoss ? '#ff6666' : '#ffffff', align: 'center',
+      fontFamily: FONT_FAMILY, fontSize: '18px', fontStyle: 'bold', stroke: CSS.ink, strokeThickness: 4,
+      color: isBoss ? CSS.danger : CSS.textLight, align: 'center',
     }).setOrigin(0.5);
   }
 
@@ -122,7 +120,7 @@ export class CombatScene extends Phaser.Scene {
 
     // Séparateur central
     this.add.text(GAME_WIDTH / 2, (ENEMY_TOP + 2 * (CELL_H + CELL_GAP) + HERO_TOP) / 2, '— VS —', {
-      ...FONTS.small, color: '#555577',
+      ...FONTS.small, color: CSS.textDim,
     }).setOrigin(0.5);
 
     // Grille héros en bas : front (0) en haut
@@ -132,7 +130,7 @@ export class CombatScene extends Phaser.Scene {
       if (startHp <= 0) return;
       const x = GRID_LEFT + h.gridCol * (CELL_W + CELL_GAP);
       const y = HERO_TOP + h.gridRow * (CELL_H + CELL_GAP);
-      this.addUnit(h.instanceId, h.name, `hero_${h.definitionId}`, x, y, startHp, h.maxHp, 'hero', false);
+      this.addUnit(h.instanceId, h.short, `hero_${h.definitionId}`, x, y, startHp, h.maxHp, 'hero', false);
     });
   }
 
@@ -142,10 +140,10 @@ export class CombatScene extends Phaser.Scene {
     hp: number, maxHp: number,
     side: 'hero' | 'enemy', isBoss: boolean,
   ): void {
-    const frame = this.add.rectangle(0, 0, CELL_W, CELL_H, side === 'hero' ? 0x1e2a3a : 0x2a1a1e, 0.9)
-      .setStrokeStyle(1, side === 'hero' ? COLORS.accentLight : 0x664444);
+    const frame = this.add.rectangle(0, 0, CELL_W, CELL_H, side === 'hero' ? COLORS.side.hero : COLORS.side.enemy, 1)
+      .setStrokeStyle(STROKE.thin, COLORS.ink);
     const sprite = this.add.image(0, -8, texture).setDisplaySize(isBoss ? 40 : 32, isBoss ? 40 : 32);
-    const label = this.add.text(0, 12, name.split(' ')[0], { fontSize: '7px', color: '#ffffff', fontFamily: 'Arial' }).setOrigin(0.5);
+    const label = this.add.text(0, 12, name.split(' ')[0], { fontSize: '7px', color: CSS.text, fontFamily: FONT_FAMILY, fontStyle: 'bold' }).setOrigin(0.5);
     const bar = makeHpBar(this, 0, 22, CELL_W - 8, 4, hp / maxHp);
     const container = this.add.container(x, y, [frame, sprite, label, bar]);
 
@@ -165,14 +163,16 @@ export class CombatScene extends Phaser.Scene {
 
   private drawControls(): void {
     this.speedBtn = this.add.text(GAME_WIDTH - 16, 24, `▶ ×${this.speed}`, {
-      fontFamily: 'Arial', fontSize: '13px', color: '#9999bb',
+      fontFamily: FONT_FAMILY, fontSize: '13px', fontStyle: 'bold', color: CSS.textDim,
     }).setOrigin(1, 0.5).setInteractive({ useHandCursor: true })
       .on('pointerdown', () => {
         this.speed = this.speed >= 4 ? 1 : this.speed * 2;
         this.speedBtn?.setText(`▶ ×${this.speed}`);
+        window.gameState.combatSpeed = this.speed;
+        saveProgress();
       });
 
-    this.skipBtn = makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 55, 'PASSER ▶▶', () => this.skipToEnd(), 180, 40, 0x444455);
+    this.skipBtn = makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 55, 'PASSER ▶▶', () => this.skipToEnd(), 180, 40, COLORS.btn.neutral);
   }
 
   // ---- Playback ----
@@ -220,31 +220,29 @@ export class CombatScene extends Phaser.Scene {
 
     switch (eff.kind) {
       case 'damage': {
-        floatText(this, x, y - 26, `-${eff.amount}`, '#ff5555', eff.amount >= 35 ? '16px' : '13px');
-        unit.sprite.setTintFill(0xffffff);
+        floatText(this, x, y - 26, `-${eff.amount}`, CSS.hpLow, eff.amount >= 35 ? '16px' : '13px');
+        unit.sprite.setTintFill(COLORS.ink);
         this.time.delayedCall(70 / this.speed, () => unit.sprite.clearTint());
         // Tremblement de la cible
         this.tweens.add({ targets: unit.container, x: x + 4, duration: 40, yoyo: true, repeat: 2, onComplete: () => { unit.container.x = x; } });
         if (eff.amount >= 35) this.cameras.main.shake(90, 0.005);
         break;
       }
-      case 'heal':
-      case 'revive': {
-        floatText(this, x, y - 26, `+${eff.amount}`, '#55ff88');
-        unit.sprite.setTint(0x88ffaa);
+      case 'revive':
+      case 'heal': {
+        floatText(this, x, y - 26, `+${eff.amount}`, CSS.hp);
+        unit.sprite.setTint(COLORS.hp);
         this.time.delayedCall(180 / this.speed, () => unit.sprite.clearTint());
         if (eff.kind === 'revive') {
-          unit.container.setAlpha(1);
+          // L'unité était grisée et couchée : on la remet debout
+          unit.container.setAlpha(1).setAngle(0).setScale(1);
           unit.sprite.clearTint();
-          floatText(this, x, y - 40, '✨ Résurrection', '#ffd700', '11px');
+          floatText(this, x, y - 42, '✨ Debout !', CSS.gold, '12px');
         }
         break;
       }
       case 'debuff':
-        floatText(this, x, y - 26, `-${eff.amount}% ATK`, '#bb88ff', '11px');
-        break;
-      case 'mark':
-        floatText(this, x, y - 26, '✜ Marqué', '#ffaa44', '11px');
+        floatText(this, x, y - 26, `-${eff.amount}% ATK`, CSS.magic, '11px');
         break;
     }
 
@@ -263,7 +261,7 @@ export class CombatScene extends Phaser.Scene {
       duration: 250 / this.speed,
       ease: 'Quad.In',
     });
-    unit.sprite.setTint(0x555555);
+    unit.sprite.setTint(COLORS.textFaint);
   }
 
   private appendLogLine(entry: CombatLogEntry): void {
@@ -298,7 +296,7 @@ export class CombatScene extends Phaser.Scene {
         const pct = Phaser.Math.Clamp(hp / unit.maxHp, 0, 1);
         fill.setScale(pct, 1).setFillStyle(pct > 0.4 ? COLORS.hp : COLORS.hpLow);
       }
-      if (hp <= 0) unit.sprite.setTint(0x555555);
+      if (hp <= 0) unit.sprite.setTint(COLORS.textFaint);
     });
 
     this.showResult();
@@ -316,11 +314,12 @@ export class CombatScene extends Phaser.Scene {
     const auto = gs.runManager.state.autoMode;
     const cx = GAME_WIDTH / 2;
 
-    const overlay = this.add.rectangle(cx, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0).setDepth(80);
-    this.tweens.add({ targets: overlay, fillAlpha: 0.55, duration: 300 });
+    const overlay = this.add.rectangle(cx, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.scrim, 0).setDepth(80);
+    this.tweens.add({ targets: overlay, fillAlpha: 0.82, duration: 300 });
 
     const banner = this.add.text(cx, 290, this.victory ? '✨ VICTOIRE' : '💀 DÉFAITE', {
-      fontFamily: 'Georgia, serif', fontSize: '32px', color: this.victory ? '#ffd700' : '#cc3333', align: 'center',
+      fontFamily: FONT_FAMILY, fontSize: '32px', fontStyle: 'bold', stroke: CSS.ink, strokeThickness: 7,
+      color: this.victory ? CSS.gold : CSS.danger, align: 'center',
     }).setOrigin(0.5).setDepth(81).setScale(0);
     this.tweens.add({ targets: banner, scale: 1, duration: 380, ease: 'Back.Out' });
 
@@ -328,7 +327,7 @@ export class CombatScene extends Phaser.Scene {
       // Pluie d'étincelles dorées autour de la bannière
       for (let i = 0; i < 14; i++) {
         const spark = this.add.image(cx + Phaser.Math.Between(-90, 90), 290 + Phaser.Math.Between(-30, 30), 'spark')
-          .setDepth(81).setTint(0xffd700).setAlpha(0).setScale(Phaser.Math.FloatBetween(0.4, 1));
+          .setDepth(81).setTint(COLORS.gold).setAlpha(0).setScale(Phaser.Math.FloatBetween(0.4, 1));
         this.tweens.add({
           targets: spark,
           alpha: { from: 1, to: 0 },
@@ -374,7 +373,7 @@ export class CombatScene extends Phaser.Scene {
         gs.runManager.endRun(false);
         transitionTo(this, 'GameOver');
       };
-      makeButton(this, cx, GAME_HEIGHT - 55, 'FIN DU RUN', end, 240, 46, 0x881122).setDepth(82);
+      makeButton(this, cx, GAME_HEIGHT - 55, 'FIN DU RUN', end, 240, 46, COLORS.btn.danger).setDepth(82);
       if (auto) this.time.delayedCall(1600, end);
     }
   }

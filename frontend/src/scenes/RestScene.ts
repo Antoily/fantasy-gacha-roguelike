@@ -1,136 +1,104 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, COLORS, FONTS } from '../config';
-import { makeButton, makePanel, makeTitle, makeHpBar, fadeIn, transitionTo, floatText } from '../ui/UIManager';
-import { isHeroAlive, healHero } from '../entities/Hero';
+import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, STROKE } from '../config';
+import { makeButton, makeTitle, makeHpBar, fadeIn, transitionTo, floatText, isTransitioning, staggerIn } from '../ui/UIManager';
+import { isHeroAlive } from '../entities/Hero';
+import { ROLE_ICONS, ROLE_LABELS } from '../data/heroes';
 import { pickRandom } from '../utils/random';
 
-const HEAL_AMOUNT = 35;
-const UPGRADE_STAT_BONUS = 8;
+const REVIVE_PCT = 0.5;
 
+// Salle de repos : une seule décision, et elle porte sur un personnage —
+// quel héros remettre d'aplomb. Les héros tombés reviennent à moitié soignés.
 export class RestScene extends Phaser.Scene {
-  // Verrou anti double-clic : completeRoom ne doit s'appliquer qu'une fois
-  private leaving = false;
+  private resolved = false;
 
   constructor() { super('Rest'); }
 
   create(): void {
-    this.leaving = false;
+    this.resolved = false;
+    const run = window.gameState.runManager.state;
+
     fadeIn(this);
     this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'bg_rest').setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.5);
+    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, COLORS.background, 0.35);
 
-    makeTitle(this, GAME_WIDTH / 2, 38, '🏕 REPOS');
-    this.add.text(GAME_WIDTH / 2, 65, 'Choisissez une action', { ...FONTS.body, align: 'center' }).setOrigin(0.5);
+    makeTitle(this, GAME_WIDTH / 2, 40, '🏕 CAMPEMENT');
+    this.add.text(GAME_WIDTH / 2, 70, 'Choisis un héros à remettre d\'aplomb.', {
+      ...FONTS.small, align: 'center',
+    }).setOrigin(0.5);
 
-    this.drawHeroList();
-    this.drawActions();
+    this.drawHeroChoices();
 
-    // Mode auto : action de repos choisie au hasard
-    if (window.gameState.runManager.state.autoMode) {
-      this.add.text(GAME_WIDTH - 10, 38, '🤖 AUTO', { ...FONTS.small, color: '#ffcc55' }).setOrigin(1, 0.5);
-      this.scheduleAuto();
+    if (run.autoMode) {
+      this.add.text(GAME_WIDTH - 10, 40, '🤖 AUTO', { ...FONTS.small, color: CSS.accent }).setOrigin(1, 0.5);
+      this.time.delayedCall(900, () => this.restore(pickRandom(run.heroes.map(h => h.instanceId))));
     }
   }
 
-  private scheduleAuto(): void {
-    this.time.delayedCall(800, () => {
-      const action = pickRandom(['heal', 'upgrade', 'leave'] as const);
-      if (action === 'heal') this.healAll();
-      else if (action === 'upgrade') this.autoUpgrade();
-      else this.leave();
-    });
-  }
-
-  private autoUpgrade(): void {
-    if (this.leaving) return;
-    const gs = window.gameState;
-    const live = gs.runManager.state.heroes.filter(isHeroAlive);
-    if (live.length === 0) { this.leave(); return; }
-    this.leaving = true;
-    const hero = pickRandom(live);
-    hero.atk += UPGRADE_STAT_BONUS;
-    gs.runManager.completeRoom({});
-    floatText(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, `+${UPGRADE_STAT_BONUS} ATK`, '#bb88ff');
-    this.time.delayedCall(550, () => transitionTo(this, 'RunMap'));
-  }
-
-  private drawHeroList(): void {
+  private drawHeroChoices(): void {
     const run = window.gameState.runManager.state;
-    const y = 100;
-    this.add.text(18, y - 8, 'Héros', { ...FONTS.small });
-    run.heroes.forEach((h, i) => {
-      const cx = 20 + i * 65;
-      const cy = y + 35;
-      const alive = isHeroAlive(h);
-      this.add.rectangle(cx + 26, cy, 56, 60, alive ? COLORS.panel : 0x1a1a1a).setStrokeStyle(1, alive ? COLORS.accentLight : 0x444444);
-      this.add.image(cx + 26, cy - 12, `hero_${h.definitionId}`).setDisplaySize(36, 36);
-      this.add.text(cx + 26, cy + 12, h.name.split(' ')[0], { fontSize: '8px', color: '#ffffff' }).setOrigin(0.5);
-      const pct = Math.max(0, h.currentHp / h.maxHp);
-      makeHpBar(this, cx + 26, cy + 25, 52, 5, pct);
-      this.add.text(cx + 26, cy + 35, `${h.currentHp}/${h.maxHp}`, { ...FONTS.small, fontSize: '8px' }).setOrigin(0.5);
+    const cardH = 74;
+
+    const cards = run.heroes.map((h, i) => {
+      const y = 130 + i * (cardH + 12);
+      const card = this.add.container(GAME_WIDTH / 2, y + cardH / 2);
+      const fallen = !isHeroAlive(h);
+      const full = h.currentHp >= h.maxHp;
+
+      const bg = this.add.rectangle(0, 0, 328, cardH, COLORS.panel)
+        .setStrokeStyle(STROKE.base, fallen ? COLORS.btn.danger : COLORS.ink);
+      const icon = this.add.image(-130, 0, `hero_${h.definitionId}`).setDisplaySize(48, 48);
+      const name = this.add.text(-96, -20, h.name, { ...FONTS.body }).setOrigin(0, 0.5);
+      const role = this.add.text(-96, -2, `${ROLE_ICONS[h.role]} ${ROLE_LABELS[h.role]}`, {
+        ...FONTS.small, color: CSS.textDim,
+      }).setOrigin(0, 0.5);
+      const bar = makeHpBar(this, -30, 20, 120, 8, Math.max(0, h.currentHp / h.maxHp));
+      const hp = this.add.text(40, 20, `${Math.max(0, h.currentHp)}/${h.maxHp}`, {
+        ...FONTS.small, fontSize: '10px', color: fallen ? CSS.danger : CSS.textDim,
+      }).setOrigin(0, 0.5);
+
+      card.add([bg, icon, name, role, bar, hp]);
+
+      // Un héros déjà au maximum ne propose rien : le bouton ne s'affiche pas,
+      // pour que le choix utile saute aux yeux.
+      if (!full) {
+        const label = fallen ? 'Relever' : 'Soigner';
+        const btn = makeButton(this, 122, 0, label, () => this.restore(h.instanceId), 78, 34,
+          fallen ? COLORS.btn.danger : COLORS.btn.success);
+        card.add(btn);
+      } else {
+        card.add(this.add.text(122, 0, 'En forme', { ...FONTS.small, color: CSS.hp }).setOrigin(0.5));
+      }
+
+      return card;
     });
+
+    staggerIn(this, cards, 16);
+
+    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 46, 'Lever le camp', () => this.leave(), 300, 44, COLORS.btn.neutral);
   }
 
-  private drawActions(): void {
-    makePanel(this, GAME_WIDTH / 2, 238, 330, 72);
-    this.add.text(GAME_WIDTH / 2, 218, '🏥 Soin de groupe', { ...FONTS.body, color: '#44dd88', align: 'center' }).setOrigin(0.5);
-    this.add.text(GAME_WIDTH / 2, 238, `Restaure ${HEAL_AMOUNT} PV à tous les héros vivants.`, { ...FONTS.small, align: 'center' }).setOrigin(0.5);
-    makeButton(this, GAME_WIDTH / 2, 258, 'Soigner l\'équipe', () => this.healAll(), 200, 36, 0x225533);
+  private restore(instanceId: string): void {
+    if (this.resolved || isTransitioning(this)) return;
+    const run = window.gameState.runManager.state;
+    const hero = run.heroes.find(h => h.instanceId === instanceId);
+    if (!hero) return;
 
-    makePanel(this, GAME_WIDTH / 2, 340, 330, 72);
-    this.add.text(GAME_WIDTH / 2, 318, '⚡ Entraînement', { ...FONTS.body, color: '#7744ff', align: 'center' }).setOrigin(0.5);
-    this.add.text(GAME_WIDTH / 2, 338, `Améliore l\'ATK d\'un héros de +${UPGRADE_STAT_BONUS}.`, { ...FONTS.small, align: 'center' }).setOrigin(0.5);
-    makeButton(this, GAME_WIDTH / 2, 358, 'Choisir un héros', () => this.selectHeroForUpgrade(), 200, 36, 0x553377);
+    this.resolved = true;
+    const wasFallen = !isHeroAlive(hero);
+    hero.currentHp = wasFallen ? Math.max(1, Math.round(hero.maxHp * REVIVE_PCT)) : hero.maxHp;
 
-    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 50, 'QUITTER LE CAMP', () => this.leave(), 240, 44, 0x444455);
-  }
+    floatText(this, GAME_WIDTH / 2, GAME_HEIGHT / 2,
+      wasFallen ? `${hero.name} se relève !` : `${hero.name} est au mieux`,
+      wasFallen ? CSS.gold : CSS.hp, '16px');
 
-  private healAll(): void {
-    if (this.leaving) return;
-    this.leaving = true;
-    const gs = window.gameState;
-    const run = gs.runManager.state;
-    run.heroes.filter(isHeroAlive).forEach((h, i) => {
-      healHero(h, HEAL_AMOUNT);
-      // +PV flottant au-dessus de chaque héros avant de quitter le camp
-      floatText(this, 46 + i * 65, 110, `+${HEAL_AMOUNT}`, '#55ff88');
-    });
-    gs.runManager.completeRoom({});
-    this.time.delayedCall(550, () => transitionTo(this, 'RunMap'));
-  }
-
-  private selectHeroForUpgrade(): void {
-    const gs = window.gameState;
-    const run = gs.runManager.state;
-    const live = run.heroes.filter(isHeroAlive);
-    if (live.length === 0) return;
-
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.7).setInteractive();
-    makePanel(this, GAME_WIDTH / 2, GAME_HEIGHT / 2, 320, 260);
-    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 110, 'Sélectionne un héros', { ...FONTS.body, align: 'center' }).setOrigin(0.5);
-
-    live.forEach((h, i) => {
-      const cx = GAME_WIDTH / 2 - 90 + i * 65;
-      const cy = GAME_HEIGHT / 2 - 30;
-      const bg = this.add.rectangle(cx, cy, 58, 60, COLORS.panel).setStrokeStyle(1, COLORS.accentLight).setInteractive({ useHandCursor: true });
-      this.add.image(cx, cy - 12, `hero_${h.definitionId}`).setDisplaySize(36, 36);
-      this.add.text(cx, cy + 12, h.name.split(' ')[0], { ...FONTS.small, fontSize: '9px' }).setOrigin(0.5);
-      bg.on('pointerdown', () => {
-        if (this.leaving) return;
-        this.leaving = true;
-        h.atk += UPGRADE_STAT_BONUS;
-        gs.runManager.completeRoom({});
-        floatText(this, cx, cy - 30, `+${UPGRADE_STAT_BONUS} ATK`, '#bb88ff');
-        this.time.delayedCall(550, () => transitionTo(this, 'RunMap'));
-      });
-    });
+    this.leave();
   }
 
   private leave(): void {
-    if (this.leaving) return;
-    this.leaving = true;
-    const gs = window.gameState;
-    gs.runManager.completeRoom({});
-    transitionTo(this, 'RunMap');
+    if (isTransitioning(this)) return;
+    this.resolved = true;
+    window.gameState.runManager.completeRoom({});
+    this.time.delayedCall(600, () => transitionTo(this, 'RunMap'));
   }
 }

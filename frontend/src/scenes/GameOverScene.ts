@@ -1,8 +1,7 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, FONTS } from '../config';
+import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS, FONTS, FONT_FAMILY, STROKE } from '../config';
 import { makeButton, makePanel, makeTitle, fadeIn, transitionTo, staggerIn, countUp } from '../ui/UIManager';
-import { saveProgress } from './MainMenuScene';
-import { apiClient } from '../api/apiClient';
+import { saveProgress } from '../state/gameState';
 
 export class GameOverScene extends Phaser.Scene {
   constructor() { super('GameOver'); }
@@ -13,7 +12,7 @@ export class GameOverScene extends Phaser.Scene {
     const victory = run.victory;
 
     fadeIn(this, 300);
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, victory ? 0x0a1a0a : 0x1a0a0a);
+    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, victory ? COLORS.result.win : COLORS.result.lose);
 
     // Braises / étoiles qui dérivent lentement vers le haut
     for (let i = 0; i < 30; i++) {
@@ -21,7 +20,7 @@ export class GameOverScene extends Phaser.Scene {
         Phaser.Math.Between(0, GAME_WIDTH),
         Phaser.Math.Between(0, GAME_HEIGHT),
         Phaser.Math.FloatBetween(1, 3),
-        victory ? 0xffd700 : 0xff4422,
+        victory ? COLORS.gold : COLORS.btn.danger,
         Phaser.Math.FloatBetween(0.2, 0.7),
       );
       if (i % 2 === 0) {
@@ -37,9 +36,6 @@ export class GameOverScene extends Phaser.Scene {
       }
     }
 
-    // Add talent points to tree
-    gs.talentTree.addPoints(run.talentPointsEarned);
-
     // Update best run
     const zonesCleared = run.zoneIndex + (victory ? 1 : 0);
     const roomsCleared = run.rooms.filter(r => r.completed).length;
@@ -49,10 +45,9 @@ export class GameOverScene extends Phaser.Scene {
     }
 
     // Carry over run gold to meta gold
-    gs.totalGold += Math.floor(run.gold * 0.3);
+    gs.totalGold += run.gold;
 
     saveProgress();
-    this.reportRun(zonesCleared, roomsCleared, victory, run.gold);
 
     const title = makeTitle(this, GAME_WIDTH / 2, 70, victory ? '🏆 VICTOIRE !' : '💀 DÉFAITE');
     title.setScale(0);
@@ -65,29 +60,31 @@ export class GameOverScene extends Phaser.Scene {
       ...FONTS.body, align: 'center', wordWrap: { width: 300 },
     }).setOrigin(0.5);
 
-    this.drawStats(zonesCleared, roomsCleared, run.talentPointsEarned, run.gold);
+    this.drawStats(zonesCleared, roomsCleared, run.gold);
     this.drawHeroSummary();
 
     makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 60, 'MENU PRINCIPAL', () => transitionTo(this, 'MainMenu'), 240, 48,
-      victory ? 0x335533 : 0x553333);
-    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 108, 'NOUVEAU RUN',
-      () => transitionTo(this, 'TeamSelect', { auto: false }), 240, 40);
+      victory ? COLORS.btn.success : COLORS.btn.danger);
+    // Relancer reprend le mode du run qui vient de finir : après un run auto,
+    // on veut manifestement enchaîner en auto.
+    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 108, run.autoMode ? 'NOUVEAU RUN AUTO' : 'NOUVEAU RUN',
+      () => transitionTo(this, 'TeamSelect', { auto: run.autoMode }), 240, 40);
   }
 
-  private drawStats(zones: number, rooms: number, pts: number, gold: number): void {
+  private drawStats(zones: number, rooms: number, gold: number): void {
     makePanel(this, GAME_WIDTH / 2, 240, 320, 130);
-    const goldRecovered = Math.floor(gold * 0.3);
     const lines = [
       `Zones traversées : ${zones}`,
       `Salles terminées : ${rooms}`,
-      `Points de talent gagnés : ${pts}`,
     ];
     const texts = lines.map((l, i) =>
       this.add.text(GAME_WIDTH / 2, 192 + i * 28, l, { ...FONTS.body, align: 'center' }).setOrigin(0.5)
     );
-    const goldText = this.add.text(GAME_WIDTH / 2, 192 + 3 * 28, `Or récupéré (30%) : 0 💰`, { ...FONTS.body, align: 'center' }).setOrigin(0.5);
+    // Troisième ligne du bloc : l'index 2 suit les deux précédentes, sinon le
+    // panneau garde un trou de 28px au milieu.
+    const goldText = this.add.text(GAME_WIDTH / 2, 192 + 2 * 28, 'Or gagné : 0 💰', { ...FONTS.body, align: 'center' }).setOrigin(0.5);
     staggerIn(this, [...texts, goldText], 10, 90);
-    countUp(this, goldText, 0, goldRecovered, n => `Or récupéré (30%) : ${n} 💰`, 800);
+    countUp(this, goldText, 0, gold, n => `Or gagné : ${n} 💰`, 800);
   }
 
   private drawHeroSummary(): void {
@@ -97,21 +94,10 @@ export class GameOverScene extends Phaser.Scene {
     run.heroes.forEach((h, i) => {
       const cx = 20 + i * 68;
       const alive = h.currentHp > 0;
-      this.add.rectangle(cx + 26, y + 32, 52, 44, alive ? 0x1e2a1e : 0x2a1e1e).setStrokeStyle(1, alive ? 0x44cc44 : 0xcc4444);
-      this.add.text(cx + 26, y + 22, alive ? '✓' : '✗', { fontSize: '18px', color: alive ? '#44cc44' : '#cc4444' }).setOrigin(0.5);
-      this.add.text(cx + 26, y + 42, h.name.split(' ')[0], { fontSize: '8px', color: '#888899' }).setOrigin(0.5);
+      this.add.rectangle(cx + 26, y + 32, 52, 44, COLORS.panel)
+        .setStrokeStyle(STROKE.thin, alive ? COLORS.hp : COLORS.btn.danger);
+      this.add.text(cx + 26, y + 22, alive ? '✓' : '✗', { fontSize: '18px', color: alive ? CSS.hp : CSS.danger, fontFamily: FONT_FAMILY, fontStyle: 'bold' }).setOrigin(0.5);
+      this.add.text(cx + 26, y + 42, h.short, { fontSize: '8px', color: CSS.textDim, fontFamily: FONT_FAMILY, fontStyle: 'bold' }).setOrigin(0.5);
     });
-  }
-
-  private reportRun(zones: number, rooms: number, victory: boolean, gold: number): void {
-    const run = window.gameState.runManager.state;
-    if (!apiClient.isAuthenticated()) return;
-    apiClient.saveRun({
-      zonesCleared: zones,
-      roomsCleared: rooms,
-      victory,
-      goldEarned: gold,
-      heroesUsed: run.heroes.map(h => h.definitionId),
-    }).catch(() => { /* offline, no-op */ });
   }
 }

@@ -9,11 +9,9 @@ export interface EnemyInstance {
   maxHp: number;
   currentHp: number;
   atk: number;
-  def: number;
   spd: number;
   gridRow: number;
   gridCol: number;
-  isMarked: boolean;
   atkDebuffPct: number;
   // boss cycle counter
   cycleIndex: number;
@@ -31,11 +29,9 @@ export function createEnemyInstance(def: EnemyDefinition, row: number, col: numb
     maxHp: def.hp,
     currentHp: def.hp,
     atk: def.atk,
-    def: def.def,
     spd: def.spd,
     gridRow: row,
     gridCol: col,
-    isMarked: false,
     atkDebuffPct: 0,
     cycleIndex: 0,
   };
