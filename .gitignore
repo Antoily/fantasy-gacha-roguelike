@@ -10,3 +10,4 @@ ios/
 .capacitor/
 coverage/
 *.tsbuildinfo
+.claude/
