@@ -22,3 +22,11 @@ export const JWT_EXPIRES_IN = '30d';
 export const PORT = parseInt(process.env.PORT ?? '4000', 10);
 
 export const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
+// Origines autorisées par CORS. En production, la liste doit venir de
+// l'environnement : la valeur codée en dur était `https://your-game-domain.com`,
+// un placeholder qui aurait bloqué le vrai frontend le jour de la mise en ligne.
+// En développement, tout est autorisé — c'est sans conséquence en local.
+export const CORS_ORIGIN: string[] | '*' = IS_PRODUCTION
+  ? required('CORS_ORIGIN').split(',').map(o => o.trim()).filter(Boolean)
+  : '*';

@@ -63,10 +63,15 @@ git remote set-url origin https://github.com/Antoily/fantasy-gacha-roguelike.git
 
 ## CI/CD
 
-3 workflows GitHub Actions :
-- **`ci.yml`** : lint + typecheck + build sur chaque push/PR → `frontend/` et `backend/`
-- **`pr-checks.yml`** : validation typecheck sur chaque PR + commentaire auto
+2 workflows GitHub Actions :
+- **`ci.yml`** : lint + typecheck + tests + build → `frontend/` et `backend/`.
+  Se déclenche sur **toutes** les PRs, pas seulement celles qui visent `main` :
+  une PR empilée sur une autre branche doit être vérifiée elle aussi, sinon les
+  contrôles n'arrivent qu'au dernier merge, trop tard pour servir.
 - **`deploy-backend.yml`** : deploy VPS via SSH sur push `main` (nécessite secrets `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`)
+
+(`pr-checks.yml` a été supprimé : il ne faisait qu'un typecheck que `ci.yml`
+couvre déjà, en réinstallant les deux packages une seconde fois à chaque PR.)
 
 **Prérequis CI** : les `package-lock.json` doivent exister. Les générer avec :
 ```bash
@@ -74,6 +79,10 @@ cd frontend && npm install && cd ../backend && npm install
 ```
 
 **Fix CI cassée** : toujours ouvrir une PR (`fix/ci-...`), ne pas patcher directement sur main.
+
+**Tests** : Vitest, côté `frontend/` uniquement (`npm test`, `npm run test:watch`).
+**Rester en Vitest 2.x** tant que la machine de dev est en Node 18 : la v4 exige
+Node ≥ 20 et ne démarre même pas (`styleText` absent de `node:util`).
 
 **Lint** : config ESLint legacy (`.eslintrc.json`) dans `frontend/` et `backend/`,
 format imposé par ESLint 8.57 + typescript-eslint 7 épinglés. Ne pas migrer vers
@@ -290,6 +299,33 @@ reçoit quoi que ce soit.
 
 ---
 
+## Tests — écrire des tests qui mordent
+
+`CombatResolver.ts` est la seule logique pure du jeu (pas de Phaser, pas d'I/O)
+et le cœur du gameplay : c'est là que vivent les tests. `Math.random` est figé
+via `vi.spyOn` pour rendre les combats reproductibles.
+
+⚠️ **Un test vert ne prouve rien tant qu'on ne l'a pas vu échouer.** Trois des
+premiers tests écrits passaient sans rien vérifier :
+
+- le test de `taunt` mettait Sylva dans l'équipe : son tir double tuait l'archer
+  **avant qu'il ne joue**, donc aucun ciblage n'était exercé ;
+- le test de `first_strike` opposait Nix (26 VIT, le plus rapide du jeu) à un
+  ennemi plus lent : il passait premier de toute façon ;
+- le test de `heal_one` vérifiait `entry.heal`, une constante écrite à part dans
+  le journal, qui reste à 50 même si le soin ne rend plus aucun PV.
+
+Règle qui en découle : **valider chaque test par mutation** — casser la règle
+dans le résolveur, vérifier que la suite rougit, restaurer. Et faire porter les
+assertions sur l'**effet réel** (PV, cibles des actions du journal), jamais sur
+un champ descriptif recopié à côté.
+
+Quand une équipe de test doit laisser l'ennemi agir, la composer avec des héros
+peu offensifs (Ourg 16 ATK, Finn qui ne fait que soigner) plutôt qu'avec les
+gros attaquants.
+
+---
+
 ## Conventions de code
 
 - **TypeScript strict** partout — pas de `any` sauf cas exceptionnel documenté
@@ -409,6 +445,12 @@ scène de run doit offrir un moyen clair de revenir au menu.
 ---
 
 ## Backend — déploiement VPS
+
+Variables d'environnement obligatoires en production (le serveur **refuse de
+démarrer** si elles manquent, cf. `backend/src/config.ts`) :
+- `JWT_SECRET` — secret de signature des tokens
+- `CORS_ORIGIN` — origines autorisées, séparées par des virgules
+  (`https://mon-domaine.fr,https://www.mon-domaine.fr`)
 
 Variables à configurer dans GitHub → Settings → Variables/Secrets :
 - `VPS_HOST` (variable) : IP ou domaine du VPS
