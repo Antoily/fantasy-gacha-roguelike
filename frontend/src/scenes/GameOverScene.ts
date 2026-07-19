@@ -67,7 +67,9 @@ export class GameOverScene extends Phaser.Scene {
       victory ? COLORS.btn.success : COLORS.btn.danger);
     // Relancer reprend le mode du run qui vient de finir : après un run auto,
     // on veut manifestement enchaîner en auto.
-    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 108, run.autoMode ? 'NOUVEAU RUN AUTO' : 'NOUVEAU RUN',
+    // 116 et non 108 : à 108 les deux boutons n'avaient que 4px d'écart, que
+    // l'ombre portée de 3px de makeButton refermait presque entièrement.
+    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 116, run.autoMode ? 'NOUVEAU RUN AUTO' : 'NOUVEAU RUN',
       () => transitionTo(this, 'TeamSelect', { auto: run.autoMode }), 240, 40);
   }
 

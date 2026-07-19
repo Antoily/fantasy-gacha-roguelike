@@ -9,6 +9,16 @@ import { pickRandom } from '../utils/random';
 
 const REST_HEAL = 40;
 
+// Même grille de marge que RunMapScene, qui sert de référence de layout.
+const MARGIN = 16;
+const CONTENT_W = GAME_WIDTH - MARGIN * 2; // 328
+
+// Bouton « Passer » : le bandeau d'équipe se positionne au-dessus, donc sa
+// géométrie doit être partagée plutôt que recopiée de part et d'autre.
+const SKIP_H = 44;
+const SKIP_CY = GAME_HEIGHT - 46;
+const SKIP_TOP = SKIP_CY - SKIP_H / 2;
+
 // Salle de renfort : le joueur choisit un héros parmi trois. Si son équipe est
 // pleine, il doit décider qui laisse sa place — c'est la seule vraie décision
 // d'un run, et elle porte uniquement sur les personnages.
@@ -35,8 +45,8 @@ export class RecruitScene extends Phaser.Scene {
     this.drawOffers(offers);
     this.drawTeamStrip();
 
-    makeButton(this, GAME_WIDTH / 2, GAME_HEIGHT - 46, `Passer (+${REST_HEAL} PV à l'équipe)`,
-      () => this.skip(), 300, 44, COLORS.btn.neutral);
+    makeButton(this, GAME_WIDTH / 2, SKIP_CY, `Passer (+${REST_HEAL} PV à l'équipe)`,
+      () => this.skip(), 300, SKIP_H, COLORS.btn.neutral);
 
     if (run.autoMode) {
       this.add.text(GAME_WIDTH - 10, 36, '🤖 AUTO', { ...FONTS.small, color: CSS.accent }).setOrigin(1, 0.5);
@@ -81,20 +91,39 @@ export class RecruitScene extends Phaser.Scene {
   // faut écarter quelqu'un.
   private drawTeamStrip(): void {
     const run = window.gameState.runManager.state;
-    const y = GAME_HEIGHT - 128;
-    this.add.text(16, y - 26, `Ton équipe (${run.heroes.length}/${MAX_TEAM}) :`, { ...FONTS.small }).setOrigin(0, 0.5);
-    makePanel(this, GAME_WIDTH / 2, y + 12, 328, 64);
+
+    // Géométrie dérivée du contenu, ancrée sur le bouton du bas. En dur, le
+    // panneau était trop court de 10px pour ce qu'il contenait : les PV
+    // débordaient sur le bord des cases et le label collait au cadre.
+    const PAD = 10;
+    const BOX_W = 60;
+    const BOX_H = 48;          // nom + barre + PV, tous à l'intérieur
+    const LABEL_GAP = 10;      // écart label / boîte imposé par la charte
+
+    const panelH = PAD * 2 + BOX_H;
+    const panelBottom = SKIP_TOP - 16;   // 16px au-dessus du bouton
+    const panelTop = panelBottom - panelH;
+    const boxCy = panelTop + PAD + BOX_H / 2;
+
+    this.add.text(MARGIN, panelTop - LABEL_GAP - 6, `Ton équipe (${run.heroes.length}/${MAX_TEAM}) :`, {
+      ...FONTS.small,
+    }).setOrigin(0, 0.5);
+    makePanel(this, GAME_WIDTH / 2, panelTop + panelH / 2, CONTENT_W, panelH);
+
+    // Les cases occupent MAX_TEAM emplacements répartis sur toute la largeur :
+    // une équipe incomplète laisse un trou visible, ce qui est l'information utile.
+    const slot = CONTENT_W / MAX_TEAM;
 
     run.heroes.forEach((h, i) => {
-      const cx = 46 + i * 78;
+      const cx = MARGIN + slot * i + slot / 2;
       const alive = isHeroAlive(h);
-      this.add.rectangle(cx, y + 6, 60, 40, COLORS.panel)
+      this.add.rectangle(cx, boxCy, BOX_W, BOX_H, COLORS.panel)
         .setStrokeStyle(STROKE.thin, alive ? COLORS.ink : COLORS.textFaint);
-      this.add.text(cx, y - 4, `${ROLE_ICONS[h.role]} ${h.short}`, {
+      this.add.text(cx, boxCy - 15, `${ROLE_ICONS[h.role]} ${h.short}`, {
         ...FONTS.small, fontSize: '9px', color: alive ? CSS.text : CSS.textFaint,
       }).setOrigin(0.5);
-      makeHpBar(this, cx, y + 12, 50, 5, Math.max(0, h.currentHp / h.maxHp));
-      this.add.text(cx, y + 30, `${Math.max(0, h.currentHp)}/${h.maxHp}`, {
+      makeHpBar(this, cx, boxCy + 1, 50, 5, Math.max(0, h.currentHp / h.maxHp));
+      this.add.text(cx, boxCy + 15, `${Math.max(0, h.currentHp)}/${h.maxHp}`, {
         ...FONTS.small, fontSize: '8px',
       }).setOrigin(0.5);
     });
