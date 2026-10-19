@@ -10,4 +10,5 @@ ios/
 .capacitor/
 coverage/
 *.tsbuildinfo
-.claude/
+.claude/*
+!.claude/skills/
