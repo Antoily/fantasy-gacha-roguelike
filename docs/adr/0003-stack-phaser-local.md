@@ -1,6 +1,6 @@
 # 0003 — Phaser 3 + TypeScript + Vite, local-only
 
-- **Statut** : Accepté
+- **Statut** : Remplacé par [0004](0004-phaser4-node24.md)
 - **Date** : 2026-10-19
 - **Spec liée** : —
 
