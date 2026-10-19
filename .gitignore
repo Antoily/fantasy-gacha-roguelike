@@ -12,3 +12,5 @@ coverage/
 *.tsbuildinfo
 .claude/*
 !.claude/skills/
+test-results/
+playwright-report/
