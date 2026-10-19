@@ -14,10 +14,13 @@ const half = (CONTENT_W - MARGIN) / 2;
 
 export const GACHA = {
   header: { x: MARGIN, y: MARGIN, w: CONTENT_W, h: 52 },
-  orb: { x: WIDTH / 2, y: 200, r: 72 },
-  pullSingle: { x: MARGIN, y: 316, w: CONTENT_W, h: 60 },
-  pullTen: { x: MARGIN, y: 392, w: CONTENT_W, h: 72 },
-  shortageMessageY: 488,
+  orb: { x: WIDTH / 2, y: 170, r: 64 },
+  // Ligne du pity, sous l'orbe (002).
+  pityLineY: 250,
+  pullSingle: { x: MARGIN, y: 274, w: CONTENT_W, h: 56 },
+  pullTen: { x: MARGIN, y: 342, w: CONTENT_W, h: 68 },
+  shortageMessageY: 422,
+  exchange: { x: MARGIN, y: 476, w: CONTENT_W, h: 48 },
   rates: { x: MARGIN, y: 560, w: half, h: 48 },
   reset: { x: MARGIN * 2 + half, y: 560, w: half, h: 48 },
 } as const satisfies Record<string, unknown>;
@@ -29,9 +32,41 @@ export const RESULTS = {
   gridTop: 72,
   card: { w: half, h: 92 },
   gap: 8,
-  single: { x: (WIDTH - 260) / 2, y: 170, w: 260, h: 200 },
+  single: { x: (WIDTH - 260) / 2, y: 160, w: 260, h: 224 },
   ok: { x: MARGIN * 2, y: 568, w: CONTENT_W - 2 * MARGIN, h: 44 },
 } as const;
+
+// Liste d'échange (002) : grille 2 × 10, assez pour tout le catalogue sans défilement.
+export const EXCHANGE = {
+  titleY: 36,
+  balanceY: 60,
+  gridTop: 78,
+  cell: { w: half, h: 44 },
+  gap: 4,
+} as const;
+
+// La fenêtre d'échange se dimensionne d'après le nombre d'éléments manquants : avec un
+// seul manquant, pas de grand panneau vide. Vide : une ligne de message.
+export function exchangeLayout(count: number): { panel: Rect; close: Rect; emptyY: number } {
+  const rows = Math.ceil(count / 2);
+  const contentBottom = rows > 0
+    ? EXCHANGE.gridTop + rows * (EXCHANGE.cell.h + EXCHANGE.gap) - EXCHANGE.gap
+    : EXCHANGE.gridTop + 40;
+  const close = { x: MARGIN * 2, y: contentBottom + 16, w: CONTENT_W - 2 * MARGIN, h: 44 };
+  const panel = { x: MARGIN / 2, y: MARGIN, w: WIDTH - MARGIN, h: close.y + close.h + MARGIN / 2 - MARGIN };
+  return { panel, close, emptyY: EXCHANGE.gridTop + 20 };
+}
+
+export function exchangeCellRect(index: number): Rect {
+  const col = index % 2;
+  const row = Math.floor(index / 2);
+  return {
+    x: MARGIN + col * (EXCHANGE.cell.w + MARGIN),
+    y: EXCHANGE.gridTop + row * (EXCHANGE.cell.h + EXCHANGE.gap),
+    w: EXCHANGE.cell.w,
+    h: EXCHANGE.cell.h,
+  };
+}
 
 export function resultCardRect(index: number): Rect {
   const col = index % 2;
@@ -69,6 +104,6 @@ export function dialogButtons(dialog: Rect, count: 1 | 2): Rect[] {
 }
 
 // Hauteurs des fenêtres, partagées avec l'e2e pour viser leurs boutons.
-export const RATES_DIALOG_H = 336;
+export const RATES_DIALOG_H = 400;
 export const CONFIRM_DIALOG_H = 156;
 export const WARNING_DIALOG_H = 156;

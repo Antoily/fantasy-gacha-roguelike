@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CATALOGUE } from './catalogue';
-import { GACHA_CONFIG, RARITIES } from './gachaConfig';
+import { GACHA_CONFIG, RARITIES, SHARD_COST, SHARD_GAIN } from './gachaConfig';
 
 describe('catalogue (FR-001, FR-003)', () => {
   it('contient 20 éléments aux identifiants uniques', () => {
@@ -30,5 +30,20 @@ describe('configuration (FR-006, FR-008, FR-009)', () => {
   it('rend le ×10 strictement moins cher que dix ×1', () => {
     expect(GACHA_CONFIG.costTen).toBeLessThan(10 * GACHA_CONFIG.costSingle);
     expect([GACHA_CONFIG.costSingle, GACHA_CONFIG.costTen, GACHA_CONFIG.startingCurrency]).toEqual([100, 900, 9000]);
+  });
+});
+
+describe('pity et éclats (002 : FR-001, FR-009, FR-013)', () => {
+  it('garantit un Légendaire ou mieux au 40ᵉ tirage, seuil > 10 (une garantie par salve au plus)', () => {
+    expect(GACHA_CONFIG.pityThreshold).toBe(40);
+    expect(GACHA_CONFIG.pityMinRank).toBe(RARITIES.find(r => r.id === 'legendary')!.rank);
+    expect(GACHA_CONFIG.pityThreshold).toBeGreaterThan(10);
+    // gacha.ts s'appuie dessus : un résultat forcé par le pity vaut aussi la garantie du ×10.
+    expect(GACHA_CONFIG.pityMinRank).toBeGreaterThan(GACHA_CONFIG.guaranteedMinRank);
+  });
+
+  it('fixe les gains et coûts en éclats, croissants avec la rareté', () => {
+    expect(RARITIES.map(r => SHARD_GAIN[r.id])).toEqual([1, 2, 5, 15, 30]);
+    expect(RARITIES.map(r => SHARD_COST[r.id])).toEqual([10, 20, 50, 150, 300]);
   });
 });

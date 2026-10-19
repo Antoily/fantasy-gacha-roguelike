@@ -1,44 +1,12 @@
-import { expect, test, type Page } from '@playwright/test';
-import { CATALOGUE } from '../../src/data/catalogue';
-import { RARITIES } from '../../src/data/gachaConfig';
+import { expect, test } from '@playwright/test';
 import {
   CONFIRM_DIALOG_H, GACHA, RATES_DIALOG_H, RESULTS, WARNING_DIALOG_H,
-  center, dialogButtons, dialogRect, type Rect,
+  center, dialogButtons, dialogRect,
 } from '../../src/ui/layout';
+import { FRESH, KEY, capture, copies, load, rankOf, save, tap } from './helpers';
 
 // Scénario de specs/001-tirage/quickstart.md, joué sur le build. Les positions viennent
 // de src/ui/layout.ts : le test clique là où la scène dessine.
-
-interface Save { version: number; currency: number; owned: Record<string, number> }
-const KEY = 'gacha.save';
-const shots: string[] = [];
-
-async function capture(page: Page, name: string) {
-  const path = `test-results/captures/${String(shots.length + 1).padStart(2, '0')}-${name}.png`;
-  shots.push(path);
-  await page.screenshot({ path });
-}
-
-async function tap(page: Page, r: Rect) {
-  const { x, y } = center(r);
-  await page.mouse.click(x, y);
-  // Laisse Phaser traiter l'appui et redessiner.
-  await page.waitForTimeout(150);
-}
-
-async function save(page: Page): Promise<Save | null> {
-  const raw = await page.evaluate(k => localStorage.getItem(k), KEY);
-  return raw === null ? null : (JSON.parse(raw) as Save);
-}
-
-async function load(page: Page) {
-  await page.evaluate(() => delete document.body.dataset.ready);
-  await page.reload();
-  await page.waitForSelector('body[data-ready="gacha"]');
-}
-
-const copies = (s: Save) => Object.values(s.owned).reduce((a, b) => a + b, 0);
-const rankOf = (id: string) => RARITIES.find(r => r.id === CATALOGUE.find(i => i.id === id)!.rarity)!.rank;
 
 test('parcours complet du tirage', async ({ page }) => {
   const start = Date.now();
@@ -94,13 +62,13 @@ test('parcours complet du tirage', async ({ page }) => {
   expect(await save(page)).toEqual(afterTen);
   await tap(page, GACHA.reset);
   await tap(page, erase!);
-  expect(await save(page)).toEqual({ version: 1, currency: 9000, owned: {} });
+  expect(await save(page)).toEqual(FRESH);
   await capture(page, 'apres-effacement');
 
   // 7. Sauvegarde illisible : avertissement, partie neuve aussitôt réécrite.
   await page.evaluate(k => localStorage.setItem(k, '{cassé'), KEY);
   await load(page);
-  expect(await save(page)).toEqual({ version: 1, currency: 9000, owned: {} });
+  expect(await save(page)).toEqual(FRESH);
   await capture(page, 'sauvegarde-illisible');
   await tap(page, dialogButtons(dialogRect(WARNING_DIALOG_H), 1)[0]!);
 

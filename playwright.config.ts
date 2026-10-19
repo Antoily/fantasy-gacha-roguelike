@@ -6,6 +6,8 @@ export default defineConfig({
   testDir: 'tests/e2e',
   outputDir: 'test-results',
   fullyParallel: false,
+  // Un seul worker : les captures sont numérotées dans l'ordre et ne s'écrasent pas.
+  workers: 1,
   retries: 0,
   reporter: [['list']],
   use: {

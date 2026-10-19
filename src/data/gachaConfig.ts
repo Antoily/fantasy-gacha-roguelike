@@ -22,6 +22,18 @@ export const GACHA_CONFIG = {
   costSingle: 100,
   costTen: 900,
   startingCurrency: 9000,
-  // Le ×10 garantit au moins un résultat de ce rang ou plus (FR-007).
+  // Le ×10 garantit au moins un résultat de ce rang ou plus (001, FR-007).
   guaranteedMinRank: 2,
+  // Pity (002) : Légendaire ou mieux au plus tard au 40ᵉ tirage sans en avoir eu.
+  pityThreshold: 40,
+  pityMinRank: 3,
 } as const;
+
+// Éclats (002) : gagnés sur un doublon, dépensés pour obtenir un élément manquant.
+export const SHARD_GAIN: Readonly<Record<Rarity, number>> = {
+  common: 1, uncommon: 2, rare: 5, legendary: 15, ultra: 30,
+};
+
+export const SHARD_COST: Readonly<Record<Rarity, number>> = {
+  common: 10, uncommon: 20, rare: 50, legendary: 150, ultra: 300,
+};

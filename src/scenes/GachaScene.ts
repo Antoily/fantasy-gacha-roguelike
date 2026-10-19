@@ -1,17 +1,22 @@
 import Phaser from 'phaser';
 import { CATALOGUE } from '../data/catalogue';
-import { GACHA_CONFIG } from '../data/gachaConfig';
+import type { Item } from '../data/catalogue';
+import { GACHA_CONFIG, SHARD_COST } from '../data/gachaConfig';
 import { formatAmount } from '../logic/format';
 import type { PullResult } from '../logic/gacha';
-import { canAfford, distinctOwned, pull, reset, type Progression, type PullCount } from '../logic/progression';
+import {
+  canAfford, distinctOwned, exchange, exchangeableItems, pull, pullsUntilPity, reset, type Progression, type PullCount,
+} from '../logic/progression';
 import { formatPercent, ratePercent, rarityTable } from '../logic/rates';
 import { SAVE_KEY, serializeSave, type SaveStatus } from '../logic/save';
 import {
-  CONFIRM_DIALOG_H, DIALOG, GACHA, RATES_DIALOG_H, RESULTS, WARNING_DIALOG_H,
-  dialogButtons, dialogRect, resultCardRect, type Rect,
+  CONFIRM_DIALOG_H, DIALOG, EXCHANGE, GACHA, RATES_DIALOG_H, RESULTS, WARNING_DIALOG_H,
+  dialogButtons, dialogRect, exchangeCellRect, exchangeLayout, resultCardRect, type Rect,
 } from '../ui/layout';
 import { COLORS, CSS, FONT_SIZE, STROKE } from '../ui/theme';
-import { makeButton, makeModal, makePanel, makeResultCard, textStyle, type Button } from '../ui/widgets';
+import {
+  makeButton, makeModal, makePanel, makeResultCard, makeShardAmount, makeShardIcon, textStyle, type Button,
+} from '../ui/widgets';
 
 interface GachaData {
   progression: Progression;
@@ -25,6 +30,8 @@ export class GachaScene extends Phaser.Scene {
   private modalOpen = false;
   private currencyText!: Phaser.GameObjects.Text;
   private counterText!: Phaser.GameObjects.Text;
+  private shardsText!: Phaser.GameObjects.Text;
+  private pityText!: Phaser.GameObjects.Text;
   private shortageText!: Phaser.GameObjects.Text;
   private singleButton!: Button;
   private tenButton!: Button;
@@ -48,6 +55,8 @@ export class GachaScene extends Phaser.Scene {
       { ...textStyle(FONT_SIZE.body, CSS.textDim), align: 'center', wordWrap: { width: GACHA.pullSingle.w } })
       .setOrigin(0.5, 0);
 
+    this.pityText = this.add.text(GACHA.orb.x, GACHA.pityLineY, '', textStyle(FONT_SIZE.body, CSS.textDim)).setOrigin(0.5);
+    makeButton(this, GACHA.exchange, 'Échanger des éclats', COLORS.btn.secondary, () => this.showExchange());
     makeButton(this, GACHA.rates, 'Taux', COLORS.btn.secondary, () => this.showRates());
     makeButton(this, GACHA.reset, 'Recommencer', COLORS.btn.neutral, () => this.showResetConfirm());
 
@@ -70,6 +79,9 @@ export class GachaScene extends Phaser.Scene {
     coin.lineStyle(STROKE.thin, COLORS.ink, 1).strokeCircle(coinX, cy, 12);
     this.currencyText = this.add.text(coinX + 20, cy, '', textStyle(FONT_SIZE.big)).setOrigin(0, 0.5);
     this.counterText = this.add.text(h.x + h.w - 16, cy, '', textStyle(FONT_SIZE.big)).setOrigin(1, 0.5);
+    const shardX = h.x + h.w / 2 - 6;
+    makeShardIcon(this, shardX, cy, 12);
+    this.shardsText = this.add.text(shardX + 16, cy, '', textStyle(FONT_SIZE.big)).setOrigin(0, 0.5);
   }
 
   private drawOrb() {
@@ -87,6 +99,11 @@ export class GachaScene extends Phaser.Scene {
     const p = this.progression;
     this.currencyText.setText(formatAmount(p.currency));
     this.counterText.setText(`${distinctOwned(p)} / ${CATALOGUE.length}`);
+    this.shardsText.setText(formatAmount(p.shards));
+    const left = pullsUntilPity(p);
+    this.pityText.setText(left === 1
+      ? 'Légendaire garanti au prochain tirage'
+      : `Légendaire garanti dans ${left} tirages au plus`);
     const single = canAfford(p, 1);
     const ten = canAfford(p, 10);
     this.singleButton.setEnabled(single);
@@ -125,18 +142,22 @@ export class GachaScene extends Phaser.Scene {
     }
   }
 
-  private openModal(): Phaser.GameObjects.Container {
+  // Le nom de la fenêtre ouverte est exposé dans le DOM pour le test de bout en bout :
+  // il vérifie l'enchaînement des écrans, pas seulement la sauvegarde.
+  private openModal(name: string): Phaser.GameObjects.Container {
     this.modalOpen = true;
+    document.body.dataset.modal = name;
     return makeModal(this);
   }
 
   private closeModal(modal: Phaser.GameObjects.Container) {
     modal.destroy();
     this.modalOpen = false;
+    delete document.body.dataset.modal;
   }
 
   private showResults(results: PullResult[], ownedBefore: Readonly<Record<string, number>>) {
-    const modal = this.openModal();
+    const modal = this.openModal('results');
     // Chaque carte affiche le nombre d'exemplaires atteint À CE résultat : deux doublons
     // d'une même salve montrent ×2 puis ×3, pas deux fois le total final.
     const running: Record<string, number> = { ...ownedBefore };
@@ -154,8 +175,8 @@ export class GachaScene extends Phaser.Scene {
     modal.add(makeButton(this, RESULTS.ok, 'OK', COLORS.btn.primary, () => this.closeModal(modal)).container);
   }
 
-  private dialog(h: number, title: string): { modal: Phaser.GameObjects.Container; rect: Rect; bodyY: number } {
-    const modal = this.openModal();
+  private dialog(name: string, h: number, title: string): { modal: Phaser.GameObjects.Container; rect: Rect; bodyY: number } {
+    const modal = this.openModal(name);
     const rect = dialogRect(h);
     modal.add(makePanel(this, rect));
     const t = this.add.text(rect.x + rect.w / 2, rect.y + DIALOG.padding, title,
@@ -167,7 +188,7 @@ export class GachaScene extends Phaser.Scene {
 
   private showRates() {
     if (this.modalOpen) return;
-    const { modal, rect, bodyY } = this.dialog(RATES_DIALOG_H, 'Taux par rareté');
+    const { modal, rect, bodyY } = this.dialog('rates', RATES_DIALOG_H, 'Taux par rareté');
     const left = rect.x + DIALOG.padding;
     const right = rect.x + rect.w - DIALOG.padding;
     let y = bodyY;
@@ -180,16 +201,86 @@ export class GachaScene extends Phaser.Scene {
       modal.add(this.add.text(right, y + 11, formatPercent(ratePercent(r.id)), textStyle(FONT_SIZE.body)).setOrigin(1, 0.5));
       y += 34;
     }
-    modal.add(this.add.text(left, y + 6, '×10 : au moins un Rare ou mieux garanti',
-      { ...textStyle(FONT_SIZE.body, CSS.textDim), wordWrap: { width: right - left } }));
+    const rules = this.add.text(left, y + 6,
+      '×10 : au moins un Rare ou mieux garanti.\n'
+      + `Légendaire ou mieux garanti au plus tard au ${GACHA_CONFIG.pityThreshold}ᵉ tirage ; `
+      + 'le compteur repart de zéro à chaque Légendaire ou Ultra rare.',
+      { ...textStyle(FONT_SIZE.body, CSS.textDim), wordWrap: { width: right - left }, lineSpacing: 2 });
+    modal.add(rules);
     const [close] = dialogButtons(rect, 1);
     modal.add(makeButton(this, close!, 'Fermer', COLORS.btn.secondary, () => this.closeModal(modal)).container);
   }
 
+  private showExchange() {
+    if (this.modalOpen) return;
+    const modal = this.openModal('exchange');
+    const p = this.progression;
+    const items = exchangeableItems(p);
+    const { panel, close, emptyY } = exchangeLayout(items.length);
+    modal.add(makePanel(this, panel, COLORS.background));
+    modal.add(this.add.text(panel.x + panel.w / 2, EXCHANGE.titleY, 'Échanger des éclats', textStyle(FONT_SIZE.big))
+      .setOrigin(0.5));
+    modal.add(makeShardAmount(this, panel.x + panel.w / 2, EXCHANGE.balanceY, `${formatAmount(p.shards)} éclats`, 0.5,
+      FONT_SIZE.body));
+
+    if (items.length === 0) {
+      modal.add(this.add.text(panel.x + panel.w / 2, emptyY, 'Tu possèdes déjà tout !', textStyle(FONT_SIZE.button))
+        .setOrigin(0.5));
+    }
+    items.forEach((item, i) => modal.add(this.makeExchangeCell(exchangeCellRect(i), item, modal)));
+    modal.add(makeButton(this, close, 'Fermer', COLORS.btn.neutral, () => this.closeModal(modal)).container);
+  }
+
+  private makeExchangeCell(r: Rect, item: Item, modal: Phaser.GameObjects.Container): Phaser.GameObjects.Container {
+    const cost = SHARD_COST[item.rarity];
+    const affordable = this.progression.shards >= cost;
+    const c = this.add.container(0, 0);
+    // Case grisée quand le solde ne suffit pas (FR-015) : elle n'est alors pas cliquable.
+    c.add(makePanel(this, r, affordable ? COLORS.panel : COLORS.btn.disabled));
+    const disc = this.add.graphics();
+    disc.fillStyle(COLORS.rarity[item.rarity], 1).fillCircle(r.x + 18, r.y + r.h / 2, 10);
+    disc.lineStyle(STROKE.thin, COLORS.ink, 1).strokeCircle(r.x + 18, r.y + r.h / 2, 10);
+    c.add(disc);
+    c.add(this.add.text(r.x + 34, r.y + 5, item.name, textStyle(FONT_SIZE.small, affordable ? CSS.text : CSS.textFaint)));
+    c.add(makeShardAmount(this, r.x + 34, r.y + 31, formatAmount(cost), 0));
+    if (affordable) {
+      const zone = this.add.zone(r.x, r.y, r.w, r.h).setOrigin(0).setInteractive({ useHandCursor: true });
+      zone.on('pointerup', () => {
+        this.closeModal(modal);
+        this.showExchangeConfirm(item);
+      });
+      c.add(zone);
+    }
+    return c;
+  }
+
+  private showExchangeConfirm(item: Item) {
+    const cost = SHARD_COST[item.rarity];
+    // Insécables : le montant reste collé à son unité et le « ? » au mot qui précède.
+    const { modal, rect } = this.dialog('confirm-exchange', CONFIRM_DIALOG_H,
+      `Échanger ${item.name} contre ${formatAmount(cost)}\u00a0éclats\u00a0?`);
+    const [confirm, cancel] = dialogButtons(rect, 2);
+    modal.add(makeButton(this, confirm!, 'Échanger', COLORS.btn.primary, () => {
+      const before = this.progression.owned;
+      const outcome = exchange(this.progression, item.id);
+      this.closeModal(modal);
+      if (!outcome.ok) return;
+      this.progression = outcome.progression;
+      // Sauvegardé avant d'afficher, comme un tirage.
+      this.persist();
+      this.refresh();
+      this.showResults([{ item: outcome.item, isNew: true, guaranteed: false, pity: false, shards: 0 }], before);
+    }).container);
+    modal.add(makeButton(this, cancel!, 'Annuler', COLORS.btn.neutral, () => {
+      this.closeModal(modal);
+      this.showExchange();
+    }).container);
+  }
+
   private showResetConfirm() {
     if (this.modalOpen) return;
-    const { modal, rect } = this.dialog(CONFIRM_DIALOG_H,
-      `Tout effacer et repartir avec ${formatAmount(GACHA_CONFIG.startingCurrency)} pièces ?`);
+    const { modal, rect } = this.dialog('confirm-reset', CONFIRM_DIALOG_H,
+      `Tout effacer et repartir avec ${formatAmount(GACHA_CONFIG.startingCurrency)}\u00a0pièces\u00a0?`);
     const [erase, cancel] = dialogButtons(rect, 2);
     modal.add(makeButton(this, erase!, 'Effacer', COLORS.btn.danger, () => {
       this.progression = reset();
@@ -201,7 +292,7 @@ export class GachaScene extends Phaser.Scene {
   }
 
   private showWarning() {
-    const { modal, rect } = this.dialog(WARNING_DIALOG_H,
+    const { modal, rect } = this.dialog('warning', WARNING_DIALOG_H,
       'Ta sauvegarde n’a pas pu être relue : nouvelle partie.');
     const [ok] = dialogButtons(rect, 1);
     modal.add(makeButton(this, ok!, 'OK', COLORS.btn.primary, () => this.closeModal(modal)).container);

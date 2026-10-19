@@ -16,6 +16,8 @@ const palette = {
   neutral: 0xf0e6d2,
   disabled: 0xd9d2c5,
   success: 0x6fcf74,
+  shard: 0x7fe0e8,
+  sticker: 0xff5c8a,
 } as const;
 
 const rarity: Record<Rarity, number> = {
@@ -42,6 +44,9 @@ export const COLORS = {
     disabled: palette.disabled,
   },
   badgeNew: palette.success,
+  // Éclats (002) : losange de l'en-tête et des coûts ; pastille « Garanti ! ».
+  shard: palette.shard,
+  badgePity: palette.sticker,
   rarity,
 } as const;
 
