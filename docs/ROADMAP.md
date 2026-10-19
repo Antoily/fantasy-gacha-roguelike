@@ -6,7 +6,7 @@ mergée et jouable.
 
 ## En cours
 
-_Rien : prochaine étape, spécifier 002 Pity & doublons._
+_Rien : prochaine étape, spécifier 003 Collection._
 
 ## Ensuite — le gacha
 
@@ -33,6 +33,9 @@ Ordre prévu. Chaque ligne = une spec, un mécanisme.
 
 ## Fait
 
+- 2026-10-19 — **002 Pity & doublons** : Légendaire ou mieux au plus tard au 40ᵉ
+  tirage (compteur visible), éclats sur chaque doublon, échange contre un élément
+  manquant, sauvegarde v2.
 - 2026-10-19 — **001 Tirage** : ×1 / ×10 (Rare garanti), taux affichés, sauvegarde
   versionnée, recommencer. 20 personnages et créatures provisoires.
 - 2026-10-19 — Remise à zéro, Spec Kit, constitution 1.0.0, ADR 0001–0003.
