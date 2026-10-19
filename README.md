@@ -1,58 +1,14 @@
-# Fantasy Roguelike Gacha
+# Gacha (nom de travail)
 
-A mobile roguelike with tactical formation combat and a gacha collection system.
+Jeu de collection à tirages, DA cartoon. On le construit **un mécanisme à la fois**,
+en commençant par le gacha seul.
 
-## Stack
+Le projet est piloté par specs avec [Spec Kit](https://github.com/github/spec-kit) :
 
-- **Frontend**: Phaser.js (TypeScript) + Vite + Capacitor (Android/iOS)
-- **Backend**: Node.js + Express + PostgreSQL + Prisma
+- [Constitution](.specify/memory/constitution.md) : les principes du projet
+- [Roadmap](docs/ROADMAP.md) : en cours, ensuite, plus tard
+- [ADR](docs/adr/) : les décisions structurantes
+- `specs/NNN-nom/` : spec, plan et tâches de chaque feature
 
-## Project Structure
-
-```
-gamingadd/
-├── frontend/   # Phaser.js game
-├── backend/    # Node.js REST API
-└── assets/     # AI image generation prompts
-```
-
-## Getting Started
-
-### Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### Backend
-
-```bash
-cd backend
-npm install
-cp .env.example .env  # fill in your DB URL and JWT secret
-npx prisma migrate dev
-npm run dev
-```
-
-## Android Build
-
-```bash
-cd frontend
-npm run build
-npx cap sync android
-npx cap open android
-```
-
-## Gameplay
-
-1. **Formation phase**: Place your heroes on a 3×3 grid before each fight
-2. **Auto-combat**: Combat resolves automatically based on positions and synergies
-3. **Run structure**: Corridor of rooms — combats, events, shop, rest, boss
-4. **Gacha**: Spend gold to draw heroes and relics (pity at 80 pulls)
-5. **Meta-progression**: Permanent talent tree unlocked between runs
-
-## Contributing
-
-All PRs, commits, and CI are managed autonomously by Claude Code.
+L'ancien prototype « Fantasy Roguelike Gacha » (roguelike + combat + backend) est
+conservé sous le tag `legacy-v1`.
