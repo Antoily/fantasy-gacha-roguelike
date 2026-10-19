@@ -6,7 +6,7 @@ mergée et jouable.
 
 ## En cours
 
-_Rien : prochaine étape, spécifier 001._
+- **001 Tirage** — spec en cours de clarification (`specs/001-tirage/`).
 
 ## Ensuite — le gacha
 
@@ -14,14 +14,10 @@ Ordre prévu. Chaque ligne = une spec, un mécanisme.
 
 | # | Feature | Le joueur peut… | Hors périmètre |
 |---|---------|-----------------|----------------|
-| 001 | **Tirage** | dépenser une monnaie pour un tirage ×1 ou ×10, voir les taux par rareté, voir ce qu'il a obtenu. Sa monnaie et ses personnages sont sauvegardés. | pity, doublons, animation, collection |
+| 001 | **Tirage** | dépenser une monnaie pour un tirage ×1 ou ×10 (×10 moins cher, un Rare garanti), voir les taux par rareté, voir ce qu'il a obtenu. Sa monnaie et ses personnages/créatures sont sauvegardés. | pity, valeur des doublons, animation, collection |
 | 002 | **Pity & doublons** | savoir combien de tirages le séparent de la garantie, et recevoir quelque chose d'utile pour un doublon. | ce que vaut un personnage en jeu |
 | 003 | **Collection** | parcourir les personnages obtenus et voir ceux qui lui manquent. | tri avancé, fiche détaillée |
 | 004 | **Révélation** | vivre le tirage : suspense, puis mise en scène qui dépend de la rareté. | son |
-
-À trancher pendant la spec 001 : **que collectionne-t-on**, combien de personnages et
-de raretés pour démarrer, et **d'où vient la monnaie** tant qu'il n'y a pas de gameplay
-(stock de départ, recharge gratuite, bouton de test…).
 
 ## Plus tard — non spécifié, ne pas coder
 
