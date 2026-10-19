@@ -10,5 +10,17 @@ Le projet est piloté par specs avec [Spec Kit](https://github.com/github/spec-k
 - [ADR](docs/adr/) : les décisions structurantes
 - `specs/NNN-nom/` : spec, plan et tâches de chaque feature
 
+## Jouer
+
+```bash
+nvm use            # Node 24
+npm ci
+npm run dev        # puis ouvrir l'URL affichée
+```
+
+Tests : `npm test` (logique) et `npm run e2e` (parcours complet dans Chromium).
+
+## Historique
+
 L'ancien prototype « Fantasy Roguelike Gacha » (roguelike + combat + backend) est
 conservé sous le tag `legacy-v1`.

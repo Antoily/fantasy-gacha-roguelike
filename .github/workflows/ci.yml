@@ -14,3 +14,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python3 scripts/check-docs.py
+
+  game:
+    name: Jeu (lint, types, tests, build, e2e)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e
+        env:
+          CI: 'true'
+      # Les captures servent à juger le rendu avant merge, même quand tout passe.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-captures
+          path: test-results/
+          if-no-files-found: ignore

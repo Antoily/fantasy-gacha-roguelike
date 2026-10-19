@@ -20,10 +20,40 @@ ADR, les specs, le code ou git.
 
 ## État du projet
 
-Remise à zéro le 2026-10-19 (ADR 0002) : **aucun code applicatif sur `main`**.
-L'ancien prototype « Fantasy Roguelike Gacha » est sous le tag `legacy-v1` et la
-branche `legacy` (ne pas supprimer). On construit d'abord **le gacha seul** ; le
-gameplay viendra après. Stack : Phaser 3 + TS + Vite, local-only (ADR 0003).
+Remise à zéro le 2026-10-19 (ADR 0002). L'ancien prototype « Fantasy Roguelike
+Gacha » est sous le tag `legacy-v1` et la branche `legacy` (ne pas supprimer). On
+construit d'abord **le gacha seul** ; le gameplay viendra après. Stack : Phaser 4 +
+TS 6 + Vite 8 sur Node 24, local-only (ADR 0004). Feature livrée : 001 Tirage.
+
+## Commandes
+
+**Toujours charger nvm d'abord** : le `node` du PATH non interactif est le Node 18
+système, trop vieux pour toute la chaîne (`.nvmrc` = 24).
+
+```bash
+source ~/.nvm/nvm.sh && nvm use
+npm run lint && npm run typecheck && npm test   # logique pure (Vitest)
+npm run e2e        # build + vite preview + Playwright ; captures dans test-results/captures/
+npm run dev        # jeu en local (pour vérifier un rendu : e2e ou preview, pas dev)
+scripts/mutate.sh <fichier> '<ancien>' '<nouveau>' [filtre]   # validation par mutation
+```
+
+## Structure
+
+```
+src/data/     contenu : catalogue.ts (20 éléments), gachaConfig.ts (raretés, poids, coûts)
+src/logic/    TS pur, testé : rng, rates, gacha, progression, save, format (lint : ni phaser ni navigateur)
+src/ui/       theme.ts (SEULES couleurs/polices), layout.ts (géométrie, partagée avec l'e2e), widgets.ts
+src/scenes/   BootScene (lit la sauvegarde) → GachaScene (écran + fenêtres)
+tests/e2e/    parcours Playwright du quickstart, critère de merge
+```
+
+- Positions : toute zone cliquable vient de `src/ui/layout.ts`, que le test e2e
+  importe pour cliquer au même endroit. Déplacer un bouton = changer `layout.ts`.
+- `GachaScene` pose `document.body.dataset.ready = 'gacha'` quand l'écran est prêt :
+  c'est le signal qu'attend l'e2e.
+- **Relire les captures de l'e2e** avant chaque merge touchant l'affichage : un test
+  vert n'empêche ni un texte qui déborde ni une fenêtre trop haute.
 
 ## Workflow Spec Kit
 
@@ -70,11 +100,8 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
 
 ## Leçons du prototype à réappliquer
 
-- **Node 18** sur la machine de dev : Vitest 4 ne démarre pas (exige Node ≥ 20).
-  Choisir des versions compatibles, ou monter Node (à décider au plan, ADR si besoin).
 - **Vérifier un rendu via le build statique**, jamais via `npm run dev` : sur WSL2, le
-  serveur de dev a servi du JS obsolète au navigateur. `npm run build` puis
-  `npx serve -s dist -l 4173`, piloté par Playwright.
+  serveur de dev a servi du JS obsolète au navigateur. `npm run e2e` le fait.
 - **Headless WSL2** : WebGL échoue par défaut (« Framebuffer Unsupported ») ; lancer
   Chromium avec `--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader`.
   Le canvas WebGL se capture avec `page.screenshot()`, pas avec `getImageData`.
@@ -87,7 +114,22 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
   hauteur fixe.
 - **Tests qui mordent** : plusieurs tests du prototype passaient sans rien vérifier
   (scénario qui contournait la règle testée, assertion sur une constante recopiée).
-  D'où le principe V de la constitution : mutation systématique.
+  D'où le principe V de la constitution : mutation systématique (`scripts/mutate.sh`).
+
+## Leçons de la feature 001
+
+- **Le voile d'une fenêtre ne bloque pas un double-clic** : Phaser traite deux clics
+  rapprochés dans la même image, avant que le voile existe. Toute action qui ne doit
+  pas partir deux fois garde son propre verrou (`modalOpen` dans `GachaScene`) ;
+  la mutation qui l'enlève fait débiter deux tirages.
+- **Montants** : `formatAmount` sépare les milliers par U+00A0 (insécable). Pas de
+  `toLocaleString('fr-FR')` (U+202F, carré dans certaines polices) ni d'espace
+  ordinaire (« 9 / 000 » coupé en fin de ligne).
+- Une mutation peut créer une boucle infinie synchrone que vitest n'interrompt pas :
+  `scripts/mutate.sh` borne chaque essai à 180 s et compte le blocage comme détecté.
+- Tests à graine fixe : pour vérifier une table de tirage précise, un `scriptedRng`
+  (`src/logic/testing.ts`) rend des valeurs choisies ; l'ordre de consommation du
+  hasard (rareté puis élément) est contractuel.
 
 ## Conventions de code
 

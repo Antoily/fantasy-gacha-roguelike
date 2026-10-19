@@ -1,0 +1,27 @@
+export type Rarity = 'common' | 'uncommon' | 'rare' | 'legendary' | 'ultra';
+
+export interface RarityInfo {
+  readonly id: Rarity;
+  // Ordre croissant de la spec (FR-002) : « Rare ou mieux » = rang ≥ 2.
+  readonly rank: number;
+  readonly label: string;
+  // Poids entiers sur 1 000 : pas d'arrondi flottant dans le tirage, et le
+  // pourcentage affiché se calcule à partir de la même valeur (FR-016).
+  readonly weight: number;
+}
+
+export const RARITIES: readonly RarityInfo[] = [
+  { id: 'common', rank: 0, label: 'Commun', weight: 600 },
+  { id: 'uncommon', rank: 1, label: 'Peu commun', weight: 270 },
+  { id: 'rare', rank: 2, label: 'Rare', weight: 100 },
+  { id: 'legendary', rank: 3, label: 'Légendaire', weight: 25 },
+  { id: 'ultra', rank: 4, label: 'Ultra rare', weight: 5 },
+];
+
+export const GACHA_CONFIG = {
+  costSingle: 100,
+  costTen: 900,
+  startingCurrency: 9000,
+  // Le ×10 garantit au moins un résultat de ce rang ou plus (FR-007).
+  guaranteedMinRank: 2,
+} as const;
