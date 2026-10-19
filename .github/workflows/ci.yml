@@ -1,0 +1,16 @@
+name: CI
+
+# Toutes les PR, pas seulement celles qui visent main : une PR empilée doit être
+# vérifiée elle aussi, sinon les contrôles n'arrivent qu'au dernier merge.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  docs:
+    name: Documents Spec Kit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/check-docs.py
