@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain — 3 restants : FR-004, FR-006, FR-008
+- [x] No [NEEDS CLARIFICATION] markers remain — FR-004, FR-006, FR-008 tranchés par l'utilisateur
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -31,5 +31,5 @@
 
 ## Notes
 
-- Les 3 clarifications portent sur des choix de design (pool, taux, économie) sans
-  valeur par défaut évidente : elles attendent la réponse de l'utilisateur.
+- Les 3 choix de design (pool, taux, économie) ont été tranchés le 2026-10-19 ; la
+  clarification a ajouté le lancement local et le catalogue en annexe.

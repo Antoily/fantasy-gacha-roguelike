@@ -8,6 +8,13 @@
 
 **Input**: User description: "Le gacha seul : dépenser une monnaie pour un tirage ×1 ou ×10, voir les taux par rareté, voir ce qu'on a obtenu, progression sauvegardée. On collectionne des personnages et des créatures. Raretés : Commun, Peu commun, Rare, Légendaire, Ultra rare. La monnaie vient d'un stock de départ fixe. Le ×10 coûte moins cher que dix ×1 et garantit un Rare."
 
+## Clarifications
+
+### Session 2026-10-19
+
+- Q: Où l'utilisateur doit-il pouvoir jouer à cette première version ? → A: En local seulement (navigateur du PC) ; la mise en ligne fera l'objet d'une feature dédiée plus tard.
+- Q: Qui choisit les noms provisoires des 20 éléments ? → A: Claude propose la liste (annexe `catalogue.md`), l'utilisateur la valide ou la corrige avec la spec.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Faire un tirage simple (Priority: P1)
@@ -65,7 +72,7 @@ tirages ×1, les fréquences observées correspondent aux taux affichés.
 **Acceptance Scenarios**:
 
 1. **Given** l'écran de tirage, **When** le joueur ouvre les taux, **Then** il voit les cinq raretés dans l'ordre, chacune avec son pourcentage, et la mention « ×10 : au moins un Rare ou mieux garanti ».
-2. **Given** les taux affichés, **When** on simule 100 000 tirages ×1, **Then** la fréquence de chaque rareté s'écarte de moins d'un point de pourcentage du taux affiché.
+2. **Given** les taux affichés, **When** on simule 1 000 000 de tirages ×1, **Then** la fréquence de chaque rareté s'écarte de moins de 5 % (en relatif) du taux affiché.
 
 ---
 
@@ -124,17 +131,17 @@ possédé ; une annulation ne change rien.
 
 **Contenu**
 
-- **FR-001**: Le jeu MUST proposer un catalogue de 20 éléments à collectionner, chacun étant soit un **personnage**, soit une **créature**, avec un nom et une rareté.
+- **FR-001**: Le jeu MUST proposer un catalogue de 20 éléments à collectionner, chacun étant soit un **personnage**, soit une **créature**, avec un nom et une rareté Le contenu est celui de l'annexe [catalogue.md](catalogue.md).
 - **FR-002**: Les raretés MUST être, de la plus faible à la plus forte : **Commun, Peu commun, Rare, Légendaire, Ultra rare**. Chaque rareté a une couleur distinctive.
 - **FR-003**: Chaque rareté MUST contenir au moins un personnage et au moins une créature ; la répartition du catalogue est 6 Communs, 5 Peu communs, 4 Rares, 3 Légendaires, 2 Ultra rares.
-- **FR-004**: Personnages et créatures MUST être tirés [NEEDS CLARIFICATION: dans un même tirage commun, ou chacun dans son propre tirage (deux boutons, deux catalogues) ?].
+- **FR-004**: Personnages et créatures MUST être tirés dans **un seul tirage commun** : le type est une information de l'élément, pas un choix du joueur.
 
 **Tirage**
 
 - **FR-005**: Un tirage MUST d'abord déterminer une rareté selon les taux en vigueur, puis un élément de cette rareté, chaque élément d'une même rareté ayant la même chance.
-- **FR-006**: Les taux par rareté MUST être [NEEDS CLARIFICATION: valeurs à fixer — proposition : Commun 55 %, Peu commun 28 %, Rare 12 %, Légendaire 4 %, Ultra rare 1 %].
+- **FR-006**: Les taux par rareté MUST être : **Commun 60 %, Peu commun 27 %, Rare 10 %, Légendaire 2,5 %, Ultra rare 0,5 %** (total 100 %).
 - **FR-007**: Un tirage ×10 MUST contenir au moins un élément Rare ou mieux. Si les neuf premiers résultats n'en contiennent aucun, le dixième est tiré parmi Rare, Légendaire et Ultra rare uniquement, en gardant entre elles les proportions de leurs taux.
-- **FR-008**: Les coûts et le stock de départ MUST être [NEEDS CLARIFICATION: valeurs à fixer — proposition : ×1 = 100, ×10 = 900, stock de départ = 3 000, soit 30 à 33 tirages].
+- **FR-008**: Un tirage ×1 MUST coûter **100**, un tirage ×10 **900**, et le stock de départ MUST être de **9 000** (de quoi faire 100 tirages en ×10).
 - **FR-009**: Le coût d'un ×10 MUST être strictement inférieur à dix fois le coût d'un ×1.
 - **FR-010**: Un tirage MUST être refusé si le solde est inférieur à son coût ; aucun débit n'a lieu.
 - **FR-011**: Le débit de la monnaie et l'ajout des éléments obtenus MUST être indissociables : l'un n'existe jamais sans l'autre, y compris si le jeu est fermé juste après.
@@ -170,7 +177,7 @@ possédé ; une annulation ne change rien.
 ### Measurable Outcomes
 
 - **SC-001**: Depuis le lancement du jeu, un nouveau joueur voit le résultat de son premier tirage en moins de 10 secondes et en au plus 2 appuis.
-- **SC-002**: Sur 100 000 tirages ×1 simulés, la fréquence observée de chaque rareté s'écarte de moins d'un point de pourcentage du taux affiché.
+- **SC-002**: Sur 1 000 000 de tirages ×1 simulés, la fréquence observée de chaque rareté s'écarte de moins de 5 % (en relatif) du taux affiché — un écart absolu ne voudrait rien dire pour l'Ultra rare à 0,5 %.
 - **SC-003**: Sur 10 000 tirages ×10 simulés, 100 % contiennent au moins un Rare ou mieux.
 - **SC-004**: Après fermeture et réouverture, 100 % des tirages effectués sont retrouvés (solde et possessions), sans écart d'une seule unité de monnaie.
 - **SC-005**: Un joueur peut, sans aide, dire quelle est la probabilité d'obtenir un Ultra rare en moins de 15 secondes depuis l'écran de tirage.
@@ -178,11 +185,13 @@ possédé ; une annulation ne change rien.
 ## Assumptions
 
 - Un seul joueur par appareil, sans compte ni connexion (ADR 0003).
+- Le jeu se lance en local, dans le navigateur du PC (affichage au format portrait) ; aucune mise en ligne dans cette feature.
 - La monnaie a un nom et une icône provisoires ; ils seront fixés avec l'univers.
-- Les 20 éléments ont des noms provisoires et une représentation simple (forme ou pastille colorée selon la rareté, initiale ou silhouette) ; les visuels réels viendront avec la DA.
+- Les 20 éléments ont des noms provisoires (annexe `catalogue.md`) et une représentation simple (forme ou pastille colorée selon la rareté, initiale ou silhouette) ; les visuels réels viendront avec la DA.
 - La rareté Ultra rare est au-dessus de Légendaire, dans l'ordre donné par l'utilisateur.
 - Le résultat s'affiche directement, sans animation de suspense : la mise en scène est la feature 004.
 - Pas de pity : le compteur de garantie sur plusieurs tirages et la valeur d'un doublon sont la feature 002. La garantie du ×10 ne porte que sur la salve en cours.
 - Pas d'écran de collection : seul le compteur « possédés / total » existe ici ; la liste détaillée est la feature 003.
 - Les éléments n'ont pas encore d'utilité en jeu : il n'y a ni statistiques ni compétences.
 - Une fois le stock dépensé, aucune monnaie ne s'ajoute : seul « Recommencer » permet de tirer à nouveau.
+- Conséquence assumée des valeurs retenues : sur les 100 tirages du stock de départ, on obtient en moyenne environ 0,6 Ultra rare et 3 Légendaires ; environ la moitié des parties ne verront aucun Ultra rare.

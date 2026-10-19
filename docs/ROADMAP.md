@@ -26,6 +26,7 @@ Ordre prévu. Chaque ligne = une spec, un mécanisme.
 - Bannières / événements (taux augmentés sur certains personnages).
 - Progression d'un personnage (niveaux, étoiles, éveil).
 - Son et musique.
+- Mise en ligne jouable sur téléphone (sous-domaine `decli.de` en IaC, bloc Caddy, déploiement au merge).
 - Application mobile (Capacitor).
 - Serveur : compte, synchronisation, tirages côté serveur (ADR requis).
 - Monnaie premium, achats réels (ADR requis).
