@@ -38,12 +38,16 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
 /speckit-implement → code, en cochant tasks.md
 ```
 
-- La spec et le plan se **discutent avec l'utilisateur** : `/speckit-clarify` est
-  systématique, et on attend son accord explicite avant `/speckit-tasks`.
+- **Autonomie complète** (consigne de l'utilisateur, 2026-10-19) : ne jamais demander
+  s'il faut merger. Merger toute PR jugée prête, et construire soi-même les contrôles
+  nécessaires pour en juger. Seules les questions de **design** (contenu, règles,
+  équilibrage) vont à l'utilisateur, pendant `/speckit-clarify`, une à la fois.
+- Garde-fou des PR de spec : `scripts/check-docs.py` (lancé par la CI). L'étendre dès
+  qu'une erreur de document passe à travers.
 - Branche git `feat/NNN-nom` (le script Spec Kit ne crée pas de branche, il crée
   seulement le dossier `specs/NNN-nom/`).
-- Deux PR par feature : **PR de spec** (docs, mergée sur accord de l'utilisateur),
-  puis **PR d'implémentation** (mergée quand la CI est verte et le rendu vérifié).
+- Deux PR par feature : **PR de spec** (mergée quand la CI est verte et
+  `/speckit-analyze` propre), puis **PR d'implémentation** (CI verte et rendu vérifié).
 - Mettre à jour `docs/ROADMAP.md` en ouvrant et en clôturant une feature.
 - `specify` est installé via `uv tool` (`~/.local/bin/specify`). Montée de version :
   `uv tool install --force specify-cli --from git+https://github.com/github/spec-kit.git@vX.Y.Z`
@@ -59,9 +63,9 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
 - Jamais de push sur `main`, jamais de force-push ; supprimer la branche après merge.
 - Ne jamais committer : `.env`, `node_modules/`, `dist/`, `android/`.
 - `.claude/` est ignoré **sauf** `.claude/skills/` (les skills Spec Kit sont versionnés).
-- Pas de CI pour l'instant (rien à construire) : elle revient avec le plan de la
-  feature 001. Elle devra tourner sur **toutes** les PR, pas seulement celles qui
-  visent `main`.
+- CI (`.github/workflows/ci.yml`) sur **toutes** les PR, pas seulement celles qui
+  visent `main`. Pour l'instant : contrôle des documents ; le jeu y ajoute lint,
+  typecheck, tests et build avec la feature 001.
 
 ## Leçons du prototype à réappliquer
 

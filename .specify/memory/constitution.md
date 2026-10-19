@@ -21,8 +21,12 @@ même temps) a montré qu'empiler les features empêche d'en finir une seule cor
 
 - Ordre imposé : `/speckit-specify` → `/speckit-clarify` → `/speckit-plan` →
   `/speckit-tasks` → `/speckit-analyze` → `/speckit-implement`.
-- **Aucun code applicatif sans `spec.md` validée par l'utilisateur.** Le plan est lui
-  aussi validé avant les tâches.
+- **Aucun code applicatif sans `spec.md` clarifiée et mergée.** Les choix de design
+  (contenu, règles, équilibrage) sont posés à l'utilisateur pendant `/speckit-clarify` ;
+  tout le reste (plan, tâches, merge) est décidé par Claude en autonomie.
+- Une spec est prête quand `scripts/check-docs.py` passe (aucune clarification en
+  suspens, checklist qualité complète) ; un plan l'est quand `/speckit-analyze` ne
+  remonte aucun problème critique.
 - `spec.md` dit le *quoi* et le *pourquoi*, du point de vue du joueur, sans technique.
   La technique vit dans `plan.md`.
 - Un écart découvert pendant l'implémentation se corrige **d'abord dans la spec**
@@ -33,7 +37,8 @@ même temps) a montré qu'empiler les features empêche d'en finir une seule cor
 - Toute décision structurante est un ADR dans `docs/adr/NNNN-titre.md`, au format de
   `docs/adr/0000-template.md` : stack, architecture, format de sauvegarde, règle de
   design durable, option écartée qu'on ne veut pas rediscuter.
-- Statuts : `Proposé` → `Accepté` (par l'utilisateur) → éventuellement `Remplacé par NNNN`.
+- Statuts : `Proposé` → `Accepté` → éventuellement `Remplacé par NNNN`. Claude accepte
+  les ADR techniques ; un ADR qui tranche un choix de design est soumis à l'utilisateur.
 - **Un ADR accepté n'est jamais réécrit** : on en écrit un nouveau qui le remplace.
 - `plan.md` cite les ADR qu'il respecte et ceux qu'il propose ; un ADR proposé par un
   plan est accepté en même temps que ce plan.
@@ -79,8 +84,11 @@ même temps) a montré qu'empiler les features empêche d'en finir une seule cor
 
 - Une branche par feature : `feat/NNN-nom` pour `specs/NNN-nom/` ; `chore/…` et `fix/…`
   pour le reste. Jamais de push direct sur `main`.
-- **PR de spec** (`spec.md` + `plan.md` + `tasks.md` + ADR éventuels) : mergée seulement
-  après accord explicite de l'utilisateur.
+- **Merge en autonomie** : Claude merge lui-même toute PR qu'il juge prête, sans demander.
+  À lui de mettre en place les contrôles qui lui permettent d'en juger (CI, scripts,
+  tests, captures) ; l'absence de contrôle n'est pas une raison de demander.
+- **PR de spec** (`spec.md` + `plan.md` + `tasks.md` + ADR éventuels) : mergée quand la
+  CI est verte (dont `scripts/check-docs.py`) et que `/speckit-analyze` est propre.
 - **PR d'implémentation** : CI verte et comportement vérifié dans le jeu réel (build
   statique, capture d'écran) avant le merge ; `tasks.md` coché au fil de l'eau.
 - Une fois la feature mergée, `docs/ROADMAP.md` est mis à jour.
@@ -89,9 +97,10 @@ même temps) a montré qu'empiler les features empêche d'en finir une seule cor
 
 - Cette constitution prime sur `CLAUDE.md`, qui prime sur les habitudes. En cas de
   conflit, on amende ici plutôt que de contourner.
-- Amendement : PR dédiée avec accord de l'utilisateur, version semver (MAJOR : principe
+- Amendement : PR dédiée, sur demande de l'utilisateur ou proposée par Claude et
+  signalée à l'utilisateur ; version semver (MAJOR : principe
   retiré ou redéfini ; MINOR : principe ou section ajouté ; PATCH : formulation).
 - `/speckit-analyze` vérifie la conformité à la constitution avant toute implémentation ;
   une violation se corrige ou se justifie dans la section *Complexity Tracking* du plan.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-19 | **Last Amended**: 2026-10-19
+**Version**: 2.0.0 | **Ratified**: 2026-10-19 | **Last Amended**: 2026-10-19
