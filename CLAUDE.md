@@ -61,6 +61,7 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
 - `gh` : toujours `env -u GITHUB_TOKEN -u GH_TOKEN gh …` (ces variables pointent vers
   un autre compte).
 - Jamais de push sur `main`, jamais de force-push ; supprimer la branche après merge.
+- **PR empilées** : rebasculer la PR fille sur `main` (`gh api -X PATCH repos/…/pulls/N -f base=main`) **avant** de merger la mère avec `--delete-branch` ; sinon GitHub ferme la fille définitivement (#17 perdue ainsi). `gh pr edit` échoue (dépréciation Projects classic) : passer par `gh api`.
 - Ne jamais committer : `.env`, `node_modules/`, `dist/`, `android/`.
 - `.claude/` est ignoré **sauf** `.claude/skills/` (les skills Spec Kit sont versionnés).
 - CI (`.github/workflows/ci.yml`) sur **toutes** les PR, pas seulement celles qui
