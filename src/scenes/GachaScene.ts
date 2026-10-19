@@ -93,7 +93,8 @@ export class GachaScene extends Phaser.Scene {
     this.tenButton.setEnabled(ten);
     this.shortageText.setText(
       !single
-        ? 'Plus assez de pièces pour tirer. « Recommencer » remet le stock de départ.'
+        // Espaces insécables dans les guillemets : un « » ne doit jamais finir seul sur sa ligne.
+        ? 'Plus assez de pièces pour tirer. «\u00a0Recommencer\u00a0» remet le stock de départ.'
         : !ten
           ? `Pas assez de pièces pour un ×10 (il en faut ${formatAmount(GACHA_CONFIG.costTen)}).`
           : '',
