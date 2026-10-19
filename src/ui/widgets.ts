@@ -124,6 +124,8 @@ export function makeResultCard(
     c.add(scene.add.text(cx, y, `${kind} · ${info.label}`, textStyle(FONT_SIZE.body, CSS.textDim)).setOrigin(0.5, 0));
     y += 24;
     c.add(makeBadge(scene, cx, y, badge, result.isNew, 0.5));
+    if (result.shards > 0) c.add(makeShardAmount(scene, cx, y + 34, `+${result.shards} éclats`, 0.5));
+    if (result.pity) c.add(makeSticker(scene, r.x + r.w - 8, r.y - 8, 'Garanti !'));
     return c;
   }
 
@@ -132,6 +134,48 @@ export function makeResultCard(
   c.add(scene.add.text(textX, r.y + pad, item.name, { ...textStyle(FONT_SIZE.body), wordWrap: { width: textW } }));
   c.add(scene.add.text(r.x + pad, r.y + 53, `${kind} · ${info.label}`, textStyle(FONT_SIZE.micro, CSS.textDim)));
   c.add(makeBadge(scene, r.x + pad, r.y + 70, badge, result.isNew, 0));
+  if (result.shards > 0) c.add(makeShardAmount(scene, r.x + r.w - pad, r.y + 79, `+${result.shards}`, 1));
+  // Pastille façon autocollant, à cheval sur le bord : la ligne du bas est déjà pleine
+  // quand un résultat forcé est aussi un doublon.
+  if (result.pity) c.add(makeSticker(scene, r.x + r.w - 6, r.y - 7, 'Garanti !'));
+  return c;
+}
+
+// Losange des éclats, centré en (x, y).
+export function makeShardIcon(scene: Phaser.Scene, x: number, y: number, size: number): Phaser.GameObjects.Graphics {
+  const g = scene.add.graphics();
+  const V = Phaser.Math.Vector2;
+  const points = [new V(x, y - size), new V(x + size * 0.75, y), new V(x, y + size), new V(x - size * 0.75, y)];
+  g.fillStyle(COLORS.shard, 1).fillPoints(points, true);
+  g.lineStyle(STROKE.thin, COLORS.ink, 1).strokePoints(points, true);
+  return g;
+}
+
+// Montant d'éclats précédé du losange. originX : 0 = à gauche de x, 0,5 = centré, 1 = à droite.
+export function makeShardAmount(
+  scene: Phaser.Scene, x: number, y: number, label: string, originX: number, size: number = FONT_SIZE.tiny,
+): Phaser.GameObjects.Container {
+  const c = scene.add.container(0, 0);
+  const t = scene.add.text(0, 0, label, textStyle(size));
+  const icon = size * 0.55;
+  const w = icon * 1.5 + 4 + t.width;
+  const left = x - originX * w;
+  c.add(makeShardIcon(scene, left + icon * 0.75, y, icon));
+  t.setPosition(left + icon * 1.5 + 4, y).setOrigin(0, 0.5);
+  c.add(t);
+  return c;
+}
+
+function makeSticker(scene: Phaser.Scene, rightX: number, topY: number, label: string): Phaser.GameObjects.Container {
+  const c = scene.add.container(0, 0);
+  const t = scene.add.text(0, 0, label, textStyle(FONT_SIZE.tiny));
+  const w = t.width + 12;
+  const h = t.height + 4;
+  const g = scene.add.graphics();
+  g.fillStyle(COLORS.badgePity, 1).fillRoundedRect(rightX - w, topY, w, h, h / 2);
+  g.lineStyle(STROKE.thin, COLORS.ink, 1).strokeRoundedRect(rightX - w, topY, w, h, h / 2);
+  t.setPosition(rightX - w + 6, topY + 2);
+  c.add([g, t]);
   return c;
 }
 
