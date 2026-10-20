@@ -12,40 +12,40 @@
 
 ## Phase 1: Setup
 
-- [ ] T001 `src/data/revealConfig.ts` : `riseChance` 0,25, `lureChance` 0,10, `lureUltraShare` 0,2 et les durées de research R3
+- [x] T001 `src/data/revealConfig.ts` : `riseChance` 0,25, `lureChance` 0,10, `lureUltraShare` 0,2 et les durées de research R3
 
 ## Phase 2: Foundational
 
-- [ ] T002 Écrire `src/logic/reveal.test.ts` puis `src/logic/reveal.ts` : `bestRarity`, `planReveal` (consommation 1 + 1 valeur, R2), `flipOrder` (vedette = dernier résultat de la meilleure rareté, en dernier), `revealDuration`, `flipDuration` ; tests à `scriptedRng` aux bornes exactes de `u` et `v`, test statistique sur 100 000 déroulés (SC-006, SC-007), parcours de tous les plans pour les bornes de FR-010
-- [ ] T003 Valider T002 par mutation : seuil 0,10 / 0,35 / 0,25 / 0,2, montée autorisée pour Peu commun, leurre autorisé pour Légendaire, `steps` qui ne finit pas sur `final`, vedette = premier au lieu du dernier, durée d'Ultra gonflée au-delà de 5 000
+- [x] T002 Écrire `src/logic/reveal.test.ts` puis `src/logic/reveal.ts` : `bestRarity`, `planReveal` (consommation 1 + 1 valeur, R2), `flipOrder` (vedette = dernier résultat de la meilleure rareté, en dernier), `revealDuration`, `flipDuration` ; tests à `scriptedRng` aux bornes exactes de `u` et `v`, test statistique sur 100 000 déroulés (SC-006, SC-007), parcours de tous les plans pour les bornes de FR-010
+- [x] T003 Valider T002 par mutation : seuil 0,10 / 0,35 / 0,25 / 0,2, montée autorisée pour Peu commun, leurre autorisé pour Légendaire, `steps` qui ne finit pas sur `final`, vedette = premier au lieu du dernier, durée d'Ultra gonflée au-delà de 5 000
 
 ## Phase 3: User Story 1 - Deviner son meilleur résultat avant les cartes (P1) 🎯 MVP
 
-- [ ] T004 [US1] `src/ui/theme.ts` : tokens d'effet (rayons, onde, éclair) dérivés de la palette ; `src/ui/reveal.ts` : jouer un déroulé direct depuis `GACHA.orb` (suspense commun, révélation à l'ampleur croissante avec le rang, R4), rappel de fin
-- [ ] T005 [US1] `src/scenes/GachaScene.ts` : `onPull` → fenêtre `reveal` (`dataset.reveal`, `modalOpen` tenu) → `showResults` ; l'échange d'éclats garde `showResults` direct
+- [x] T004 [US1] `src/ui/theme.ts` : tokens d'effet (rayons, onde, éclair) dérivés de la palette ; `src/ui/reveal.ts` : jouer un déroulé direct depuis `GACHA.orb` (suspense commun, révélation à l'ampleur croissante avec le rang, R4), rappel de fin
+- [x] T005 [US1] `src/scenes/GachaScene.ts` : `onPull` → fenêtre `reveal` (`dataset.reveal`, `modalOpen` tenu) → `showResults` ; l'échange d'éclats garde `showResults` direct
 
 ## Phase 4: User Story 2 - Passer l'animation (P1)
 
-- [ ] T006 [US2] Zone plein écran de `reveal` armée après 200 ms : `pointerup` → arrêt des tweens, `results` cartes retournées ; texte « Touche pour passer »
+- [x] T006 [US2] Zone plein écran de `reveal` armée après 200 ms : `pointerup` → arrêt des tweens, `results` cartes retournées ; texte « Touche pour passer »
 
 ## Phase 5: User Story 3 - Montée de palier (P2)
 
-- [ ] T007 [US3] `src/ui/reveal.ts` : déroulé `rise` (palier du dessous, l'orbe se fend, vrai palier)
+- [x] T007 [US3] `src/ui/reveal.ts` : déroulé `rise` (palier du dessous, l'orbe se fend, vrai palier)
 
 ## Phase 6: User Story 4 - Faux espoir (P2)
 
-- [ ] T008 [US4] `src/ui/reveal.ts` : déroulé `lure` (faux palier, l'effet se dégonfle, retombée sur Rare)
+- [x] T008 [US4] `src/ui/reveal.ts` : déroulé `lure` (faux palier, l'effet se dégonfle, retombée sur Rare)
 
 ## Phase 7: User Story 5 - Cartes du ×10 une par une (P2)
 
-- [ ] T009 [US5] Fenêtre `flip` dans `GachaScene` : cartes face cachée aux places de `resultCardRect`, retournées selon `flipOrder`, vedette mise en valeur ; appui → tout retourné ; OK seulement après
+- [x] T009 [US5] Fenêtre `flip` dans `GachaScene` : cartes face cachée aux places de `resultCardRect`, retournées selon `flipOrder`, vedette mise en valeur ; appui → tout retourné ; OK seulement après
 
 ## Phase 8: Polish
 
-- [ ] T010 `tests/e2e/helpers.ts` : hasard scripté (`addInitScript`, file `window.__rng`) et `skipReveal` ; adapter les tirages de `gacha.spec.ts`, `pity-eclats.spec.ts`, `collection.spec.ts` ; écrire `tests/e2e/revelation.spec.ts` (scénarios 1–11 du [quickstart](quickstart.md)) ; valider par mutation de la scène (verrou retiré, passage non armé, OK présent pendant `flip`, échange qui joue `reveal`)
-- [ ] T011 [P] Contrôles de conformité (couleurs, valeurs en dur, logique pure, aucun `Phaser.Math.Between`)
-- [ ] T012 Relire les captures : 5 paliers reconnaissables sans texte (SC-005), montée, leurre, retournement, rien qui déborde
-- [ ] T013 [P] `CLAUDE.md`, `docs/ROADMAP.md` (004 → Fait), cocher ce fichier
+- [x] T010 `tests/e2e/helpers.ts` : hasard scripté (`addInitScript`, file `window.__rng`) et `skipReveal` ; adapter les tirages de `gacha.spec.ts`, `pity-eclats.spec.ts`, `collection.spec.ts` ; écrire `tests/e2e/revelation.spec.ts` (scénarios 1–11 du [quickstart](quickstart.md)) ; valider par mutation de la scène (verrou retiré, passage non armé, OK présent pendant `flip`, échange qui joue `reveal`)
+- [x] T011 [P] Contrôles de conformité (couleurs, valeurs en dur, logique pure, aucun `Phaser.Math.Between`)
+- [x] T012 Relire les captures : 5 paliers reconnaissables sans texte (SC-005), montée, leurre, retournement, rien qui déborde
+- [x] T013 [P] `CLAUDE.md`, `docs/ROADMAP.md` (004 → Fait), cocher ce fichier
 
 ## Dependencies & Execution Order
 

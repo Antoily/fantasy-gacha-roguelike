@@ -3,7 +3,7 @@ import {
   CONFIRM_DIALOG_H, GACHA, RATES_DIALOG_H, RESULTS, WARNING_DIALOG_H,
   center, dialogButtons, dialogRect,
 } from '../../src/ui/layout';
-import { FRESH, KEY, capture, copies, load, rankOf, save, tap } from './helpers';
+import { FRESH, KEY, capture, copies, load, rankOf, save, skipReveal, tap } from './helpers';
 
 // Scénario de specs/001-tirage/quickstart.md, joué sur le build. Les positions viennent
 // de src/ui/layout.ts : le test clique là où la scène dessine.
@@ -27,6 +27,8 @@ test('parcours complet du tirage', async ({ page }) => {
   expect(afterSingle.currency).toBe(8900);
   expect(copies(afterSingle)).toBe(1);
   expect(Date.now() - start).toBeLessThan(10_000); // SC-001
+  // Depuis 004, une animation précède les cartes : on la passe.
+  await skipReveal(page);
   await capture(page, 'resultat-x1');
   await tap(page, RESULTS.ok);
 
@@ -37,6 +39,7 @@ test('parcours complet du tirage', async ({ page }) => {
   expect(copies(afterTen)).toBe(11);
   const gained = Object.keys(afterTen.owned).filter(id => (afterTen.owned[id] ?? 0) > (afterSingle.owned[id] ?? 0));
   expect(gained.some(id => rankOf(id) >= 2)).toBe(true);
+  await skipReveal(page);
   await capture(page, 'resultat-x10');
   await tap(page, RESULTS.ok);
 

@@ -24,7 +24,7 @@ Remise à zéro le 2026-10-19 (ADR 0002). L'ancien prototype « Fantasy Roguelik
 Gacha » est sous le tag `legacy-v1` et la branche `legacy` (ne pas supprimer). On
 construit d'abord **le gacha seul** ; le gameplay viendra après. Stack : Phaser 4 +
 TS 6 + Vite 8 sur Node 24, local-only (ADR 0004). Features livrées : 001 Tirage,
-002 Pity & doublons, 003 Collection.
+002 Pity & doublons, 003 Collection, 004 Révélation.
 
 ## Commandes
 
@@ -37,14 +37,15 @@ npm run lint && npm run typecheck && npm test   # logique pure (Vitest)
 npm run e2e        # build + vite preview + Playwright ; captures dans test-results/captures/
 npm run dev        # jeu en local (pour vérifier un rendu : e2e ou preview, pas dev)
 scripts/mutate.sh <fichier> '<ancien>' '<nouveau>' [filtre]   # validation par mutation
+scripts/mutate-e2e.sh <fichier> '<ancien>' '<nouveau>' <spec e2e> [-g titre]   # idem pour une scène
 ```
 
 ## Structure
 
 ```
-src/data/     contenu : catalogue.ts (20 éléments), gachaConfig.ts (raretés, poids, coûts)
-src/logic/    TS pur, testé : rng, rates, gacha, progression, save, format (lint : ni phaser ni navigateur)
-src/ui/       theme.ts (SEULES couleurs/polices), layout.ts (géométrie, partagée avec l'e2e), widgets.ts
+src/data/     contenu : catalogue.ts (20 éléments), gachaConfig.ts (raretés, poids, coûts), revealConfig.ts (fausses pistes, durées)
+src/logic/    TS pur, testé : rng, rates, gacha, progression, save, format, collection, reveal (lint : ni phaser ni navigateur)
+src/ui/       theme.ts (SEULES couleurs/polices), layout.ts (géométrie, partagée avec l'e2e), widgets.ts, reveal.ts (animation)
 src/scenes/   BootScene (lit la sauvegarde) → GachaScene (écran + fenêtres)
 tests/e2e/    parcours Playwright du quickstart, critère de merge
 ```
@@ -52,10 +53,12 @@ tests/e2e/    parcours Playwright du quickstart, critère de merge
 - Positions : toute zone cliquable vient de `src/ui/layout.ts`, que le test e2e
   importe pour cliquer au même endroit. Déplacer un bouton = changer `layout.ts`.
 - `GachaScene` pose `document.body.dataset.ready = 'gacha'` quand l'écran est prêt, et
-  `document.body.dataset.modal = '<nom>'` tant qu'une fenêtre est ouverte (`results`,
-  `rates`, `collection`, `confirm-exchange`, `confirm-reset`, `warning`). L'e2e s'en
-  sert pour vérifier l'enchaînement des écrans : sans lui, deux mutations de la 002
-  survivaient (une confirmation ouverte à tort que la logique refusait ensuite).
+  `document.body.dataset.modal = '<nom>'` tant qu'une fenêtre est ouverte (`reveal`,
+  `flip`, `results`, `rates`, `collection`, `confirm-exchange`, `confirm-reset`,
+  `warning`), et `dataset.reveal` = paliers montrés (`rare>legendary`) pendant
+  `reveal`. L'e2e s'en sert pour vérifier l'enchaînement des écrans : sans lui, deux
+  mutations de la 002 survivaient (une confirmation ouverte à tort que la logique
+  refusait ensuite).
 - Playwright tourne avec **un seul worker** : les captures sont numérotées dans
   l'ordre d'exécution et deux fichiers en parallèle s'écrasaient mutuellement.
 - Sauvegarde **v2** (`{ version, currency, owned, pity, shards }`) ; migration 1 → 2
@@ -150,6 +153,23 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
 - Tests à graine fixe : pour vérifier une table de tirage précise, un `scriptedRng`
   (`src/logic/testing.ts`) rend des valeurs choisies ; l'ordre de consommation du
   hasard (rareté puis élément) est contractuel.
+
+## Leçons de la feature 004
+
+- **Hasard scripté dans l'e2e** : `installRng` / `scriptRng` (`tests/e2e/helpers.ts`)
+  remplacent `Math.random` par une file. Ça ne tient que parce que l'ordre de
+  consommation est contractuel (tirage, puis déroulé) et que la scène ne tire **aucun**
+  autre hasard : pas de `Phaser.Math.Between` / `FloatBetween` (ils lisent `Math.random`).
+- **Tweens concurrents** : un tween encore en cours écrase une valeur posée à la main
+  (le leurre « dégonflé » effaçait les rayons du vrai palier). `killTweensOf` sur la
+  cible et ses enfants avant de reposer un état. Bug invisible aux tests, vu sur capture.
+- Une mise en scène garde ses minuteries et tweens (`Sequence`, `src/ui/reveal.ts`) pour
+  tout arrêter d'un coup quand le joueur passe ; sinon un rappel en retard rouvre une
+  fenêtre.
+- **Mutations de scène** : `scripts/mutate-e2e.sh` (même principe que `mutate.sh`, mais
+  l'e2e) ; il refuse de tourner si un `vite preview` écoute déjà (build non muté).
+- L'outil d'écriture de fichier transforme `\u00a0` en vrai U+00A0, que le lint refuse
+  (`no-irregular-whitespace`) : réécrire l'échappement après coup.
 
 ## Conventions de code
 

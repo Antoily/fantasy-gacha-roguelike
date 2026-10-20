@@ -6,7 +6,7 @@ mergée et jouable.
 
 ## En cours
 
-- **004 Révélation** — spec en cours (`specs/004-revelation/`, branche `feat/004-revelation`).
+_Rien : la suite du gacha est livrée ; prochaine étape à choisir avec l'utilisateur (« Plus tard »)._
 
 ## Ensuite — le gacha
 
@@ -37,6 +37,10 @@ résultat du tirage ; le joueur devine ce qu'il a eu avant de voir les cartes.
 
 ## Fait
 
+- 2026-10-20 — **004 Révélation** : animation avant les cartes, 5 paliers (un par
+  rareté) selon la meilleure rareté du tirage ; montée surprise (1/4, Rare ou mieux) et
+  leurre (1/10 sur un Rare) ; cartes du ×10 retournées une à une, la meilleure en
+  dernier ; un appui passe tout.
 - 2026-10-20 — **003 Collection** : les 20 éléments sur un écran (possédés ×N,
   manquants grisés avec leur coût), résumé par rareté ; l'échange d'éclats s'y fait
   directement (fusion avec la liste d'échange de 002).
