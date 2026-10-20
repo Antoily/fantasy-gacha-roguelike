@@ -2,6 +2,10 @@
 
 Instructions pour Claude Code. À lire entièrement avant toute action sur ce repo.
 
+**Projet perso** (GitHub `Antoily`), sans lien avec un contexte professionnel : ces consignes
+s'appliquent ici quel que soit le compte Claude ou la machine ; ne pas utiliser ici de compte, dépôt
+ou outil du travail. Autre machine : `infra/docs/nouvelle-machine.md` (dépôt `Antoily/infra`).
+
 ## ⚠️ Tenir ce fichier à jour
 
 À chaque interaction, inscrire ici toute nouvelle consigne, convention ou décision
@@ -28,8 +32,9 @@ TS 6 + Vite 8 sur Node 24, local-only (ADR 0004). Features livrées : 001 Tirage
 
 ## Commandes
 
-**Toujours charger nvm d'abord** : le `node` du PATH non interactif est le Node 18
-système, trop vieux pour toute la chaîne (`.nvmrc` = 24).
+**Node 24 obligatoire** (`.nvmrc`). Sur la WSL, toujours charger nvm d'abord : le `node`
+du PATH non interactif y est le Node 18 système. Ailleurs, vérifier `node -v` (Mac :
+`brew install node@24` ou nvm).
 
 ```bash
 source ~/.nvm/nvm.sh && nvm use
@@ -101,10 +106,10 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
 
 ## Git et GitHub
 
-- Remote en **SSH** (`git@github.com:Antoily/fantasy-gacha-roguelike.git`) : le HTTPS
-  n'a pas d'identifiants sur cette machine.
-- `gh` : toujours `env -u GITHUB_TOKEN -u GH_TOKEN gh …` (ces variables pointent vers
-  un autre compte).
+- Remote en **SSH** (`git@github.com:Antoily/fantasy-gacha-roguelike.git`) ; sur une
+  autre machine, `new-machine.sh` le redirige vers la clé perso de la machine.
+- `gh` = compte Antoily : `gha …` s'il existe, sinon `env -u GITHUB_TOKEN -u GH_TOKEN gh …`
+  (ces variables pointent vers un autre compte). Ne jamais changer le compte gh actif.
 - Jamais de push sur `main`, jamais de force-push ; supprimer la branche après merge.
 - **PR empilées** : rebasculer la PR fille sur `main` (`gh api -X PATCH repos/…/pulls/N -f base=main`) **avant** de merger la mère avec `--delete-branch` ; sinon GitHub ferme la fille définitivement (#17 perdue ainsi). `gh pr edit` échoue (dépréciation Projects classic) : passer par `gh api`.
 - Ne jamais committer : `.env`, `node_modules/`, `dist/`, `android/`.
@@ -117,7 +122,7 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
 
 - **Vérifier un rendu via le build statique**, jamais via `npm run dev` : sur WSL2, le
   serveur de dev a servi du JS obsolète au navigateur. `npm run e2e` le fait.
-- **Headless WSL2** : WebGL échoue par défaut (« Framebuffer Unsupported ») ; lancer
+- **Headless WSL2** (ailleurs, Chromium headless suffit en principe) : WebGL échoue par défaut (« Framebuffer Unsupported ») ; lancer
   Chromium avec `--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader`.
   Le canvas WebGL se capture avec `page.screenshot()`, pas avec `getImageData`.
 - `tsc` sans `--noEmit` compile des `.js` à côté des `.ts` : mettre `noEmit` dans le
