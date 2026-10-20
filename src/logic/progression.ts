@@ -1,5 +1,5 @@
 import { CATALOGUE, type Item } from '../data/catalogue';
-import { GACHA_CONFIG, RARITIES, SHARD_COST } from '../data/gachaConfig';
+import { GACHA_CONFIG, SHARD_COST } from '../data/gachaConfig';
 import { pullSingle, pullTen, type Owned, type PullResult } from './gacha';
 import type { Rng } from './rng';
 
@@ -58,18 +58,6 @@ export function distinctOwned(p: Progression): number {
 
 export function pullsUntilPity(p: Progression): number {
   return GACHA_CONFIG.pityThreshold - p.pity;
-}
-
-const rankOf = (item: Item) => RARITIES.find(r => r.id === item.rarity)!.rank;
-
-// Éléments échangeables : non possédés, les plus rares d'abord (ce qui manque en fin de
-// partie est presque toujours Légendaire ou Ultra rare), puis dans l'ordre du catalogue.
-export function exchangeableItems(p: Progression): readonly Item[] {
-  return CATALOGUE
-    .map((item, index) => ({ item, index }))
-    .filter(({ item }) => !(item.id in p.owned))
-    .sort((a, b) => rankOf(b.item) - rankOf(a.item) || a.index - b.index)
-    .map(({ item }) => item);
 }
 
 // Un échange n'est pas un tirage : ni pièces, ni pity (FR-016).

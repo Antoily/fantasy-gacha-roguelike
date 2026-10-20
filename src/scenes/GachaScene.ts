@@ -4,14 +4,15 @@ import type { Item } from '../data/catalogue';
 import { GACHA_CONFIG, SHARD_COST } from '../data/gachaConfig';
 import { formatAmount } from '../logic/format';
 import type { PullResult } from '../logic/gacha';
+import { collectionEntries, isComplete, raritySummary, type CollectionEntry } from '../logic/collection';
 import {
-  canAfford, distinctOwned, exchange, exchangeableItems, pull, pullsUntilPity, reset, type Progression, type PullCount,
+  canAfford, distinctOwned, exchange, pull, pullsUntilPity, reset, type Progression, type PullCount,
 } from '../logic/progression';
 import { formatPercent, ratePercent, rarityTable } from '../logic/rates';
 import { SAVE_KEY, serializeSave, type SaveStatus } from '../logic/save';
 import {
-  CONFIRM_DIALOG_H, DIALOG, EXCHANGE, GACHA, RATES_DIALOG_H, RESULTS, WARNING_DIALOG_H,
-  dialogButtons, dialogRect, exchangeCellRect, exchangeLayout, resultCardRect, type Rect,
+  COLLECTION, CONFIRM_DIALOG_H, DIALOG, GACHA, RATES_DIALOG_H, RESULTS, WARNING_DIALOG_H,
+  collectionCellRect, dialogButtons, dialogRect, resultCardRect, type Rect,
 } from '../ui/layout';
 import { COLORS, CSS, FONT_SIZE, STROKE } from '../ui/theme';
 import {
@@ -56,7 +57,7 @@ export class GachaScene extends Phaser.Scene {
       .setOrigin(0.5, 0);
 
     this.pityText = this.add.text(GACHA.orb.x, GACHA.pityLineY, '', textStyle(FONT_SIZE.body, CSS.textDim)).setOrigin(0.5);
-    makeButton(this, GACHA.exchange, 'Échanger des éclats', COLORS.btn.secondary, () => this.showExchange());
+    makeButton(this, GACHA.collection, 'Collection', COLORS.btn.secondary, () => this.showCollection());
     makeButton(this, GACHA.rates, 'Taux', COLORS.btn.secondary, () => this.showRates());
     makeButton(this, GACHA.reset, 'Recommencer', COLORS.btn.neutral, () => this.showResetConfirm());
 
@@ -211,38 +212,54 @@ export class GachaScene extends Phaser.Scene {
     modal.add(makeButton(this, close!, 'Fermer', COLORS.btn.secondary, () => this.closeModal(modal)).container);
   }
 
-  private showExchange() {
+  // Collection (003) : tout le catalogue, et le seul endroit où dépenser ses éclats.
+  private showCollection() {
     if (this.modalOpen) return;
-    const modal = this.openModal('exchange');
+    const modal = this.openModal('collection');
     const p = this.progression;
-    const items = exchangeableItems(p);
-    const { panel, close, emptyY } = exchangeLayout(items.length);
+    const panel = RESULTS.panel;
+    const cx = panel.x + panel.w / 2;
     modal.add(makePanel(this, panel, COLORS.background));
-    modal.add(this.add.text(panel.x + panel.w / 2, EXCHANGE.titleY, 'Échanger des éclats', textStyle(FONT_SIZE.big))
-      .setOrigin(0.5));
-    modal.add(makeShardAmount(this, panel.x + panel.w / 2, EXCHANGE.balanceY, `${formatAmount(p.shards)} éclats`, 0.5,
-      FONT_SIZE.body));
+    modal.add(this.add.text(cx, COLLECTION.titleY, isComplete(p) ? 'Collection complète !' : 'Collection',
+      textStyle(FONT_SIZE.big)).setOrigin(0.5));
+    modal.add(makeShardAmount(this, cx, COLLECTION.balanceY,
+      `${formatAmount(p.shards)}\u00a0éclats · ${distinctOwned(p)} / ${CATALOGUE.length}`, 0.5, FONT_SIZE.body));
 
-    if (items.length === 0) {
-      modal.add(this.add.text(panel.x + panel.w / 2, emptyY, 'Tu possèdes déjà tout !', textStyle(FONT_SIZE.button))
-        .setOrigin(0.5));
-    }
-    items.forEach((item, i) => modal.add(this.makeExchangeCell(exchangeCellRect(i), item, modal)));
-    modal.add(makeButton(this, close, 'Fermer', COLORS.btn.neutral, () => this.closeModal(modal)).container);
+    // Résumé par rareté : il sert aussi de légende aux couleurs des pastilles.
+    const summary = raritySummary(p);
+    const slot = panel.w / summary.length;
+    summary.forEach((s, i) => {
+      const x = panel.x + slot * i + slot / 2;
+      const g = this.add.graphics();
+      g.fillStyle(COLORS.rarity[s.rarity], 1).fillCircle(x - 16, COLLECTION.summaryY, 7);
+      g.lineStyle(STROKE.thin, COLORS.ink, 1).strokeCircle(x - 16, COLLECTION.summaryY, 7);
+      modal.add(g);
+      modal.add(this.add.text(x - 5, COLLECTION.summaryY, `${s.owned}/${s.total}`, textStyle(FONT_SIZE.small))
+        .setOrigin(0, 0.5));
+    });
+
+    collectionEntries(p).forEach((entry, i) => modal.add(this.makeCollectionCell(collectionCellRect(i), entry, modal)));
+    modal.add(makeButton(this, COLLECTION.close, 'Fermer', COLORS.btn.neutral, () => this.closeModal(modal)).container);
   }
 
-  private makeExchangeCell(r: Rect, item: Item, modal: Phaser.GameObjects.Container): Phaser.GameObjects.Container {
-    const cost = SHARD_COST[item.rarity];
-    const affordable = this.progression.shards >= cost;
+  private makeCollectionCell(r: Rect, entry: CollectionEntry, modal: Phaser.GameObjects.Container) {
+    const { item, count, cost, affordable } = entry;
+    const owned = count > 0;
     const c = this.add.container(0, 0);
-    // Case grisée quand le solde ne suffit pas (FR-015) : elle n'est alors pas cliquable.
-    c.add(makePanel(this, r, affordable ? COLORS.panel : COLORS.btn.disabled));
+    // Manquant : grisé, nom visible (clarification de la spec).
+    c.add(makePanel(this, r, owned ? COLORS.panel : COLORS.btn.disabled));
     const disc = this.add.graphics();
-    disc.fillStyle(COLORS.rarity[item.rarity], 1).fillCircle(r.x + 18, r.y + r.h / 2, 10);
-    disc.lineStyle(STROKE.thin, COLORS.ink, 1).strokeCircle(r.x + 18, r.y + r.h / 2, 10);
+    disc.fillStyle(COLORS.rarity[item.rarity], owned ? 1 : 0.45).fillCircle(r.x + 18, r.y + r.h / 2, 10);
+    disc.lineStyle(STROKE.thin, COLORS.ink, owned ? 1 : 0.45).strokeCircle(r.x + 18, r.y + r.h / 2, 10);
     c.add(disc);
-    c.add(this.add.text(r.x + 34, r.y + 5, item.name, textStyle(FONT_SIZE.small, affordable ? CSS.text : CSS.textFaint)));
-    c.add(makeShardAmount(this, r.x + 34, r.y + 31, formatAmount(cost), 0));
+    c.add(this.add.text(r.x + 34, r.y + 5, item.name, textStyle(FONT_SIZE.small, owned ? CSS.text : CSS.textDim)));
+    if (owned) {
+      const kind = item.kind === 'character' ? 'Personnage' : 'Créature';
+      c.add(this.add.text(r.x + 34, r.y + 24, `${kind} · ×${count}`, textStyle(FONT_SIZE.micro, CSS.textDim)));
+      return c;
+    }
+    // Coût mis en évidence s'il est abordable, estompé sinon (FR-004).
+    c.add(makeShardAmount(this, r.x + 34, r.y + 30, formatAmount(cost), 0).setAlpha(affordable ? 1 : 0.4));
     if (affordable) {
       const zone = this.add.zone(r.x, r.y, r.w, r.h).setOrigin(0).setInteractive({ useHandCursor: true });
       zone.on('pointerup', () => {
@@ -273,7 +290,7 @@ export class GachaScene extends Phaser.Scene {
     }).container);
     modal.add(makeButton(this, cancel!, 'Annuler', COLORS.btn.neutral, () => {
       this.closeModal(modal);
-      this.showExchange();
+      this.showCollection();
     }).container);
   }
 

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { CATALOGUE } from '../data/catalogue';
 import { SHARD_COST } from '../data/gachaConfig';
 import {
-  distinctOwned, exchange, exchangeableItems, initialProgression, pull, pullsUntilPity, reset, type Progression,
+  distinctOwned, exchange, initialProgression, pull, pullsUntilPity, reset, type Progression,
 } from './progression';
 import { mulberry32 } from './rng';
 
@@ -141,12 +141,4 @@ describe('échange d’éclats (002, US4)', () => {
     expect(exchange({ ...poor, shards: SHARD_COST.legendary }, 'tonnerrouf').ok).toBe(true);
   });
 
-  it('liste les manquants, les plus rares d’abord puis dans l’ordre du catalogue (FR-012)', () => {
-    const p: Progression = { ...initialProgression(), owned: { gribouille: 1, orbulle: 2 } };
-    const ids = exchangeableItems(p).map(i => i.id);
-    expect(ids).toHaveLength(18);
-    expect(ids.slice(0, 5)).toEqual(['cosmo-l-infini', 'roi-barbichon', 'marquise-cerise', 'tonnerrouf', 'professeur-fizz']);
-    expect(ids.at(-1)).toBe('gloups');
-    expect(exchangeableItems({ ...p, owned: allOwned })).toEqual([]);
-  });
 });

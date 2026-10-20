@@ -20,7 +20,7 @@ export const GACHA = {
   pullSingle: { x: MARGIN, y: 274, w: CONTENT_W, h: 56 },
   pullTen: { x: MARGIN, y: 342, w: CONTENT_W, h: 68 },
   shortageMessageY: 422,
-  exchange: { x: MARGIN, y: 476, w: CONTENT_W, h: 48 },
+  collection: { x: MARGIN, y: 476, w: CONTENT_W, h: 48 },
   rates: { x: MARGIN, y: 560, w: half, h: 48 },
   reset: { x: MARGIN * 2 + half, y: 560, w: half, h: 48 },
 } as const satisfies Record<string, unknown>;
@@ -36,35 +36,27 @@ export const RESULTS = {
   ok: { x: MARGIN * 2, y: 568, w: CONTENT_W - 2 * MARGIN, h: 44 },
 } as const;
 
-// Liste d'échange (002) : grille 2 × 10, assez pour tout le catalogue sans défilement.
-export const EXCHANGE = {
+// Collection (003, remplace la liste d'échange de 002) : les 20 éléments en grille
+// 2 × 10, un résumé par rareté, sans défilement.
+export const COLLECTION = {
   titleY: 36,
   balanceY: 60,
-  gridTop: 78,
-  cell: { w: half, h: 44 },
+  summaryY: 82,
+  gridTop: 100,
+  cell: { w: half, h: 42 },
   gap: 4,
+  completeY: 86,
+  close: { x: MARGIN * 2, y: 568, w: CONTENT_W - 2 * MARGIN, h: 44 },
 } as const;
 
-// La fenêtre d'échange se dimensionne d'après le nombre d'éléments manquants : avec un
-// seul manquant, pas de grand panneau vide. Vide : une ligne de message.
-export function exchangeLayout(count: number): { panel: Rect; close: Rect; emptyY: number } {
-  const rows = Math.ceil(count / 2);
-  const contentBottom = rows > 0
-    ? EXCHANGE.gridTop + rows * (EXCHANGE.cell.h + EXCHANGE.gap) - EXCHANGE.gap
-    : EXCHANGE.gridTop + 40;
-  const close = { x: MARGIN * 2, y: contentBottom + 16, w: CONTENT_W - 2 * MARGIN, h: 44 };
-  const panel = { x: MARGIN / 2, y: MARGIN, w: WIDTH - MARGIN, h: close.y + close.h + MARGIN / 2 - MARGIN };
-  return { panel, close, emptyY: EXCHANGE.gridTop + 20 };
-}
-
-export function exchangeCellRect(index: number): Rect {
+export function collectionCellRect(index: number): Rect {
   const col = index % 2;
   const row = Math.floor(index / 2);
   return {
-    x: MARGIN + col * (EXCHANGE.cell.w + MARGIN),
-    y: EXCHANGE.gridTop + row * (EXCHANGE.cell.h + EXCHANGE.gap),
-    w: EXCHANGE.cell.w,
-    h: EXCHANGE.cell.h,
+    x: MARGIN + col * (COLLECTION.cell.w + MARGIN),
+    y: COLLECTION.gridTop + row * (COLLECTION.cell.h + COLLECTION.gap),
+    w: COLLECTION.cell.w,
+    h: COLLECTION.cell.h,
   };
 }
 
