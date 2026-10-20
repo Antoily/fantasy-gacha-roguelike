@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { RARITIES, type Rarity } from '../data/gachaConfig';
 import { REVEAL_TIMING } from '../data/revealConfig';
 import type { RevealKind, RevealPlan } from '../logic/reveal';
+import { revealCues, type Cue } from '../logic/soundCues';
 import { GACHA, HEIGHT, REVEAL, WIDTH } from './layout';
 import { COLORS, CSS, FONT_SIZE, REVEAL_FX, STROKE } from './theme';
 import { makeOrb, textStyle } from './widgets';
@@ -37,10 +38,15 @@ const labelOf = (rarity: Rarity) => RARITIES.find(r => r.id === rarity)!.label;
 
 // Joue un déroulé calculé par la logique (src/logic/reveal.ts) : la scène ne décide de
 // rien, elle montre `plan.steps` dans l'ordre aux instants de REVEAL_TIMING, puis
-// appelle onDone. Aucun hasard ici : `Phaser.Math.Between` lirait Math.random et
+// appelle onDone. Les sons (005) suivent le même calendrier, sur les mêmes minuteries :
+// passer l'animation annule aussi ceux qui restaient à jouer. Aucun hasard ici : `Phaser.Math.Between` lirait Math.random et
 // décalerait le hasard scripté de l'e2e (research R6).
 export function playReveal(
-  scene: Phaser.Scene, modal: Phaser.GameObjects.Container, plan: RevealPlan, onDone: () => void,
+  scene: Phaser.Scene,
+  modal: Phaser.GameObjects.Container,
+  plan: RevealPlan,
+  onCue: (cue: Cue) => void,
+  onDone: () => void,
 ): Sequence {
   const seq = new Sequence(scene);
   const { x, y } = REVEAL.center;
@@ -153,5 +159,6 @@ export function playReveal(
     }
   });
   seq.at(time, onDone);
+  revealCues(plan).forEach(c => seq.at(c.at, () => onCue(c.cue)));
   return seq;
 }

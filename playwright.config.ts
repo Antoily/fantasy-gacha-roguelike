@@ -21,7 +21,11 @@ export default defineConfig({
       ...devices['Desktop Chrome'],
       viewport: { width: 360, height: 640 },
       // WebGL logiciel : sans lui, Chromium headless échoue (« Framebuffer Unsupported »).
-      launchOptions: { args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] },
+      // Autoplay : sans lui, le contexte audio (005) resterait suspendu en headless.
+      launchOptions: { args: [
+        '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader',
+        '--autoplay-policy=no-user-gesture-required',
+      ] },
     },
   }],
   webServer: {
