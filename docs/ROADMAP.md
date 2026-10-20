@@ -6,7 +6,7 @@ mergée et jouable.
 
 ## En cours
 
-- **005 Son** — spec en cours (`specs/005-son/`, branche `feat/005-son`).
+_Rien : prochaine étape à choisir avec l'utilisateur (« Plus tard »)._
 
 ## Ensuite — le gacha
 
@@ -38,6 +38,9 @@ résultat du tirage ; le joueur devine ce qu'il a eu avant de voir les cartes.
 
 ## Fait
 
+- 2026-10-20 — **005 Son** : bruitages synthétisés de la révélation (suspense, un son
+  par palier, montée, cartes), rire diabolique CC0 sur le leurre, bouton son mémorisé
+  (`gacha.settings`, ADR 0006).
 - 2026-10-20 — **004 Révélation** : animation avant les cartes, 5 paliers (un par
   rareté) selon la meilleure rareté du tirage ; montée surprise (1/4, Rare ou mieux) et
   leurre (1/10 sur un Rare) ; cartes du ×10 retournées une à une, la meilleure en

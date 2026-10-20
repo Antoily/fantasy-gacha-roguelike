@@ -28,7 +28,7 @@ Remise à zéro le 2026-10-19 (ADR 0002). L'ancien prototype « Fantasy Roguelik
 Gacha » est sous le tag `legacy-v1` et la branche `legacy` (ne pas supprimer). On
 construit d'abord **le gacha seul** ; le gameplay viendra après. Stack : Phaser 4 +
 TS 6 + Vite 8 sur Node 24, local-only (ADR 0004). Features livrées : 001 Tirage,
-002 Pity & doublons, 003 Collection, 004 Révélation.
+002 Pity & doublons, 003 Collection, 004 Révélation, 005 Son.
 
 ## Commandes
 
@@ -48,11 +48,12 @@ scripts/mutate-e2e.sh <fichier> '<ancien>' '<nouveau>' <spec e2e> [-g titre]   #
 ## Structure
 
 ```
-src/data/     contenu : catalogue.ts (20 éléments), gachaConfig.ts (raretés, poids, coûts), revealConfig.ts (fausses pistes, durées)
-src/logic/    TS pur, testé : rng, rates, gacha, progression, save, format, collection, reveal (lint : ni phaser ni navigateur)
-src/ui/       theme.ts (SEULES couleurs/polices), layout.ts (géométrie, partagée avec l'e2e), widgets.ts, reveal.ts (animation)
+src/data/     contenu : catalogue.ts (20 éléments), gachaConfig.ts (raretés, poids, coûts), revealConfig.ts (fausses pistes, durées), sounds.ts (recettes des bruitages)
+src/logic/    TS pur, testé : rng, rates, gacha, progression, save, format, collection, reveal, soundCues, settings (lint : ni phaser ni navigateur)
+src/ui/       theme.ts (SEULES couleurs/polices), layout.ts (géométrie, partagée avec l'e2e), widgets.ts, reveal.ts (animation), sfx.ts (son)
 src/scenes/   BootScene (lit la sauvegarde) → GachaScene (écran + fenêtres)
 tests/e2e/    parcours Playwright du quickstart, critère de merge
+public/sounds/ enregistrements CC0 seulement, chacun listé dans CREDITS.md (ADR 0006)
 ```
 
 - Positions : toute zone cliquable vient de `src/ui/layout.ts`, que le test e2e
@@ -61,13 +62,16 @@ tests/e2e/    parcours Playwright du quickstart, critère de merge
   `document.body.dataset.modal = '<nom>'` tant qu'une fenêtre est ouverte (`reveal`,
   `flip`, `results`, `rates`, `collection`, `confirm-exchange`, `confirm-reset`,
   `warning`), et `dataset.reveal` = paliers montrés (`rare>legendary`) pendant
-  `reveal`. L'e2e s'en sert pour vérifier l'enchaînement des écrans : sans lui, deux
+  `reveal` ; `dataset.sounds` (sons émis depuis le dernier tirage), `dataset.soundsLive`
+  (notes en train de sonner) et `dataset.muted`. L'e2e s'en sert pour vérifier l'enchaînement des écrans : sans lui, deux
   mutations de la 002 survivaient (une confirmation ouverte à tort que la logique
   refusait ensuite).
 - Playwright tourne avec **un seul worker** : les captures sont numérotées dans
   l'ordre d'exécution et deux fichiers en parallèle s'écrasaient mutuellement.
 - Sauvegarde **v2** (`{ version, currency, owned, pity, shards }`) ; migration 1 → 2
   dans `src/logic/save.ts`. Ajouter un champ = version + 1, migration, tests.
+- Réglages de l'appareil (son coupé…) dans **`gacha.settings`**, hors sauvegarde de
+  partie : « Recommencer » ne les touche pas (ADR 0006).
 - **Relire les captures de l'e2e** avant chaque merge touchant l'affichage : un test
   vert n'empêche ni un texte qui déborde ni une fenêtre trop haute.
 
@@ -175,6 +179,20 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
   l'e2e) ; il refuse de tourner si un `vite preview` écoute déjà (build non muté).
 - L'outil d'écriture de fichier transforme `\u00a0` en vrai U+00A0, que le lint refuse
   (`no-irregular-whitespace`) : réécrire l'échappement après coup.
+
+## Leçons de la feature 005
+
+- **Tester du son sans l'entendre** : le lecteur (`src/ui/sfx.ts`) tient un journal
+  (`dataset.sounds`) et le nombre de notes en cours (`dataset.soundsLive`). Le journal
+  seul laissait survivre la mutation « passer ne coupe pas le son en cours ».
+- Chromium headless a besoin de `--autoplay-policy=no-user-gesture-required`
+  (`playwright.config.ts`) pour que le contexte audio tourne.
+- Un `try/catch` défensif ne compte que si un test le fait servir : l'e2e « un son qui
+  plante » casse `createOscillator` et exige zéro `pageerror`.
+- Une garde jamais vue échouer est retirée plutôt que gardée (le voile bloquait déjà
+  le bouton son pendant une fenêtre).
+- `ffmpeg` (installé via apt sur la WSL) sert à convertir / mesurer les sons :
+  `ffprobe -show_entries format=duration`, spectre avec `showspectrumpic`.
 
 ## Conventions de code
 

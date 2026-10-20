@@ -11,12 +11,15 @@ import {
 } from '../logic/progression';
 import { formatPercent, ratePercent, rarityTable } from '../logic/rates';
 import { planReveal } from '../logic/reveal';
+import { SETTINGS_KEY, serializeSettings, type Settings } from '../logic/settings';
+import { flipCues } from '../logic/soundCues';
 import { SAVE_KEY, serializeSave, type SaveStatus } from '../logic/save';
 import {
   COLLECTION, CONFIRM_DIALOG_H, DIALOG, GACHA, RATES_DIALOG_H, RESULTS, REVEAL, WARNING_DIALOG_H,
-  collectionCellRect, dialogButtons, dialogRect, resultCardRect, type Rect,
+  center, collectionCellRect, dialogButtons, dialogRect, resultCardRect, type Rect,
 } from '../ui/layout';
 import { playReveal, Sequence } from '../ui/reveal';
+import { Sfx } from '../ui/sfx';
 import { COLORS, CSS, FONT_SIZE, RADIUS, REVEAL_FX, STROKE } from '../ui/theme';
 import {
   makeButton, makeModal, makeOrb, makePanel, makeResultCard, makeShardAmount, makeShardIcon, textStyle, type Button,
@@ -36,6 +39,7 @@ const SKIP_ARM_MS = 200;
 interface GachaData {
   progression: Progression;
   status: SaveStatus;
+  settings: Settings;
 }
 
 // L'unique écran de la feature 001. Toute règle vit dans src/logic : la scène affiche
@@ -44,6 +48,8 @@ export class GachaScene extends Phaser.Scene {
   private progression!: Progression;
   private modalOpen = false;
   private orb!: Phaser.GameObjects.Container;
+  private sfx!: Sfx;
+  private muteIcon!: Phaser.GameObjects.Graphics;
   private currencyText!: Phaser.GameObjects.Text;
   private counterText!: Phaser.GameObjects.Text;
   private shardsText!: Phaser.GameObjects.Text;
@@ -59,8 +65,10 @@ export class GachaScene extends Phaser.Scene {
   create(data: GachaData) {
     this.progression = data.progression;
     this.modalOpen = false;
+    this.sfx = new Sfx(this, data.settings.muted);
     this.drawHeader();
     this.drawOrb();
+    this.drawMuteButton();
 
     this.singleButton = makeButton(this, GACHA.pullSingle,
       `Tirer ×1 — ${formatAmount(GACHA_CONFIG.costSingle)}`, COLORS.btn.primary, () => this.onPull(1));
@@ -103,6 +111,47 @@ export class GachaScene extends Phaser.Scene {
   private drawOrb() {
     const { x, y, r } = GACHA.orb;
     this.orb = makeOrb(this, r).setPosition(x, y);
+  }
+
+  // Bouton son (005) : haut-parleur avec ondes, ou barré quand le son est coupé.
+  private drawMuteButton() {
+    const r = GACHA.mute;
+    // Pendant une fenêtre, le voile le recouvre : il ne reçoit pas l'appui.
+    makeButton(this, r, '', COLORS.btn.neutral, () => {
+      this.sfx.setMuted(!this.sfx.isMuted);
+      this.persistSettings();
+      this.drawMuteIcon();
+    });
+    this.muteIcon = this.add.graphics();
+    this.drawMuteIcon();
+  }
+
+  private drawMuteIcon() {
+    const { x, y } = center(GACHA.mute);
+    const g = this.muteIcon.clear();
+    const V = Phaser.Math.Vector2;
+    g.fillStyle(COLORS.ink, 1);
+    g.fillRect(x - 11, y - 4, 6, 8);
+    g.fillPoints([new V(x - 6, y - 4), new V(x + 1, y - 10), new V(x + 1, y + 10), new V(x - 6, y + 4)], true);
+    g.lineStyle(STROKE.base, COLORS.ink, 1);
+    if (this.sfx.isMuted) {
+      g.lineBetween(x + 5, y - 5, x + 13, y + 5);
+      g.lineBetween(x + 13, y - 5, x + 5, y + 5);
+      return;
+    }
+    for (const radius of [6, 11]) {
+      g.beginPath();
+      g.arc(x + 1, y, radius, -Math.PI / 4, Math.PI / 4);
+      g.strokePath();
+    }
+  }
+
+  private persistSettings() {
+    try {
+      localStorage.setItem(SETTINGS_KEY, serializeSettings({ muted: this.sfx.isMuted }));
+    } catch {
+      // Stockage plein ou interdit : le réglage vaut pour la session.
+    }
   }
 
   private refresh() {
@@ -148,6 +197,7 @@ export class GachaScene extends Phaser.Scene {
   // que le montrer. Le hasard du déroulé est consommé après celui du tirage (R2).
   private showReveal(results: PullResult[], ownedBefore: Readonly<Record<string, number>>) {
     const plan = planReveal(results, Math.random);
+    this.sfx.resetLog();
     const modal = this.openModal('reveal');
     document.body.dataset.reveal = plan.steps.join('>');
     // L'orbe quitte sa place : la révélation en dessine une copie qui gagne le centre.
@@ -157,13 +207,15 @@ export class GachaScene extends Phaser.Scene {
       if (done) return;
       done = true;
       seq.stop();
+      // Passer coupe aussi les sons en cours ; à la fin naturelle, le palier finit de sonner.
+      if (skipped) this.sfx.stopAll();
       delete document.body.dataset.reveal;
       this.orb.setVisible(true);
       this.closeModal(modal);
       // Passer montre tout de suite toutes les cartes, déjà retournées (FR-006).
       this.showResults(results, ownedBefore, skipped ? undefined : plan.flipOrder);
     };
-    const seq = playReveal(this, modal, plan, () => finish(false));
+    const seq = playReveal(this, modal, plan, cue => this.sfx.play(cue), () => finish(false));
     this.addSkipZone(modal, seq, SKIP_ARM_MS, () => finish(true));
   }
 
@@ -291,10 +343,11 @@ export class GachaScene extends Phaser.Scene {
     modal.add(hint);
 
     let done = false;
-    const finish = () => {
+    const finish = (tapped: boolean) => {
       if (done) return;
       done = true;
       seq.stop();
+      if (tapped) this.sfx.stopAll();
       zone.destroy();
       hint.destroy();
       cards.forEach(c => { show(c); c.pivot.setScale(1); });
@@ -318,9 +371,10 @@ export class GachaScene extends Phaser.Scene {
       }));
       time += t.flipStar;
     });
-    seq.at(time, finish);
+    seq.at(time, () => finish(false));
+    flipCues(order.length).forEach(c => seq.at(c.at, () => this.sfx.play(c.cue)));
     // Appui pendant le retournement : tout se retourne, OK apparaît ; il ne ferme rien.
-    const zone = this.addSkipZone(modal, seq, 0, finish);
+    const zone = this.addSkipZone(modal, seq, 0, () => finish(true));
   }
 
   private dialog(name: string, h: number, title: string): { modal: Phaser.GameObjects.Container; rect: Rect; bodyY: number } {

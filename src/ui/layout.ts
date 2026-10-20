@@ -14,6 +14,8 @@ const half = (CONTENT_W - MARGIN) / 2;
 
 export const GACHA = {
   header: { x: MARGIN, y: MARGIN, w: CONTENT_W, h: 52 },
+  // Bouton son (005), sous l'en-tête à droite, à l'écart de l'orbe.
+  mute: { x: WIDTH - MARGIN - 44, y: 76, w: 44, h: 40 },
   orb: { x: WIDTH / 2, y: 170, r: 64 },
   // Ligne du pity, sous l'orbe (002).
   pityLineY: 250,
