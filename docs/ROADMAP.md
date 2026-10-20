@@ -6,7 +6,7 @@ mergée et jouable.
 
 ## En cours
 
-_Rien : prochaine étape, spécifier 003 Collection._
+_Rien : prochaine étape, spécifier 004 Révélation._
 
 ## Ensuite — le gacha
 
@@ -33,6 +33,9 @@ Ordre prévu. Chaque ligne = une spec, un mécanisme.
 
 ## Fait
 
+- 2026-10-20 — **003 Collection** : les 20 éléments sur un écran (possédés ×N,
+  manquants grisés avec leur coût), résumé par rareté ; l'échange d'éclats s'y fait
+  directement (fusion avec la liste d'échange de 002).
 - 2026-10-19 — **002 Pity & doublons** : Légendaire ou mieux au plus tard au 40ᵉ
   tirage (compteur visible), éclats sur chaque doublon, échange contre un élément
   manquant, sauvegarde v2.

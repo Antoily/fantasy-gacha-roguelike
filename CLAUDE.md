@@ -24,7 +24,7 @@ Remise à zéro le 2026-10-19 (ADR 0002). L'ancien prototype « Fantasy Roguelik
 Gacha » est sous le tag `legacy-v1` et la branche `legacy` (ne pas supprimer). On
 construit d'abord **le gacha seul** ; le gameplay viendra après. Stack : Phaser 4 +
 TS 6 + Vite 8 sur Node 24, local-only (ADR 0004). Features livrées : 001 Tirage,
-002 Pity & doublons.
+002 Pity & doublons, 003 Collection.
 
 ## Commandes
 
@@ -53,7 +53,7 @@ tests/e2e/    parcours Playwright du quickstart, critère de merge
   importe pour cliquer au même endroit. Déplacer un bouton = changer `layout.ts`.
 - `GachaScene` pose `document.body.dataset.ready = 'gacha'` quand l'écran est prêt, et
   `document.body.dataset.modal = '<nom>'` tant qu'une fenêtre est ouverte (`results`,
-  `rates`, `exchange`, `confirm-exchange`, `confirm-reset`, `warning`). L'e2e s'en
+  `rates`, `collection`, `confirm-exchange`, `confirm-reset`, `warning`). L'e2e s'en
   sert pour vérifier l'enchaînement des écrans : sans lui, deux mutations de la 002
   survivaient (une confirmation ouverte à tort que la logique refusait ensuite).
 - Playwright tourne avec **un seul worker** : les captures sont numérotées dans
@@ -139,8 +139,14 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
   « ? » / « ! » : Phaser coupe les lignes sur les espaces ordinaires.
 - Phaser 4 a supprimé `Phaser.Geom.Point` : utiliser `Phaser.Math.Vector2` (ex.
   `fillPoints`).
-- Une fenêtre au contenu variable dérive sa géométrie d'une fonction de `layout.ts`
-  (`exchangeLayout(n)`), que l'e2e appelle aussi pour viser ses boutons.
+- Une fenêtre au contenu variable dérive sa géométrie d'une fonction de `layout.ts`,
+  que l'e2e appelle aussi pour viser ses boutons.
+- **003** : la collection a remplacé la liste d'échange de 002 (fusion décidée par
+  l'utilisateur). L'échange d'éclats ne passe plus que par elle ; l'ordre des cases
+  vient de `collectionEntries` (`src/logic/collection.ts`), importé par l'e2e.
+- Mutations « purement visuelles » (un élément dessiné en trop, sans effet sur l'état
+  ni les fenêtres) : l'e2e ne peut pas les voir, seule la relecture des captures le
+  peut. Les signaler comme telles plutôt que d'alourdir les tests.
 - Tests à graine fixe : pour vérifier une table de tirage précise, un `scriptedRng`
   (`src/logic/testing.ts`) rend des valeurs choisies ; l'ordre de consommation du
   hasard (rareté puis élément) est contractuel.

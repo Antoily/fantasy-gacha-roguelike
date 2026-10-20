@@ -23,5 +23,6 @@ Le bouton « Échanger des éclats » devient **« Collection »** (même positi
 - Appui sur un manquant abordable → « Échanger X contre N éclats ? » (002) ;
   Annuler → retour à la collection ; Échanger → carte « Nouveau ! ».
 - Appui sur un possédé ou un manquant trop cher → rien (FR-011).
-- Collection complète → « Collection complète ! » sous le résumé (FR-007).
+- Collection complète → le titre devient « Collection complète ! » (FR-007) : la grille
+  occupe toute la hauteur, il n'y a pas de place pour une ligne de plus.
 - Nom de fenêtre exposé à l'e2e : `collection` (au lieu de `exchange`).
