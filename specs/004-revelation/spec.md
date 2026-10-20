@@ -188,3 +188,4 @@ Aucune donnée nouvelle à sauvegarder : le palier se déduit des résultats.
 - Le leurre ne concerne que le palier Rare (« tu penses avoir un Légendaire, tu n'as qu'un Rare ») ; pas de leurre pour Commun et Peu commun.
 - Le badge « Nouveau ! » et les éclats restent sur les cartes ; l'animation n'annonce ni la nouveauté ni le doublon.
 - Les cartes de résultat et leur contenu sont ceux de 001–003 ; seule leur apparition change.
+- Un échange d'éclats (003) n'est pas un tirage : sa carte « Nouveau ! » s'affiche sans animation, comme aujourd'hui.
