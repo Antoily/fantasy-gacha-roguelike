@@ -17,7 +17,11 @@ Ordre prévu. Chaque ligne = une spec, un mécanisme.
 | 001 | **Tirage** | dépenser une monnaie pour un tirage ×1 ou ×10 (×10 moins cher, un Rare garanti), voir les taux par rareté, voir ce qu'il a obtenu. Sa monnaie et ses personnages/créatures sont sauvegardés. | pity, valeur des doublons, animation, collection |
 | 002 | **Pity & doublons** | savoir combien de tirages le séparent de la garantie, et recevoir quelque chose d'utile pour un doublon. | ce que vaut un personnage en jeu |
 | 003 | **Collection** | parcourir les personnages obtenus et voir ceux qui lui manquent. | tri avancé, fiche détaillée |
-| 004 | **Révélation** | vivre le tirage : suspense, puis mise en scène qui dépend de la rareté. | son |
+| 004 | **Révélation** | vivre le tirage : suspense, puis mise en scène qui dépend de la **meilleure rareté obtenue** (au ×10, le meilleur des 10). | son |
+
+Idée de l'utilisateur pour 004 (2026-10-20), à reprendre en `/speckit-clarify` : comme
+dans les gachas du genre, **une animation par palier**, choisie d'après le meilleur
+résultat du tirage ; le joueur devine ce qu'il a eu avant de voir les cartes.
 
 ## Plus tard — non spécifié, ne pas coder
 
