@@ -55,11 +55,24 @@ export const CSS = {
   textDim: toCss(palette.inkSoft),
   textFaint: toCss(palette.inkFaint),
   textOnColor: toCss(palette.ink),
+  // Contour du nom de la rareté révélée (004), lisible par-dessus les rayons.
+  outline: toCss(palette.panel),
   // Bandes autour du canvas quand la fenêtre n'a pas le format portrait.
   letterbox: '#2b2620',
 } as const;
 
 export const SCRIM_ALPHA = 0.82;
+
+// Révélation (004) : opacités des effets ; leurs couleurs sont celles des raretés.
+export const REVEAL_FX = {
+  rayAlpha: 0.9,
+  waveAlpha: 0.9,
+  flashAlpha: 0.65,
+  // Dos des cartes du ×10 avant retournement.
+  cardBack: palette.secondary,
+  // Liseré de la carte vedette.
+  starStroke: 6,
+} as const;
 
 export const STROKE = { thin: 2, base: 3, thick: 4 } as const;
 export const SHADOW_OFFSET = 4;

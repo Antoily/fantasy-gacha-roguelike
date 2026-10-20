@@ -36,6 +36,21 @@ export const RESULTS = {
   ok: { x: MARGIN * 2, y: 568, w: CONTENT_W - 2 * MARGIN, h: 44 },
 } as const;
 
+// Révélation (004) : l'orbe quitte sa place pour le centre de l'écran, où éclatent
+// les paliers. Ampleur par rang de rareté (0 = Commun … 4 = Ultra rare, FR-004).
+export const REVEAL = {
+  center: { x: WIDTH / 2, y: 300 },
+  orbScale: 1.3,
+  rays: [6, 8, 10, 12, 16],
+  rayLength: [96, 120, 144, 168, 200],
+  wave: [120, 150, 190, 240, 300],
+  pulse: [1.05, 1.1, 1.18, 1.26, 1.36],
+  labelY: 510,
+  hintY: 600,
+  // Toute la fenêtre : un appui n'importe où passe l'animation (FR-006).
+  skip: { x: 0, y: 0, w: WIDTH, h: HEIGHT },
+} as const;
+
 // Collection (003, remplace la liste d'échange de 002) : les 20 éléments en grille
 // 2 × 10, un résumé par rareté, sans défilement.
 export const COLLECTION = {

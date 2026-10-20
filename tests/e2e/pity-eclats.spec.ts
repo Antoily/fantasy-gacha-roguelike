@@ -3,7 +3,7 @@ import { SHARD_GAIN } from '../../src/data/gachaConfig';
 import { collectionEntries } from '../../src/logic/collection';
 import type { Progression } from '../../src/logic/progression';
 import { CONFIRM_DIALOG_H, GACHA, RATES_DIALOG_H, RESULTS, collectionCellRect, dialogButtons, dialogRect } from '../../src/ui/layout';
-import { FRESH, allOwned, capture, loadWith, modal, rankOf, rarityOf, save, start, tap } from './helpers';
+import { FRESH, allOwned, capture, loadWith, modal, rankOf, rarityOf, save, skipReveal, start, tap } from './helpers';
 
 // Scénarios de specs/002-pity-doublons/quickstart.md, joués sur le build.
 
@@ -19,6 +19,7 @@ test('le pity force un Légendaire ou mieux au 40ᵉ tirage', async ({ page }) =
   const [id] = Object.keys(after.owned);
   expect(rankOf(id!)).toBeGreaterThanOrEqual(3);
   expect(after.pity).toBe(0);
+  await skipReveal(page);
   await capture(page, 'pity-garanti');
   await tap(page, RESULTS.ok);
   await capture(page, 'pity-compteur-remis');
@@ -30,6 +31,7 @@ test('le compteur avance d’un tirage et la règle est dans les taux', async ({
   const after = (await save(page))!;
   const [id] = Object.keys(after.owned);
   expect(after.pity).toBe(rankOf(id!) >= 3 ? 0 : 1);
+  await skipReveal(page);
   await tap(page, RESULTS.ok);
   await capture(page, 'compteur-apres-un-tirage');
   await tap(page, GACHA.rates);
@@ -46,6 +48,7 @@ test('chaque doublon rapporte les éclats de sa rareté', async ({ page }) => {
   for (const [id, n] of Object.entries(after.owned)) expected += (n - 1) * SHARD_GAIN[rarityOf(id)];
   expect(after.shards).toBe(expected);
   expect(after.shards).toBeGreaterThanOrEqual(before.shards + 10);
+  await skipReveal(page);
   await capture(page, 'doublons-eclats');
 });
 

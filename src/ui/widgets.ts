@@ -87,6 +87,19 @@ export function makeModal(scene: Phaser.Scene): Phaser.GameObjects.Container {
   return container;
 }
 
+// Orbe de l'écran de tirage, centrée sur l'origine du conteneur : la révélation (004)
+// la déplace et la fait grossir.
+export function makeOrb(scene: Phaser.Scene, r: number): Phaser.GameObjects.Container {
+  const g = scene.add.graphics();
+  g.fillStyle(COLORS.ink, 1).fillCircle(5, 5, r);
+  g.fillStyle(COLORS.rarity.ultra, 1).fillCircle(0, 0, r);
+  g.fillStyle(COLORS.rarity.rare, 1).fillCircle(0, 0, r * 0.7);
+  g.fillStyle(COLORS.coin, 1).fillCircle(0, 0, r * 0.4);
+  g.lineStyle(STROKE.thick, COLORS.ink, 1).strokeCircle(0, 0, r);
+  const mark = scene.add.text(0, 0, '?', textStyle(FONT_SIZE.title * 1.6)).setOrigin(0.5);
+  return scene.add.container(0, 0, [g, mark]);
+}
+
 const rarityInfo = (id: string) => RARITIES.find(r => r.id === id)!;
 
 // Carte d'un résultat (FR-012) : pastille de rareté + initiale, nom, type, rareté,
