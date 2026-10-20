@@ -6,7 +6,7 @@ mergée et jouable.
 
 ## En cours
 
-_Rien : la suite du gacha est livrée ; prochaine étape à choisir avec l'utilisateur (« Plus tard »)._
+- **005 Son** — spec en cours (`specs/005-son/`, branche `feat/005-son`).
 
 ## Ensuite — le gacha
 
@@ -18,6 +18,7 @@ Ordre prévu. Chaque ligne = une spec, un mécanisme.
 | 002 | **Pity & doublons** | savoir combien de tirages le séparent de la garantie, et recevoir quelque chose d'utile pour un doublon. | ce que vaut un personnage en jeu |
 | 003 | **Collection** | parcourir les personnages obtenus et voir ceux qui lui manquent. | tri avancé, fiche détaillée |
 | 004 | **Révélation** | vivre le tirage : suspense, puis mise en scène qui dépend de la **meilleure rareté obtenue** (au ×10, le meilleur des 10). | son |
+| 005 | **Son** | entendre la révélation (suspense, un son par palier, montée, rire diabolique du leurre, cartes) et couper le son. | musique, volume, vibration |
 
 Idée de l'utilisateur pour 004 (2026-10-20), à reprendre en `/speckit-clarify` : comme
 dans les gachas du genre, **une animation par palier**, choisie d'après le meilleur
@@ -29,7 +30,7 @@ résultat du tirage ; le joueur devine ce qu'il a eu avant de voir les cartes.
 - Univers et DA définitive, visuels réels des personnages, nom du jeu.
 - Bannières / événements (taux augmentés sur certains personnages).
 - Progression d'un personnage (niveaux, étoiles, éveil).
-- Son et musique.
+- Musique de fond (après l'univers définitif).
 - Mise en ligne jouable sur téléphone (sous-domaine `decli.de` en IaC, bloc Caddy, déploiement au merge).
 - Application mobile (Capacitor).
 - Serveur : compte, synchronisation, tirages côté serveur (ADR requis).
