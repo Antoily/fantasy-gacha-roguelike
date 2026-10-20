@@ -6,7 +6,7 @@ mergée et jouable.
 
 ## En cours
 
-_Rien : prochaine étape, spécifier 004 Révélation._
+- **004 Révélation** — spec en cours (`specs/004-revelation/`, branche `feat/004-revelation`).
 
 ## Ensuite — le gacha
 
