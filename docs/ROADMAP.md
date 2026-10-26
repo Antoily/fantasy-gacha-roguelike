@@ -38,6 +38,10 @@ résultat du tirage ; le joueur devine ce qu'il a eu avant de voir les cartes.
 
 ## Fait
 
+- 2026-10-26 — **Révision de 004** : particules faites main (aspiration pendant le
+  suspense, explosion par palier, pluie dès Légendaire), cartes du ×10 une à une avec
+  anticipation selon la rareté, vedette qui bat pendant que les autres s'assombrissent,
+  éclat de la carte du ×1 (FR-013 à FR-015). Validée par l'utilisateur en jeu.
 - 2026-10-26 — **006 Bannières** : bannière standard + une par Légendaire / Ultra rare,
   permanentes, au choix (◀ ▶) ; 50/50 sur la vedette, garantie après un échec, propre à
   chaque bannière ; pity des 40 commun ; taux de la vedette affichés ; sauvegarde v3.

@@ -207,7 +207,21 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
 - Texte sur une vedette : tournure sans accord (« Prochain Légendaire garanti : … »),
   le catalogue mélange noms masculins et féminins.
 - Sessions parallèles sur le dépôt : Playwright réutilise tout `vite preview` déjà
-  lancé sur son port (`reuseExistingServer`) ; couper un serveur de test avant l'e2e.
+  lancé sur son port (`reuseExistingServer`) ; couper un serveur de test avant l'e2e,
+  ou prendre un autre port (`E2E_PORT`, voir révision 004).
+
+## Leçons de la révision 004 (particules)
+
+- **Particules faites main** (`src/ui/particles.ts`, un Graphics redessiné à chaque
+  image) : l'émetteur de Phaser et `cameras.main.shake` lisent `Math.random` et
+  décaleraient le hasard scripté de l'e2e. Le décor tire son hasard d'un `mulberry32`
+  à graine propre.
+- **Deux worktrees en parallèle** : `E2E_PORT=4183 npm run e2e`. Sans ça, Playwright
+  réutilise le `vite preview` de l'autre copie sur 4173 et teste **son** build.
+- **Filmer une animation** : la capture vidéo de Playwright ralentit le rendu logiciel
+  et Phaser borne alors son delta (page « hors focus ») : le jeu passe au ralenti.
+  Remplacer `requestAnimationFrame` et `performance.now` par une horloge virtuelle,
+  avancer de 1/30 s, `page.screenshot()` à chaque image, puis `ffmpeg -framerate 30`.
 
 ## Conventions de code
 

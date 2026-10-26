@@ -2,7 +2,6 @@ import Phaser from 'phaser';
 import { CATALOGUE } from '../data/catalogue';
 import type { Item } from '../data/catalogue';
 import { GACHA_CONFIG, RARITIES, SHARD_COST, type Rarity } from '../data/gachaConfig';
-import { REVEAL_TIMING } from '../data/revealConfig';
 import { formatAmount } from '../logic/format';
 import type { PullResult } from '../logic/gacha';
 import { collectionEntries, isComplete, raritySummary, type CollectionEntry } from '../logic/collection';
@@ -11,27 +10,20 @@ import {
   type Progression, type PullCount,
 } from '../logic/progression';
 import { featuredRatePercent, formatPercent, ratePercent, rarityTable } from '../logic/rates';
-import { planReveal } from '../logic/reveal';
+import { flipSchedule, planReveal } from '../logic/reveal';
 import { SETTINGS_KEY, serializeSettings, type Settings } from '../logic/settings';
-import { flipCues } from '../logic/soundCues';
 import { SAVE_KEY, serializeSave, type SaveStatus } from '../logic/save';
 import {
   COLLECTION, CONFIRM_DIALOG_H, DIALOG, GACHA, RESULTS, REVEAL, WARNING_DIALOG_H,
   center, ratesDialogH, collectionCellRect, dialogButtons, dialogRect, resultCardRect, type Rect,
 } from '../ui/layout';
-import { playReveal, Sequence } from '../ui/reveal';
+import { Particles } from '../ui/particles';
+import { celebrateSingle, playFlip, playReveal, sparkleBest, type Sequence } from '../ui/reveal';
 import { Sfx } from '../ui/sfx';
-import { COLORS, CSS, FONT_SIZE, RADIUS, REVEAL_FX, STROKE } from '../ui/theme';
+import { COLORS, CSS, FONT_SIZE, STROKE } from '../ui/theme';
 import {
   makeButton, makeModal, makeOrb, makePanel, makeResultCard, makeShardAmount, makeShardIcon, textStyle, type Button,
 } from '../ui/widgets';
-
-// Carte du ×10 montée sur un pivot centré, pour se retourner autour de son milieu.
-interface FlipCard {
-  readonly pivot: Phaser.GameObjects.Container;
-  readonly face: Phaser.GameObjects.Container;
-  readonly back: readonly (Phaser.GameObjects.Graphics | Phaser.GameObjects.Text)[];
-}
 
 // Délai avant qu'un appui passe l'animation : un double appui sur « Tirer » ne doit
 // pas la passer à l'insu du joueur (research R5).
@@ -318,7 +310,9 @@ export class GachaScene extends Phaser.Scene {
     if (results.length === 1) {
       const r = RESULTS.single;
       modal.add(this.add.text(r.x + r.w / 2, r.y - 40, 'Tu as obtenu…', textStyle(FONT_SIZE.big)).setOrigin(0.5));
-      modal.add(makeResultCard(this, r, results[0]!, counts[0]!, true));
+      const card = makeResultCard(this, r, results[0]!, counts[0]!, true);
+      modal.add(card);
+      celebrateSingle(this, modal, card, r, results[0]!.item.rarity);
       addOk();
       return;
     }
@@ -328,24 +322,11 @@ export class GachaScene extends Phaser.Scene {
     const faces = results.map((res, i) => makeResultCard(this, resultCardRect(i), res, counts[i]!));
     if (!flip) {
       modal.add(faces);
+      sparkleBest(new Particles(this, modal, 2), results.map((res, i) => ({ r: resultCardRect(i), rarity: res.item.rarity })));
       addOk();
       return;
     }
     this.playFlip(modal, faces, results, flipOrder, addOk);
-  }
-
-  private makeFlipCard(modal: Phaser.GameObjects.Container, r: Rect, face: Phaser.GameObjects.Container): FlipCard {
-    const cx = r.x + r.w / 2;
-    const cy = r.y + r.h / 2;
-    const pivot = this.add.container(cx, cy);
-    face.setPosition(-cx, -cy).setVisible(false);
-    const g = this.add.graphics();
-    g.fillStyle(REVEAL_FX.cardBack, 1).fillRoundedRect(-r.w / 2, -r.h / 2, r.w, r.h, RADIUS);
-    g.lineStyle(STROKE.base, COLORS.ink, 1).strokeRoundedRect(-r.w / 2, -r.h / 2, r.w, r.h, RADIUS);
-    const mark = this.add.text(0, 0, '?', textStyle(FONT_SIZE.title)).setOrigin(0.5);
-    pivot.add([face, g, mark]);
-    modal.add(pivot);
-    return { pivot, face, back: [g, mark] };
   }
 
   private playFlip(
@@ -355,76 +336,18 @@ export class GachaScene extends Phaser.Scene {
     order: readonly number[],
     addOk: () => void,
   ) {
-    const cards = faces.map((face, i) => this.makeFlipCard(modal, resultCardRect(i), face));
-    const starIndex = order[order.length - 1]!;
-    const star = cards[starIndex]!;
-    const t = REVEAL_TIMING;
-    const seq = new Sequence(this);
-    const show = (c: FlipCard) => {
-      c.back.forEach(o => o.setVisible(false));
-      c.face.setVisible(true);
-    };
-    // Liseré de la couleur de la vedette, posé sous la carte (FR-008).
-    let highlighted = false;
-    const highlight = () => {
-      if (highlighted) return;
-      highlighted = true;
-      const r = resultCardRect(starIndex);
-      const g = this.add.graphics();
-      const pad = REVEAL_FX.starStroke / 2;
-      g.lineStyle(REVEAL_FX.starStroke, COLORS.rarity[results[starIndex]!.item.rarity], 1)
-        .strokeRoundedRect(-r.w / 2 - pad, -r.h / 2 - pad, r.w + 2 * pad, r.h + 2 * pad, RADIUS + pad);
-      star.pivot.addAt(g, 0);
-      modal.bringToTop(star.pivot);
-    };
-    const turn = (c: FlipCard, ms: number, onShown?: () => void) => {
-      seq.tween({
-        targets: c.pivot, scaleX: 0, duration: ms / 2, ease: 'Quad.easeIn',
-        onComplete: () => {
-          show(c);
-          onShown?.();
-          seq.tween({ targets: c.pivot, scaleX: 1, duration: ms / 2, ease: 'Quad.easeOut' });
-        },
-      });
-    };
-
     const hint = this.add.text(RESULTS.ok.x + RESULTS.ok.w / 2, RESULTS.ok.y + RESULTS.ok.h / 2,
       'Touche pour tout retourner', textStyle(FONT_SIZE.small, CSS.textFaint)).setOrigin(0.5);
     modal.add(hint);
-
-    let done = false;
-    const finish = (tapped: boolean) => {
-      if (done) return;
-      done = true;
-      seq.stop();
+    const flip = playFlip(this, modal, faces, results, flipSchedule(results, order), cue => this.sfx.play(cue), tapped => {
       if (tapped) this.sfx.stopAll();
       zone.destroy();
       hint.destroy();
-      cards.forEach(c => { show(c); c.pivot.setScale(1); });
-      highlight();
       document.body.dataset.modal = 'results';
       addOk();
-    };
-
-    let time = 0;
-    order.forEach((index, k) => {
-      const card = cards[index]!;
-      if (k < order.length - 1) {
-        seq.at(time, () => turn(card, t.flipCard));
-        time += t.flipCard;
-        return;
-      }
-      time += t.flipPause;
-      seq.at(time, () => turn(card, t.flipStar / 2, () => {
-        highlight();
-        seq.tween({ targets: card.pivot, scale: 1.12, duration: t.flipStar / 4, yoyo: true, ease: 'Quad.easeOut' });
-      }));
-      time += t.flipStar;
     });
-    seq.at(time, () => finish(false));
-    flipCues(order.length).forEach(c => seq.at(c.at, () => this.sfx.play(c.cue)));
     // Appui pendant le retournement : tout se retourne, OK apparaît ; il ne ferme rien.
-    const zone = this.addSkipZone(modal, seq, 0, () => finish(true));
+    const zone = this.addSkipZone(modal, flip.seq, 0, () => flip.finish(true));
   }
 
   private dialog(name: string, h: number, title: string): { modal: Phaser.GameObjects.Container; rect: Rect; bodyY: number } {

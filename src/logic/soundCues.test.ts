@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { CATALOGUE } from '../data/catalogue';
 import { RARITIES, type Rarity } from '../data/gachaConfig';
-import { REVEAL_TIMING as T } from '../data/revealConfig';
+import { FLIP_TIMING, REVEAL_TIMING as T } from '../data/revealConfig';
 import { SOUND_RECIPES } from '../data/sounds';
 import type { PullResult } from './gacha';
-import { planReveal, revealDuration, type RevealPlan } from './reveal';
+import { flipOrder, flipSchedule, planReveal, revealDuration, type RevealPlan } from './reveal';
 import { DEFAULT_SETTINGS, parseSettings, serializeSettings } from './settings';
 import { flipCues, revealCues } from './soundCues';
 import { scriptedRng } from './testing';
@@ -60,15 +60,19 @@ describe('sons de la révélation (FR-001 à FR-003)', () => {
 });
 
 describe('sons du retournement (FR-004)', () => {
-  it('×10 : 9 cartes aux instants du retournement, puis la vedette après la pause', () => {
-    const cues = flipCues(10);
+  const ten = [...Array<Rarity>(9).fill('common'), 'legendary' as Rarity]
+    .map(r => ({ item: CATALOGUE.find(i => i.rarity === r)!, isNew: true, guaranteed: false, pity: false, shards: 0, featuredGuarantee: false }));
+
+  it('×10 : un son par carte quand elle tourne, la vedette en dernier', () => {
+    const schedule = flipSchedule(ten, flipOrder(ten));
+    const cues = flipCues(schedule);
     expect(cues.map(c => c.cue)).toEqual([...Array<string>(9).fill('card'), 'star']);
-    expect(cues.slice(0, 9).map(c => c.at)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8].map(k => k * T.flipCard));
-    expect(cues[9]!.at).toBe(9 * T.flipCard + T.flipPause);
+    expect(cues.map(c => c.at)).toEqual(schedule.steps.map(s => s.at + s.anticipation));
+    expect(cues[9]!.at).toBeGreaterThan(cues[8]!.at + FLIP_TIMING.starPause);
   });
 
   it('×1 : aucun', () => {
-    expect(flipCues(1)).toEqual([]);
+    expect(flipCues(flipSchedule(ten.slice(0, 1), [0]))).toEqual([]);
   });
 });
 

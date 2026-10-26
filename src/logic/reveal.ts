@@ -1,5 +1,5 @@
 import { RARITIES, type Rarity } from '../data/gachaConfig';
-import { REVEAL_CONFIG, REVEAL_TIMING } from '../data/revealConfig';
+import { FLIP_TIMING, REVEAL_CONFIG, REVEAL_TIMING } from '../data/revealConfig';
 import type { PullResult } from './gacha';
 import type { Rng } from './rng';
 
@@ -58,8 +58,46 @@ export function revealDuration(plan: RevealPlan): number {
   return t.suspense + (plan.steps.length - 1) * (t.fakeStep + t.transition) + t.final[plan.final];
 }
 
-// Retournement : toutes les cartes sauf la vedette, une pause, puis la vedette.
-export function flipDuration(count: number): number {
-  const t = REVEAL_TIMING;
-  return count <= 1 ? 0 : (count - 1) * t.flipCard + t.flipPause + t.flipStar;
+export interface FlipStep {
+  readonly index: number;
+  readonly rarity: Rarity;
+  readonly star: boolean;
+  // Instants en ms depuis le début du retournement : le dos s'anime pendant
+  // `anticipation`, puis la carte se retourne pendant `turn`.
+  readonly at: number;
+  readonly anticipation: number;
+  readonly turn: number;
+}
+
+export interface FlipSchedule {
+  readonly steps: readonly FlipStep[];
+  readonly duration: number;
+}
+
+// Calendrier du retournement du ×10, dans l'ordre de `order` (vedette en dernier). Une
+// carte ordinaire prend un créneau qui grandit avec sa rareté ; si le tout dépasse
+// FLIP_TIMING.max, ces créneaux sont raccourcis d'un même facteur, la vedette garde le
+// sien. Au ×1, rien à retourner.
+export function flipSchedule(results: readonly PullResult[], order: readonly number[]): FlipSchedule {
+  if (results.length <= 1) return { steps: [], duration: 0 };
+  const t = FLIP_TIMING;
+  const ordinary = order.slice(0, -1).map(index => {
+    const rarity = results[index]!.item.rarity;
+    return { index, rarity, anticipation: t.anticipation[rarity], turn: t.turn[rarity], after: t.after[rarity] };
+  });
+  const starIndex = order[order.length - 1]!;
+  const starRarity = results[starIndex]!.item.rarity;
+  const starPart = t.starPause + t.starBeat[starRarity] + t.starTurn + t.starHold;
+  const slots = ordinary.reduce((sum, c) => sum + c.anticipation + c.turn + c.after, 0);
+  const k = Math.min(1, (t.max - starPart) / slots);
+
+  const steps: FlipStep[] = [];
+  let time = 0;
+  for (const c of ordinary) {
+    steps.push({ index: c.index, rarity: c.rarity, star: false, at: time, anticipation: c.anticipation * k, turn: c.turn * k });
+    time += (c.anticipation + c.turn + c.after) * k;
+  }
+  time += t.starPause;
+  steps.push({ index: starIndex, rarity: starRarity, star: true, at: time, anticipation: t.starBeat[starRarity], turn: t.starTurn });
+  return { steps, duration: time + t.starBeat[starRarity] + t.starTurn + t.starHold };
 }

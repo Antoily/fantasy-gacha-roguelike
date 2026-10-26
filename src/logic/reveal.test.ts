@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { CATALOGUE } from '../data/catalogue';
 import { RARITIES, type Rarity } from '../data/gachaConfig';
 import type { PullResult } from './gacha';
-import { bestRarity, flipDuration, flipOrder, planReveal, revealDuration, type RevealPlan } from './reveal';
+import { FLIP_TIMING } from '../data/revealConfig';
+import { bestRarity, flipOrder, flipSchedule, planReveal, revealDuration, type FlipStep, type RevealPlan } from './reveal';
 import { mulberry32 } from './rng';
 import { scriptedRng } from './testing';
 
@@ -152,9 +153,72 @@ describe('durées (FR-010, SC-003)', () => {
     expect(revealDuration(planReveal(single('legendary'), scriptedRng([0])))).toBeGreaterThan(direct);
   });
 
-  it('retournement des 10 cartes ≤ 4 s ; rien au ×1', () => {
-    expect(flipDuration(10)).toBeLessThanOrEqual(4000);
-    expect(flipDuration(10)).toBeGreaterThan(0);
-    expect(flipDuration(1)).toBe(0);
+});
+
+describe('retournement une à une (FR-008, FR-010)', () => {
+  const schedule = (ten: PullResult[]) => flipSchedule(ten, flipOrder(ten));
+  const tenOf = (rarities: readonly Rarity[]) => rarities.map(r => res(r));
+  const typical = tenOf(['common', 'uncommon', 'common', 'common', 'rare', 'common', 'uncommon', 'common', 'common', 'uncommon']);
+
+  it('suit l’ordre de retournement, vedette en dernier, seule marquée', () => {
+    const s = schedule(typical);
+    expect(s.steps.map(x => x.index)).toEqual(flipOrder(typical));
+    expect(s.steps.map(x => x.star)).toEqual([...Array<boolean>(9).fill(false), true]);
+    expect(s.steps.map(x => x.rarity)).toEqual(flipOrder(typical).map(i => typical[i]!.item.rarity));
+  });
+
+  it('une carte à la fois : chacune finit de tourner avant que la suivante bouge', () => {
+    const s = schedule(typical);
+    s.steps.slice(1).forEach((x, i) => {
+      const prev = s.steps[i]!;
+      expect(x.at).toBeGreaterThanOrEqual(prev.at + prev.anticipation + prev.turn);
+    });
+    const last = s.steps.at(-1)!;
+    expect(s.duration).toBeGreaterThan(last.at + last.anticipation + last.turn);
+  });
+
+  it('plus la carte est rare, plus elle prend son temps (anticipation et retournement)', () => {
+    // Une vedette Ultra et des Communs : aucune accélération ne fausse la comparaison.
+    for (let k = 1; k < ALL.length; k++) {
+      const lo = schedule(tenOf([ALL[k - 1]!, 'common', 'common', 'common', 'common', 'common', 'common', 'common', 'common', 'ultra'])).steps[0]!;
+      const hi = schedule(tenOf([ALL[k]!, 'common', 'common', 'common', 'common', 'common', 'common', 'common', 'common', 'ultra'])).steps[0]!;
+      expect(hi.anticipation + hi.turn, ALL[k]).toBeGreaterThan(lo.anticipation + lo.turn);
+    }
+  });
+
+  it('une pause marquée avant la vedette', () => {
+    const s = schedule(typical);
+    const [prev, star] = s.steps.slice(-2) as [FlipStep, FlipStep];
+    expect(star.at - (prev.at + prev.anticipation + prev.turn)).toBeGreaterThanOrEqual(FLIP_TIMING.starPause);
+  });
+
+  it('la vedette bat plus longtemps quand elle est plus rare', () => {
+    const beats = ALL.slice(2).map(r => schedule(tenOf([...Array<Rarity>(9).fill('common'), r])).steps.at(-1)!.anticipation);
+    expect(beats).toEqual([...beats].sort((a, b) => a - b));
+    expect(new Set(beats).size).toBe(beats.length);
+  });
+
+  it('jamais plus de 4 s, même au pire ; la vedette garde son temps fort', () => {
+    const rng = mulberry32(7);
+    const draws = [tenOf(Array<Rarity>(10).fill('ultra')), tenOf([...Array<Rarity>(9).fill('legendary'), 'ultra'])];
+    for (let n = 0; n < 2000; n++) draws.push(tenOf(Array.from({ length: 10 }, () => ALL[Math.floor(rng() * ALL.length)]!)));
+    for (const ten of draws) {
+      const s = schedule(ten);
+      expect(s.duration).toBeLessThanOrEqual(FLIP_TIMING.max + 1e-9);
+      const star = s.steps.at(-1)!;
+      expect(star.anticipation).toBe(FLIP_TIMING.starBeat[star.rarity]);
+    }
+    // Au pire, les cartes ordinaires ont bien été accélérées.
+    expect(schedule(draws[0]!).steps[0]!.turn).toBeLessThan(FLIP_TIMING.turn.ultra);
+  });
+
+  it('un ×10 ordinaire reste court (≤ 3,5 s) et n’est pas accéléré', () => {
+    const s = schedule(typical);
+    expect(s.duration).toBeLessThanOrEqual(3500);
+    expect(s.steps[0]!.turn).toBe(FLIP_TIMING.turn.common);
+  });
+
+  it('×1 : rien à retourner', () => {
+    expect(flipSchedule(single('ultra'), [0])).toEqual({ steps: [], duration: 0 });
   });
 });
