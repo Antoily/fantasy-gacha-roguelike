@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { RARITIES, type Rarity } from '../data/gachaConfig';
-import { formatPercent, ratePercent, rarityTable, rollRarity } from './rates';
+import { CATALOGUE } from '../data/catalogue';
+import { featuredRatePercent, formatPercent, ratePercent, rarityTable, rollRarity } from './rates';
 import { mulberry32 } from './rng';
 
 describe('taux affichés (FR-015, FR-016)', () => {
@@ -17,6 +18,12 @@ describe('taux affichés (FR-015, FR-016)', () => {
   it('se formatent à la française', () => {
     expect(formatPercent(2.5)).toBe('2,5 %');
     expect(formatPercent(60)).toBe('60 %');
+  });
+
+  it('affiche la chance d’une vedette par tirage : moitié de sa rareté (006, FR-016)', () => {
+    const vedette = (id: string) => formatPercent(featuredRatePercent(CATALOGUE.find(i => i.id === id)!));
+    expect(vedette('roi-barbichon')).toBe('1,25 %');
+    expect(vedette('orbulle')).toBe('0,25 %');
   });
 });
 

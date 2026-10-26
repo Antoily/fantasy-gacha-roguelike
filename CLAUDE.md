@@ -28,7 +28,7 @@ Remise à zéro le 2026-10-19 (ADR 0002). L'ancien prototype « Fantasy Roguelik
 Gacha » est sous le tag `legacy-v1` et la branche `legacy` (ne pas supprimer). On
 construit d'abord **le gacha seul** ; le gameplay viendra après. Stack : Phaser 4 +
 TS 6 + Vite 8 sur Node 24, local-only (ADR 0004). Features livrées : 001 Tirage,
-002 Pity & doublons, 003 Collection, 004 Révélation, 005 Son.
+002 Pity & doublons, 003 Collection, 004 Révélation, 005 Son, 006 Bannières.
 
 ## Commandes
 
@@ -49,7 +49,7 @@ scripts/mutate-e2e.sh <fichier> '<ancien>' '<nouveau>' <spec e2e> [-g titre]   #
 
 ```
 src/data/     contenu : catalogue.ts (20 éléments), gachaConfig.ts (raretés, poids, coûts), revealConfig.ts (fausses pistes, durées), sounds.ts (recettes des bruitages)
-src/logic/    TS pur, testé : rng, rates, gacha, progression, save, format, collection, reveal, soundCues, settings (lint : ni phaser ni navigateur)
+src/logic/    TS pur, testé : rng, rates, gacha, banners, progression, save, format, collection, reveal, soundCues, settings (lint : ni phaser ni navigateur)
 src/ui/       theme.ts (SEULES couleurs/polices), layout.ts (géométrie, partagée avec l'e2e), widgets.ts, reveal.ts (animation), sfx.ts (son)
 src/scenes/   BootScene (lit la sauvegarde) → GachaScene (écran + fenêtres)
 tests/e2e/    parcours Playwright du quickstart, critère de merge
@@ -63,13 +63,15 @@ public/sounds/ enregistrements CC0 seulement, chacun listé dans CREDITS.md (ADR
   `flip`, `results`, `rates`, `collection`, `confirm-exchange`, `confirm-reset`,
   `warning`), et `dataset.reveal` = paliers montrés (`rare>legendary`) pendant
   `reveal` ; `dataset.sounds` (sons émis depuis le dernier tirage), `dataset.soundsLive`
-  (notes en train de sonner) et `dataset.muted`. L'e2e s'en sert pour vérifier l'enchaînement des écrans : sans lui, deux
+  (notes en train de sonner), `dataset.muted`, `dataset.banner` (bannière active) et
+  `dataset.featuredLine` (ligne de garantie vedette). L'e2e s'en sert pour vérifier l'enchaînement des écrans : sans lui, deux
   mutations de la 002 survivaient (une confirmation ouverte à tort que la logique
   refusait ensuite).
 - Playwright tourne avec **un seul worker** : les captures sont numérotées dans
   l'ordre d'exécution et deux fichiers en parallèle s'écrasaient mutuellement.
-- Sauvegarde **v2** (`{ version, currency, owned, pity, shards }`) ; migration 1 → 2
-  dans `src/logic/save.ts`. Ajouter un champ = version + 1, migration, tests.
+- Sauvegarde **v3** (`{ version, currency, owned, pity, shards, banner, guarantees }`) ;
+  migrations 1 → 2 → 3 dans `src/logic/save.ts`. Ajouter un champ = version + 1,
+  migration, tests.
 - Réglages de l'appareil (son coupé…) dans **`gacha.settings`**, hors sauvegarde de
   partie : « Recommencer » ne les touche pas (ADR 0006).
 - **Relire les captures de l'e2e** avant chaque merge touchant l'affichage : un test
@@ -193,6 +195,19 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
   le bouton son pendant une fenêtre).
 - `ffmpeg` (installé via apt sur la WSL) sert à convertir / mesurer les sons :
   `ffprobe -show_entries format=duration`, spectre avec `showspectrumpic`.
+
+## Leçons de la feature 006
+
+- **Une mutation qui ne compile pas ne prouve rien** : `scripts/mutate-e2e.sh` comptait un
+  build cassé comme « détectée ». Il passe maintenant `tsc` d'abord (sortie 3, INVALIDE).
+  Attention aux imports devenus inutilisés et aux rétrécissements de type perdus.
+- **Bannière standard identique bit à bit** : `gacha.test.ts` compare à une séquence
+  relevée sur `main` avant 006 (graine 2026). Toute évolution du tirage doit la garder
+  intacte sur la standard, ou la spec doit dire pourquoi.
+- Texte sur une vedette : tournure sans accord (« Prochain Légendaire garanti : … »),
+  le catalogue mélange noms masculins et féminins.
+- Sessions parallèles sur le dépôt : Playwright réutilise tout `vite preview` déjà
+  lancé sur son port (`reuseExistingServer`) ; couper un serveur de test avant l'e2e.
 
 ## Conventions de code
 

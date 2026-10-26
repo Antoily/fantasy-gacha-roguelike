@@ -2,15 +2,17 @@ import { describe, expect, it } from 'vitest';
 import { CATALOGUE } from '../data/catalogue';
 import { SHARD_COST } from '../data/gachaConfig';
 import {
-  distinctOwned, exchange, initialProgression, pull, pullsUntilPity, reset, type Progression,
+  activeBanner, cycleBanner, distinctOwned, exchange, hasFeaturedGuarantee, initialProgression, pull, pullsUntilPity,
+  reset, type Progression,
 } from './progression';
 import { mulberry32 } from './rng';
+import { scriptedRng } from './testing';
 
 const totalCopies = (p: Progression) => Object.values(p.owned).reduce((a, b) => a + b, 0);
 
 describe('progression initiale', () => {
   it('commence avec 9 000 et rien de possédé (US4-2)', () => {
-    expect(initialProgression()).toEqual({ currency: 9000, owned: {}, pity: 0, shards: 0 });
+    expect(initialProgression()).toEqual({ currency: 9000, owned: {}, pity: 0, shards: 0, banner: 'standard', guarantees: [] });
     expect(distinctOwned(initialProgression())).toBe(0);
   });
 });
@@ -35,7 +37,7 @@ describe('tirage ×1 (US1)', () => {
   });
 
   it('refuse sans rien changer quand le solde est insuffisant (FR-010)', () => {
-    const poor: Progression = { currency: 99, owned: { gribouille: 1 }, pity: 5, shards: 3 };
+    const poor: Progression = { ...initialProgression(), currency: 99, owned: { gribouille: 1 }, pity: 5, shards: 3 };
     const snapshot = structuredClone(poor);
     expect(pull(poor, 1, mulberry32(1))).toEqual({ ok: false, reason: 'insufficient-funds' });
     expect(poor).toEqual(snapshot);
@@ -78,7 +80,7 @@ describe('compteur et remise à zéro', () => {
   });
 
   it('reset rend la progression initiale (FR-019)', () => {
-    expect(reset()).toEqual({ currency: 9000, owned: {}, pity: 0, shards: 0 });
+    expect(reset()).toEqual({ currency: 9000, owned: {}, pity: 0, shards: 0, banner: 'standard', guarantees: [] });
   });
 });
 
@@ -141,4 +143,67 @@ describe('échange d’éclats (002, US4)', () => {
     expect(exchange({ ...poor, shards: SHARD_COST.legendary }, 'tonnerrouf').ok).toBe(true);
   });
 
+});
+
+describe('bannières (006)', () => {
+  const LEGENDARY = 0.98;
+  const on = (banner: string, guarantees: string[] = []): Progression =>
+    ({ ...initialProgression(), banner, guarantees });
+  const ok = (out: ReturnType<typeof pull>) => {
+    if (!out.ok) throw new Error('refusé');
+    return out;
+  };
+
+  it('tire sur la bannière active (FR-005)', () => {
+    const out = ok(pull(on('roi-barbichon'), 1, scriptedRng([LEGENDARY, 0.2])));
+    expect(out.results[0]!.item.id).toBe('roi-barbichon');
+    const std = ok(pull(on('standard'), 1, scriptedRng([LEGENDARY, 0.2])));
+    expect(std.results[0]!.item.id).toBe('roi-barbichon'); // élément 0.2 × 3 → le premier
+    const other = ok(pull(on('tonnerrouf'), 1, scriptedRng([LEGENDARY, 0.2])));
+    expect(other.results[0]!.item.id).toBe('tonnerrouf');
+  });
+
+  it('ouvre puis referme la garantie de la bannière active', () => {
+    const lost = ok(pull(on('roi-barbichon'), 1, scriptedRng([LEGENDARY, 0.7, 0])));
+    expect(lost.progression.guarantees).toEqual(['roi-barbichon']);
+    expect(hasFeaturedGuarantee(lost.progression)).toBe(true);
+    const won = ok(pull(lost.progression, 1, scriptedRng([LEGENDARY])));
+    expect(won.results[0]!.featuredGuarantee).toBe(true);
+    expect(won.progression.guarantees).toEqual([]);
+  });
+
+  it('ne touche ni n’utilise la garantie d’une autre bannière (FR-014)', () => {
+    const p = on('tonnerrouf', ['roi-barbichon']);
+    // Légendaire sur Tonnerrouf, 50/50 perdu → Roi Barbichon tombe, mais pas par la garantie.
+    const out = ok(pull(p, 1, scriptedRng([LEGENDARY, 0.7, 0])));
+    expect(out.results[0]!.item.id).toBe('roi-barbichon');
+    expect(out.results[0]!.featuredGuarantee).toBe(false);
+    expect([...out.progression.guarantees].sort()).toEqual(['roi-barbichon', 'tonnerrouf']);
+    const won = ok(pull(p, 1, scriptedRng([LEGENDARY, 0.2])));
+    expect(won.progression.guarantees).toEqual(['roi-barbichon']);
+  });
+
+  it('partage le compteur des 40 entre les bannières (FR-013)', () => {
+    const out = ok(pull({ ...on('orbulle'), pity: 25 }, 1, scriptedRng([0.1, 0])));
+    expect(out.progression.pity).toBe(26);
+    expect(pullsUntilPity(cycleBanner(out.progression, 1))).toBe(14);
+  });
+
+  it('change de bannière en boucle sans rien toucher d’autre (FR-004)', () => {
+    const p = { ...on('standard', ['tonnerrouf']), pity: 7, shards: 12, currency: 500 };
+    const next = cycleBanner(p, 1);
+    expect(next).toEqual({ ...p, banner: 'roi-barbichon' });
+    expect(cycleBanner(p, -1).banner).toBe('orbulle');
+    expect(activeBanner(next).featured!.id).toBe('roi-barbichon');
+  });
+
+  it('n’annonce que la garantie de la bannière active (FR-015)', () => {
+    expect(hasFeaturedGuarantee(on('roi-barbichon', ['roi-barbichon']))).toBe(true);
+    expect(hasFeaturedGuarantee(on('tonnerrouf', ['roi-barbichon']))).toBe(false);
+    expect(hasFeaturedGuarantee(on('standard', ['roi-barbichon']))).toBe(false);
+  });
+
+  it('retombe sur la standard pour une bannière inconnue', () => {
+    expect(activeBanner(on('flambichon')).featured).toBeNull();
+  });
 });

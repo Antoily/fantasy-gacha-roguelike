@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { CATALOGUE } from '../data/catalogue';
 import { GACHA_CONFIG, RARITIES, SHARD_GAIN } from '../data/gachaConfig';
-import { pullSingle, pullTen } from './gacha';
+import { pullSingle, pullTen, type FeaturedState } from './gacha';
 import { mulberry32 } from './rng';
 import { scriptedRng } from './testing';
 
@@ -179,5 +179,163 @@ describe('éclats des doublons (002, US3)', () => {
     const { results } = pullTen(scriptedRng([...commons(9), 0.5, 0]), {}, 0);
     expect(results[0]!.shards).toBe(0);
     expect(results[1]!.shards).toBe(SHARD_GAIN.common);
+  });
+});
+
+// --- Bannières (006) ---------------------------------------------------------------
+
+const item = (id: string) => CATALOGUE.find(i => i.id === id)!;
+const onBanner = (id: string, guaranteed = false): FeaturedState => ({ item: item(id), guaranteed });
+// Valeurs de hasard dans la table complète des raretés (poids 600/270/100/25/5).
+const LEGENDARY = 0.98;
+const COMMON = 0.1;
+const WIN = 0.2; // < featuredChance
+const LOSE = 0.7;
+
+// Relevé sur le code d'avant 006 (main, graine 2026, 8 × 10 tirages enchaînés).
+const GOLDEN = ["mirette", "ronronflette", "mirette", "machouille", "gribouille", "pataplouf", "gribouille", "mirette", "gloups", "professeur-fizz", "mirette", "machouille", "coquillard", "mirette", "mirette", "machouille", "gloups", "gribouille", "croquinet", "zigzag", "flambichon", "zigzag", "gloups", "gloups", "zigzag", "mirette", "marquise-cerise", "ronronflette", "bidule", "croquinet", "dame-petunia", "machouille", "gribouille", "gribouille", "coquillard", "mirette", "pataplouf", "gloups", "professeur-fizz", "flambichon", "professeur-fizz", "pataplouf", "gloups", "machouille", "capitaine-tartine", "coquillard", "bidule", "mirette", "machouille", "mirette", "bidule", "tonnerrouf", "mirette", "machouille", "pataplouf", "professeur-fizz", "gribouille", "ronronflette", "mirette", "gribouille", "lulu-tempete", "bidule", "gloups", "ronronflette", "zigzag", "bidule", "gribouille", "gloups", "croquinet", "roi-barbichon", "mirette", "gloups", "mirette", "pataplouf", "gloups", "pataplouf", "croquinet", "flambichon", "pataplouf", "capitaine-tartine"];
+
+function eightTens(featured: FeaturedState | null) {
+  const rng = mulberry32(2026);
+  const ids: string[] = [];
+  let pity = 0;
+  let state = featured;
+  for (let i = 0; i < 8; i++) {
+    const b = pullTen(rng, {}, pity, state);
+    pity = b.pity;
+    if (state) state = { item: state.item, guaranteed: b.featuredGuaranteed };
+    ids.push(...b.results.map(r => r.item.id));
+  }
+  return ids;
+}
+
+describe('bannière standard (SC-006)', () => {
+  it('donne exactement les tirages d’avant 006 pour un même hasard', () => {
+    expect(eightTens(null)).toEqual(GOLDEN);
+  });
+
+  it('une vedette d’une rareté qui ne tombe pas ne change rien au tirage', () => {
+    // Aucun Ultra rare dans la séquence de référence.
+    expect(eightTens(onBanner('orbulle'))).toEqual(GOLDEN);
+  });
+});
+
+describe('50/50 de la vedette (US2, FR-008 à FR-012)', () => {
+  it('50/50 gagné : la vedette, sans garantie ouverte ni « Garanti ! »', () => {
+    const b = pullSingle(scriptedRng([LEGENDARY, WIN]), {}, 0, onBanner('roi-barbichon'));
+    expect(b.results[0]!.item.id).toBe('roi-barbichon');
+    expect(b.results[0]!.featuredGuarantee).toBe(false);
+    expect(b.featuredGuaranteed).toBe(false);
+  });
+
+  it('50/50 perdu : un autre élément de la rareté, et la garantie s’ouvre', () => {
+    const a = pullSingle(scriptedRng([LEGENDARY, LOSE, 0]), {}, 0, onBanner('roi-barbichon'));
+    expect(a.results[0]!.item.id).toBe('marquise-cerise');
+    expect(a.featuredGuaranteed).toBe(true);
+    const b = pullSingle(scriptedRng([LEGENDARY, LOSE, 0.99]), {}, 0, onBanner('roi-barbichon'));
+    expect(b.results[0]!.item.id).toBe('tonnerrouf');
+  });
+
+  it('garantie ouverte : la vedette sans autre hasard que la rareté, « Garanti ! », garantie refermée', () => {
+    // scriptedRng échoue si une valeur de plus est consommée.
+    const b = pullSingle(scriptedRng([LEGENDARY]), {}, 0, onBanner('roi-barbichon', true));
+    expect(b.results[0]!.item.id).toBe('roi-barbichon');
+    expect(b.results[0]!.featuredGuarantee).toBe(true);
+    expect(b.featuredGuaranteed).toBe(false);
+  });
+
+  it('une autre rareté se tire comme sur la standard et ne touche pas la garantie', () => {
+    for (const guaranteed of [false, true]) {
+      const b = pullSingle(scriptedRng([COMMON, 0]), {}, 0, onBanner('roi-barbichon', guaranteed));
+      expect(b.results[0]!.item.rarity).toBe('common');
+      expect(b.results[0]!.featuredGuarantee).toBe(false);
+      expect(b.featuredGuaranteed).toBe(guaranteed);
+    }
+    // Ultra rare sur une bannière Légendaire : tiré normalement (US2-4).
+    const u = pullSingle(scriptedRng([0.997, 0.9]), {}, 0, onBanner('roi-barbichon'));
+    expect(u.results[0]!.item.id).toBe('orbulle');
+  });
+
+  it('dans un ×10 : un échec au 3ᵉ rend garanti le prochain Légendaire de la salve', () => {
+    const values = [COMMON, 0, COMMON, 0, LEGENDARY, LOSE, 0.5, COMMON, 0, COMMON, 0, COMMON, 0,
+      LEGENDARY, COMMON, 0, COMMON, 0, COMMON, 0];
+    const b = pullTen(scriptedRng(values), {}, 0, onBanner('roi-barbichon'));
+    expect(b.results[2]!.item.id).toBe('tonnerrouf');
+    expect(b.results[6]!.item.id).toBe('roi-barbichon');
+    expect(b.results[6]!.featuredGuarantee).toBe(true);
+    expect(b.featuredGuaranteed).toBe(false);
+  });
+
+  it('le pity forcé sur la rareté de la vedette passe aussi par le 50/50 (US2-5)', () => {
+    // Table restreinte Légendaire/Ultra (25/5) : 0.5 tombe sur Légendaire.
+    const b = pullSingle(scriptedRng([0.5, LOSE, 0]), {}, 39, onBanner('roi-barbichon'));
+    expect(b.results[0]!.pity).toBe(true);
+    expect(b.results[0]!.item.id).toBe('marquise-cerise');
+    expect(b.featuredGuaranteed).toBe(true);
+  });
+
+  it('un Ultra rare en vedette : perdu, c’est l’autre Ultra rare', () => {
+    const b = pullSingle(scriptedRng([0.997, LOSE, 0.3]), {}, 0, onBanner('orbulle'));
+    expect(b.results[0]!.item.id).toBe('cosmo-l-infini');
+    expect(b.featuredGuaranteed).toBe(true);
+  });
+});
+
+describe('statistiques d’une bannière vedette (SC-001 à SC-003)', () => {
+  const N = 1_000_000;
+  const rng = mulberry32(606);
+  const rarityCounts = new Map<string, number>();
+  const losers = new Map<string, number>();
+  let free = 0; // Légendaires tirés hors garantie
+  let freeWins = 0;
+  let maxMissStreak = 0;
+  let miss = 0;
+  let state = onBanner('roi-barbichon');
+  let pity = 0;
+  for (let i = 0; i < N; i++) {
+    const wasGuaranteed = state.guaranteed;
+    const b = pullSingle(rng, {}, pity, state);
+    pity = b.pity;
+    state = { item: state.item, guaranteed: b.featuredGuaranteed };
+    const r = b.results[0]!;
+    rarityCounts.set(r.item.rarity, (rarityCounts.get(r.item.rarity) ?? 0) + 1);
+    if (r.item.rarity !== 'legendary') continue;
+    const won = r.item.id === 'roi-barbichon';
+    if (!wasGuaranteed) {
+      free++;
+      if (won) freeWins++;
+      else losers.set(r.item.id, (losers.get(r.item.id) ?? 0) + 1);
+    }
+    miss = won ? 0 : miss + 1;
+    maxMissStreak = Math.max(maxMissStreak, miss);
+  }
+
+  it('garde les fréquences des raretés de la standard, pity compris', () => {
+    // Référence : la même simulation sur la standard.
+    const ref = new Map<string, number>();
+    const rng2 = mulberry32(606);
+    let p2 = 0;
+    for (let i = 0; i < N; i++) {
+      const b = pullSingle(rng2, {}, p2);
+      p2 = b.pity;
+      ref.set(b.results[0]!.item.rarity, (ref.get(b.results[0]!.item.rarity) ?? 0) + 1);
+    }
+    for (const r of RARITIES) {
+      expect(Math.abs(rarityCounts.get(r.id)! / ref.get(r.id)! - 1), r.id).toBeLessThan(0.05);
+    }
+  });
+
+  it('donne la vedette pour la moitié des Légendaires hors garantie', () => {
+    expect(Math.abs(freeWins / free - 0.5) / 0.5).toBeLessThan(0.05);
+  });
+
+  it('répartit les perdants à égalité entre les autres Légendaires', () => {
+    expect([...losers.keys()].sort()).toEqual(['marquise-cerise', 'tonnerrouf']);
+    const total = losers.get('marquise-cerise')! + losers.get('tonnerrouf')!;
+    expect(Math.abs(losers.get('marquise-cerise')! / total - 0.5) / 0.5).toBeLessThan(0.05);
+  });
+
+  it('jamais deux Légendaires de suite sans la vedette', () => {
+    expect(maxMissStreak).toBe(1);
   });
 });

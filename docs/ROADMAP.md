@@ -6,9 +6,7 @@ mergée et jouable.
 
 ## En cours
 
-| # | Feature | Le joueur peut… | Hors périmètre |
-|---|---------|-----------------|----------------|
-| 006 | **Bannières** | choisir sur quelle bannière il tire : la standard, ou une bannière par Légendaire / Ultra rare qui met cet élément en avant (50/50, garanti après un échec). | bannières limitées dans le temps, visuels de bannière |
+_Rien : prochaine étape à choisir avec l'utilisateur (« Plus tard »)._
 
 ## Ensuite — le gacha
 
@@ -40,6 +38,9 @@ résultat du tirage ; le joueur devine ce qu'il a eu avant de voir les cartes.
 
 ## Fait
 
+- 2026-10-26 — **006 Bannières** : bannière standard + une par Légendaire / Ultra rare,
+  permanentes, au choix (◀ ▶) ; 50/50 sur la vedette, garantie après un échec, propre à
+  chaque bannière ; pity des 40 commun ; taux de la vedette affichés ; sauvegarde v3.
 - 2026-10-20 — **005 Son** : bruitages synthétisés de la révélation (suspense, un son
   par palier, montée, cartes), rire diabolique CC0 sur le leurre, bouton son mémorisé
   (`gacha.settings`, ADR 0006).

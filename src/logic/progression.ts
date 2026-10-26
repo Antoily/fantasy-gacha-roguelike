@@ -1,6 +1,7 @@
 import { CATALOGUE, type Item } from '../data/catalogue';
 import { GACHA_CONFIG, SHARD_COST } from '../data/gachaConfig';
-import { pullSingle, pullTen, type Owned, type PullResult } from './gacha';
+import { findBanner, neighbourBanner, STANDARD, type Banner } from './banners';
+import { pullSingle, pullTen, type FeaturedState, type Owned, type PullResult } from './gacha';
 import type { Rng } from './rng';
 
 export interface Progression {
@@ -11,6 +12,10 @@ export interface Progression {
   readonly pity: number;
   // Solde d'éclats, gagnés sur les doublons.
   readonly shards: number;
+  // Bannière active (006) : 'standard' ou l'id de sa vedette.
+  readonly banner: string;
+  // Bannières vedettes dont la garantie est ouverte (50/50 perdu), sans doublon.
+  readonly guarantees: readonly string[];
 }
 
 export type PullCount = 1 | 10;
@@ -24,7 +29,7 @@ export type ExchangeOutcome =
   | { readonly ok: false; readonly reason: 'already-owned' | 'insufficient-shards' | 'unknown-item' };
 
 export function initialProgression(): Progression {
-  return { currency: GACHA_CONFIG.startingCurrency, owned: {}, pity: 0, shards: 0 };
+  return { currency: GACHA_CONFIG.startingCurrency, owned: {}, pity: 0, shards: 0, banner: STANDARD, guarantees: [] };
 }
 
 export const reset = initialProgression;
@@ -41,13 +46,24 @@ export function canAfford(p: Progression, count: PullCount): boolean {
 // d'un bloc, ce qui rend tout indissociable (001 FR-011, 002 FR-011).
 export function pull(p: Progression, count: PullCount, rng: Rng): PullOutcome {
   if (!canAfford(p, count)) return { ok: false, reason: 'insufficient-funds' };
-  const batch = count === 1 ? pullSingle(rng, p.owned, p.pity) : pullTen(rng, p.owned, p.pity);
+  const banner = activeBanner(p);
+  // Seule la garantie de la bannière active entre dans le tirage : celles des autres
+  // bannières restent intactes (FR-014).
+  const featured: FeaturedState | null = banner.featured
+    ? { item: banner.featured, guaranteed: p.guarantees.includes(banner.id) }
+    : null;
+  const batch = count === 1 ? pullSingle(rng, p.owned, p.pity, featured) : pullTen(rng, p.owned, p.pity, featured);
+  const others = p.guarantees.filter(id => id !== banner.id);
   const owned: Record<string, number> = { ...p.owned };
   for (const r of batch.results) owned[r.item.id] = (owned[r.item.id] ?? 0) + 1;
   const shards = p.shards + batch.results.reduce((sum, r) => sum + r.shards, 0);
   return {
     ok: true,
-    progression: { currency: p.currency - costOf(count), owned, pity: batch.pity, shards },
+    progression: {
+      ...p,
+      currency: p.currency - costOf(count), owned, pity: batch.pity, shards,
+      guarantees: batch.featuredGuaranteed ? [...others, banner.id] : others,
+    },
     results: batch.results,
   };
 }
@@ -58,6 +74,20 @@ export function distinctOwned(p: Progression): number {
 
 export function pullsUntilPity(p: Progression): number {
   return GACHA_CONFIG.pityThreshold - p.pity;
+}
+
+export function activeBanner(p: Progression): Banner {
+  return findBanner(p.banner) ?? findBanner(STANDARD)!;
+}
+
+// Garantie vedette ouverte sur la bannière active (FR-015).
+export function hasFeaturedGuarantee(p: Progression): boolean {
+  return p.guarantees.includes(activeBanner(p).id);
+}
+
+// Changer de bannière ne touche à rien d'autre : ni pity, ni garanties (US3).
+export function cycleBanner(p: Progression, step: 1 | -1): Progression {
+  return { ...p, banner: neighbourBanner(p.banner, step).id };
 }
 
 // Un échange n'est pas un tirage : ni pièces, ni pity (FR-016).
