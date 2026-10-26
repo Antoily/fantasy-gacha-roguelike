@@ -1,5 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 
+// Port du `vite preview` : E2E_PORT pour lancer l'e2e de deux worktrees en parallèle.
+// Sans lui, un preview déjà lancé par l'autre copie serait réutilisé (son build, pas le nôtre).
+const PORT = process.env.E2E_PORT ?? '4173';
+
 // Le test de bout en bout tourne sur le BUILD (vite preview) : sur WSL2, le serveur de
 // dev a déjà servi du JS obsolète au navigateur pendant le prototype.
 export default defineConfig({
@@ -11,7 +15,7 @@ export default defineConfig({
   retries: 0,
   reporter: [['list']],
   use: {
-    baseURL: 'http://localhost:4173',
+    baseURL: `http://localhost:${PORT}`,
     viewport: { width: 360, height: 640 },
     screenshot: 'only-on-failure',
   },
@@ -29,8 +33,8 @@ export default defineConfig({
     },
   }],
   webServer: {
-    command: 'npm run build && npm run preview',
-    url: 'http://localhost:4173',
+    command: `npm run build && npx vite preview --port ${PORT} --strictPort`,
+    url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },

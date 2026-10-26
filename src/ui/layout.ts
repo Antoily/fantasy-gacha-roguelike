@@ -47,6 +47,13 @@ export const REVEAL = {
   rayLength: [96, 120, 144, 168, 200],
   wave: [120, 150, 190, 240, 300],
   pulse: [1.05, 1.1, 1.18, 1.26, 1.36],
+  // Particules (révision du 2026-10-26) : nombre et vitesse maximale (px/s) de
+  // l'explosion du palier, puis de l'éclat d'une carte retournée.
+  burst: [16, 30, 50, 80, 120],
+  burstSpeed: [170, 210, 270, 330, 400],
+  cardBurst: [5, 10, 18, 30, 44],
+  // Rebond d'une carte retournée.
+  cardBounce: [1, 1.04, 1.08, 1.12, 1.16],
   labelY: 510,
   hintY: 600,
   // Toute la fenêtre : un appui n'importe où passe l'animation (FR-006).

@@ -29,7 +29,14 @@ joueur devine ce qu'il a eu avant de voir les cartes, et un tirage rare devient 
 - Q: (proposé par l'utilisateur) Une fausse piste dans l'autre sens ? → A: Oui, en plus de la montée : 1 fois sur 10, un tirage dont le meilleur résultat est Rare fait croire à un Légendaire ou un Ultra rare, puis retombe sur Rare. Les deux fausses pistes coexistent.
 - Q: Le leurre fait croire à quel palier ? → A: Sans réponse de l'utilisateur, défaut retenu : Légendaire 4 fois sur 5, Ultra rare 1 fois sur 5 (même une animation Ultra garde un petit doute).
 
-## User Scenarios & Testing *(mandatory)*
+### Session 2026-10-26 (révision)
+
+- Demande de l'utilisateur : « les animations sont sommaires ; plus de particules, une révélation un à un des résultats, avec une légère animation par résultat selon la rareté ; quelque chose qui incarne le suspense, sans que ce soit trop long. Fais des propositions, on corrigera le tir. »
+- Q: Comment incarner le suspense sans allonger ? → A (proposition de Claude, en attente du retour de l'utilisateur) : le temps se mérite. Un Commun passe vite ; plus un résultat est rare, plus sa carte tremble et s'allume avant de se retourner. Pendant le suspense, l'orbe aspire des particules et un halo bat de plus en plus vite.
+- Q: Quelles particules ? → A (proposition) : explosion à chaque palier, plus nombreuse et plus variée avec le rang (points, puis étoiles dès Rare, confettis dès Légendaire, arc-en-ciel pour l'Ultra rare) ; pluie d'étoiles plein écran pour Légendaire et Ultra rare ; au leurre, l'énergie s'éteint et retombe.
+- Q: Et la carte vedette du ×10 ? → A (proposition) : les cartes déjà vues s'assombrissent, son dos bat comme un cœur (plus longtemps si elle est plus rare), puis elle éclate.
+
+
 
 ### User Story 1 - Deviner son meilleur résultat avant les cartes (Priority: P1)
 
@@ -155,11 +162,15 @@ une, la meilleure en dernier ; les 10 finissent visibles, à la même place qu'e
 - **FR-005**: L'animation MUST **finir sur le vrai palier** ; seuls les déroulés de FR-011 et FR-012 montrent un autre palier avant lui. Les taux, les cartes et les règles restent exacts (constitution IV) : les fausses pistes sont de la mise en scène et ne changent rien au tirage.
 - **FR-006**: Un appui pendant l'animation MUST la passer et afficher directement toutes les cartes, déjà retournées (×10 compris) ; les résultats affichés sont les mêmes que sans appui.
 - **FR-007**: Pendant l'animation et le retournement des cartes, les éléments de l'écran de tirage MUST NOT réagir (tirage, collection, taux, recommencer).
-- **FR-008**: Au ×10, les cartes MUST arriver face cachée à leur place habituelle et se retourner une à une, dans l'ordre du tirage, sauf la meilleure, retournée en dernier avec un temps fort (si plusieurs résultats ont la meilleure rareté, la dernière tirée). Un appui MUST les retourner toutes aussitôt. Au ×1, la carte apparaît directement après l'animation.
+- **FR-008**: Au ×10, les cartes MUST arriver face cachée à leur place habituelle et se retourner une à une, dans l'ordre du tirage, sauf la meilleure, retournée en dernier avec un temps fort (si plusieurs résultats ont la meilleure rareté, la dernière tirée). Une carte ne bouge qu'une fois la précédente retournée. Un appui MUST les retourner toutes aussitôt. Au ×1, la carte apparaît directement après l'animation, avec l'éclat de sa rareté (FR-014).
 - **FR-009**: L'animation MUST ne rien changer aux règles : résultats, débit, pity, éclats et sauvegarde sont ceux de 001–003, décidés et sauvegardés **avant** qu'elle commence.
 - **FR-010**: L'animation complète (suspense + révélation, fausses pistes comprises) MUST durer au plus 3 s pour le palier le plus bas et au plus 5 s pour le plus haut ; le retournement des 10 cartes MUST durer au plus 4 s.
 - **FR-011**: Pour un palier Rare ou plus, la révélation MUST faire une **fausse piste** avec une probabilité de 1/4 : elle démarre au palier juste en dessous, puis monte au vrai palier. Les paliers Commun et Peu commun n'en font jamais. La fausse piste ne change rien aux résultats.
 - **FR-012**: Pour le palier Rare, la révélation MUST faire un **leurre** avec une probabilité de 1/10 : elle montre le palier Légendaire (4 fois sur 5) ou Ultra rare (1 fois sur 5), puis retombe sur le palier Rare. Les autres paliers n'en font jamais. Pour un palier Rare, montée (FR-011) et leurre s'excluent : 1/10 de leurre, 1/4 de montée, le reste direct.
+
+- **FR-013** *(révision 2026-10-26)*: L'animation MUST comporter des particules : aspirées par l'orbe pendant le suspense (sans couleur de palier), en explosion à chaque palier montré (plus nombreuses et plus variées avec le rang ; une fausse piste explose comme un vrai palier), en pluie plein écran pour Légendaire et Ultra rare. Au leurre, les particules du faux palier s'éteignent avant le vrai.
+- **FR-014** *(révision 2026-10-26)*: Chaque carte retournée MUST avoir un éclat propre à sa rareté (particules, rebond, onde dès Rare). À partir de Rare, son dos tremble et prend la couleur de la rareté avant de se retourner, d'autant plus longtemps que la rareté est haute ; un Commun ou un Peu commun se retourne sans attendre. Avant la vedette, les autres cartes s'assombrissent et son dos bat, plus longtemps si elle est plus rare. Sur l'écran final, les cartes Légendaire et Ultra rare scintillent.
+- **FR-015** *(révision 2026-10-26)*: Un ×10 sans rien au-dessus du Rare MUST se retourner en 3,5 s au plus ; si les créneaux des cartes rares dépassent la borne de FR-010 (4 s), les cartes ordinaires accélèrent et la vedette garde son temps fort.
 
 ### Key Entities
 

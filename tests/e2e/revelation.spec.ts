@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { CATALOGUE } from '../../src/data/catalogue';
 import { RARITIES, type Rarity } from '../../src/data/gachaConfig';
 import { REVEAL_TIMING } from '../../src/data/revealConfig';
+import { flipOrder, flipSchedule } from '../../src/logic/reveal';
 import { GACHA, RESULTS, center } from '../../src/ui/layout';
 import {
   FRESH, capture, installRng, load, loadWith, modal, rarityRoll, revealSteps, save, scriptRng, start, tap,
@@ -33,11 +34,19 @@ test('un palier par rareté, puis la carte obtenue (US1, FR-003)', async ({ page
     const t0 = Date.now();
     await pullOne(page, id, [DIRECT]);
     expect(await revealSteps(page)).toBe(id);
+    if (id === 'common') {
+      await page.waitForTimeout(T.suspense * 0.8 - (Date.now() - t0));
+      await capture(page, 'suspense-charge');
+    }
     // Capture en pleine révélation du palier (relue avant merge, SC-005).
     await page.waitForTimeout(T.suspense + 250 - (Date.now() - t0));
     await capture(page, `palier-${id}`);
     await waitModal(page, 'results');
     expect(Date.now() - t0).toBeLessThan(5_500); // SC-003
+    if (id === 'legendary') {
+      await page.waitForTimeout(150);
+      await capture(page, 'x1-carte-legendaire');
+    }
     expect((await save(page))!.owned[firstOf(id)]).toBe(1);
     await tap(page, RESULTS.ok);
     expect(await modal(page)).toBeNull();
@@ -72,20 +81,31 @@ test('leurre : Ultra rare ou Légendaire, puis Rare (US4, FR-012)', async ({ pag
 });
 
 test('×10 : palier du meilleur, puis cartes une à une, OK à la fin (US5, FR-008)', async ({ page }) => {
-  const values: number[] = [];
-  for (let i = 0; i < 10; i++) values.push(rarityRoll(i === 3 ? 'legendary' : 'common'), 0);
+  // Un Rare (index 6) tremble avant de tourner ; le Légendaire (index 3) est la vedette.
+  const rarities: Rarity[] = ['common', 'uncommon', 'common', 'legendary', 'common', 'common', 'rare', 'common', 'uncommon', 'common'];
+  const values = rarities.flatMap(r => [rarityRoll(r), 0]);
   await scriptRng(page, [...values, DIRECT]);
   await tap(page, GACHA.pullTen);
   await waitModal(page, 'reveal');
   expect(await revealSteps(page)).toBe('legendary');
   await waitModal(page, 'flip');
-  await page.waitForTimeout(T.flipCard * 5);
-  await capture(page, 'x10-retournement');
-  // Vedette : retournée en dernier, après la pause.
-  await page.waitForTimeout(T.flipCard * 4 + T.flipPause + T.flipStar / 2);
+  const t0 = Date.now();
+  const fakeResults = rarities.map(r => ({ item: CATALOGUE.find(i => i.rarity === r)!, isNew: true, guaranteed: false, pity: false, shards: 0 }));
+  const { steps, duration } = flipSchedule(fakeResults, flipOrder(fakeResults));
+  const at = async (ms: number) => page.waitForTimeout(Math.max(0, ms - (Date.now() - t0)));
+  const rare = steps.find(s => s.rarity === 'rare')!;
+  const star = steps.at(-1)!;
+  await at(rare.at + rare.anticipation * 0.6);
+  await capture(page, 'x10-anticipation-rare');
+  await at(rare.at + rare.anticipation + rare.turn);
+  await capture(page, 'x10-eclat-rare');
+  await at(star.at + star.anticipation * 0.7);
+  await capture(page, 'x10-vedette-coeur');
+  await at(star.at + star.anticipation + star.turn * 0.8);
   await capture(page, 'x10-vedette');
   await waitModal(page, 'results');
-  await page.waitForTimeout(150);
+  expect(Date.now() - t0).toBeLessThan(duration + 500);
+  await page.waitForTimeout(400);
   await capture(page, 'x10-fin');
   await tap(page, RESULTS.ok);
   expect(await modal(page)).toBeNull();

@@ -24,8 +24,9 @@ PY
 
 # Le webServer de Playwright reconstruit le jeu : la mutation est bien dans le build,
 # à condition qu'aucun `vite preview` ne tourne déjà (reuseExistingServer hors CI).
-if ss -ltn 2>/dev/null | grep -q ':4173 '; then
-  echo "un serveur écoute déjà sur 4173 : il servirait le build non muté" >&2
+PORT="${E2E_PORT:-4173}"
+if ss -ltn 2>/dev/null | grep -q ":$PORT "; then
+  echo "un serveur écoute déjà sur $PORT : il servirait le build non muté (E2E_PORT=… pour un autre port)" >&2
   exit 2
 fi
 if timeout 400 npx playwright test "$@" >/dev/null 2>&1; then

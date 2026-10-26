@@ -72,6 +72,20 @@ export const REVEAL_FX = {
   cardBack: palette.secondary,
   // Liseré de la carte vedette.
   starStroke: 6,
+  // Particules (révision du 2026-10-26). Énergie aspirée par l'orbe pendant le suspense :
+  // les couleurs de l'orbe, qui ne trahissent aucun palier.
+  charge: [rarity.ultra, rarity.rare, palette.primary],
+  // Étincelles d'accompagnement (montée, éclats) : jamais de blanc, invisible sur le papier.
+  sparkle: palette.primary,
+  // Leurre : l'énergie retombe, éteinte.
+  fizzle: palette.inkFaint,
+  // Halo qui bat autour de l'orbe pendant le suspense.
+  heartbeat: palette.ink,
+  heartbeatAlpha: 0.5,
+  // Lueur du dos d'une carte rare avant qu'elle se retourne.
+  glowStroke: 6,
+  // Cartes déjà retournées, assombries pendant que la vedette se prépare.
+  dimAlpha: 0.35,
 } as const;
 
 export const STROKE = { thin: 2, base: 3, thick: 4 } as const;

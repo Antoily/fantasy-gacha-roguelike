@@ -1,6 +1,6 @@
 import type { Rarity } from '../data/gachaConfig';
 import { REVEAL_TIMING } from '../data/revealConfig';
-import type { RevealPlan } from './reveal';
+import type { FlipSchedule, RevealPlan } from './reveal';
 
 export type Cue = 'suspense' | `tier:${Rarity}` | 'rise' | 'laugh' | 'card' | 'star';
 
@@ -28,12 +28,7 @@ export function revealCues(plan: RevealPlan): SoundCue[] {
 }
 
 // Retournement du ×10 : un petit bruit par carte ordinaire, un son marqué pour la
-// vedette, aux mêmes instants que l'animation (FR-004).
-export function flipCues(count: number): SoundCue[] {
-  if (count <= 1) return [];
-  const t = REVEAL_TIMING;
-  const cues: SoundCue[] = [];
-  for (let k = 0; k < count - 1; k++) cues.push({ at: k * t.flipCard, cue: 'card' });
-  cues.push({ at: (count - 1) * t.flipCard + t.flipPause, cue: 'star' });
-  return cues;
+// vedette, chacun quand la carte commence à tourner (FR-004).
+export function flipCues(schedule: FlipSchedule): SoundCue[] {
+  return schedule.steps.map(s => ({ at: s.at + s.anticipation, cue: s.star ? 'star' : 'card' }));
 }

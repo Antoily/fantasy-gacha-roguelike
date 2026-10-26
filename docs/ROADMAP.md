@@ -6,7 +6,9 @@ mergée et jouable.
 
 ## En cours
 
-_Rien : prochaine étape à choisir avec l'utilisateur (« Plus tard »)._
+- **Révision de 004** (2026-10-26, branche `feat/004-revelation-v2`) : particules,
+  retournement une à une avec anticipation selon la rareté, vedette qui bat (FR-013 à
+  FR-015). Proposition en attente du retour de l'utilisateur sur la vidéo.
 
 ## Ensuite — le gacha
 

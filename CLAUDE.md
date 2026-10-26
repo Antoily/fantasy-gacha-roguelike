@@ -194,6 +194,19 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
 - `ffmpeg` (installé via apt sur la WSL) sert à convertir / mesurer les sons :
   `ffprobe -show_entries format=duration`, spectre avec `showspectrumpic`.
 
+## Leçons de la révision 004 (particules)
+
+- **Particules faites main** (`src/ui/particles.ts`, un Graphics redessiné à chaque
+  image) : l'émetteur de Phaser et `cameras.main.shake` lisent `Math.random` et
+  décaleraient le hasard scripté de l'e2e. Le décor tire son hasard d'un `mulberry32`
+  à graine propre.
+- **Deux worktrees en parallèle** : `E2E_PORT=4183 npm run e2e`. Sans ça, Playwright
+  réutilise le `vite preview` de l'autre copie sur 4173 et teste **son** build.
+- **Filmer une animation** : la capture vidéo de Playwright ralentit le rendu logiciel
+  et Phaser borne alors son delta (page « hors focus ») : le jeu passe au ralenti.
+  Remplacer `requestAnimationFrame` et `performance.now` par une horloge virtuelle,
+  avancer de 1/30 s, `page.screenshot()` à chaque image, puis `ffmpeg -framerate 30`.
+
 ## Conventions de code
 
 - TypeScript strict, pas de `any`. Imports relatifs.
