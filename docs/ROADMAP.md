@@ -6,7 +6,9 @@ mergée et jouable.
 
 ## En cours
 
-_Rien : prochaine étape à choisir avec l'utilisateur (« Plus tard »)._
+| # | Feature | Le joueur peut… | Hors périmètre |
+|---|---------|-----------------|----------------|
+| 006 | **Bannières** | choisir sur quelle bannière il tire : la standard, ou une bannière par Légendaire / Ultra rare qui met cet élément en avant (50/50, garanti après un échec). | bannières limitées dans le temps, visuels de bannière |
 
 ## Ensuite — le gacha
 
@@ -28,7 +30,7 @@ résultat du tirage ; le joueur devine ce qu'il a eu avant de voir les cartes.
 
 - Gameplay qui fait gagner la monnaie (et donne une utilité aux personnages).
 - Univers et DA définitive, visuels réels des personnages, nom du jeu.
-- Bannières / événements (taux augmentés sur certains personnages).
+- Événements / bannières limitées dans le temps (mécanique de pression : ADR requis).
 - Progression d'un personnage (niveaux, étoiles, éveil).
 - Musique de fond (après l'univers définitif).
 - Mise en ligne jouable sur téléphone (sous-domaine `decli.de` en IaC, bloc Caddy, déploiement au merge).
