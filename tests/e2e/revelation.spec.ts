@@ -90,7 +90,7 @@ test('×10 : palier du meilleur, puis cartes une à une, OK à la fin (US5, FR-0
   expect(await revealSteps(page)).toBe('legendary');
   await waitModal(page, 'flip');
   const t0 = Date.now();
-  const fakeResults = rarities.map(r => ({ item: CATALOGUE.find(i => i.rarity === r)!, isNew: true, guaranteed: false, pity: false, shards: 0 }));
+  const fakeResults = rarities.map(r => ({ item: CATALOGUE.find(i => i.rarity === r)!, isNew: true, guaranteed: false, pity: false, shards: 0, featuredGuarantee: false }));
   const { steps, duration } = flipSchedule(fakeResults, flipOrder(fakeResults));
   const at = async (ms: number) => page.waitForTimeout(Math.max(0, ms - (Date.now() - t0)));
   const rare = steps.find(s => s.rarity === 'rare')!;

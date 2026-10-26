@@ -9,7 +9,7 @@ import { scriptedRng } from './testing';
 
 const itemOf = (rarity: Rarity, n = 0) => CATALOGUE.filter(i => i.rarity === rarity)[n]!;
 const res = (rarity: Rarity, n = 0): PullResult =>
-  ({ item: itemOf(rarity, n), isNew: true, guaranteed: false, pity: false, shards: 0 });
+  ({ item: itemOf(rarity, n), isNew: true, guaranteed: false, pity: false, shards: 0, featuredGuarantee: false });
 const single = (rarity: Rarity) => [res(rarity)];
 const ALL: Rarity[] = RARITIES.map(r => r.id);
 

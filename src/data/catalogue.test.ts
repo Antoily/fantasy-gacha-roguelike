@@ -47,3 +47,12 @@ describe('pity et éclats (002 : FR-001, FR-009, FR-013)', () => {
     expect(RARITIES.map(r => SHARD_COST[r.id])).toEqual([10, 20, 50, 150, 300]);
   });
 });
+
+describe('bannières (006 : FR-001, FR-008)', () => {
+  it('met en avant Légendaires et Ultra rares, à 50/50', () => {
+    expect(GACHA_CONFIG.featuredMinRank).toBe(RARITIES.find(r => r.id === 'legendary')!.rank);
+    expect(GACHA_CONFIG.featuredChance).toBe(0.5);
+    // Un Rare forcé par la garantie du ×10 n'est jamais concerné par une vedette.
+    expect(GACHA_CONFIG.featuredMinRank).toBeGreaterThan(GACHA_CONFIG.guaranteedMinRank);
+  });
+});

@@ -30,7 +30,7 @@ résultat du tirage ; le joueur devine ce qu'il a eu avant de voir les cartes.
 
 - Gameplay qui fait gagner la monnaie (et donne une utilité aux personnages).
 - Univers et DA définitive, visuels réels des personnages, nom du jeu.
-- Bannières / événements (taux augmentés sur certains personnages).
+- Événements / bannières limitées dans le temps (mécanique de pression : ADR requis).
 - Progression d'un personnage (niveaux, étoiles, éveil).
 - Musique de fond (après l'univers définitif).
 - Mise en ligne jouable sur téléphone (sous-domaine `decli.de` en IaC, bloc Caddy, déploiement au merge).
@@ -40,6 +40,9 @@ résultat du tirage ; le joueur devine ce qu'il a eu avant de voir les cartes.
 
 ## Fait
 
+- 2026-10-26 — **006 Bannières** : bannière standard + une par Légendaire / Ultra rare,
+  permanentes, au choix (◀ ▶) ; 50/50 sur la vedette, garantie après un échec, propre à
+  chaque bannière ; pity des 40 commun ; taux de la vedette affichés ; sauvegarde v3.
 - 2026-10-20 — **005 Son** : bruitages synthétisés de la révélation (suspense, un son
   par palier, montée, cartes), rire diabolique CC0 sur le leurre, bouton son mémorisé
   (`gacha.settings`, ADR 0006).

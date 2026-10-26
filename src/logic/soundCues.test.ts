@@ -10,7 +10,7 @@ import { flipCues, revealCues } from './soundCues';
 import { scriptedRng } from './testing';
 
 const res = (rarity: Rarity): PullResult =>
-  ({ item: CATALOGUE.find(i => i.rarity === rarity)!, isNew: true, guaranteed: false, pity: false, shards: 0 });
+  ({ item: CATALOGUE.find(i => i.rarity === rarity)!, isNew: true, guaranteed: false, pity: false, shards: 0, featuredGuarantee: false });
 const plan = (rarity: Rarity, u: number, v = 0.5): RevealPlan => planReveal([res(rarity)], scriptedRng([u, v]));
 const names = (p: RevealPlan) => revealCues(p).map(c => c.cue);
 const ALL: Rarity[] = RARITIES.map(r => r.id);
@@ -61,7 +61,7 @@ describe('sons de la révélation (FR-001 à FR-003)', () => {
 
 describe('sons du retournement (FR-004)', () => {
   const ten = [...Array<Rarity>(9).fill('common'), 'legendary' as Rarity]
-    .map(r => ({ item: CATALOGUE.find(i => i.rarity === r)!, isNew: true, guaranteed: false, pity: false, shards: 0 }));
+    .map(r => ({ item: CATALOGUE.find(i => i.rarity === r)!, isNew: true, guaranteed: false, pity: false, shards: 0, featuredGuarantee: false }));
 
   it('×10 : un son par carte quand elle tourne, la vedette en dernier', () => {
     const schedule = flipSchedule(ten, flipOrder(ten));

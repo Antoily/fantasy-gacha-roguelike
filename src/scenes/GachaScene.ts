@@ -1,20 +1,21 @@
 import Phaser from 'phaser';
 import { CATALOGUE } from '../data/catalogue';
 import type { Item } from '../data/catalogue';
-import { GACHA_CONFIG, SHARD_COST } from '../data/gachaConfig';
+import { GACHA_CONFIG, RARITIES, SHARD_COST, type Rarity } from '../data/gachaConfig';
 import { formatAmount } from '../logic/format';
 import type { PullResult } from '../logic/gacha';
 import { collectionEntries, isComplete, raritySummary, type CollectionEntry } from '../logic/collection';
 import {
-  canAfford, distinctOwned, exchange, pull, pullsUntilPity, reset, type Progression, type PullCount,
+  activeBanner, canAfford, cycleBanner, distinctOwned, exchange, hasFeaturedGuarantee, pull, pullsUntilPity, reset,
+  type Progression, type PullCount,
 } from '../logic/progression';
-import { formatPercent, ratePercent, rarityTable } from '../logic/rates';
+import { featuredRatePercent, formatPercent, ratePercent, rarityTable } from '../logic/rates';
 import { flipSchedule, planReveal } from '../logic/reveal';
 import { SETTINGS_KEY, serializeSettings, type Settings } from '../logic/settings';
 import { SAVE_KEY, serializeSave, type SaveStatus } from '../logic/save';
 import {
-  COLLECTION, CONFIRM_DIALOG_H, DIALOG, GACHA, RATES_DIALOG_H, RESULTS, REVEAL, WARNING_DIALOG_H,
-  center, collectionCellRect, dialogButtons, dialogRect, resultCardRect, type Rect,
+  COLLECTION, CONFIRM_DIALOG_H, DIALOG, GACHA, RESULTS, REVEAL, WARNING_DIALOG_H,
+  center, ratesDialogH, collectionCellRect, dialogButtons, dialogRect, resultCardRect, type Rect,
 } from '../ui/layout';
 import { Particles } from '../ui/particles';
 import { celebrateSingle, playFlip, playReveal, sparkleBest, type Sequence } from '../ui/reveal';
@@ -27,6 +28,8 @@ import {
 // Délai avant qu'un appui passe l'animation : un double appui sur « Tirer » ne doit
 // pas la passer à l'insu du joueur (research R5).
 const SKIP_ARM_MS = 200;
+
+const rarityLabel = (rarity: Rarity) => RARITIES.find(r => r.id === rarity)!.label;
 
 interface GachaData {
   progression: Progression;
@@ -46,6 +49,9 @@ export class GachaScene extends Phaser.Scene {
   private counterText!: Phaser.GameObjects.Text;
   private shardsText!: Phaser.GameObjects.Text;
   private pityText!: Phaser.GameObjects.Text;
+  private bannerName!: Phaser.GameObjects.Text;
+  private bannerDetail!: Phaser.GameObjects.Text;
+  private featuredText!: Phaser.GameObjects.Text;
   private shortageText!: Phaser.GameObjects.Text;
   private singleButton!: Button;
   private tenButton!: Button;
@@ -61,6 +67,7 @@ export class GachaScene extends Phaser.Scene {
     this.drawHeader();
     this.drawOrb();
     this.drawMuteButton();
+    this.drawBannerSelector();
 
     this.singleButton = makeButton(this, GACHA.pullSingle,
       `Tirer ×1 — ${formatAmount(GACHA_CONFIG.costSingle)}`, COLORS.btn.primary, () => this.onPull(1));
@@ -72,6 +79,7 @@ export class GachaScene extends Phaser.Scene {
       .setOrigin(0.5, 0);
 
     this.pityText = this.add.text(GACHA.orb.x, GACHA.pityLineY, '', textStyle(FONT_SIZE.body, CSS.textDim)).setOrigin(0.5);
+    this.featuredText = this.add.text(GACHA.orb.x, GACHA.featuredLineY, '', textStyle(FONT_SIZE.body)).setOrigin(0.5);
     makeButton(this, GACHA.collection, 'Collection', COLORS.btn.secondary, () => this.showCollection());
     makeButton(this, GACHA.rates, 'Taux', COLORS.btn.secondary, () => this.showRates());
     makeButton(this, GACHA.reset, 'Recommencer', COLORS.btn.neutral, () => this.showResetConfirm());
@@ -138,6 +146,30 @@ export class GachaScene extends Phaser.Scene {
     }
   }
 
+  // Bannières (006) : flèches en boucle. Pendant une fenêtre, le voile les recouvre.
+  private drawBannerSelector() {
+    makePanel(this, GACHA.banner);
+    const { x, y } = center(GACHA.banner);
+    this.bannerName = this.add.text(x, y - 8, '', textStyle(FONT_SIZE.body)).setOrigin(0.5);
+    this.bannerDetail = this.add.text(x, y + 10, '', textStyle(FONT_SIZE.micro, CSS.textDim)).setOrigin(0.5);
+    const V = Phaser.Math.Vector2;
+    for (const [r, step] of [[GACHA.bannerPrev, -1], [GACHA.bannerNext, 1]] as const) {
+      makeButton(this, r, '', COLORS.btn.neutral, () => this.onCycleBanner(step));
+      const c = center(r);
+      const tip = step * 6;
+      this.add.graphics().fillStyle(COLORS.ink, 1)
+        .fillPoints([new V(c.x + tip, c.y), new V(c.x - tip, c.y - 8), new V(c.x - tip, c.y + 8)], true);
+    }
+  }
+
+  // Sans garde modalOpen : le voile d'une fenêtre recouvre les flèches (vérifié par
+  // l'e2e « les flèches ne réagissent pas sous une fenêtre », mutation survivante).
+  private onCycleBanner(step: 1 | -1) {
+    this.progression = cycleBanner(this.progression, step);
+    this.persist();
+    this.refresh();
+  }
+
   private persistSettings() {
     try {
       localStorage.setItem(SETTINGS_KEY, serializeSettings({ muted: this.sfx.isMuted }));
@@ -155,6 +187,24 @@ export class GachaScene extends Phaser.Scene {
     this.pityText.setText(left === 1
       ? 'Légendaire garanti au prochain tirage'
       : `Légendaire garanti dans ${left} tirages au plus`);
+    const banner = activeBanner(p);
+    // Signal pour l'e2e : la bannière active, sans lire le canvas.
+    document.body.dataset.banner = banner.id;
+    const vedette = banner.featured;
+    if (vedette) {
+      const count = p.owned[vedette.id] ?? 0;
+      this.bannerName.setText(vedette.name);
+      this.bannerDetail.setText(
+        `${rarityLabel(vedette.rarity)} · ${count > 0 ? `possédé ×${count}` : 'pas encore obtenu'}`);
+    } else {
+      this.bannerName.setText('Bannière standard');
+      this.bannerDetail.setText('Tous les éléments, taux de base');
+    }
+    // Tournure sans accord : la vedette peut être féminine (Marquise Cerise).
+    this.featuredText.setText(vedette && hasFeaturedGuarantee(p)
+      ? `Prochain ${rarityLabel(vedette.rarity)} garanti\u00a0: ${vedette.name}`
+      : '');
+    document.body.dataset.featuredLine = this.featuredText.text;
     const single = canAfford(p, 1);
     const ten = canAfford(p, 10);
     this.singleButton.setEnabled(single);
@@ -313,7 +363,8 @@ export class GachaScene extends Phaser.Scene {
 
   private showRates() {
     if (this.modalOpen) return;
-    const { modal, rect, bodyY } = this.dialog('rates', RATES_DIALOG_H, 'Taux par rareté');
+    const vedette = activeBanner(this.progression).featured;
+    const { modal, rect, bodyY } = this.dialog('rates', ratesDialogH(vedette !== null), 'Taux par rareté');
     const left = rect.x + DIALOG.padding;
     const right = rect.x + rect.w - DIALOG.padding;
     let y = bodyY;
@@ -332,6 +383,17 @@ export class GachaScene extends Phaser.Scene {
       + 'le compteur repart de zéro à chaque Légendaire ou Ultra rare.',
       { ...textStyle(FONT_SIZE.body, CSS.textDim), wordWrap: { width: right - left }, lineSpacing: 2 });
     modal.add(rules);
+    if (vedette) {
+      // Bannière vedette (006, FR-016) : sa chance par tirage et la règle du 50/50.
+      y = rules.y + rules.height + 16;
+      const label = rarityLabel(vedette.rarity);
+      modal.add(this.add.text(left, y, `Vedette\u00a0: ${vedette.name}`, textStyle(FONT_SIZE.body)));
+      modal.add(this.add.text(right, y, formatPercent(featuredRatePercent(vedette)), textStyle(FONT_SIZE.body)).setOrigin(1, 0));
+      modal.add(this.add.text(left, y + 26,
+        `Quand un ${label} tombe ici, une chance sur deux que ce soit ${vedette.name}. `
+        + `Sinon, le prochain ${label} de cette bannière sera ${vedette.name}.`,
+        { ...textStyle(FONT_SIZE.body, CSS.textDim), wordWrap: { width: right - left }, lineSpacing: 2 }));
+    }
     const [close] = dialogButtons(rect, 1);
     modal.add(makeButton(this, close!, 'Fermer', COLORS.btn.secondary, () => this.closeModal(modal)).container);
   }
@@ -410,7 +472,7 @@ export class GachaScene extends Phaser.Scene {
       // Sauvegardé avant d'afficher, comme un tirage.
       this.persist();
       this.refresh();
-      this.showResults([{ item: outcome.item, isNew: true, guaranteed: false, pity: false, shards: 0 }], before);
+      this.showResults([{ item: outcome.item, isNew: true, guaranteed: false, pity: false, shards: 0, featuredGuarantee: false }], before);
     }).container);
     modal.add(makeButton(this, cancel!, 'Annuler', COLORS.btn.neutral, () => {
       this.closeModal(modal);

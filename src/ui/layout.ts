@@ -14,15 +14,21 @@ const half = (CONTENT_W - MARGIN) / 2;
 
 export const GACHA = {
   header: { x: MARGIN, y: MARGIN, w: CONTENT_W, h: 52 },
+  // Bannière (006), sous l'en-tête, à gauche du bouton son : ◀ nom ▶.
+  bannerPrev: { x: MARGIN, y: 76, w: 40, h: 40 },
+  banner: { x: MARGIN + 44, y: 76, w: 188, h: 40 },
+  bannerNext: { x: MARGIN + 236, y: 76, w: 40, h: 40 },
   // Bouton son (005), sous l'en-tête à droite, à l'écart de l'orbe.
   mute: { x: WIDTH - MARGIN - 44, y: 76, w: 44, h: 40 },
-  orb: { x: WIDTH / 2, y: 170, r: 64 },
-  // Ligne du pity, sous l'orbe (002).
-  pityLineY: 250,
-  pullSingle: { x: MARGIN, y: 274, w: CONTENT_W, h: 56 },
-  pullTen: { x: MARGIN, y: 342, w: CONTENT_W, h: 68 },
-  shortageMessageY: 422,
-  collection: { x: MARGIN, y: 476, w: CONTENT_W, h: 48 },
+  // Orbe réduit en 006 pour laisser la place au bandeau de bannière.
+  orb: { x: WIDTH / 2, y: 182, r: 54 },
+  // Ligne du pity, sous l'orbe (002), puis celle de la garantie vedette (006).
+  pityLineY: 252,
+  featuredLineY: 272,
+  pullSingle: { x: MARGIN, y: 292, w: CONTENT_W, h: 56 },
+  pullTen: { x: MARGIN, y: 358, w: CONTENT_W, h: 68 },
+  shortageMessageY: 436,
+  collection: { x: MARGIN, y: 486, w: CONTENT_W, h: 48 },
   rates: { x: MARGIN, y: 560, w: half, h: 48 },
   reset: { x: MARGIN * 2 + half, y: 560, w: half, h: 48 },
 } as const satisfies Record<string, unknown>;
@@ -121,5 +127,7 @@ export function dialogButtons(dialog: Rect, count: 1 | 2): Rect[] {
 
 // Hauteurs des fenêtres, partagées avec l'e2e pour viser leurs boutons.
 export const RATES_DIALOG_H = 400;
+// Sur une bannière vedette, la fenêtre des taux gagne la ligne de la vedette et la règle du 50/50.
+export const ratesDialogH = (featured: boolean) => (featured ? RATES_DIALOG_H + 112 : RATES_DIALOG_H);
 export const CONFIRM_DIALOG_H = 156;
 export const WARNING_DIALOG_H = 156;
