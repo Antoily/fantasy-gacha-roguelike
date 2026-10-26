@@ -32,9 +32,9 @@ joueur devine ce qu'il a eu avant de voir les cartes, et un tirage rare devient 
 ### Session 2026-10-26 (révision)
 
 - Demande de l'utilisateur : « les animations sont sommaires ; plus de particules, une révélation un à un des résultats, avec une légère animation par résultat selon la rareté ; quelque chose qui incarne le suspense, sans que ce soit trop long. Fais des propositions, on corrigera le tir. »
-- Q: Comment incarner le suspense sans allonger ? → A (proposition de Claude, en attente du retour de l'utilisateur) : le temps se mérite. Un Commun passe vite ; plus un résultat est rare, plus sa carte tremble et s'allume avant de se retourner. Pendant le suspense, l'orbe aspire des particules et un halo bat de plus en plus vite.
-- Q: Quelles particules ? → A (proposition) : explosion à chaque palier, plus nombreuse et plus variée avec le rang (points, puis étoiles dès Rare, confettis dès Légendaire, arc-en-ciel pour l'Ultra rare) ; pluie d'étoiles plein écran pour Légendaire et Ultra rare ; au leurre, l'énergie s'éteint et retombe.
-- Q: Et la carte vedette du ×10 ? → A (proposition) : les cartes déjà vues s'assombrissent, son dos bat comme un cœur (plus longtemps si elle est plus rare), puis elle éclate.
+- Q: Comment incarner le suspense sans allonger ? → A (proposé par Claude, validé par l'utilisateur sur le jeu) : le temps se mérite. Un Commun passe vite ; plus un résultat est rare, plus sa carte tremble et s'allume avant de se retourner. Pendant le suspense, l'orbe aspire des particules et un halo bat de plus en plus vite.
+- Q: Quelles particules ? → A (proposé, validé) : explosion à chaque palier, plus nombreuse et plus variée avec le rang (points, puis étoiles dès Rare, confettis dès Légendaire, arc-en-ciel pour l'Ultra rare) ; pluie d'étoiles plein écran pour Légendaire et Ultra rare ; au leurre, l'énergie s'éteint et retombe.
+- Q: Et la carte vedette du ×10 ? → A (proposé, validé) : les cartes déjà vues s'assombrissent, son dos bat comme un cœur (plus longtemps si elle est plus rare), puis elle éclate.
 
 
 
