@@ -55,9 +55,9 @@ liste plutôt qu'objet : une garantie est ouverte ou non, rien d'autre à reteni
 **Décision** : un bandeau sous l'en-tête, à gauche du bouton son : flèche ◀, nom de la
 bannière (vedette : son nom ; sinon « Bannière standard ») sur une ligne, détail en
 petit dessous (« Légendaire · possédé ×2 » / « Légendaire · pas encore obtenu » /
-« Tous les éléments, taux de base »), flèche ▶. L'orbe passe au rayon 56 et descend ;
-une ligne sous celle du pity annonce « Vedette garantie au prochain Légendaire » quand la
-garantie de la bannière est ouverte. Les boutons descendent d'autant.
+« Tous les éléments, taux de base »), flèche ▶. L'orbe passe au rayon 54 et descend ;
+une ligne sous celle du pity annonce « Prochain Légendaire garanti : <vedette> » quand
+la garantie de la bannière est ouverte. Les boutons descendent d'autant.
 
 **Pourquoi** : le joueur voit la bannière active sans appui (FR-003), et chaque
 bannière est à un appui (FR-004, SC-004). Pas de fenêtre de choix : 6 bannières tiennent

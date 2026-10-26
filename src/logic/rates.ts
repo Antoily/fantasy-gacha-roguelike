@@ -1,4 +1,5 @@
-import { RARITIES, type Rarity, type RarityInfo } from '../data/gachaConfig';
+import type { Item } from '../data/catalogue';
+import { GACHA_CONFIG, RARITIES, type Rarity, type RarityInfo } from '../data/gachaConfig';
 import type { Rng } from './rng';
 
 const TOTAL_WEIGHT = RARITIES.reduce((sum, r) => sum + r.weight, 0);
@@ -13,9 +14,15 @@ export function ratePercent(rarity: Rarity): number {
   return (info.weight / TOTAL_WEIGHT) * 100;
 }
 
+// Chance d'obtenir la vedette à un tirage, hors garanties (006, FR-016) : même source
+// que le tirage, qui applique featuredChance à la rareté tirée.
+export function featuredRatePercent(item: Item): number {
+  return ratePercent(item.rarity) * GACHA_CONFIG.featuredChance;
+}
+
 export function formatPercent(value: number): string {
-  // Arrondi d'affichage à une décimale ; les poids entiers sur 1 000 n'en ont pas besoin de plus.
-  const rounded = Math.round(value * 10) / 10;
+  // Deux décimales au plus : une vedette Légendaire est à 1,25 %, pas « 1,3 % ».
+  const rounded = Math.round(value * 100) / 100;
   return `${String(rounded).replace('.', ',')} %`;
 }
 

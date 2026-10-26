@@ -27,6 +27,11 @@ export const GACHA_CONFIG = {
   // Pity (002) : Légendaire ou mieux au plus tard au 40ᵉ tirage sans en avoir eu.
   pityThreshold: 40,
   pityMinRank: 3,
+  // Bannières (006) : une par élément de ce rang ou plus ; quand la rareté de la
+  // vedette tombe sur sa bannière, c'est elle avec cette chance (50/50), sinon la
+  // suivante de cette rareté sur cette bannière l'est à coup sûr.
+  featuredMinRank: 3,
+  featuredChance: 0.5,
 } as const;
 
 // Éclats (002) : gagnés sur un doublon, dépensés pour obtenir un élément manquant.

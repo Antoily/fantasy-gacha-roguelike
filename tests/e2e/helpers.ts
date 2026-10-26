@@ -3,9 +3,12 @@ import { CATALOGUE } from '../../src/data/catalogue';
 import { RARITIES } from '../../src/data/gachaConfig';
 import { center, type Rect } from '../../src/ui/layout';
 
-export interface Save { version: number; currency: number; owned: Record<string, number>; pity?: number; shards?: number }
+export interface Save {
+  version: number; currency: number; owned: Record<string, number>; pity?: number; shards?: number;
+  banner?: string; guarantees?: string[];
+}
 export const KEY = 'gacha.save';
-export const FRESH = { version: 2, currency: 9000, owned: {}, pity: 0, shards: 0 };
+export const FRESH = { version: 3, currency: 9000, owned: {}, pity: 0, shards: 0, banner: 'standard', guarantees: [] as string[] };
 
 let shot = 0;
 export async function capture(page: Page, name: string) {

@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { initialProgression, type Progression } from './progression';
 import { parseSave, SAVE_VERSION, serializeSave } from './save';
 
-const sample: Progression = { currency: 8100, owned: { gribouille: 2, orbulle: 1 }, pity: 17, shards: 4 };
+const sample: Progression = {
+  currency: 8100, owned: { gribouille: 2, orbulle: 1 }, pity: 17, shards: 4, banner: 'orbulle', guarantees: ['tonnerrouf'],
+};
+const NO_BANNER = { banner: 'standard', guarantees: [] };
 
 describe('sauvegarde (FR-018, ADR 0005)', () => {
   it('relit exactement ce qu’elle a écrit', () => {
@@ -42,10 +45,37 @@ describe('sauvegarde (FR-018, ADR 0005)', () => {
     expect(parseSave(raw).status).toBe('corrupted');
   });
 
+  it('reprend une sauvegarde v2 sans perte, sur la standard, sans garantie (FR-019)', () => {
+    const raw = JSON.stringify({ version: 2, currency: 4200, owned: { orbulle: 1 }, pity: 12, shards: 30 });
+    expect(parseSave(raw)).toEqual({
+      progression: { currency: 4200, owned: { orbulle: 1 }, pity: 12, shards: 30, ...NO_BANNER },
+      status: 'loaded',
+    });
+  });
+
+  it('retombe sur la standard pour une bannière inconnue, ignore les garanties inconnues ou en double', () => {
+    const raw = JSON.stringify({
+      version: 3, currency: 10, owned: {}, pity: 0, shards: 0,
+      banner: 'ancienne', guarantees: ['orbulle', 'ancienne', 'standard', 'flambichon', 'orbulle'],
+    });
+    expect(parseSave(raw)).toMatchObject({ progression: { banner: 'standard', guarantees: ['orbulle'] }, status: 'loaded' });
+  });
+
+  it.each([
+    ['bannière absente', { guarantees: [] }],
+    ['bannière non textuelle', { banner: 3, guarantees: [] }],
+    ['garanties absentes', { banner: 'standard' }],
+    ['garanties pas une liste', { banner: 'standard', guarantees: 'orbulle' }],
+    ['garantie non textuelle', { banner: 'standard', guarantees: [1] }],
+  ])('signale une sauvegarde v3 corrompue : %s', (_label, extra) => {
+    const raw = JSON.stringify({ version: 3, currency: 10, owned: {}, pity: 0, shards: 0, ...extra });
+    expect(parseSave(raw).status).toBe('corrupted');
+  });
+
   it('reprend une sauvegarde de la version 001 sans perte, pity 0 et 0 éclat (FR-020)', () => {
     const raw = JSON.stringify({ version: 1, currency: 4200, owned: { gribouille: 3, orbulle: 1 } });
     expect(parseSave(raw)).toEqual({
-      progression: { currency: 4200, owned: { gribouille: 3, orbulle: 1 }, pity: 0, shards: 0 },
+      progression: { currency: 4200, owned: { gribouille: 3, orbulle: 1 }, pity: 0, shards: 0, ...NO_BANNER },
       status: 'loaded',
     });
   });
@@ -61,10 +91,11 @@ describe('sauvegarde (FR-018, ADR 0005)', () => {
     const migrations = {
       0: (d: Record<string, unknown>) => ({ version: 1, currency: d.coins, owned: d.owned }),
       1: (d: Record<string, unknown>) => ({ ...d, version: 2, pity: 0, shards: 0 }),
+      2: (d: Record<string, unknown>) => ({ ...d, version: 3, banner: 'standard', guarantees: [] }),
     };
     const raw = JSON.stringify({ version: 0, coins: 500, owned: { orbulle: 1 } });
     expect(parseSave(raw, migrations)).toEqual({
-      progression: { currency: 500, owned: { orbulle: 1 }, pity: 0, shards: 0 },
+      progression: { currency: 500, owned: { orbulle: 1 }, pity: 0, shards: 0, ...NO_BANNER },
       status: 'loaded',
     });
   });

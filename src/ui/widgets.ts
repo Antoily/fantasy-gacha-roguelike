@@ -138,7 +138,7 @@ export function makeResultCard(
     y += 24;
     c.add(makeBadge(scene, cx, y, badge, result.isNew, 0.5));
     if (result.shards > 0) c.add(makeShardAmount(scene, cx, y + 34, `+${result.shards} éclats`, 0.5));
-    if (result.pity) c.add(makeSticker(scene, r.x + r.w - 8, r.y - 8, 'Garanti !'));
+    if (result.pity || result.featuredGuarantee) c.add(makeSticker(scene, r.x + r.w - 8, r.y - 8, 'Garanti !'));
     return c;
   }
 
@@ -150,7 +150,7 @@ export function makeResultCard(
   if (result.shards > 0) c.add(makeShardAmount(scene, r.x + r.w - pad, r.y + 79, `+${result.shards}`, 1));
   // Pastille façon autocollant, à cheval sur le bord : la ligne du bas est déjà pleine
   // quand un résultat forcé est aussi un doublon.
-  if (result.pity) c.add(makeSticker(scene, r.x + r.w - 6, r.y - 7, 'Garanti !'));
+  if (result.pity || result.featuredGuarantee) c.add(makeSticker(scene, r.x + r.w - 6, r.y - 7, 'Garanti !'));
   return c;
 }
 

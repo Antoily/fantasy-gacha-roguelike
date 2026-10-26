@@ -95,11 +95,11 @@ test('annuler un échange ramène à la collection sans rien dépenser', async (
   expect(await save(page)).toEqual(before);
 });
 
-test('une sauvegarde de la version 001 est reprise et passe en version 2', async ({ page }) => {
+test('une sauvegarde de la version 001 est reprise et passe à la version courante', async ({ page }) => {
   await loadWith(page, { version: 1, currency: 4200, owned: { gribouille: 3 } });
   await tap(page, GACHA.pullSingle);
   const after = (await save(page))!;
-  expect(after.version).toBe(2);
+  expect(after.version).toBe(3);
   expect(after.currency).toBe(4100);
   expect(after.owned.gribouille).toBeGreaterThanOrEqual(3);
   expect(after.pity).toBeLessThanOrEqual(1);

@@ -5,7 +5,8 @@
 #   scripts/mutate-e2e.sh <fichier> '<ancien texte>' '<nouveau texte>' [args playwright…]
 #   ex. scripts/mutate-e2e.sh src/scenes/GachaScene.ts 'const SKIP_ARM_MS = 200;' 'const SKIP_ARM_MS = 0;' tests/e2e/revelation.spec.ts -g verrou
 #
-# Sortie 0 = mutation détectée, 1 = survivante, 2 = texte introuvable.
+# Sortie 0 = mutation détectée, 1 = survivante, 2 = texte introuvable, 3 = la mutation
+# ne compile pas (rien n'est prouvé : un build cassé ferait échouer n'importe quel test).
 set -uo pipefail
 file=$1 old=$2 new=$3
 shift 3
@@ -27,6 +28,11 @@ PY
 if ss -ltn 2>/dev/null | grep -q ':4173 '; then
   echo "un serveur écoute déjà sur 4173 : il servirait le build non muté" >&2
   exit 2
+fi
+# 006 : une mutation qui ne passait pas tsc était comptée « détectée » à tort.
+if ! npx tsc --noEmit >/dev/null 2>&1; then
+  echo "? INVALIDE  : $file : « $old » → « $new » (ne compile pas)"
+  exit 3
 fi
 if timeout 400 npx playwright test "$@" >/dev/null 2>&1; then
   echo "✗ SURVIVANTE : $file : « $old » → « $new »"
