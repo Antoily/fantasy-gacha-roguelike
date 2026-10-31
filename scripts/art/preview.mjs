@@ -29,7 +29,7 @@ const uri = path => `data:image/svg+xml;base64,${readFileSync(path).toString('ba
 const maybe = path => (existsSync(path) ? uri(path) : null);
 
 // Fenêtre w×h px sur la zone (x, y, cw, ch) d'une illustration de 400×500.
-function crop(src, { x, y, w: cw, h: ch }, w, h, style = '') {
+function crop(src, { x, y, w: cw }, w, h, style = '') {
   const s = w / cw;
   return `<div style="position:relative;overflow:hidden;width:${w}px;height:${h}px;flex:none;${style}">`
     + `<img src="${src}" style="position:absolute;left:${-x * s}px;top:${-y * s}px;width:${400 * s}px;height:${500 * s}px"></div>`;
