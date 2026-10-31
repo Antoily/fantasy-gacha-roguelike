@@ -11,7 +11,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "art:check": "node --no-warnings scripts/art/check.mjs",
+    "art:preview": "node --no-warnings scripts/art/preview.mjs"
   },
   "dependencies": {
     "phaser": "4.2.1"

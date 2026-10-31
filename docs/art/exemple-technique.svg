@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <!-- Exemple de TECHNIQUE (pas un personnage du jeu) : charte docs/art/charte.md, § Construction. -->
+  <defs>
+    <!-- Silhouette définie une fois : aplat, découpe des ombres et contour s'en servent. -->
+    <path id="exemple-technique-corps" d="M200 92 C 292 92 338 170 338 268 C 338 378 282 442 200 442 C 118 442 62 378 62 268 C 62 170 108 92 200 92 Z"/>
+    <clipPath id="exemple-technique-corps-clip"><use href="#exemple-technique-corps"/></clipPath>
+    <path id="exemple-technique-oreille" d="M112 150 C 82 118 70 70 92 42 C 128 52 156 92 160 122 Z"/>
+    <clipPath id="exemple-technique-oreille-clip"><use href="#exemple-technique-oreille"/></clipPath>
+    <radialGradient id="exemple-technique-volume" cx="0.36" cy="0.3" r="0.85">
+      <stop offset="0" stop-color="#a6e88f"/>
+      <stop offset="1" stop-color="#63c25b"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ombre portée au sol : encre à 18 %. -->
+  <ellipse cx="200" cy="452" rx="122" ry="15" fill="#1d1a16" opacity="0.18"/>
+
+  <!-- Oreille (derrière le corps) : même recette en plus petit. -->
+  <use href="#exemple-technique-oreille" fill="#63c25b"/>
+  <g clip-path="url(#exemple-technique-oreille-clip)">
+    <path d="M100 40 C 130 70 150 100 156 130 L 180 130 L 180 30 Z" fill="#3f8f4f"/>
+    <path d="M96 70 C 104 96 118 116 132 128" fill="none" stroke="#ff9db0" stroke-width="12" stroke-linecap="round"/>
+  </g>
+  <use href="#exemple-technique-oreille" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+  <!-- 1. Aplat de base (dégradé doux autorisé sur un grand volume rond). -->
+  <use href="#exemple-technique-corps" fill="url(#exemple-technique-volume)"/>
+  <!-- 2. Ombre propre et lumières, découpées par la silhouette : rien ne déborde. -->
+  <g clip-path="url(#exemple-technique-corps-clip)">
+    <!-- Ombre propre : grande forme à bord net, côté opposé à la lumière (haut gauche). -->
+    <path d="M338 150 C 318 300 262 402 118 446 L 360 470 L 360 120 Z" fill="#3f8f4f"/>
+    <!-- Occlusion : sous le visage, plus sombre encore. -->
+    <path d="M150 352 C 180 372 226 372 254 350 C 236 384 168 386 150 352 Z" fill="#2f7040"/>
+    <!-- Reflet principal (haut gauche) puis petit reflet nerveux. -->
+    <path d="M118 168 C 132 128 172 106 214 108 C 172 124 146 150 134 192 Z" fill="#e2f9cf"/>
+    <circle cx="232" cy="118" r="7" fill="#e2f9cf"/>
+    <!-- Liseré de contre-jour sur le bord ombré (dès Rare, facultatif avant). -->
+    <path d="M322 232 C 330 286 322 338 298 380" fill="none" stroke="#c9f2a6" stroke-width="5" stroke-linecap="round"/>
+    <!-- Détail de matière : taches, avec leur propre petite ombre. -->
+    <circle cx="282" cy="196" r="13" fill="#4fae55"/>
+    <circle cx="300" cy="232" r="8" fill="#4fae55"/>
+    <circle cx="96" cy="300" r="10" fill="#7ccf6a"/>
+  </g>
+  <!-- 3. Contour de silhouette par-dessus : 7 (traits intérieurs 4,5 ; détails 2,5). -->
+  <use href="#exemple-technique-corps" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+  <!-- Yeux de la charte : blanc cassé cerné, iris, pupille, deux reflets. -->
+  <ellipse cx="158" cy="236" rx="25" ry="31" fill="#fffaf0" stroke="#1d1a16" stroke-width="4.5"/>
+  <ellipse cx="164" cy="242" rx="16" ry="20" fill="#3b6fd6"/>
+  <ellipse cx="164" cy="248" rx="16" ry="12" fill="#2a4fa8"/>
+  <ellipse cx="165" cy="244" rx="8.5" ry="11" fill="#1d1a16"/>
+  <circle cx="157" cy="232" r="6.5" fill="#ffffff"/>
+  <circle cx="172" cy="254" r="2.8" fill="#ffffff"/>
+  <ellipse cx="246" cy="236" rx="25" ry="31" fill="#fffaf0" stroke="#1d1a16" stroke-width="4.5"/>
+  <ellipse cx="252" cy="242" rx="16" ry="20" fill="#3b6fd6"/>
+  <ellipse cx="252" cy="248" rx="16" ry="12" fill="#2a4fa8"/>
+  <ellipse cx="253" cy="244" rx="8.5" ry="11" fill="#1d1a16"/>
+  <circle cx="245" cy="232" r="6.5" fill="#ffffff"/>
+  <circle cx="260" cy="254" r="2.8" fill="#ffffff"/>
+  <!-- Sourcils : traits épais aux bouts ronds, qui portent l'expression. -->
+  <path d="M132 192 C 146 182 164 182 176 188" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linecap="round"/>
+  <path d="M228 188 C 242 180 260 182 272 192" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Joues : rose à 55 %, petit reflet. -->
+  <ellipse cx="124" cy="292" rx="20" ry="11" fill="#ff7f96" opacity="0.55"/>
+  <ellipse cx="282" cy="292" rx="20" ry="11" fill="#ff7f96" opacity="0.55"/>
+  <!-- Bouche : intérieur sombre, langue, contour intérieur 4,5. -->
+  <path d="M170 298 C 186 300 222 300 238 296 C 232 330 178 334 170 298 Z" fill="#6e2430"/>
+  <path d="M186 322 C 196 312 214 312 224 320 C 214 330 194 330 186 322 Z" fill="#ff8d9e"/>
+  <path d="M170 298 C 186 300 222 300 238 296 C 232 330 178 334 170 298 Z" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Effet d'accompagnement : étincelle à quatre branches cernée. -->
+  <path d="M330 70 L 338 92 L 360 100 L 338 108 L 330 130 L 322 108 L 300 100 L 322 92 Z" fill="#ffd34d" stroke="#1d1a16" stroke-width="3" stroke-linejoin="round"/>
+</svg>

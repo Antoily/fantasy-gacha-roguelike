@@ -36,6 +36,12 @@ joueur devine ce qu'il a eu avant de voir les cartes, et un tirage rare devient 
 - Q: Quelles particules ? → A (proposé, validé) : explosion à chaque palier, plus nombreuse et plus variée avec le rang (points, puis étoiles dès Rare, confettis dès Légendaire, arc-en-ciel pour l'Ultra rare) ; pluie d'étoiles plein écran pour Légendaire et Ultra rare ; au leurre, l'énergie s'éteint et retombe.
 - Q: Et la carte vedette du ×10 ? → A (proposé, validé) : les cartes déjà vues s'assombrissent, son dos bat comme un cœur (plus longtemps si elle est plus rare), puis elle éclate.
 
+### Session 2026-10-30 (révision 2, avec la feature 007)
+
+- Demande de l'utilisateur : « on avance un peu avec l'animation des tirages, mais il faudrait un peu plus de particules, et un peu plus de suspense ».
+- Q: Combien de suspense avant l'explosion (0,9 s jusqu'ici) ? → A: Environ 1,6 s, en trois temps : l'écran plonge dans la nuit, l'orbe aspire l'énergie et se fissure en trois étapes, tout se fige un instant, puis elle éclate. Le tirage complet reste dans les bornes de FR-010.
+- Q: Quelles particules en plus ? → A (proposé par Claude, à valider sur le jeu) : au moins deux fois plus de particules à chaque palier et à chaque carte, des lueurs et des traînées, les éclats de verre de l'orbe brisée, un cercle magique qui prend la couleur du palier, une pluie plus dense pour Légendaire et Ultra rare.
+
 
 
 ### User Story 1 - Deviner son meilleur résultat avant les cartes (Priority: P1)
@@ -171,6 +177,8 @@ une, la meilleure en dernier ; les 10 finissent visibles, à la même place qu'e
 - **FR-013** *(révision 2026-10-26)*: L'animation MUST comporter des particules : aspirées par l'orbe pendant le suspense (sans couleur de palier), en explosion à chaque palier montré (plus nombreuses et plus variées avec le rang ; une fausse piste explose comme un vrai palier), en pluie plein écran pour Légendaire et Ultra rare. Au leurre, les particules du faux palier s'éteignent avant le vrai.
 - **FR-014** *(révision 2026-10-26)*: Chaque carte retournée MUST avoir un éclat propre à sa rareté (particules, rebond, onde dès Rare). À partir de Rare, son dos tremble et prend la couleur de la rareté avant de se retourner, d'autant plus longtemps que la rareté est haute ; un Commun ou un Peu commun se retourne sans attendre. Avant la vedette, les autres cartes s'assombrissent et son dos bat, plus longtemps si elle est plus rare. Sur l'écran final, les cartes Légendaire et Ultra rare scintillent.
 - **FR-015** *(révision 2026-10-26)*: Un ×10 sans rien au-dessus du Rare MUST se retourner en 3,5 s au plus ; si les créneaux des cartes rares dépassent la borne de FR-010 (4 s), les cartes ordinaires accélèrent et la vedette garde son temps fort.
+- **FR-016** *(révision 2026-10-30)*: Le suspense MUST durer environ 1,6 s et monter en trois temps, identiques pour tous les paliers (FR-002) : l'écran plonge dans la nuit et l'orbe gagne le centre au-dessus d'un cercle magique qui s'allume ; l'orbe aspire l'énergie de plus en plus vite et se fissure en trois étapes, une lumière **neutre** filtrant par les fissures (elle ne trahit aucun palier) ; tout se fige un court instant ; puis l'orbe éclate sur le premier palier montré. Les bornes de FR-010 restent valables.
+- **FR-017** *(révision 2026-10-30)*: À chaque palier montré et à chaque carte retournée, l'éclat MUST compter au moins deux fois plus de particules que dans la révision du 2026-10-26, avec des lueurs et des traînées ; l'orbe brisée projette des éclats de verre et le cercle magique prend la couleur du palier ; la pluie de Légendaire et d'Ultra rare MUST être plus dense qu'avant.
 
 ### Key Entities
 
