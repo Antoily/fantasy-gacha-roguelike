@@ -2,6 +2,7 @@
 // Playwright : c'est le moteur qui rastérise les SVG pour Phaser, donc ce qu'on voit ici
 // est ce que verra le joueur. Sortie dans test-results/art/<nom>/ (non versionné).
 //
+//   npm run art:preview -- gallery
 //   npm run art:preview -- character <id>
 //   npm run art:preview -- ui <fichier.svg> [--size LxH]... [--bg #couleur]... [--mock main|reveal|cards]...
 //
@@ -202,6 +203,19 @@ function uiSheet(file, sizes, bgs, mocks, cracks) {
   return { name, pages };
 }
 
+// Galerie : toutes les illustrations côte à côte, pour juger la cohérence de l'ensemble.
+function gallery() {
+  const cards = CATALOGUE.map(item => {
+    const svg = join(root, 'public/art/characters', `${item.id}.svg`);
+    const color = hex(COLORS.rarity[item.rarity]);
+    const tint = `radial-gradient(circle at 50% 40%, #fff 0%, ${color}55 70%, ${color}aa 100%)`;
+    const art = existsSync(svg) ? `<img src="${uri(svg)}" width="200" height="250" style="display:block">` : '<div style="width:200px;height:250px"></div>';
+    return `<div style="background:${tint};border:3px solid ${INK};border-radius:12px;padding:4px">${art}`
+      + `<div class="t" style="text-align:center;font-size:15px">${item.name}</div></div>`;
+  }).join('');
+  return { name: 'galerie', pages: [{ file: 'galerie.png', html: PAGE(`<div class="row">${cards}</div>`, 1150), width: 1182, scale: 1 }] };
+}
+
 function parseArgs(argv) {
   const [mode, target, ...rest] = argv;
   const opts = { sizes: [], bgs: [], mocks: [], cracks: 0 };
@@ -217,11 +231,12 @@ function parseArgs(argv) {
 }
 
 const { mode, target, opts } = parseArgs(process.argv.slice(2));
-if (!['character', 'ui'].includes(mode) || !target) {
-  console.error('usage : preview.mjs character <id> | ui <fichier.svg> [--size LxH] [--bg #hex] [--mock main|reveal|cards] [--cracks 1-3]');
+if (!['character', 'ui', 'gallery'].includes(mode) || (mode !== 'gallery' && !target)) {
+  console.error('usage : preview.mjs gallery | character <id> | ui <fichier.svg> [--size LxH] [--bg #hex] [--mock main|reveal|cards] [--cracks 1-3]');
   process.exit(2);
 }
-const sheet = mode === 'character' ? characterSheet(target) : uiSheet(target, opts.sizes, opts.bgs, opts.mocks, opts.cracks);
+const sheet = mode === 'gallery' ? gallery()
+  : mode === 'character' ? characterSheet(target) : uiSheet(target, opts.sizes, opts.bgs, opts.mocks, opts.cracks);
 const out = join(root, 'test-results/art', sheet.name);
 mkdirSync(out, { recursive: true });
 const browser = await chromium.launch();
