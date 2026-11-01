@@ -6,7 +6,7 @@ mergée et jouable.
 
 ## En cours
 
-_Rien : prochaine étape à choisir avec l'utilisateur (« Plus tard »)._
+- **007 Illustrations** (`specs/007-illustrations/`) : une illustration cartoon détaillée par élément (cartes, collection en silhouettes, bannière), présentation plein écran des Légendaires et Ultra rares, écran de tirage habillé ; avec la révision 2 de 004 (suspense de 1,6 s en trois temps, deux fois plus de particules).
 
 ## Ensuite — le gacha
 
