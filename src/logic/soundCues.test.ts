@@ -6,7 +6,7 @@ import { SOUND_RECIPES } from '../data/sounds';
 import type { PullResult } from './gacha';
 import { flipOrder, flipSchedule, planReveal, revealDuration, type RevealPlan } from './reveal';
 import { DEFAULT_SETTINGS, parseSettings, serializeSettings } from './settings';
-import { flipCues, revealCues } from './soundCues';
+import { crackTimes, flipCues, revealCues } from './soundCues';
 import { scriptedRng } from './testing';
 
 const res = (rarity: Rarity): PullResult =>
@@ -14,17 +14,28 @@ const res = (rarity: Rarity): PullResult =>
 const plan = (rarity: Rarity, u: number, v = 0.5): RevealPlan => planReveal([res(rarity)], scriptedRng([u, v]));
 const names = (p: RevealPlan) => revealCues(p).map(c => c.cue);
 const ALL: Rarity[] = RARITIES.map(r => r.id);
+// Début de toute révélation : la sirène, puis un craquement à chaque fissure (FR-016).
+const OPENING = [{ at: 0, cue: 'suspense' }, ...crackTimes().map(at => ({ at, cue: 'crack' }))];
+const OPEN = ['suspense', 'crack', 'crack', 'crack'];
 
 describe('sons de la révélation (FR-001 à FR-003)', () => {
+  it('trois craquements pendant le suspense, avant le temps figé (004, FR-016)', () => {
+    const cracks = revealCues(plan('common', 0.9)).filter(c => c.cue === 'crack').map(c => c.at);
+    expect(cracks).toHaveLength(3);
+    expect(cracks.every(at => at > 0 && at < T.suspense - T.freeze)).toBe(true);
+    // La sirène se tait au temps figé.
+    expect(SOUND_RECIPES.suspense.at(-1)!.dur).toBe(T.suspense - T.freeze);
+  });
+
   it('palier direct : suspense à 0, puis le palier à la fin du suspense', () => {
     for (const r of ALL) {
-      expect(revealCues(plan(r, 0.9))).toEqual([{ at: 0, cue: 'suspense' }, { at: T.suspense, cue: `tier:${r}` }]);
+      expect(revealCues(plan(r, 0.9))).toEqual([...OPENING, { at: T.suspense, cue: `tier:${r}` }]);
     }
   });
 
   it('montée : faux palier, son de montée à la transition, vrai palier', () => {
     expect(revealCues(plan('legendary', 0))).toEqual([
-      { at: 0, cue: 'suspense' },
+      ...OPENING,
       { at: T.suspense, cue: 'tier:rare' },
       { at: T.suspense + T.fakeStep, cue: 'rise' },
       { at: T.suspense + T.fakeStep + T.transition, cue: 'tier:legendary' },
@@ -33,12 +44,12 @@ describe('sons de la révélation (FR-001 à FR-003)', () => {
 
   it('leurre : le rire quand l’effet se dégonfle, puis Rare', () => {
     expect(revealCues(plan('rare', 0.05, 0.1))).toEqual([
-      { at: 0, cue: 'suspense' },
+      ...OPENING,
       { at: T.suspense, cue: 'tier:ultra' },
       { at: T.suspense + T.fakeStep, cue: 'laugh' },
       { at: T.suspense + T.fakeStep + T.transition, cue: 'tier:rare' },
     ]);
-    expect(names(plan('rare', 0.05, 0.5))).toEqual(['suspense', 'tier:legendary', 'laugh', 'tier:rare']);
+    expect(names(plan('rare', 0.05, 0.5))).toEqual([...OPEN, 'tier:legendary', 'laugh', 'tier:rare']);
   });
 
   it('le rire seulement pour un leurre, le son de montée seulement pour une montée (SC-004)', () => {

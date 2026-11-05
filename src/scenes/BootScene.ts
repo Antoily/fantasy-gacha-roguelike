@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { LAUGH } from '../data/sounds';
+import { buildVignettes, queueArt } from '../ui/art';
 import { parseSave, SAVE_KEY } from '../logic/save';
 import { parseSettings, SETTINGS_KEY } from '../logic/settings';
 
@@ -13,9 +14,15 @@ export class BootScene extends Phaser.Scene {
   // chargeur le signale et le jeu restera muet sur ce son (FR-008).
   preload() {
     this.load.audio(LAUGH.key, [...LAUGH.urls]);
+    // Visuels (007) : un fichier introuvable laisse le dessin d'avant à sa place (FR-010).
+    queueArt(this.load);
   }
 
   create() {
+    // Signal pour l'e2e : les illustrations en repli (FR-010).
+    const missing = buildVignettes(this);
+    if (missing.length > 0) document.body.dataset.artMissing = missing.join(',');
+    else delete document.body.dataset.artMissing;
     let raw: string | null = null;
     let settings: string | null = null;
     try {

@@ -9,11 +9,17 @@ export const REVEAL_CONFIG = {
   lureChance: 0.1,
   // Part des leurres qui montrent Ultra rare (les autres montrent Légendaire).
   lureUltraShare: 0.2,
+  // Présentation plein écran (007, FR-003) : rang minimal d'un résultat présenté.
+  presentMinRank: 3,
 } as const;
 
 // Durées en millisecondes (research R3). Bornes de FR-010 vérifiées par les tests.
 export const REVEAL_TIMING = {
-  suspense: 900,
+  // Révision 2 (2026-10-30, FR-016) : 1,6 s en trois temps. Fissures aux fractions du
+  // suspense, puis tout se fige sur ses `freeze` dernières ms avant l'éclatement.
+  suspense: 1600,
+  cracks: [0.45, 0.65, 0.82],
+  freeze: 150,
   // Révélation du vrai palier : plus le palier est haut, plus elle dure.
   final: { common: 600, uncommon: 800, rare: 1100, legendary: 1500, ultra: 2000 } satisfies Record<Rarity, number>,
   // Palier montré par une fausse piste avant le vrai, puis bascule vers le vrai.
