@@ -1,0 +1,463 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <!-- Capitaine Tartine (Peu commun) : « Pirate des cuisines, armé d'une louche. »
+       Pose d'abordage de trois quarts : louche brandie comme un sabre, tartine de confiture
+       en bouclier. Lumière en haut à gauche. Construction : docs/art/charte.md § 3. -->
+  <defs>
+    <!-- ===== Bas du corps ===== -->
+    <path id="capitaine-tartine-jambe-g" d="M 120 394 L 172 394 L 175 448 L 117 448 Z"/>
+    <clipPath id="capitaine-tartine-jambe-g-clip"><use href="#capitaine-tartine-jambe-g"/></clipPath>
+    <path id="capitaine-tartine-jambe-d" d="M 226 394 L 278 394 L 281 448 L 223 448 Z"/>
+    <clipPath id="capitaine-tartine-jambe-d-clip"><use href="#capitaine-tartine-jambe-d"/></clipPath>
+    <path id="capitaine-tartine-botte-g" d="M 120 444 L 176 444 L 178 470 C 178 476 174 479 168 479 L 94 479 C 80 479 76 468 84 459 C 90 452 104 450 120 450 Z"/>
+    <clipPath id="capitaine-tartine-botte-g-clip"><use href="#capitaine-tartine-botte-g"/></clipPath>
+    <path id="capitaine-tartine-botte-d" d="M 224 444 L 280 444 L 281 450 C 296 450 310 453 316 461 C 322 469 318 479 304 479 L 230 479 C 225 479 222 476 222 470 Z"/>
+    <clipPath id="capitaine-tartine-botte-d-clip"><use href="#capitaine-tartine-botte-d"/></clipPath>
+    <path id="capitaine-tartine-revers-g" d="M 108 430 C 132 423 166 423 188 430 L 184 453 C 162 447 134 447 112 453 Z"/>
+    <clipPath id="capitaine-tartine-revers-g-clip"><use href="#capitaine-tartine-revers-g"/></clipPath>
+    <path id="capitaine-tartine-revers-d" d="M 212 430 C 236 423 270 423 294 430 L 290 453 C 268 447 240 447 216 453 Z"/>
+    <clipPath id="capitaine-tartine-revers-d-clip"><use href="#capitaine-tartine-revers-d"/></clipPath>
+
+    <!-- ===== Marinière ===== -->
+    <path id="capitaine-tartine-torse" d="M 138 236 C 116 240 96 258 90 286 C 82 318 86 352 100 380 L 296 380 C 306 352 308 318 302 290 C 298 266 282 244 256 234 C 220 222 170 224 138 236 Z"/>
+    <clipPath id="capitaine-tartine-torse-clip"><use href="#capitaine-tartine-torse"/></clipPath>
+    <path id="capitaine-tartine-torse-ombre" d="M 254 226 C 282 262 290 324 266 386 L 330 386 L 330 226 Z"/>
+    <clipPath id="capitaine-tartine-torse-ombre-clip"><use href="#capitaine-tartine-torse-ombre"/></clipPath>
+    <path id="capitaine-tartine-torse-occl" d="M 98 226 C 110 250 140 270 178 279 C 212 283 246 272 266 252 C 274 244 280 236 284 226 L 284 200 L 98 200 Z"/>
+    <clipPath id="capitaine-tartine-torse-occl-clip"><use href="#capitaine-tartine-torse-occl"/></clipPath>
+    <path id="capitaine-tartine-torse-lumiere" d="M 130 314 C 132 294 146 280 166 274 C 152 288 144 302 142 322 C 140 326 132 324 130 314 Z"/>
+    <clipPath id="capitaine-tartine-torse-lumiere-clip"><use href="#capitaine-tartine-torse-lumiere"/></clipPath>
+    <g id="capitaine-tartine-rayures" fill="none" stroke-width="12">
+      <path d="M 70 256 Q 186 274 322 246"/>
+      <path d="M 70 282 Q 186 306 322 272"/>
+      <path d="M 70 308 Q 186 336 322 298"/>
+      <path d="M 70 334 Q 186 366 322 324"/>
+      <path d="M 70 360 Q 186 394 322 350"/>
+    </g>
+
+    <!-- ===== Tablier, ceinture, fouet ===== -->
+    <path id="capitaine-tartine-tablier" d="M 104 350 C 150 366 236 368 294 348 L 302 404 C 304 412 299 418 291 420 C 268 426 246 428 226 424 C 206 430 180 430 160 424 C 140 428 120 426 106 418 C 98 414 95 408 97 400 Z"/>
+    <clipPath id="capitaine-tartine-tablier-clip"><use href="#capitaine-tartine-tablier"/></clipPath>
+    <path id="capitaine-tartine-ceinture" d="M 86 328 C 140 350 240 352 306 328 L 304 362 C 240 386 140 384 90 364 Z"/>
+    <clipPath id="capitaine-tartine-ceinture-clip"><use href="#capitaine-tartine-ceinture"/></clipPath>
+    <path id="capitaine-tartine-noeud" d="M 280 340 C 288 330 306 330 313 341 C 319 352 315 366 303 370 C 291 373 280 365 278 354 C 277 348 278 344 280 340 Z"/>
+    <clipPath id="capitaine-tartine-noeud-clip"><use href="#capitaine-tartine-noeud"/></clipPath>
+    <path id="capitaine-tartine-pan1" d="M 300 362 C 312 376 322 392 330 410 L 318 413 L 313 422 C 306 404 296 386 288 372 Z"/>
+    <clipPath id="capitaine-tartine-pan1-clip"><use href="#capitaine-tartine-pan1"/></clipPath>
+    <path id="capitaine-tartine-pan2" d="M 288 366 C 291 384 291 402 286 420 L 277 413 L 267 418 C 273 400 275 384 275 368 Z"/>
+    <clipPath id="capitaine-tartine-pan2-clip"><use href="#capitaine-tartine-pan2"/></clipPath>
+    <rect id="capitaine-tartine-fouet-manche" x="180" y="319" width="62" height="12" rx="6" transform="rotate(69.2 211 325)"/>
+    <clipPath id="capitaine-tartine-fouet-manche-clip"><use href="#capitaine-tartine-fouet-manche"/></clipPath>
+    <path id="capitaine-tartine-fouet" d="M 219 362 C 209 380 211 400 223 410 C 231 418 243 420 250 414 C 258 406 262 392 256 380 C 249 370 239 362 229 358 Z"/>
+    <clipPath id="capitaine-tartine-fouet-clip"><use href="#capitaine-tartine-fouet"/></clipPath>
+
+    <!-- ===== Tête ===== -->
+    <path id="capitaine-tartine-oreille" d="M 254 148 C 266 138 285 144 285 163 C 285 182 273 197 258 195 C 251 186 251 160 254 148 Z"/>
+    <clipPath id="capitaine-tartine-oreille-clip"><use href="#capitaine-tartine-oreille"/></clipPath>
+    <path id="capitaine-tartine-tete" d="M 186 92 C 234 92 268 122 273 166 C 277 200 270 228 254 244 C 236 262 206 272 178 270 C 146 266 118 248 108 220 C 98 192 102 152 120 124 C 134 104 158 92 186 92 Z"/>
+    <clipPath id="capitaine-tartine-tete-clip"><use href="#capitaine-tartine-tete"/></clipPath>
+    <path id="capitaine-tartine-oeil" d="M 186 162 C 186 148 196 140 208 142 C 220 144 226 156 225 170 C 224 184 216 193 205 193 C 193 193 186 180 186 162 Z"/>
+    <clipPath id="capitaine-tartine-oeil-clip"><use href="#capitaine-tartine-oeil"/></clipPath>
+    <path id="capitaine-tartine-nez" d="M 157 190 C 154 176 164 166 177 167 C 190 168 196 180 192 192 C 189 202 178 207 168 205 C 161 204 158 198 157 190 Z"/>
+    <clipPath id="capitaine-tartine-nez-clip"><use href="#capitaine-tartine-nez"/></clipPath>
+    <path id="capitaine-tartine-bouche" d="M 142 222 C 160 228 200 230 222 220 C 222 240 208 258 184 260 C 162 260 146 244 142 222 Z"/>
+    <clipPath id="capitaine-tartine-bouche-clip"><use href="#capitaine-tartine-bouche"/></clipPath>
+    <path id="capitaine-tartine-moustache" d="M 172 196 C 190 190 214 194 234 200 C 244 202 250 198 252 192 C 254 184 262 182 266 188 C 272 198 264 214 248 220 C 228 228 198 230 174 224 C 150 230 120 228 104 218 C 90 208 88 192 98 186 C 104 182 110 184 110 190 C 112 196 118 200 128 198 C 144 194 160 192 172 196 Z"/>
+    <clipPath id="capitaine-tartine-moustache-clip"><use href="#capitaine-tartine-moustache"/></clipPath>
+
+    <!-- ===== Tricorne ===== -->
+    <path id="capitaine-tartine-calotte" d="M 92 106 C 92 62 140 30 198 30 C 254 30 302 56 310 90 L 290 112 L 152 130 L 102 122 Z"/>
+    <clipPath id="capitaine-tartine-calotte-clip"><use href="#capitaine-tartine-calotte"/></clipPath>
+    <path id="capitaine-tartine-bord-g" d="M 150 82 C 128 84 104 90 86 102 C 88 112 94 120 100 126 C 118 128 136 130 150 134 Z"/>
+    <clipPath id="capitaine-tartine-bord-g-clip"><use href="#capitaine-tartine-bord-g"/></clipPath>
+    <path id="capitaine-tartine-bord-d" d="M 150 82 C 196 98 262 98 312 82 C 308 96 300 106 288 114 C 240 118 192 124 150 134 Z"/>
+    <clipPath id="capitaine-tartine-bord-d-clip"><use href="#capitaine-tartine-bord-d"/></clipPath>
+
+    <!-- ===== Bras levé ===== -->
+    <path id="capitaine-tartine-manche" d="M 250 254 C 262 238 284 226 304 218 L 330 258 C 312 266 296 280 282 292 C 266 288 252 272 250 254 Z"/>
+    <clipPath id="capitaine-tartine-manche-clip"><use href="#capitaine-tartine-manche"/></clipPath>
+    <rect id="capitaine-tartine-revers-manche" x="308" y="210" width="16" height="56" rx="8" transform="rotate(-32.6 316 238)"/>
+    <clipPath id="capitaine-tartine-revers-manche-clip"><use href="#capitaine-tartine-revers-manche"/></clipPath>
+    <path id="capitaine-tartine-avant-bras" d="M 301 232 C 304 214 312 196 320 182 L 349 192 C 348 210 342 228 336 242 Z"/>
+    <clipPath id="capitaine-tartine-avant-bras-clip"><use href="#capitaine-tartine-avant-bras"/></clipPath>
+    <path id="capitaine-tartine-poing" d="M 320 156 C 318 144 330 137 343 139 C 356 141 363 152 361 166 C 359 181 351 191 337 191 C 324 191 316 181 318 169 C 316 164 317 160 320 156 Z"/>
+    <clipPath id="capitaine-tartine-poing-clip"><use href="#capitaine-tartine-poing"/></clipPath>
+    <!-- Manche qui se courbe en col jusqu'au bord du bol ; bol vu de trois quarts : ouverture
+         ovale (le creux, plein de soupe) et ventre bombé en dessous. -->
+    <path id="capitaine-tartine-louche-manche" d="M 323 212 L 332 100 C 333 90 336 84 340 80 L 348 84 C 345 88 343 94 342 100 L 333 212 Z"/>
+    <clipPath id="capitaine-tartine-louche-manche-clip"><use href="#capitaine-tartine-louche-manche"/></clipPath>
+    <path id="capitaine-tartine-louche-bol" d="M 338 82 C 335.9 77 345 68.4 358.4 63 C 371.7 57.6 384.1 57.5 386.2 62.6 C 391.8 76.5 385.2 92.1 372.2 97.3 C 359.2 102.6 343.6 96 338 82 Z"/>
+    <clipPath id="capitaine-tartine-louche-bol-clip"><use href="#capitaine-tartine-louche-bol"/></clipPath>
+    <ellipse id="capitaine-tartine-louche-creux" cx="362.1" cy="72.3" rx="26" ry="10" transform="rotate(-22 362.1 72.3)"/>
+    <clipPath id="capitaine-tartine-louche-creux-clip"><use href="#capitaine-tartine-louche-creux"/></clipPath>
+
+    <!-- ===== Tartine (repère local, tourné de -10° autour de 76,312) ===== -->
+    <path id="capitaine-tartine-croute" d="M 26 360 L 26.2 295 Q 35.3 299.4 42.2 292 Q 52.1 292.1 54.8 282.5 Q 63.7 278.2 62 268.5 Q 68.4 262.5 62.7 255.7 C 76 250 100 246 114 252 C 132 260 136 284 124 298 L 124 360 C 124 366 120 370 114 370 L 36 370 C 30 370 26 366 26 360 Z"/>
+    <clipPath id="capitaine-tartine-croute-clip"><use href="#capitaine-tartine-croute"/></clipPath>
+    <path id="capitaine-tartine-mie" d="M 34 358 L 34 297 Q 38 299 42.2 292 Q 52.1 292.1 54.8 282.5 Q 63.7 278.2 62 268.5 L 65 263 C 78 258 98 255 110 260 C 124 267 126 284 116 294 L 116 358 C 116 361 114 362 111 362 L 39 362 C 36 362 34 361 34 358 Z"/>
+    <clipPath id="capitaine-tartine-mie-clip"><use href="#capitaine-tartine-mie"/></clipPath>
+    <path id="capitaine-tartine-confiture" d="M 44 350 C 40 334 40 316 44 306 C 50 302 56 298 60 290 C 64 282 68 276 70 270 C 80 264 96 262 106 266 C 114 270 114 284 110 296 C 108 316 112 336 108 350 C 104 356 98 356 94 354 L 94 366 C 94 372 86 374 86 366 L 86 356 C 76 358 66 358 58 356 L 58 376 C 58 384 48 384 48 376 L 48 356 C 46 354 44 352 44 350 Z"/>
+    <clipPath id="capitaine-tartine-confiture-clip"><use href="#capitaine-tartine-confiture"/></clipPath>
+    <g id="capitaine-tartine-doigts">
+      <rect x="108" y="299" width="30" height="15" rx="7.5"/>
+      <rect x="106" y="314" width="32" height="16" rx="8"/>
+      <rect x="110" y="330" width="28" height="15" rx="7.5"/>
+    </g>
+    <clipPath id="capitaine-tartine-doigts-clip"><use href="#capitaine-tartine-doigts"/></clipPath>
+  </defs>
+
+  <!-- Ombre portée -->
+  <ellipse cx="200" cy="474" rx="138" ry="12" fill="#1d1a16" opacity="0.18"/>
+
+  <!-- ===== Jambes (pantalon marine) ===== -->
+  <use href="#capitaine-tartine-jambe-g" fill="#253b6c"/>
+  <g clip-path="url(#capitaine-tartine-jambe-g-clip)">
+    <path d="M 152 390 C 158 410 160 430 156 450 L 180 450 L 180 390 Z" fill="#172649"/>
+    <path d="M 126 404 C 124 418 124 430 126 444" fill="none" stroke="#39579a" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <use href="#capitaine-tartine-jambe-g" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <use href="#capitaine-tartine-jambe-d" fill="#253b6c"/>
+  <g clip-path="url(#capitaine-tartine-jambe-d-clip)">
+    <path d="M 258 390 C 264 410 266 430 262 450 L 286 450 L 286 390 Z" fill="#172649"/>
+    <path d="M 232 404 C 230 418 230 430 232 444" fill="none" stroke="#39579a" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <use href="#capitaine-tartine-jambe-d" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+  <!-- ===== Bottes ===== -->
+  <use href="#capitaine-tartine-botte-g" fill="#3b3442"/>
+  <g clip-path="url(#capitaine-tartine-botte-g-clip)">
+    <path d="M 70 470 L 190 470 L 190 490 L 70 490 Z" fill="#6e4b3a"/>
+    <path d="M 150 440 C 160 452 164 462 160 472 L 190 472 L 190 440 Z" fill="#25202c"/>
+    <path d="M 90 462 C 96 456 106 454 116 454" fill="none" stroke="#6a6075" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <use href="#capitaine-tartine-botte-g" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M 80 470 L 176 470" fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linecap="round"/>
+  <use href="#capitaine-tartine-revers-g" fill="#4b4254"/>
+  <g clip-path="url(#capitaine-tartine-revers-g-clip)">
+    <path d="M 160 420 C 166 432 168 444 166 456 L 194 456 L 194 420 Z" fill="#2e2834"/>
+    <path d="M 116 433 C 132 428 150 427 164 428" fill="none" stroke="#6f6680" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#capitaine-tartine-revers-g" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="140" y="436" width="14" height="11" rx="2" fill="#f2bf4a" stroke="#1d1a16" stroke-width="2.5"/>
+
+  <use href="#capitaine-tartine-botte-d" fill="#3b3442"/>
+  <g clip-path="url(#capitaine-tartine-botte-d-clip)">
+    <path d="M 210 470 L 330 470 L 330 490 L 210 490 Z" fill="#6e4b3a"/>
+    <path d="M 258 440 C 270 450 290 456 300 462 C 312 468 316 472 318 472 L 330 472 L 330 440 Z" fill="#25202c"/>
+    <path d="M 230 452 C 230 458 230 462 232 466" fill="none" stroke="#6a6075" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <use href="#capitaine-tartine-botte-d" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M 226 470 L 318 470" fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linecap="round"/>
+  <use href="#capitaine-tartine-revers-d" fill="#4b4254"/>
+  <g clip-path="url(#capitaine-tartine-revers-d-clip)">
+    <path d="M 266 420 C 272 432 274 444 272 456 L 300 456 L 300 420 Z" fill="#2e2834"/>
+    <path d="M 220 433 C 236 428 254 427 268 428" fill="none" stroke="#6f6680" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#capitaine-tartine-revers-d" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="246" y="436" width="14" height="11" rx="2" fill="#f2bf4a" stroke="#1d1a16" stroke-width="2.5"/>
+
+  <!-- ===== Marinière ===== -->
+  <use href="#capitaine-tartine-torse" fill="#fffaf0"/>
+  <g clip-path="url(#capitaine-tartine-torse-clip)">
+    <use href="#capitaine-tartine-torse-lumiere" fill="#ffffff"/>
+    <use href="#capitaine-tartine-torse-ombre" fill="#cdd1e8"/>
+    <use href="#capitaine-tartine-torse-occl" fill="#a7acd0"/>
+    <use href="#capitaine-tartine-rayures" stroke="#2b4a8e"/>
+    <g clip-path="url(#capitaine-tartine-torse-lumiere-clip)"><use href="#capitaine-tartine-rayures" stroke="#4a70b8"/></g>
+    <g clip-path="url(#capitaine-tartine-torse-ombre-clip)"><use href="#capitaine-tartine-rayures" stroke="#1a2c5e"/></g>
+    <g clip-path="url(#capitaine-tartine-torse-occl-clip)"><use href="#capitaine-tartine-rayures" stroke="#111d45"/></g>
+  </g>
+  <use href="#capitaine-tartine-torse" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <!-- Plis tirés par le bras levé -->
+  <path d="M 276 300 C 262 300 250 296 240 290" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 280 316 C 268 318 256 318 246 314" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- ===== Tablier taché de confiture ===== -->
+  <use href="#capitaine-tartine-tablier" fill="#fffaf0"/>
+  <g clip-path="url(#capitaine-tartine-tablier-clip)">
+    <path d="M 252 350 C 262 372 266 400 258 432 L 320 432 L 320 340 Z" fill="#cdd1e8"/>
+    <path d="M 90 340 C 140 372 240 374 310 340 L 310 330 L 90 330 Z" fill="#a7acd0"/>
+    <path d="M 90 350 C 140 380 240 382 310 350 L 310 340 C 240 374 140 372 90 340 Z" fill="#cdd1e8"/>
+    <path d="M 150 384 C 154 398 152 414 156 428 L 166 428 C 162 414 164 398 160 384 Z" fill="#cdd1e8"/>
+    <path d="M 220 386 C 224 400 222 414 226 428 L 236 428 C 232 414 234 400 230 386 Z" fill="#cdd1e8"/>
+    <!-- Taches de confiture -->
+    <path d="M 124 388 C 128 378 144 377 151 384 C 158 389 158 399 150 403 C 146 410 132 411 128 403 C 120 401 118 392 124 388 Z" fill="#d62a46"/>
+    <path d="M 136 406 C 138 412 136 418 140 421 C 144 424 147 419 145 414 C 144 410 142 406 142 404 Z" fill="#d62a46"/>
+    <path d="M 130 388 C 134 384 140 383 144 385" fill="none" stroke="#ff7c8f" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="160" cy="396" r="3" fill="#d62a46"/>
+    <circle cx="116" cy="384" r="2.5" fill="#d62a46"/>
+    <path d="M 196 374 C 202 370 210 373 210 380 C 210 386 202 389 197 386 C 192 384 192 377 196 374 Z" fill="#d62a46"/>
+    <circle cx="214" cy="372" r="2.5" fill="#d62a46"/>
+    <circle cx="190" cy="390" r="2" fill="#d62a46"/>
+    <path d="M 108 410 C 122 418 142 420 160 416 C 180 422 206 422 226 416 C 246 420 268 418 292 412" fill="none" stroke="#a7acd0" stroke-width="2.5" stroke-dasharray="6 5" stroke-linecap="round"/>
+  </g>
+  <use href="#capitaine-tartine-tablier" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M 158 388 C 160 400 158 414 160 424" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 228 390 C 230 402 228 414 230 424" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- ===== Fouet glissé dans la ceinture ===== -->
+  <use href="#capitaine-tartine-fouet" fill="#e3e8f0" opacity="0.55"/>
+  <g clip-path="url(#capitaine-tartine-fouet-clip)">
+    <path d="M 244 360 C 258 376 262 396 254 416 L 270 420 L 270 356 Z" fill="#8892a9" opacity="0.6"/>
+  </g>
+  <path d="M 222 362 C 214 384 222 404 238 415" fill="none" stroke="#5b6580" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 226 360 C 230 384 238 404 246 417" fill="none" stroke="#5b6580" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 228 359 C 240 376 252 394 254 410" fill="none" stroke="#5b6580" stroke-width="3" stroke-linecap="round"/>
+  <use href="#capitaine-tartine-fouet" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <use href="#capitaine-tartine-fouet-manche" fill="#c8874a"/>
+  <g clip-path="url(#capitaine-tartine-fouet-manche-clip)">
+    <path d="M 200 290 L 250 360 L 260 350 L 214 286 Z" fill="#8f5530"/>
+    <path d="M 196 300 L 214 346" fill="none" stroke="#e8ad6c" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#capitaine-tartine-fouet-manche" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <circle cx="201" cy="301" r="3" fill="#1d1a16"/>
+
+  <!-- ===== Ceinture rouge et nœud ===== -->
+  <use href="#capitaine-tartine-ceinture" fill="#d8342c"/>
+  <g clip-path="url(#capitaine-tartine-ceinture-clip)">
+    <path d="M 252 330 C 266 346 270 362 262 386 L 320 386 L 320 320 Z" fill="#9b1d38"/>
+    <path d="M 80 362 C 140 386 240 388 310 360 L 310 390 L 80 390 Z" fill="#6c1231"/>
+    <path d="M 100 336 C 140 352 200 356 240 350" fill="none" stroke="#ff7a5c" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#capitaine-tartine-ceinture" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M 120 352 C 160 366 220 368 262 356" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+
+  <use href="#capitaine-tartine-pan2" fill="#d8342c"/>
+  <g clip-path="url(#capitaine-tartine-pan2-clip)">
+    <path d="M 282 360 C 284 384 284 402 280 424 L 296 424 L 296 360 Z" fill="#9b1d38"/>
+  </g>
+  <use href="#capitaine-tartine-pan2" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+  <use href="#capitaine-tartine-pan1" fill="#d8342c"/>
+  <g clip-path="url(#capitaine-tartine-pan1-clip)">
+    <path d="M 306 360 C 316 380 324 396 330 414 L 340 414 L 340 360 Z" fill="#9b1d38"/>
+  </g>
+  <use href="#capitaine-tartine-pan1" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+  <use href="#capitaine-tartine-noeud" fill="#d8342c"/>
+  <g clip-path="url(#capitaine-tartine-noeud-clip)">
+    <path d="M 304 330 C 316 344 316 362 302 374 L 324 374 L 324 330 Z" fill="#9b1d38"/>
+    <path d="M 286 344 C 290 338 298 336 304 338" fill="none" stroke="#ff7a5c" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <use href="#capitaine-tartine-noeud" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- ===== Tête ===== -->
+  <use href="#capitaine-tartine-oreille" fill="#7b4a31"/>
+  <g clip-path="url(#capitaine-tartine-oreille-clip)">
+    <path d="M 274 150 C 284 160 284 180 272 196 L 292 196 L 292 150 Z" fill="#57302f"/>
+  </g>
+  <use href="#capitaine-tartine-oreille" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M 266 156 C 276 160 276 176 266 184" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+
+  <use href="#capitaine-tartine-tete" fill="#7b4a31"/>
+  <g clip-path="url(#capitaine-tartine-tete-clip)">
+    <path d="M 230 94 C 258 120 266 170 256 212 C 246 246 214 266 170 270 L 170 290 L 300 290 L 300 90 Z" fill="#57302f"/>
+    <path d="M 96 128 C 116 140 136 146 150 148 C 196 140 244 132 292 126 L 292 90 L 96 90 Z" fill="#3e1f27"/>
+    <path d="M 110 168 C 110 150 116 138 126 130 C 120 146 118 160 120 176 Z" fill="#9c6741"/>
+    <!-- Favori -->
+    <path d="M 238 124 C 250 126 258 134 260 146 L 261 176 C 257 182 250 180 248 172 C 247 158 244 140 234 128 Z" fill="#2e2624"/>
+    <!-- Joues -->
+    <ellipse cx="238" cy="190" rx="12" ry="7" fill="#d0604f" opacity="0.55"/>
+  </g>
+  <use href="#capitaine-tartine-tete" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+  <!-- Bouche ouverte (cri d'abordage) -->
+  <use href="#capitaine-tartine-bouche" fill="#5a1a26"/>
+  <g clip-path="url(#capitaine-tartine-bouche-clip)">
+    <path d="M 136 216 C 160 226 200 228 228 214 L 228 234 C 200 242 160 240 136 232 Z" fill="#fffaf0"/>
+    <path d="M 136 230 C 160 238 200 240 228 232 L 228 236 C 200 244 160 242 136 234 Z" fill="#cdd1e8"/>
+    <ellipse cx="186" cy="256" rx="22" ry="10" fill="#e4687c"/>
+    <path d="M 172 250 C 178 247 186 247 192 249" fill="none" stroke="#ff9aa8" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#capitaine-tartine-bouche" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Œil (le gauche) -->
+  <use href="#capitaine-tartine-oeil" fill="#fffaf0"/>
+  <g clip-path="url(#capitaine-tartine-oeil-clip)">
+    <path d="M 180 140 L 232 140 L 232 154 C 216 146 198 146 180 156 Z" fill="#d9d6e8"/>
+    <ellipse cx="200" cy="170" rx="12.5" ry="15.5" fill="#c07a2c"/>
+    <ellipse cx="200" cy="176" rx="12.5" ry="10" fill="#83491c"/>
+    <ellipse cx="198" cy="171" rx="6.5" ry="8.5" fill="#1d1a16"/>
+    <circle cx="193" cy="163" r="5" fill="#ffffff"/>
+    <circle cx="205" cy="180" r="2.3" fill="#ffffff"/>
+  </g>
+  <use href="#capitaine-tartine-oeil" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M 184 160 C 186 146 198 139 210 141 C 220 143 226 152 227 162" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 230 160 L 238 155" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M 230 168 L 239 169" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Cache-œil et son lacet -->
+  <path d="M 157 154 C 168 146 180 138 198 126" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 121 162 C 114 160 108 158 103 158" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 120 158 C 124 147 146 145 158 153 C 166 160 164 176 154 183 C 142 190 126 186 121 175 C 118 169 118 163 120 158 Z" fill="#1d1a16"/>
+  <path d="M 128 156 C 134 152 144 151 150 154" fill="none" stroke="#5a5868" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Sourcils -->
+  <path d="M 181 147 C 192 135 212 127 232 128 C 236 129 236 135 232 136 C 214 137 198 144 187 153 C 182 156 178 152 181 147 Z" fill="#2e2624" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 117 138 C 128 130 148 132 161 143 C 164 146 161 151 157 149 C 146 142 132 141 121 145 C 116 146 114 141 117 138 Z" fill="#2e2624" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+
+  <!-- Nez -->
+  <use href="#capitaine-tartine-nez" fill="#8a5536"/>
+  <g clip-path="url(#capitaine-tartine-nez-clip)">
+    <path d="M 196 176 C 192 194 180 204 160 204 L 160 214 L 200 214 L 200 176 Z" fill="#57302f"/>
+    <circle cx="167" cy="178" r="4.5" fill="#c08a5c"/>
+  </g>
+  <use href="#capitaine-tartine-nez" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Moustache en guidon -->
+  <use href="#capitaine-tartine-moustache" fill="#2e2624"/>
+  <g clip-path="url(#capitaine-tartine-moustache-clip)">
+    <path d="M 100 214 C 130 226 160 230 174 226 C 200 232 236 226 262 206 L 270 230 L 96 230 Z" fill="#1d1a16"/>
+    <path d="M 120 204 C 136 198 152 197 164 200" fill="none" stroke="#6b5a55" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 186 199 C 204 197 222 200 236 205" fill="none" stroke="#6b5a55" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 98 194 C 100 190 104 189 106 191" fill="none" stroke="#6b5a55" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <use href="#capitaine-tartine-moustache" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Boucle d'oreille -->
+  <circle cx="270" cy="204" r="8.5" fill="none" stroke="#1d1a16" stroke-width="7"/>
+  <circle cx="270" cy="204" r="8.5" fill="none" stroke="#f2bf4a" stroke-width="3"/>
+
+  <!-- ===== Tricorne ===== -->
+  <use href="#capitaine-tartine-calotte" fill="#2e3b66"/>
+  <g clip-path="url(#capitaine-tartine-calotte-clip)">
+    <path d="M 228 26 C 266 44 290 70 296 104 L 330 104 L 330 20 Z" fill="#1e2647"/>
+    <path d="M 106 84 C 112 58 140 40 172 35 C 146 48 126 64 118 88 Z" fill="#4a5c94"/>
+    <path d="M 80 98 C 104 84 128 76 150 74 C 196 90 262 90 316 74 L 316 130 L 80 130 Z" fill="#151b35"/>
+  </g>
+  <use href="#capitaine-tartine-calotte" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <!-- Emblème : cuillère et fourchette croisées -->
+  <g transform="rotate(38 186 58)">
+    <path d="M 178.5 30 L 182 30 L 182 42 L 184.5 42 L 184.5 30 L 187.5 30 L 187.5 42 L 190 42 L 190 30 L 193.5 30 L 193.5 44 C 193.5 49 191 51 188.5 52 L 188.5 80 Q 186 83 183.5 80 L 183.5 52 C 181 51 178.5 49 178.5 44 Z" fill="#eef2f8" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  </g>
+  <g transform="rotate(-38 186 58)">
+    <ellipse cx="186" cy="40" rx="8" ry="11" fill="#eef2f8" stroke="#1d1a16" stroke-width="2.5"/>
+    <rect x="183" y="50" width="6" height="30" rx="3" fill="#eef2f8" stroke="#1d1a16" stroke-width="2.5"/>
+    <ellipse cx="184" cy="37" rx="3" ry="5" fill="#ffffff"/>
+  </g>
+
+  <use href="#capitaine-tartine-bord-g" fill="#34447a"/>
+  <g clip-path="url(#capitaine-tartine-bord-g-clip)">
+    <path d="M 150 82 C 128 84 104 90 86 102" fill="none" stroke="#f2bf4a" stroke-width="10"/>
+    <path d="M 96 112 C 112 116 132 118 146 116" fill="none" stroke="#4a5c94" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <use href="#capitaine-tartine-bord-g" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  <use href="#capitaine-tartine-bord-d" fill="#2e3b66"/>
+  <g clip-path="url(#capitaine-tartine-bord-d-clip)">
+    <path d="M 250 80 C 262 96 268 110 270 124 L 330 124 L 330 80 Z" fill="#1e2647"/>
+    <path d="M 150 82 C 196 98 262 98 312 82" fill="none" stroke="#f2bf4a" stroke-width="10"/>
+    <path d="M 250 90 C 270 92 290 88 312 82" fill="none" stroke="#c3862b" stroke-width="10"/>
+  </g>
+  <use href="#capitaine-tartine-bord-d" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+
+  <!-- ===== Louche ===== -->
+  <use href="#capitaine-tartine-louche-manche" fill="#c6cfdb"/>
+  <g clip-path="url(#capitaine-tartine-louche-manche-clip)">
+    <path d="M 339 98 L 330 214 L 344 214 L 352 82 Z" fill="#8892a9"/>
+    <path d="M 334 104 L 327 190" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <use href="#capitaine-tartine-louche-manche" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <use href="#capitaine-tartine-louche-bol" fill="#c6cfdb"/>
+  <g clip-path="url(#capitaine-tartine-louche-bol-clip)">
+    <!-- Ventre du bol : ombre en bas à droite, reflet nerveux à gauche -->
+    <path d="M 390 66 C 392 84 380 98 354 104 L 400 112 L 400 60 Z" fill="#8892a9"/>
+    <path d="M 376 94 C 382 90 386 84 388 78" fill="none" stroke="#5b6580" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 343 89 C 348 94 354 97 361 98" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <!-- Creux : paroi du fond éclairée, soupe dorée au fond -->
+  <use href="#capitaine-tartine-louche-creux" fill="#5b6580"/>
+  <g clip-path="url(#capitaine-tartine-louche-creux-clip)">
+    <ellipse cx="366" cy="66" rx="26" ry="8" transform="rotate(-22 366 66)" fill="#8892a9"/>
+    <ellipse cx="364" cy="77" rx="24" ry="8" transform="rotate(-22 364 77)" fill="#f0a03a"/>
+    <path d="M 346 80 C 356 80 368 76 378 70" fill="none" stroke="#ffd98c" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="372" cy="79" r="2" fill="#c46a22"/>
+  </g>
+  <use href="#capitaine-tartine-louche-creux" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linejoin="round"/>
+  <use href="#capitaine-tartine-louche-bol" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+
+  <!-- ===== Bras levé ===== -->
+  <use href="#capitaine-tartine-avant-bras" fill="#7b4a31"/>
+  <g clip-path="url(#capitaine-tartine-avant-bras-clip)">
+    <path d="M 336 180 C 342 200 340 222 330 246 L 356 246 L 356 180 Z" fill="#57302f"/>
+    <path d="M 308 224 C 310 210 314 198 320 188" fill="none" stroke="#9c6741" stroke-width="4" stroke-linecap="round"/>
+    <!-- Tatouage d'ancre -->
+    <path d="M 322 200 L 320 216 M 316 204 L 326 205 M 313 211 C 314 218 324 220 327 213" fill="none" stroke="#3e1f27" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="322.5" cy="197" r="2.5" fill="none" stroke="#3e1f27" stroke-width="2"/>
+  </g>
+  <use href="#capitaine-tartine-avant-bras" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  <use href="#capitaine-tartine-manche" fill="#fffaf0"/>
+  <g clip-path="url(#capitaine-tartine-manche-clip)">
+    <path d="M 290 230 C 306 248 304 270 286 296 L 340 296 L 340 230 Z" fill="#cdd1e8"/>
+    <path d="M 252.8 230.9 Q 276 262 296 298.3 M 268 221.2 Q 292 252 311.2 288.6 M 283.1 211.5 Q 306 242 326.3 278.9" fill="none" stroke="#2b4a8e" stroke-width="10"/>
+  </g>
+  <use href="#capitaine-tartine-manche" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  <use href="#capitaine-tartine-revers-manche" fill="#fffaf0"/>
+  <g clip-path="url(#capitaine-tartine-revers-manche-clip)">
+    <path d="M 316 226 L 340 250 L 340 270 L 310 270 Z" fill="#cdd1e8"/>
+  </g>
+  <use href="#capitaine-tartine-revers-manche" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+  <use href="#capitaine-tartine-poing" fill="#7b4a31"/>
+  <g clip-path="url(#capitaine-tartine-poing-clip)">
+    <path d="M 352 140 C 362 156 360 178 344 194 L 366 194 L 366 140 Z" fill="#57302f"/>
+    <path d="M 326 148 C 330 142 338 140 344 141" fill="none" stroke="#9c6741" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#capitaine-tartine-poing" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M 320 164 L 336 164 M 319 175 L 335 176 M 322 185 L 335 186" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M 330 150 C 340 146 352 150 354 158" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- ===== Tartine-bouclier ===== -->
+  <g transform="rotate(-10 76 312)">
+    <use href="#capitaine-tartine-croute" fill="#c97c34"/>
+    <g clip-path="url(#capitaine-tartine-croute-clip)">
+      <path d="M 118 250 C 132 276 130 330 120 380 L 140 380 L 140 250 Z" fill="#91502b"/>
+      <path d="M 20 366 C 60 372 100 372 130 362 L 130 380 L 20 380 Z" fill="#91502b"/>
+      <path d="M 70 254 C 86 248 102 247 112 252" fill="none" stroke="#eba65a" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <use href="#capitaine-tartine-mie" fill="#f7dc9f"/>
+    <g clip-path="url(#capitaine-tartine-mie-clip)">
+      <path d="M 104 256 C 122 276 120 330 112 364 L 130 364 L 130 256 Z" fill="#dcb06c"/>
+      <circle cx="40" cy="306" r="2" fill="#c99a58"/>
+      <circle cx="48" cy="296" r="1.6" fill="#c99a58"/>
+      <circle cx="58" cy="284" r="2" fill="#c99a58"/>
+      <circle cx="38" cy="330" r="1.6" fill="#c99a58"/>
+    </g>
+    <use href="#capitaine-tartine-mie" fill="none" stroke="#91502b" stroke-width="2.5" stroke-linejoin="round"/>
+    <use href="#capitaine-tartine-confiture" fill="#d62a46"/>
+    <g clip-path="url(#capitaine-tartine-confiture-clip)">
+      <path d="M 100 262 C 116 290 112 330 100 360 L 120 380 L 120 260 Z" fill="#9a133f"/>
+      <path d="M 50 330 C 48 314 52 302 62 294 C 70 286 74 278 80 272" fill="none" stroke="#ff7c8f" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="90" cy="274" r="3.5" fill="#ffffff"/>
+      <circle cx="56" cy="342" r="2.2" fill="#ffffff"/>
+      <circle cx="72" cy="300" r="1.5" fill="#7a0f2a"/>
+      <circle cx="88" cy="316" r="1.5" fill="#7a0f2a"/>
+      <circle cx="66" cy="326" r="1.5" fill="#7a0f2a"/>
+      <circle cx="94" cy="292" r="1.5" fill="#7a0f2a"/>
+      <circle cx="80" cy="340" r="1.5" fill="#7a0f2a"/>
+    </g>
+    <use href="#capitaine-tartine-confiture" fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+    <use href="#capitaine-tartine-croute" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+    <!-- Doigts qui agrippent la croûte -->
+    <use href="#capitaine-tartine-doigts" fill="#7b4a31"/>
+    <g clip-path="url(#capitaine-tartine-doigts-clip)">
+      <path d="M 128 296 L 140 296 L 140 348 L 128 348 Z" fill="#57302f"/>
+      <path d="M 114 303 L 124 303 M 112 318 L 124 318 M 116 334 L 124 334" fill="none" stroke="#9c6741" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <use href="#capitaine-tartine-doigts" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  </g>
+
+  <!-- ===== Effets ===== -->
+  <!-- Miettes qui volent de la bouchée -->
+  <path d="M 18 252 L 26 248 L 28 256 L 21 259 Z" fill="#eba65a" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 34 236 L 40 233 L 42 239 L 36 241 Z" fill="#f7dc9f" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 10 272 L 16 270 L 17 276 L 11 277 Z" fill="#c97c34" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Goutte de confiture qui tombe -->
+  <path d="M 64 392 C 60 398 58 402 58 405 C 58 409 61 411 64 411 C 67 411 70 409 70 405 C 70 402 68 398 64 392 Z" fill="#d62a46" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Cri -->
+  <path d="M 82 214 L 66 210 M 84 228 L 70 236 M 88 200 L 76 188" fill="none" stroke="#1d1a16" stroke-width="4" stroke-linecap="round"/>
+  <!-- Traits de mouvement et éclat de la louche -->
+  <path d="M 394 98 C 392 116 384 132 372 144" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 382 110 C 380 120 376 128 370 134" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+  <!-- Soupe qui gicle du bol -->
+  <path d="M 372 50 C 373 46 374 42 375 38 C 377 34 383 35 382 40 C 381 44 377 46 372 50 Z" fill="#f0a03a" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 387 36 C 388 33 388 30 389 27 C 391 24 395 26 394 29 C 393 32 390 33 387 36 Z" fill="#f0a03a" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <circle cx="361" cy="42" r="2.8" fill="#f0a03a" stroke="#1d1a16" stroke-width="2"/>
+  <!-- Éclat sur le bord de la louche -->
+  <path d="M 338 48 L 341.5 58.5 L 352 62 L 341.5 65.5 L 338 76 L 334.5 65.5 L 324 62 L 334.5 58.5 Z" fill="#fffbe6" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+</svg>

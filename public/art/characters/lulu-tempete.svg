@@ -1,0 +1,575 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <!-- Lulu Tempête (Rare) — charte docs/art/charte.md. Lumière principale en haut à gauche ;
+       l'orage du bocal éclaire en plus par en dessous, à droite : liserés froids côté ombre. -->
+  <defs>
+    <path id="lulu-tempete-sac" d="M134 258 C 112 248 84 250 75 270 C 65 296 65 338 75 358 C 84 372 116 374 134 366 Z"/>
+    <clipPath id="lulu-tempete-sac-clip"><use href="#lulu-tempete-sac"/></clipPath>
+    <path id="lulu-tempete-poche-sac" d="M71 318 C 86 312 106 314 117 320 L 116 352 C 104 360 84 360 74 354 Z"/>
+    <path id="lulu-tempete-botte-avant" d="M228 410 L 268 408 C 270 426 272 440 274 450 C 292 450 306 458 308 468 C 309 476 304 479 297 479 L 226 479 C 219 479 217 472 220 465 C 224 447 226 428 228 410 Z"/>
+    <clipPath id="lulu-tempete-botte-avant-clip"><use href="#lulu-tempete-botte-avant"/></clipPath>
+    <path id="lulu-tempete-botte-arriere" d="M134 402 L 172 404 C 170 424 165 440 162 452 C 174 459 184 466 186 473 C 187 480 181 483 172 482 L 113 468 C 105 466 102 458 106 451 C 116 436 125 420 134 402 Z"/>
+    <clipPath id="lulu-tempete-botte-arriere-clip"><use href="#lulu-tempete-botte-arriere"/></clipPath>
+    <path id="lulu-tempete-bras-fond" d="M262 284 C 278 290 290 300 296 312 C 298 302 302 292 306 282 L 338 291 C 336 316 326 340 310 350 C 292 358 272 346 262 328 Z"/>
+    <clipPath id="lulu-tempete-bras-fond-clip"><use href="#lulu-tempete-bras-fond"/></clipPath>
+    <path id="lulu-tempete-manteau" d="M146 254 C 130 258 118 270 116 292 C 112 320 108 342 102 358 C 88 366 68 368 50 364 C 58 384 76 402 104 412 C 156 420 230 420 292 410 C 286 380 278 332 270 294 C 268 274 262 262 254 254 C 222 248 178 248 146 254 Z"/>
+    <clipPath id="lulu-tempete-manteau-clip"><use href="#lulu-tempete-manteau"/></clipPath>
+    <path id="lulu-tempete-bras-avant" d="M128 264 C 108 282 98 316 100 342 C 102 360 120 366 134 356 C 144 346 154 332 164 320 L 148 297 C 140 307 132 317 126 325 C 126 307 136 289 150 274 Z"/>
+    <clipPath id="lulu-tempete-bras-avant-clip"><use href="#lulu-tempete-bras-avant"/></clipPath>
+    <path id="lulu-tempete-poing" d="M152 302 C 148 288 158 276 172 275 C 186 274 194 284 192 297 C 190 310 178 316 166 314 C 158 312 154 308 152 302 Z"/>
+    <clipPath id="lulu-tempete-poing-clip"><use href="#lulu-tempete-poing"/></clipPath>
+    <path id="lulu-tempete-capuche" d="M124 250 C 102 238 88 198 89 150 C 90 88 136 40 198 38 C 254 36 292 64 297 104 C 302 146 298 200 280 240 C 262 260 156 264 124 250 Z"/>
+    <clipPath id="lulu-tempete-capuche-clip"><use href="#lulu-tempete-capuche"/></clipPath>
+    <path id="lulu-tempete-col" d="M146 236 C 176 252 240 252 272 232 C 278 244 280 256 276 266 C 240 282 178 284 140 266 C 138 256 140 246 146 236 Z"/>
+    <clipPath id="lulu-tempete-col-clip"><use href="#lulu-tempete-col"/></clipPath>
+    <path id="lulu-tempete-doublure" d="M138 104 C 180 90 250 90 288 108 C 296 148 290 200 270 236 C 240 232 170 232 140 226 C 128 190 126 142 138 104 Z"/>
+    <clipPath id="lulu-tempete-doublure-clip"><use href="#lulu-tempete-doublure"/></clipPath>
+    <path id="lulu-tempete-cheveux" d="M140 104 C 182 92 250 92 289 110 C 294 134 290 158 284 178 C 280 196 274 212 266 226 C 268 204 268 176 262 152 C 254 128 226 118 196 118 C 172 118 152 124 142 134 Z"/>
+    <clipPath id="lulu-tempete-cheveux-clip"><use href="#lulu-tempete-cheveux"/></clipPath>
+    <path id="lulu-tempete-visage" d="M198 88 C 238 88 268 110 271 150 C 274 180 268 206 256 226 C 244 244 226 256 206 256 C 178 256 152 242 140 216 C 128 190 128 138 142 112 C 156 96 174 88 198 88 Z"/>
+    <clipPath id="lulu-tempete-visage-clip"><use href="#lulu-tempete-visage"/></clipPath>
+    <ellipse id="lulu-tempete-oeil1" cx="181" cy="170" rx="21" ry="25"/>
+    <clipPath id="lulu-tempete-oeil1-clip"><use href="#lulu-tempete-oeil1"/></clipPath>
+    <ellipse id="lulu-tempete-iris1" cx="177" cy="174" rx="14" ry="18"/>
+    <clipPath id="lulu-tempete-iris1-clip"><use href="#lulu-tempete-iris1"/></clipPath>
+    <ellipse id="lulu-tempete-oeil2" cx="243" cy="167" rx="15" ry="23"/>
+    <clipPath id="lulu-tempete-oeil2-clip"><use href="#lulu-tempete-oeil2"/></clipPath>
+    <ellipse id="lulu-tempete-iris2" cx="240" cy="171" rx="10.5" ry="16.5"/>
+    <clipPath id="lulu-tempete-iris2-clip"><use href="#lulu-tempete-iris2"/></clipPath>
+    <path id="lulu-tempete-bouche" d="M188 214 C 204 220 230 218 248 208 C 247 230 232 246 214 246 C 198 246 188 232 188 214 Z"/>
+    <clipPath id="lulu-tempete-bouche-clip"><use href="#lulu-tempete-bouche"/></clipPath>
+    <path id="lulu-tempete-frange" d="M140 96 L 296 92 L 296 104 C 292 114 280 118 266 117 C 268 112 266 108 262 105 C 258 116 246 122 230 121 C 232 116 229 110 224 107 C 218 118 206 123 192 121 C 194 116 190 111 185 108 C 180 118 170 122 156 120 C 150 116 145 112 142 106 Z"/>
+    <clipPath id="lulu-tempete-frange-clip"><use href="#lulu-tempete-frange"/></clipPath>
+    <path id="lulu-tempete-bord" d="M138 100 C 118 142 118 214 150 258 L 168 260 C 144 220 140 154 156 108 Z"/>
+    <clipPath id="lulu-tempete-bord-clip"><use href="#lulu-tempete-bord"/></clipPath>
+    <path id="lulu-tempete-visiere" d="M130 112 C 150 92 230 78 300 84 C 314 86 318 98 308 104 C 262 96 190 98 138 114 Z"/>
+    <clipPath id="lulu-tempete-visiere-clip"><use href="#lulu-tempete-visiere"/></clipPath>
+    <path id="lulu-tempete-meche1" d="M140 186 C 120 178 96 176 60 182 C 82 190 102 198 116 204 C 102 208 86 214 70 222 C 96 226 122 222 142 214 Z"/>
+    <path id="lulu-tempete-meche2" d="M146 230 C 130 238 108 246 78 252 C 104 258 128 256 150 248 Z"/>
+    <path id="lulu-tempete-meche3" d="M138 114 C 126 106 114 104 102 108 C 114 112 124 118 132 126 Z"/>
+    <path id="lulu-tempete-bocal" d="M314 172 L 314 180 C 301 184 297 192 297 204 L 297 246 C 297 258 305 263 317 263 L 349 263 C 361 263 369 258 369 246 L 369 204 C 369 192 365 184 352 180 L 352 172 Z"/>
+    <clipPath id="lulu-tempete-bocal-clip"><use href="#lulu-tempete-bocal"/></clipPath>
+    <path id="lulu-tempete-couvercle" d="M308 160 C 308 152 358 152 358 160 L 360 174 C 360 180 306 180 306 174 Z"/>
+    <clipPath id="lulu-tempete-couvercle-clip"><use href="#lulu-tempete-couvercle"/></clipPath>
+    <path id="lulu-tempete-nuage" d="M306 214 C 299 205 306 194 317 197 C 319 187 333 184 339 193 C 345 185 361 189 360 201 C 369 203 369 217 361 221 C 357 229 345 229 339 225 C 331 231 317 229 313 223 C 305 225 301 219 306 214 Z"/>
+    <clipPath id="lulu-tempete-nuage-clip"><use href="#lulu-tempete-nuage"/></clipPath>
+    <path id="lulu-tempete-eclair" d="M340 224 L 327 243 L 336 243 L 329 260 L 348 237 L 338 237 L 345 224 Z"/>
+    <path id="lulu-tempete-main" d="M304 288 C 298 278 300 266 312 262 L 352 260 C 360 254 362 244 368 240 C 376 238 380 246 376 254 C 381 257 382 265 376 270 C 380 275 377 284 369 286 C 352 292 320 294 304 288 Z"/>
+    <clipPath id="lulu-tempete-main-clip"><use href="#lulu-tempete-main"/></clipPath>
+    <path id="lulu-tempete-etoile" d="M0 -10 Q 0 0 10 0 Q 0 0 0 10 Q 0 0 -10 0 Q 0 0 0 -10 Z"/>
+    <path id="lulu-tempete-goutte" d="M-5 0 C -5 -4 -1 -5 10 0 C -1 5 -5 4 -5 0 Z"/>
+    <radialGradient id="lulu-tempete-halo" gradientUnits="userSpaceOnUse" cx="334" cy="222" r="96">
+      <stop offset="0" stop-color="#f2fdff" stop-opacity="0.85"/>
+      <stop offset="0.3" stop-color="#a8eeff" stop-opacity="0.45"/>
+      <stop offset="0.65" stop-color="#4d9de0" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#4d9de0" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="lulu-tempete-coeur" gradientUnits="userSpaceOnUse" cx="334" cy="238" r="44">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#c4f6ff" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#8fe3ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="lulu-tempete-reflet" gradientUnits="userSpaceOnUse" cx="296" cy="268" r="110">
+      <stop offset="0" stop-color="#cfeaff" stop-opacity="0.6"/>
+      <stop offset="0.55" stop-color="#b9d8ff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#b9d8ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="lulu-tempete-flou" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+  </defs>
+
+  <!-- Ombre portée au sol. -->
+  <ellipse cx="200" cy="475" rx="122" ry="13" fill="#1d1a16" opacity="0.18"/>
+
+  <!-- Bourrasques qui sortent du bocal et filent vers la gauche. -->
+  <g fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round">
+    <path d="M50 236 C 34 230 22 218 22 204 C 22 192 34 190 38 198"/>
+    <path d="M44 398 C 28 396 16 388 12 376"/>
+    <path d="M392 66 C 372 62 356 54 350 42 C 346 32 356 26 362 34"/>
+  </g>
+
+  <!-- Mâts de la station météo portative (derrière le sac). -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M80 262 L 36 160" stroke="#1d1a16" stroke-width="10"/>
+    <path d="M80 262 L 36 160" stroke="#b8c3d8" stroke-width="5"/>
+    <path d="M78 262 L 34.6 161" stroke="#f4f8ff" stroke-width="1.6"/>
+    <path d="M86 256 L 52 44" stroke="#1d1a16" stroke-width="10"/>
+    <path d="M86 256 L 52 44" stroke="#b8c3d8" stroke-width="5"/>
+    <path d="M84.2 256 L 50.4 45" stroke="#f4f8ff" stroke-width="1.6"/>
+  </g>
+
+  <!-- Anémomètre : trois coupelles rouges qui tournent. -->
+  <g stroke-linecap="round">
+    <path d="M36 156 L 13 150 M36 156 L 59 150 M36 156 L 36 172" stroke="#1d1a16" stroke-width="6.5"/>
+    <path d="M36 156 L 13 150 M36 156 L 59 150 M36 156 L 36 172" stroke="#b8c3d8" stroke-width="2.6"/>
+    <rect x="31" y="148" width="10" height="13" rx="3" fill="#b8c3d8" stroke="#1d1a16" stroke-width="2.5"/>
+    <circle cx="59" cy="150" r="9" fill="#e93a42" stroke="#1d1a16" stroke-width="3"/>
+    <path d="M62 145 C 65 147 66 151 64 154" fill="none" stroke="#b21f48" stroke-width="3"/>
+    <circle cx="55.5" cy="146.5" r="2.4" fill="#ffffff"/>
+    <circle cx="13" cy="150" r="9" fill="#e93a42" stroke="#1d1a16" stroke-width="3"/>
+    <ellipse cx="10" cy="150" rx="4.5" ry="7" fill="#7c1440"/>
+    <circle cx="16" cy="145.5" r="2.2" fill="#ff9d90"/>
+    <circle cx="36" cy="175" r="9.5" fill="#e93a42" stroke="#1d1a16" stroke-width="3"/>
+    <ellipse cx="40" cy="175" rx="4.5" ry="7.2" fill="#7c1440"/>
+    <circle cx="32" cy="170.5" r="2.4" fill="#ffffff"/>
+    <path d="M6 168 C 12 182 26 190 44 190 M66 136 C 60 131 50 129 42 131" fill="none" stroke="#1d1a16" stroke-width="2.5"/>
+  </g>
+
+  <!-- Girouette en cuivre : la flèche pointe d'où vient le vent (le bocal). -->
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <path d="M37 66 L 74 66 M48 73 L 63 59" stroke="#1d1a16" stroke-width="6.5" fill="none"/>
+    <path d="M37 66 L 74 66 M48 73 L 63 59" stroke="#e3913f" stroke-width="2.6" fill="none"/>
+    <circle cx="37" cy="66" r="4" fill="#e3913f" stroke="#1d1a16" stroke-width="2.5"/>
+    <circle cx="74" cy="66" r="4" fill="#e3913f" stroke="#1d1a16" stroke-width="2.5"/>
+    <circle cx="48" cy="73" r="4" fill="#b45e2c" stroke="#1d1a16" stroke-width="2.5"/>
+    <circle cx="63" cy="59" r="3.5" fill="#e3913f" stroke="#1d1a16" stroke-width="2.5"/>
+    <path d="M16 46 L 82 46" stroke="#1d1a16" stroke-width="8.5" fill="none"/>
+    <path d="M16 46 L 82 46" stroke="#e3913f" stroke-width="4" fill="none"/>
+    <path d="M18 44.6 L 80 44.6" stroke="#ffd49c" stroke-width="1.4" fill="none"/>
+    <path d="M78 35 L 99 46 L 78 57 L 83 46 Z" fill="#e3913f" stroke="#1d1a16" stroke-width="3.5"/>
+    <path d="M80 39 L 93 46 L 83 46 Z" fill="#ffd49c"/>
+    <path d="M35 46 L 22 32 L 7 32 L 17 46 L 7 60 L 22 60 Z" fill="#e3913f" stroke="#1d1a16" stroke-width="3.5"/>
+    <path d="M22 46 L 26 50 L 30 46 M22 46 L 26 42" fill="none" stroke="#b45e2c" stroke-width="2.5"/>
+    <path d="M12 35 L 21 35" stroke="#ffd49c" stroke-width="2.5" fill="none"/>
+    <circle cx="51.5" cy="34" r="5" fill="#e3913f" stroke="#1d1a16" stroke-width="2.8"/>
+    <circle cx="50" cy="32.5" r="1.6" fill="#ffd49c"/>
+  </g>
+
+  <!-- Sac à dos indigo (derrière le corps). -->
+  <use href="#lulu-tempete-sac" fill="#6c5fd0"/>
+  <g clip-path="url(#lulu-tempete-sac-clip)">
+    <path d="M112 240 C 120 290 122 332 112 380 L 140 380 L 140 240 Z" fill="#4a3ca0"/>
+    <path d="M82 296 C 72 316 72 338 80 354 C 79 336 79 316 88 298 Z" fill="#a49af0"/>
+    <path d="M70 290 C 90 298 116 296 136 290 L 136 302 C 116 308 90 308 70 300 Z" fill="#2e2573"/>
+  </g>
+  <use href="#lulu-tempete-sac" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <!-- Rabat du sac et sa sangle à boucle. -->
+  <path d="M75 272 C 86 254 114 250 134 258 L 134 288 C 114 294 90 296 76 290 Z" fill="#7a6ee0" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M82 268 C 92 260 108 258 120 260" fill="none" stroke="#a49af0" stroke-width="4" stroke-linecap="round"/>
+  <path d="M80 283 C 96 287 116 286 132 282" fill="none" stroke="#fffaf0" stroke-width="1.6" stroke-dasharray="4 4"/>
+  <rect x="94" y="284" width="11" height="26" rx="2" fill="#c98f5a" stroke="#1d1a16" stroke-width="2.5"/>
+  <rect x="91" y="296" width="17" height="11" rx="2.5" fill="none" stroke="#1d1a16" stroke-width="5.5"/>
+  <rect x="91" y="296" width="17" height="11" rx="2.5" fill="none" stroke="#e3b04a" stroke-width="2.4"/>
+  <use href="#lulu-tempete-poche-sac" fill="#6c5fd0" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M74 324 C 88 319 104 320 113 324" fill="none" stroke="#a49af0" stroke-width="3" stroke-linecap="round"/>
+  <path d="M77 349 C 88 354 104 353 113 347" fill="none" stroke="#2e2573" stroke-width="4" stroke-linecap="round"/>
+  <path d="M76 328 L 77 348 M112 326 L 112 346" fill="none" stroke="#fffaf0" stroke-width="1.6" stroke-dasharray="3.5 3.5"/>
+  <!-- Colliers qui tiennent les mâts. -->
+  <rect x="68" y="246" width="26" height="10" rx="3" fill="#b8c3d8" stroke="#1d1a16" stroke-width="3" transform="rotate(-12 81 251)"/>
+  <path d="M72 248 L 89 244.5" stroke="#f4f8ff" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+  <!-- Botte arrière (jambe proche, talon levé : elle avance face au vent). -->
+  <use href="#lulu-tempete-botte-arriere" fill="#e93a42"/>
+  <g clip-path="url(#lulu-tempete-botte-arriere-clip)">
+    <path d="M160 398 C 162 418 156 440 150 456 L 200 470 L 200 398 Z" fill="#b21f48"/>
+    <path d="M100 456 L 190 477 L 190 495 L 100 495 Z" fill="#4a1838"/>
+    <path d="M132 418 C 126 428 120 438 115 448" fill="none" stroke="#ff9d90" stroke-width="7" stroke-linecap="round"/>
+    <path d="M129 422 L 124 431" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    <path d="M166 418 C 165 430 162 442 158 452" fill="none" stroke="#ffc2c8" stroke-width="3" stroke-linecap="round"/>
+    <path d="M118 464 L 122 459 M132 467 L 136 462 M146 471 L 150 466 M160 474 L 164 469" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <path d="M104 456 L 186 475" stroke="#1d1a16" stroke-width="4" stroke-linecap="round"/>
+  <use href="#lulu-tempete-botte-arriere" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+  <!-- Botte avant (jambe du fond, posée bien à plat). -->
+  <use href="#lulu-tempete-botte-avant" fill="#e93a42"/>
+  <g clip-path="url(#lulu-tempete-botte-avant-clip)">
+    <path d="M255 400 C 260 420 262 440 262 452 L 320 452 L 320 400 Z" fill="#b21f48"/>
+    <path d="M262 452 C 284 452 300 458 310 466 L 320 466 L 320 452 Z" fill="#b21f48"/>
+    <rect x="210" y="469" width="110" height="15" fill="#4a1838"/>
+    <path d="M236 416 C 234 430 234 444 236 456" fill="none" stroke="#ff9d90" stroke-width="7" stroke-linecap="round"/>
+    <path d="M236 420 L 236 434" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M276 457 C 286 457 296 461 302 466" fill="none" stroke="#ff9d90" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="287" cy="458.5" r="2" fill="#ffffff"/>
+    <path d="M269 418 C 270 430 271 440 272 448" fill="none" stroke="#ffc2c8" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <path d="M219 469 L 308 469" stroke="#1d1a16" stroke-width="4" stroke-linecap="round"/>
+  <path d="M232 474 L 232 478 M246 474 L 246 478 M260 474 L 260 478 M274 474 L 274 478 M288 474 L 288 478" stroke="#2a0f20" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M262 447 C 266 449 270 450 274 450" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <use href="#lulu-tempete-botte-avant" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+  <!-- Bras du fond (porte le bocal), derrière le ciré. -->
+  <use href="#lulu-tempete-bras-fond" fill="#ffd23f"/>
+  <g clip-path="url(#lulu-tempete-bras-fond-clip)">
+    <path d="M318 300 C 322 320 316 338 302 348 C 290 350 274 342 264 330 L 256 362 L 350 362 L 350 296 Z" fill="#f2a22e"/>
+    <path d="M282 300 C 289 304 294 310 296 317 C 291 312 285 309 279 307 Z" fill="#c96a25"/>
+    <path d="M268 290 C 278 294 288 302 292 310" fill="none" stroke="#fff3ad" stroke-width="6" stroke-linecap="round"/>
+    <path d="M274 293 L 282 298" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    <path d="M336 296 C 334 312 330 326 322 338" fill="none" stroke="#e2f8ff" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#lulu-tempete-bras-fond" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M300 324 C 306 330 308 337 306 344 M290 331 C 294 336 294 341 291 346" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Poignet indigo du bras du fond. -->
+  <path d="M306 280 L 338 290 L 335 301 L 303 291 Z" fill="#6c5fd0" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M308 285 L 334 293" stroke="#a49af0" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Ciré jaune. -->
+  <use href="#lulu-tempete-manteau" fill="#ffd23f"/>
+  <g clip-path="url(#lulu-tempete-manteau-clip)">
+    <!-- Ombre propre côté droit, ombre portée du bras proche, bas du pan. -->
+    <path d="M236 250 C 252 290 258 340 252 422 L 300 422 L 300 250 Z" fill="#f2a22e"/>
+    <path d="M126 324 C 140 316 156 312 168 316 L 172 334 C 160 336 146 344 134 362 Z" fill="#f2a22e"/>
+    <path d="M100 360 C 120 372 160 380 200 378 L 200 430 L 40 430 L 40 380 Z" fill="#f2a22e" opacity="0.55"/>
+    <!-- Occlusion sous le col. -->
+    <path d="M138 262 C 178 286 240 284 280 262 L 282 278 C 242 300 176 300 136 278 Z" fill="#f2a22e"/>
+    <path d="M140 262 C 178 280 240 280 280 260 L 280 268 C 240 288 178 288 140 270 Z" fill="#c96a25"/>
+    <!-- Brillances du vinyle (haut gauche). -->
+    <path d="M130 290 C 126 320 122 346 112 366" fill="none" stroke="#fff3ad" stroke-width="10" stroke-linecap="round"/>
+    <path d="M133 296 C 131 312 129 326 126 338" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M206 296 C 208 330 210 362 212 392" fill="none" stroke="#fff3ad" stroke-width="6" stroke-linecap="round"/>
+    <path d="M208 302 L 209 318" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="214" cy="400" r="2.2" fill="#ffffff"/>
+    <!-- Liseré froid : la lueur du bocal sur l'épaule et le flanc. -->
+    <path d="M254 258 C 262 264 268 274 270 288" fill="none" stroke="#e2f8ff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M274 336 C 278 360 282 384 286 406" fill="none" stroke="#fff3ad" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <!-- Doublure indigo du pan soulevé par le vent. -->
+  <path d="M50 364 C 58 384 76 402 104 412 L 112 403 C 92 398 74 386 62 370 Z" fill="#6c5fd0"/>
+  <path d="M60 372 C 70 386 86 398 104 405" fill="none" stroke="#a49af0" stroke-width="2.5" stroke-linecap="round"/>
+  <use href="#lulu-tempete-manteau" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M62 370 C 74 386 92 398 112 403" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+  <!-- Plis du vent et du tombé. -->
+  <g fill="none" stroke="#1d1a16" stroke-linecap="round">
+    <path d="M114 330 C 100 346 84 356 66 362" stroke-width="2.5"/>
+    <path d="M136 368 C 124 382 112 392 100 398" stroke-width="4.5"/>
+    <path d="M272 378 C 274 390 276 400 278 410" stroke-width="2.5"/>
+    <path d="M212 398 C 214 404 216 410 218 416" stroke-width="2.5"/>
+    <path d="M176 396 C 174 404 172 410 170 416" stroke-width="2.5"/>
+  </g>
+  <!-- Surpiqûre de l'ourlet. -->
+  <path d="M106 403 C 156 411 230 411 288 401" fill="none" stroke="#c96a25" stroke-width="2" stroke-dasharray="5 6" stroke-linecap="round"/>
+  <!-- Patte de boutonnage et pressions. -->
+  <path d="M230 268 C 234 318 238 368 242 414" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M236 270 C 240 318 244 368 248 412" fill="none" stroke="#c96a25" stroke-width="2" stroke-dasharray="4 5" stroke-linecap="round"/>
+  <g stroke="#1d1a16" stroke-width="2.5">
+    <circle cx="241" cy="292" r="5" fill="#b8c3d8"/>
+    <circle cx="244.5" cy="330" r="5" fill="#b8c3d8"/>
+    <circle cx="248" cy="366" r="5" fill="#b8c3d8"/>
+    <circle cx="251" cy="398" r="5" fill="#b8c3d8"/>
+  </g>
+  <g fill="#ffffff">
+    <circle cx="239.5" cy="290.5" r="1.6"/>
+    <circle cx="243" cy="328.5" r="1.6"/>
+    <circle cx="246.5" cy="364.5" r="1.6"/>
+    <circle cx="249.5" cy="396.5" r="1.6"/>
+  </g>
+  <!-- Poches à rabat (hanches) et poche de poitrine avec thermomètre et crayon. -->
+  <path d="M154 350 L 206 347 L 208 388 C 192 394 170 394 156 390 Z" fill="#ffd23f" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M158 382 C 172 388 192 388 205 383" fill="none" stroke="#f2a22e" stroke-width="5" stroke-linecap="round"/>
+  <path d="M159 356 L 160 386 M203 353 L 204 384" fill="none" stroke="#c96a25" stroke-width="1.8" stroke-dasharray="3.5 3.5"/>
+  <path d="M150 344 L 210 340 L 211 356 C 192 362 168 362 150 358 Z" fill="#ffd23f" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M154 346 L 205 343" stroke="#fff3ad" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="181" cy="356" r="3.8" fill="#b8c3d8" stroke="#1d1a16" stroke-width="2.2"/>
+  <path d="M254 344 L 280 342 L 283 382 C 274 386 264 386 256 384 Z" fill="#f2a22e" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M251 338 L 282 336 L 283 350 C 274 354 262 354 252 352 Z" fill="#ffd23f" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M255 340.5 L 278 339" stroke="#fff3ad" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M246 306 L 246 284 C 246 279 253 279 253 284 L 253 306 Z" fill="#fffaf0" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M249.5 291 L 249.5 306" stroke="#e93a42" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M248 286 L 248 289 M248 295 L 248 298" stroke="#1d1a16" stroke-width="1.4"/>
+  <path d="M256 308 L 256 290 L 259 285 L 262 290 L 262 308 Z" fill="#4a3ca0" stroke="#1d1a16" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M258 288 L 260 288" stroke="#fffaf0" stroke-width="1.6"/>
+  <path d="M240 302 L 264 299 L 266 327 C 258 329 249 330 242 329 Z" fill="#ffd23f" stroke="#1d1a16" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M244 305 L 262 303" stroke="#fff3ad" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M243 322 C 250 324 258 324 264 322" fill="none" stroke="#f2a22e" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- Bretelle du sac qui passe sur l'épaule proche, avec sa boucle. -->
+  <path d="M138 256 L 154 252 C 164 260 174 270 182 280 L 166 284 C 160 274 150 264 138 256 Z" fill="#6c5fd0" stroke="#1d1a16" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M164 312 L 178 311 C 172 324 162 336 150 348 L 136 344 C 148 334 158 324 164 312 Z" fill="#6c5fd0" stroke="#1d1a16" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M146 256 C 156 262 166 272 174 281 M171 313 C 166 324 158 334 147 344" fill="none" stroke="#a49af0" stroke-width="1.8" stroke-dasharray="3.5 3.5"/>
+  <rect x="147" y="321" width="20" height="12" rx="2.5" fill="none" stroke="#1d1a16" stroke-width="6" transform="rotate(-40 157 327)"/>
+  <rect x="147" y="321" width="20" height="12" rx="2.5" fill="none" stroke="#e3b04a" stroke-width="2.6" transform="rotate(-40 157 327)"/>
+
+  <!-- Capuche (extérieur). -->
+  <use href="#lulu-tempete-capuche" fill="#ffd23f"/>
+  <g clip-path="url(#lulu-tempete-capuche-clip)">
+    <path d="M80 196 C 110 232 170 248 230 246 L 300 236 L 300 280 L 80 280 Z" fill="#f2a22e"/>
+    <path d="M270 60 C 290 100 298 150 288 236 L 310 236 L 310 60 Z" fill="#f2a22e"/>
+    <path d="M100 236 C 130 252 170 258 210 256 L 210 270 L 100 270 Z" fill="#c96a25"/>
+    <path d="M104 118 C 112 78 150 50 196 48 C 230 47 252 56 262 66 C 236 58 196 58 164 72 C 136 84 118 102 110 124 Z" fill="#fff3ad"/>
+    <path d="M124 98 C 134 80 152 66 172 60" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+    <path d="M115 115 L 112 125" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="200" cy="54" r="3" fill="#ffffff"/>
+    <path d="M296 118 C 298 156 294 200 282 232" fill="none" stroke="#e2f8ff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M96 170 C 100 196 110 216 124 232" fill="none" stroke="#fff3ad" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#lulu-tempete-capuche" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <!-- Couture centrale de la capuche et sa surpiqûre. -->
+  <path d="M236 84 C 200 44 118 52 96 150" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M244 88 C 208 52 128 60 106 152" fill="none" stroke="#c96a25" stroke-width="1.8" stroke-dasharray="4 5" stroke-linecap="round"/>
+
+  <!-- Col montant. -->
+  <use href="#lulu-tempete-col" fill="#ffd23f"/>
+  <g clip-path="url(#lulu-tempete-col-clip)">
+    <path d="M140 236 C 176 256 240 256 280 232 L 280 250 C 240 272 176 272 140 254 Z" fill="#f2a22e"/>
+    <path d="M246 240 C 256 252 262 264 264 282 L 290 282 L 290 230 Z" fill="#f2a22e"/>
+    <path d="M148 258 C 160 267 176 273 194 275" fill="none" stroke="#fff3ad" stroke-width="4" stroke-linecap="round"/>
+    <path d="M274 240 C 278 250 278 258 274 266" fill="none" stroke="#e2f8ff" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <use href="#lulu-tempete-col" fill="none" stroke="#1d1a16" stroke-width="5.5" stroke-linejoin="round"/>
+  <path d="M230 254 C 232 262 234 270 236 277" fill="none" stroke="#1d1a16" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Intérieur de la capuche (doublure indigo). -->
+  <use href="#lulu-tempete-doublure" fill="#4a3ca0"/>
+  <g clip-path="url(#lulu-tempete-doublure-clip)">
+    <path d="M290 160 C 288 196 280 220 270 240 L 246 240 C 264 214 276 190 280 160 Z" fill="#8f86e8"/>
+    <path d="M286 186 C 284 206 278 222 270 234" fill="none" stroke="#d6f4ff" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#lulu-tempete-doublure" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Cheveux sous la capuche (derrière le visage). -->
+  <use href="#lulu-tempete-cheveux" fill="#2e2949"/>
+  <g clip-path="url(#lulu-tempete-cheveux-clip)">
+    <path d="M150 112 C 190 100 240 102 280 116" fill="none" stroke="#6d64b4" stroke-width="4" stroke-linecap="round"/>
+    <path d="M286 140 C 286 170 280 196 270 220" fill="none" stroke="#9fe8ff" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#lulu-tempete-cheveux" fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+
+  <!-- Visage (peau brun clair). -->
+  <use href="#lulu-tempete-visage" fill="#da9b67"/>
+  <g clip-path="url(#lulu-tempete-visage-clip)">
+    <!-- Ombre propre côté fuyant, ombre de la frange sous la visière. -->
+    <path d="M300 96 L 266 100 C 272 130 270 160 264 182 C 258 204 248 222 232 236 C 218 248 196 254 170 252 L 170 290 L 300 290 Z" fill="#b06b53"/>
+    <path d="M140 120 C 160 130 190 132 220 130 C 246 128 270 124 290 112 L 290 96 L 140 96 Z" fill="#b06b53"/>
+    <path d="M140 112 C 160 120 190 122 220 120 C 246 118 270 114 290 104 L 290 96 L 140 96 Z" fill="#85464a"/>
+    <!-- Lumière froide du bocal, par en dessous à droite. -->
+    <circle cx="296" cy="268" r="110" fill="url(#lulu-tempete-reflet)"/>
+    <path d="M268 186 C 262 210 248 232 228 246 C 216 252 204 255 194 255" fill="none" stroke="#d9ecff" stroke-width="7" stroke-linecap="round"/>
+    <!-- Lumières chaudes : pommette proche, arête du nez. -->
+    <path d="M152 196 C 156 186 166 182 176 184 C 168 188 160 194 156 204 Z" fill="#f7cb9b"/>
+    <path d="M214 176 C 216 180 216 184 214 188" fill="none" stroke="#f7cb9b" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#lulu-tempete-visage" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- Joues. -->
+  <ellipse cx="163" cy="206" rx="15" ry="8" fill="#f2707c" opacity="0.5"/>
+  <ellipse cx="259" cy="199" rx="8" ry="5.5" fill="#f2707c" opacity="0.5"/>
+
+  <!-- Œil proche : blanc cassé, iris violet orage, pupille, deux reflets. -->
+  <use href="#lulu-tempete-oeil1" fill="#fffaf0"/>
+  <g clip-path="url(#lulu-tempete-oeil1-clip)">
+    <path d="M150 140 L 214 140 L 214 160 C 200 152 170 150 150 160 Z" fill="#e8def5"/>
+    <use href="#lulu-tempete-iris1" fill="#8a63e0"/>
+    <g clip-path="url(#lulu-tempete-iris1-clip)">
+      <ellipse cx="177" cy="162" rx="16" ry="10" fill="#4f34a6"/>
+      <ellipse cx="179" cy="190" rx="12" ry="7" fill="#c6b0ff"/>
+    </g>
+    <ellipse cx="177" cy="176" rx="7" ry="9.5" fill="#1d1a16"/>
+    <circle cx="171" cy="165" r="6.5" fill="#ffffff"/>
+    <circle cx="185" cy="184" r="2.8" fill="#ffffff"/>
+  </g>
+  <use href="#lulu-tempete-oeil1" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+  <path d="M158 166 C 159 150 170 142 183 142 C 194 142 201 148 203 156" fill="none" stroke="#1d1a16" stroke-width="6.5" stroke-linecap="round"/>
+  <path d="M160 160 C 156 157 153 154 150 149 M165 150 L 159 144" fill="none" stroke="#1d1a16" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Œil fuyant (plus étroit). -->
+  <use href="#lulu-tempete-oeil2" fill="#fffaf0"/>
+  <g clip-path="url(#lulu-tempete-oeil2-clip)">
+    <path d="M226 140 L 262 140 L 262 158 C 252 150 236 150 226 158 Z" fill="#e8def5"/>
+    <use href="#lulu-tempete-iris2" fill="#8a63e0"/>
+    <g clip-path="url(#lulu-tempete-iris2-clip)">
+      <ellipse cx="240" cy="160" rx="12" ry="9" fill="#4f34a6"/>
+      <ellipse cx="242" cy="186" rx="9" ry="6" fill="#c6b0ff"/>
+    </g>
+    <ellipse cx="240" cy="173" rx="5" ry="8.5" fill="#1d1a16"/>
+    <circle cx="236" cy="163" r="5" fill="#ffffff"/>
+    <circle cx="246" cy="181" r="2.2" fill="#ffffff"/>
+  </g>
+  <use href="#lulu-tempete-oeil2" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+  <path d="M229 160 C 231 149 240 143 249 144 C 256 146 259 152 259 160" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linecap="round"/>
+  <path d="M257 152 C 260 149 263 146 265 142" fill="none" stroke="#1d1a16" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Sourcils levés : l'émerveillement. -->
+  <path d="M156 138 C 165 129 182 126 197 131" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linecap="round"/>
+  <path d="M228 131 C 238 125 251 126 259 133" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Nez : petit, éclairé dessous par le bocal. -->
+  <path d="M222 188 C 228 192 229 199 223 203" fill="none" stroke="#1d1a16" stroke-width="4" stroke-linecap="round"/>
+  <path d="M219 204 C 223 206 227 205 229 202" fill="none" stroke="#d9ecff" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="218" cy="191" r="2.4" fill="#f7cb9b"/>
+
+  <!-- Grand sourire ouvert : intérieur sombre, dents, langue. -->
+  <use href="#lulu-tempete-bouche" fill="#6e2430"/>
+  <g clip-path="url(#lulu-tempete-bouche-clip)">
+    <ellipse cx="214" cy="242" rx="16" ry="8.5" fill="#ff8d9e"/>
+    <path d="M204 240 C 210 237 218 237 224 240" fill="none" stroke="#e0607a" stroke-width="2" stroke-linecap="round"/>
+    <path d="M186 212 C 206 221 230 219 250 207 L 248 217 C 230 226 206 227 188 222 Z" fill="#fffaf0"/>
+  </g>
+  <use href="#lulu-tempete-bouche" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M183 209 C 184 213 186 215 190 216 M252 203 C 252 207 251 210 247 212" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Frange rabattue par le vent. -->
+  <use href="#lulu-tempete-frange" fill="#2e2949"/>
+  <g clip-path="url(#lulu-tempete-frange-clip)">
+    <path d="M150 104 C 190 98 240 98 288 102" fill="none" stroke="#6d64b4" stroke-width="4" stroke-linecap="round"/>
+    <path d="M200 112 C 196 116 192 118 186 118 M238 112 C 234 116 228 118 222 118" fill="none" stroke="#6d64b4" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M292 108 C 286 114 278 117 268 117" fill="none" stroke="#9fe8ff" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <use href="#lulu-tempete-frange" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Bord roulé de la capuche, côté proche (cache l'oreille). -->
+  <use href="#lulu-tempete-bord" fill="#ffd23f"/>
+  <g clip-path="url(#lulu-tempete-bord-clip)">
+    <path d="M150 100 C 138 150 140 214 168 262 L 180 262 L 180 100 Z" fill="#f2a22e"/>
+    <path d="M132 130 C 126 162 128 196 140 226" fill="none" stroke="#fff3ad" stroke-width="5" stroke-linecap="round"/>
+    <path d="M134 140 L 132 156" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#lulu-tempete-bord" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Visière de la capuche. -->
+  <use href="#lulu-tempete-visiere" fill="#ffd23f"/>
+  <g clip-path="url(#lulu-tempete-visiere-clip)">
+    <path d="M236 70 C 262 84 290 92 320 92 L 320 120 L 230 120 Z" fill="#f2a22e"/>
+    <path d="M136 112 C 190 96 262 94 312 100 L 312 110 L 136 120 Z" fill="#c96a25"/>
+    <path d="M148 100 C 170 88 206 82 236 82" fill="none" stroke="#fff3ad" stroke-width="5" stroke-linecap="round"/>
+    <path d="M160 96 C 172 90 186 87 198 86" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>
+    <path d="M252 101 C 274 99 294 100 308 104" fill="none" stroke="#e2f8ff" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#lulu-tempete-visiere" fill="none" stroke="#1d1a16" stroke-width="5.5" stroke-linejoin="round"/>
+
+  <!-- Mèches échappées de la capuche, rabattues vers la gauche. -->
+  <g stroke-linejoin="round">
+    <use href="#lulu-tempete-meche1" fill="#2e2949" stroke="#1d1a16" stroke-width="4.5"/>
+    <use href="#lulu-tempete-meche2" fill="#2e2949" stroke="#1d1a16" stroke-width="4.5"/>
+    <use href="#lulu-tempete-meche3" fill="#2e2949" stroke="#1d1a16" stroke-width="4"/>
+  </g>
+  <path d="M132 188 C 114 184 96 183 78 185 M130 213 C 114 216 100 218 86 221 M138 236 C 124 242 110 246 96 249" fill="none" stroke="#6d64b4" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Bras proche : il agrippe la bretelle. -->
+  <use href="#lulu-tempete-bras-avant" fill="#ffd23f"/>
+  <g clip-path="url(#lulu-tempete-bras-avant-clip)">
+    <path d="M148 272 C 136 290 128 310 126 326 L 140 326 C 142 306 148 288 160 276 Z" fill="#f2a22e"/>
+    <path d="M98 340 C 102 356 118 364 134 356 C 144 346 154 334 164 320 L 170 326 L 170 380 L 90 380 Z" fill="#f2a22e"/>
+    <path d="M112 284 C 106 298 102 314 102 330" fill="none" stroke="#fff3ad" stroke-width="6" stroke-linecap="round"/>
+    <path d="M114 288 L 109 304" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#lulu-tempete-bras-avant" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M112 334 C 118 330 124 330 128 334 M104 322 C 108 318 113 318 117 320" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Écusson du service météo sur la manche. -->
+  <circle cx="117" cy="302" r="11" fill="#6c5fd0" stroke="#1d1a16" stroke-width="2.5"/>
+  <circle cx="117" cy="302" r="7.8" fill="none" stroke="#fffaf0" stroke-width="1.4" stroke-dasharray="2.5 2.5"/>
+  <path d="M119 293 L 112 303 L 117 303 L 114 311 L 122 299 L 117 299 Z" fill="#ffd23f" stroke="#1d1a16" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Poignet indigo et poing. -->
+  <path d="M145 295 L 167 319 L 160 327 L 138 303 Z" fill="#6c5fd0" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M146 300 L 162 318" stroke="#a49af0" stroke-width="2.5" stroke-linecap="round"/>
+  <use href="#lulu-tempete-poing" fill="#da9b67"/>
+  <g clip-path="url(#lulu-tempete-poing-clip)">
+    <path d="M150 302 C 160 308 176 310 196 300 L 196 320 L 150 320 Z" fill="#b06b53"/>
+    <path d="M160 282 C 166 278 174 277 180 279" fill="none" stroke="#f7cb9b" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <use href="#lulu-tempete-poing" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M174 287 C 178 290 179 295 176 299 M183 285 C 187 288 188 293 186 297 M164 291 C 168 289 172 289 175 291" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Cordons de la capuche, emportés par le vent. -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M170 258 C 160 272 146 280 132 284" stroke="#1d1a16" stroke-width="6.5"/>
+    <path d="M170 258 C 160 272 146 280 132 284" stroke="#fffaf0" stroke-width="3"/>
+    <path d="M262 248 C 258 266 246 282 228 290" stroke="#1d1a16" stroke-width="6.5"/>
+    <path d="M262 248 C 258 266 246 282 228 290" stroke="#fffaf0" stroke-width="3"/>
+  </g>
+  <circle cx="170" cy="258" r="4" fill="#b8c3d8" stroke="#1d1a16" stroke-width="2.5"/>
+  <circle cx="262" cy="248" r="4" fill="#b8c3d8" stroke="#1d1a16" stroke-width="2.5"/>
+  <ellipse cx="127" cy="286" rx="6.5" ry="4.5" fill="#e93a42" stroke="#1d1a16" stroke-width="2.5" transform="rotate(-20 127 286)"/>
+  <ellipse cx="222" cy="293" rx="6.5" ry="4.5" fill="#e93a42" stroke="#1d1a16" stroke-width="2.5" transform="rotate(-25 222 293)"/>
+  <circle cx="125" cy="284.5" r="1.5" fill="#ffffff"/>
+  <circle cx="220" cy="291.5" r="1.5" fill="#ffffff"/>
+
+  <!-- Halo de l'orage, par-dessus le corps : la lueur déborde sur l'épaule et le visage. -->
+  <circle cx="334" cy="222" r="96" fill="url(#lulu-tempete-halo)"/>
+
+  <!-- Le bocal : verre, orage miniature, couvercle percé. -->
+  <use href="#lulu-tempete-bocal" fill="#dff6ff" opacity="0.4"/>
+  <g clip-path="url(#lulu-tempete-bocal-clip)">
+    <circle cx="334" cy="236" r="44" fill="url(#lulu-tempete-coeur)"/>
+    <g stroke="#8fd6ff" stroke-width="2.5" stroke-linecap="round">
+      <path d="M348 230 L 344 241 M356 234 L 352 245 M318 232 L 314 243 M362 228 L 359 236 M310 238 L 307 247"/>
+    </g>
+    <path d="M296 252 C 312 248 352 248 370 252 L 370 266 L 296 266 Z" fill="#7fcff7" opacity="0.75"/>
+    <path d="M298 252 C 314 249 352 249 368 252" fill="none" stroke="#e8fbff" stroke-width="2"/>
+    <ellipse cx="350" cy="253" rx="6" ry="1.5" fill="none" stroke="#ffffff" stroke-width="1.4"/>
+    <ellipse cx="316" cy="254" rx="4" ry="1.2" fill="none" stroke="#ffffff" stroke-width="1.4"/>
+    <use href="#lulu-tempete-bocal" fill="none" stroke="#bfeaff" stroke-width="10" opacity="0.55"/>
+  </g>
+  <!-- Nuage d'orage, grognon. -->
+  <use href="#lulu-tempete-nuage" fill="#a37ce9"/>
+  <g clip-path="url(#lulu-tempete-nuage-clip)">
+    <path d="M296 214 C 310 222 340 224 372 212 L 372 240 L 296 240 Z" fill="#7048c4"/>
+    <path d="M300 222 C 316 230 344 232 366 222 L 366 240 L 300 240 Z" fill="#4b2b90"/>
+    <path d="M308 204 C 310 198 316 196 322 198 M325 196 C 329 191 336 191 340 195" fill="none" stroke="#dccbff" stroke-width="3.5" stroke-linecap="round"/>
+    <ellipse cx="350" cy="212" rx="8" ry="5.5" fill="#efe6ff" opacity="0.85"/>
+  </g>
+  <use href="#lulu-tempete-nuage" fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+  <ellipse cx="326" cy="210" rx="2.3" ry="3" fill="#1d1a16"/>
+  <ellipse cx="339" cy="209.5" rx="2.3" ry="3" fill="#1d1a16"/>
+  <path d="M321 203.5 L 329 206 M344 202.5 L 336 205.5 M328 219 C 331 216 335 216 338 219" fill="none" stroke="#1d1a16" stroke-width="2.2" stroke-linecap="round"/>
+  <!-- Éclairs : lueur floue puis cœur blanc cerné. -->
+  <use href="#lulu-tempete-eclair" fill="#9fefff" stroke="#9fefff" stroke-width="6" filter="url(#lulu-tempete-flou)"/>
+  <path d="M314 226 L 309 236 L 314 236 L 310 246" fill="none" stroke="#9fefff" stroke-width="5" stroke-linejoin="round" filter="url(#lulu-tempete-flou)"/>
+  <use href="#lulu-tempete-eclair" fill="#ffffff" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M314 226 L 309 236 L 314 236 L 310 246" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- Reflets du verre (haut gauche) et liseré froid à droite. -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M304 198 C 302 214 302 232 304 246" stroke="#ffffff" stroke-width="5" opacity="0.9"/>
+    <path d="M311 204 L 311 214" stroke="#ffffff" stroke-width="3"/>
+    <path d="M305 189 C 307 185 311 183 315 182" stroke="#ffffff" stroke-width="3"/>
+    <path d="M363 202 C 365 220 365 236 362 250" stroke="#e8fbff" stroke-width="3"/>
+    <path d="M312 258 C 324 260 342 260 354 258" stroke="#ffffff" stroke-width="2.5" opacity="0.8"/>
+  </g>
+  <use href="#lulu-tempete-bocal" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M314 180 C 326 183 340 183 352 180" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Ficelle et étiquette de spécimen (symbole d'ouragan dessiné). -->
+  <path d="M312 178 C 326 183 342 183 354 178" fill="none" stroke="#c98f5a" stroke-width="3" stroke-linecap="round"/>
+  <path d="M354 179 C 362 184 368 188 371 193" fill="none" stroke="#c98f5a" stroke-width="2" stroke-linecap="round"/>
+  <path d="M368 190 L 385 196 L 380 211 L 363 205 Z" fill="#fffaf0" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <circle cx="370.5" cy="195" r="1.8" fill="#1d1a16"/>
+  <circle cx="375.5" cy="202" r="2.6" fill="none" stroke="#1d1a16" stroke-width="1.6"/>
+  <path d="M373.5 199.8 C 373 197 375 195.5 377.5 196 M377.5 204.2 C 378 207 376 208.5 373.5 208" fill="none" stroke="#1d1a16" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- Couvercle métallique percé de trous. -->
+  <use href="#lulu-tempete-couvercle" fill="#b8c3d8"/>
+  <g clip-path="url(#lulu-tempete-couvercle-clip)">
+    <path d="M344 150 L 362 150 L 362 182 L 340 182 Z" fill="#7c88a8"/>
+    <path d="M314 163 L 314 174" stroke="#f4f8ff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M320 164 L 320 176 M326 164 L 326 177 M332 164 L 332 177 M338 164 L 338 177 M350 164 L 350 176" stroke="#7c88a8" stroke-width="1.8"/>
+    <path d="M344 164 L 344 177 M352 164 L 352 176" stroke="#555d80" stroke-width="1.8"/>
+  </g>
+  <use href="#lulu-tempete-couvercle" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+  <ellipse cx="333" cy="157" rx="24" ry="4.2" fill="#f4f8ff" stroke="#1d1a16" stroke-width="2.5"/>
+  <g fill="#1d1a16">
+    <ellipse cx="322" cy="157" rx="2" ry="1.1"/>
+    <ellipse cx="333" cy="156.6" rx="2" ry="1.1"/>
+    <ellipse cx="344" cy="157" rx="2" ry="1.1"/>
+  </g>
+
+  <!-- Main du fond : paume sous le bocal, doigts repliés sur le verre. -->
+  <use href="#lulu-tempete-main" fill="#da9b67"/>
+  <g clip-path="url(#lulu-tempete-main-clip)">
+    <path d="M300 280 C 320 286 350 286 384 274 L 384 300 L 300 300 Z" fill="#b06b53"/>
+    <path d="M312 263 C 328 261 344 261 356 260" fill="none" stroke="#e2f6ff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M362 248 C 364 244 367 241 370 240" fill="none" stroke="#e2f6ff" stroke-width="3" stroke-linecap="round"/>
+    <path d="M308 270 C 312 266 318 265 324 266" fill="none" stroke="#f7cb9b" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#lulu-tempete-main" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M372 256 C 368 258 364 258 361 256 M372 271 C 367 273 362 273 359 271" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Arcs électriques qui crépitent hors du bocal. -->
+  <g fill="none" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M356 158 L 366 146 L 361 143 L 372 130 L 368 128 L 378 116 M371 236 L 382 231 L 379 226 L 392 221 M322 153 L 319 146 L 323 144 L 320 137 M344 153 L 347 147 L 343 144 L 347 138" stroke="#8fe9ff" stroke-width="7" opacity="0.8" filter="url(#lulu-tempete-flou)"/>
+    <path d="M356 158 L 366 146 L 361 143 L 372 130 L 368 128 L 378 116 M371 236 L 382 231 L 379 226 L 392 221 M322 153 L 319 146 L 323 144 L 320 137 M344 153 L 347 147 L 343 144 L 347 138" stroke="#1d1a16" stroke-width="5.5"/>
+    <path d="M356 158 L 366 146 L 361 143 L 372 130 L 368 128 L 378 116 M371 236 L 382 231 L 379 226 L 392 221 M322 153 L 319 146 L 323 144 L 320 137 M344 153 L 347 147 L 343 144 L 347 138" stroke="#ffffff" stroke-width="2.2"/>
+  </g>
+  <!-- Étincelles et gouttes de pluie emportées. -->
+  <g fill="#f2fcff" stroke="#1d1a16" stroke-width="2.2" stroke-linejoin="round">
+    <use href="#lulu-tempete-etoile" transform="translate(384 96) scale(0.95)"/>
+    <use href="#lulu-tempete-etoile" transform="translate(294 138) scale(0.55)"/>
+    <use href="#lulu-tempete-etoile" transform="translate(390 270) scale(0.65)"/>
+  </g>
+  <g fill="#8fd6ff" stroke="#1d1a16" stroke-width="2.2" stroke-linejoin="round">
+    <use href="#lulu-tempete-goutte" transform="translate(26 300)"/>
+    <use href="#lulu-tempete-goutte" transform="translate(380 318)"/>
+    <use href="#lulu-tempete-goutte" transform="translate(318 40)"/>
+  </g>
+  <g fill="#ffffff">
+    <circle cx="24" cy="298.6" r="1.4"/>
+    <circle cx="378" cy="316.6" r="1.4"/>
+    <circle cx="316" cy="38.6" r="1.4"/>
+  </g>
+</svg>

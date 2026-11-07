@@ -28,8 +28,8 @@ Remise à zéro le 2026-10-19 (ADR 0002). L'ancien prototype « Fantasy Roguelik
 Gacha » est sous le tag `legacy-v1` et la branche `legacy` (ne pas supprimer). On
 construit d'abord **le gacha seul** ; le gameplay viendra après. Stack : Phaser 4 +
 TS 6 + Vite 8 sur Node 24, local-only (ADR 0004). Features livrées : 001 Tirage,
-002 Pity & doublons, 003 Collection, 004 Révélation, 005 Son, 006 Bannières,
-007 Illustrations (avec la révision 2 de 004).
+002 Pity & doublons, 003 Collection, 004 Révélation, 005 Son, 006 Bannières. En cours :
+007 Illustrations (avec la révision 2 de 004), voir `docs/ROADMAP.md`.
 
 ## Commandes
 

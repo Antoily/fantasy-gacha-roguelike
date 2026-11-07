@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Haut-parleur cartoon (bleu ciel des boutons) : aimant, pavillon, rebord bombé, deux ondes
+       cernées d'encre. Même corps que icon-sound-off. Contour 5, ombre portée 20 %, lumière haut gauche. -->
+  <defs>
+    <path id="icon-sound-on-corps" d="M9 23 L16 23 L24 13 Q24 9.5 27.5 9.5 Q31 9.5 31 13 L31 51 Q31 54.5 27.5 54.5 Q24 54.5 24 51 L16 41 L9 41 Q6 41 6 38 L6 26 Q6 23 9 23 Z"/>
+    <clipPath id="icon-sound-on-clip"><use href="#icon-sound-on-corps"/></clipPath>
+    <path id="icon-sound-on-ondes" d="M39.8 24.6 A17 17 0 0 1 39.8 39.4 M50.1 15.4 A30.5 30.5 0 0 1 50.1 48.6"/>
+  </defs>
+
+  <!-- Ombre portée du haut-parleur et des ondes. -->
+  <g transform="translate(1.5 3)" opacity="0.2">
+    <use href="#icon-sound-on-corps" fill="#1d1a16"/>
+    <use href="#icon-sound-on-ondes" fill="none" stroke="#1d1a16" stroke-width="9.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Corps. -->
+  <use href="#icon-sound-on-corps" fill="#7ec8e3"/>
+  <g clip-path="url(#icon-sound-on-clip)">
+    <path d="M0 35.5 L16 35.5 L24 38 L24 64 L0 64 Z" fill="#5ca6dd"/>
+    <path d="M0 23 L16 23 L24 13 L24 18.5 L16 27.5 L0 27.5 Z" fill="#c4ecf9"/>
+    <!-- Rebord du pavillon : bombé, clair en haut, ombré en bas. -->
+    <rect x="24" y="0" width="8" height="38" fill="#a3daf0"/>
+    <rect x="24" y="38" width="8" height="26" fill="#7ec8e3"/>
+    <path d="M24 46 L32 46 L32 64 L24 64 Z" fill="#5ca6dd"/>
+    <!-- Reflets. -->
+    <path d="M19.9 23.6 L23 19.7" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M26.9 16.5 L26.9 24" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+    <circle cx="10" cy="27.8" r="1.2" fill="#ffffff"/>
+  </g>
+  <!-- Coutures aimant / pavillon / rebord, puis contour. -->
+  <path d="M16 23.5 L16 40.5 M24 14 L24 50" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <use href="#icon-sound-on-corps" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- Ondes : cernées d'encre, cœur bleu, petit reflet côté lumière. -->
+  <use href="#icon-sound-on-ondes" fill="none" stroke="#1d1a16" stroke-width="9.5" stroke-linecap="round"/>
+  <use href="#icon-sound-on-ondes" fill="none" stroke="#7ec8e3" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M39.3 26 A16 16 0 0 1 40.4 30.3 M50.6 18.1 A29.6 29.6 0 0 1 53.7 26.9" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,338 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <!-- Pataplouf (Commun, créature) : grenouille gonflée en ballon par la peur… d'une coccinelle.
+       Charte docs/art/charte.md ; lumière unique en haut à gauche. -->
+  <defs>
+    <!-- Corps : sphère + coupelles des yeux (les globes passent derrière, le bord des coupelles fait la paupière). -->
+    <path id="pataplouf-corps" d="M100 173.2 C95 156 101 136 109.3 127.5 C122 141 180 137 193.6 121.6 C198 128 202 134.4 208 134.4 C214 134.4 219 126 223.1 119.5 C234 131 279 130 290.4 116.2 C297 126 298 152 296 173.2 A142 142 0 1 1 100 173.2 Z"/>
+    <clipPath id="pataplouf-corps-clip"><use href="#pataplouf-corps"/></clipPath>
+    <!-- Ombre propre de la sphère : croissant à bord net, en bas à droite. -->
+    <path id="pataplouf-ombre" d="M280 160 A142 142 0 1 1 82 358 A142 142 0 0 0 280 160 Z"/>
+    <clipPath id="pataplouf-ombre-clip"><use href="#pataplouf-ombre"/></clipPath>
+    <!-- Ventre crème : de la lèvre jusqu'au bas du ballon, flancs verts autour. -->
+    <path id="pataplouf-ventre" d="M131 209 C150 219 178 223 199 222 C221 222 243 221 262 220 C278 220 292 218 306 216 C318 262 292 336 236 388 C200 414 148 406 118 378 C90 348 92 258 131 209 Z"/>
+    <clipPath id="pataplouf-ventre-clip"><use href="#pataplouf-ventre"/></clipPath>
+    <!-- Globes oculaires : l'œil proche (gauche) plein, l'œil lointain raccourci. -->
+    <circle id="pataplouf-oeil-proche" cx="150" cy="104" r="47"/>
+    <clipPath id="pataplouf-oeil-proche-clip"><use href="#pataplouf-oeil-proche"/></clipPath>
+    <ellipse id="pataplouf-oeil-loin" cx="256" cy="98" rx="38" ry="43"/>
+    <clipPath id="pataplouf-oeil-loin-clip"><use href="#pataplouf-oeil-loin"/></clipPath>
+    <!-- Bouche ouverte, lèvre du haut qui tremble. -->
+    <path id="pataplouf-bouche" d="M198 222 C204 216 210 216 214 221 C219 227 226 227 231 220 C236 214 243 214 247 220 C251 225 257 225 262 220 C262 240 248 255 230 255 C212 255 199 242 198 222 Z"/>
+    <clipPath id="pataplouf-bouche-clip"><use href="#pataplouf-bouche"/></clipPath>
+    <!-- Taches étirées par le gonflement (écrasées près du bord) ; remplissage donné par le <use>. -->
+    <g id="pataplouf-taches">
+      <ellipse cx="124" cy="166" rx="7" ry="4" transform="rotate(-35 124 166)"/>
+      <ellipse cx="176" cy="160" rx="6.5" ry="4" transform="rotate(-18 176 160)"/>
+      <ellipse cx="208" cy="152" rx="10" ry="5.5" transform="rotate(-6 208 152)"/>
+      <ellipse cx="243" cy="166" rx="8" ry="4.5" transform="rotate(8 243 166)"/>
+      <ellipse cx="272" cy="150" rx="9" ry="5" transform="rotate(18 272 150)"/>
+      <ellipse cx="325" cy="262" rx="4.5" ry="11" transform="rotate(-6 325 262)"/>
+      <ellipse cx="320" cy="314" rx="5" ry="10" transform="rotate(-24 320 314)"/>
+      <ellipse cx="82" cy="352" rx="7" ry="13" transform="rotate(28 82 352)"/>
+      <ellipse cx="106" cy="388" rx="10" ry="5.5" transform="rotate(38 106 388)"/>
+    </g>
+    <!-- Pattes : bras et jambes (tubes), mains et pieds en union de formes (contour par l'arrière). -->
+    <path id="pataplouf-bras-proche" d="M96 304 C82 303 70 302 61 300 C57 294 55 286 53 278 L37 280 C39 294 43 310 49 320 C57 330 78 330 96 328 Z"/>
+    <clipPath id="pataplouf-bras-proche-clip"><use href="#pataplouf-bras-proche"/></clipPath>
+    <path id="pataplouf-bras-loin" d="M318 290 C334 288 342 286 348 284 C352 276 354 268 355 260 L369 262 C368 274 364 288 358 298 C348 306 334 309 318 310 Z"/>
+    <clipPath id="pataplouf-bras-loin-clip"><use href="#pataplouf-bras-loin"/></clipPath>
+    <path id="pataplouf-jambe-proche" d="M136 392 C122 397 110 404 100 412 C92 418 86 424 82 430 L96 442 C100 436 106 431 114 427 C126 421 138 414 150 405 Z"/>
+    <clipPath id="pataplouf-jambe-proche-clip"><use href="#pataplouf-jambe-proche"/></clipPath>
+    <path id="pataplouf-jambe-loin" d="M246 400 C262 404 278 410 292 418 C300 424 306 430 310 436 L296 447 C292 441 286 436 278 432 C262 424 246 418 230 412 Z"/>
+    <clipPath id="pataplouf-jambe-loin-clip"><use href="#pataplouf-jambe-loin"/></clipPath>
+    <g id="pataplouf-main-proche">
+      <ellipse cx="45" cy="268" rx="10" ry="9"/>
+      <ellipse cx="33.9" cy="265" rx="10.5" ry="3.8" transform="rotate(15 33.9 265)"/>
+      <ellipse cx="40.1" cy="257.6" rx="10.5" ry="3.8" transform="rotate(65 40.1 257.6)"/>
+      <ellipse cx="49.9" cy="257.6" rx="10.5" ry="3.8" transform="rotate(115 49.9 257.6)"/>
+      <ellipse cx="56.1" cy="265" rx="10.5" ry="3.8" transform="rotate(165 56.1 265)"/>
+    </g>
+    <g id="pataplouf-main-proche-coussinets">
+      <circle cx="23.7" cy="262.3" r="4.6"/>
+      <circle cx="35.7" cy="248.1" r="4.6"/>
+      <circle cx="54.3" cy="248.1" r="4.6"/>
+      <circle cx="66.3" cy="262.3" r="4.6"/>
+    </g>
+    <g id="pataplouf-main-loin">
+      <ellipse cx="362" cy="252" rx="10" ry="9"/>
+      <ellipse cx="351.6" cy="247.1" rx="10.5" ry="3.8" transform="rotate(25 351.6 247.1)"/>
+      <ellipse cx="359" cy="240.9" rx="10.5" ry="3.8" transform="rotate(75 359 240.9)"/>
+      <ellipse cx="368.6" cy="242.6" rx="10.5" ry="3.8" transform="rotate(125 368.6 242.6)"/>
+      <ellipse cx="373.5" cy="251" rx="10.5" ry="3.8" transform="rotate(175 373.5 251)"/>
+    </g>
+    <g id="pataplouf-main-loin-coussinets">
+      <circle cx="342.1" cy="242.7" r="4.6"/>
+      <circle cx="356.3" cy="230.7" r="4.6"/>
+      <circle cx="374.6" cy="234" r="4.6"/>
+      <circle cx="383.9" cy="250.1" r="4.6"/>
+    </g>
+    <path id="pataplouf-pied-proche-palme" d="M89 436 L61.9 428.7 Q70.3 436.8 62.7 445.6 Q74.2 447.4 72.9 458.9 Z"/>
+    <g id="pataplouf-pied-proche-doigts">
+      <ellipse cx="89" cy="437" rx="9" ry="8"/>
+      <ellipse cx="75.5" cy="432.4" rx="14" ry="4.2" transform="rotate(15 75.5 432.4)"/>
+      <ellipse cx="75.8" cy="440.8" rx="14" ry="4.2" transform="rotate(160 75.8 440.8)"/>
+      <ellipse cx="81" cy="447.5" rx="14" ry="4.2" transform="rotate(125 81 447.5)"/>
+    </g>
+    <g id="pataplouf-pied-proche-coussinets">
+      <circle cx="61.9" cy="428.7" r="4.8"/>
+      <circle cx="62.7" cy="445.6" r="4.8"/>
+      <circle cx="72.9" cy="458.9" r="4.8"/>
+    </g>
+    <path id="pataplouf-pied-loin-palme" d="M304 441 L329.4 429.2 Q322.6 438.6 331.6 445.9 Q321.7 449.7 323.8 460.8 Z"/>
+    <g id="pataplouf-pied-loin-doigts">
+      <ellipse cx="304" cy="442" rx="9" ry="8"/>
+      <ellipse cx="316.7" cy="435.1" rx="14" ry="4.2" transform="rotate(-25 316.7 435.1)"/>
+      <ellipse cx="317.8" cy="443.4" rx="14" ry="4.2" transform="rotate(10 317.8 443.4)"/>
+      <ellipse cx="313.9" cy="450.9" rx="14" ry="4.2" transform="rotate(45 313.9 450.9)"/>
+    </g>
+    <g id="pataplouf-pied-loin-coussinets">
+      <circle cx="329.4" cy="429.2" r="4.8"/>
+      <circle cx="331.6" cy="445.9" r="4.8"/>
+      <circle cx="323.8" cy="460.8" r="4.8"/>
+    </g>
+    <!-- Goutte de sueur (pointe vers le haut, centrée sur sa partie ronde). -->
+    <path id="pataplouf-goutte" d="M0 -21 C3 -14 9 -8 9 0 C9 6 5 10 0 10 C-5 10 -9 6 -9 0 C-9 -8 -3 -14 0 -21 Z"/>
+    <clipPath id="pataplouf-goutte-a-clip"><use href="#pataplouf-goutte" transform="translate(72 132) rotate(124)"/></clipPath>
+    <clipPath id="pataplouf-goutte-b-clip"><use href="#pataplouf-goutte" transform="translate(50 172) rotate(113) scale(0.8)"/></clipPath>
+    <clipPath id="pataplouf-goutte-c-clip"><use href="#pataplouf-goutte" transform="translate(40 104) rotate(102) scale(0.65)"/></clipPath>
+    <clipPath id="pataplouf-coccinelle-clip"><circle cx="348" cy="46" r="17"/></clipPath>
+    <!-- Dégradés doux réservés aux deux grands volumes ronds. -->
+    <radialGradient id="pataplouf-volume" cx="0.34" cy="0.36" r="0.75">
+      <stop offset="0" stop-color="#9ee063"/>
+      <stop offset="0.6" stop-color="#7cc84a"/>
+      <stop offset="1" stop-color="#66b83f"/>
+    </radialGradient>
+    <radialGradient id="pataplouf-ventre-degrade" cx="0.32" cy="0.28" r="0.8">
+      <stop offset="0" stop-color="#fffbea"/>
+      <stop offset="1" stop-color="#f9e6b4"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ombre au sol : petite et pâle, la grenouille décolle. -->
+  <ellipse cx="198" cy="486" rx="82" ry="9.5" fill="#1d1a16" opacity="0.14"/>
+
+  <!-- Trajectoire en boucle de la coccinelle (derrière tout). -->
+  <path d="M394 118 C384 124 370 122 368 110 C366 98 382 96 383 106 C384 116 366 116 360 98 C358 90 359 76 361 66" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="0.1 7" opacity="0.6"/>
+
+  <!-- ===== Patte arrière lointaine (derrière le corps, côté ombre) ===== -->
+  <use href="#pataplouf-jambe-loin" fill="#6ab845"/>
+  <g clip-path="url(#pataplouf-jambe-loin-clip)">
+    <path d="M246 404 C262 408 278 414 290 422 C298 428 302 432 306 438 L330 460 L200 460 L200 404 Z" fill="#3f9447"/>
+  </g>
+  <use href="#pataplouf-jambe-loin" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  <g stroke="#1d1a16" stroke-width="8" stroke-linejoin="round">
+    <use href="#pataplouf-pied-loin-palme" fill="#1d1a16"/>
+    <use href="#pataplouf-pied-loin-doigts" fill="#1d1a16"/>
+    <use href="#pataplouf-pied-loin-coussinets" fill="#1d1a16"/>
+  </g>
+  <use href="#pataplouf-pied-loin-palme" fill="#93cf68"/>
+  <use href="#pataplouf-pied-loin-doigts" fill="#4f9f45"/>
+  <use href="#pataplouf-pied-loin-coussinets" fill="#a9db78"/>
+
+  <!-- ===== Bras lointain (derrière le corps), main ouverte vers la coccinelle ===== -->
+  <use href="#pataplouf-bras-loin" fill="#74c247"/>
+  <g clip-path="url(#pataplouf-bras-loin-clip)">
+    <path d="M362 262 C362 276 358 288 352 295 C344 301 332 303 318 303 L318 316 L380 316 L380 262 Z" fill="#3f9447"/>
+    <path d="M334 292 C340 291 345 290 349 288" fill="none" stroke="#b9e57a" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#pataplouf-bras-loin" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  <g stroke="#1d1a16" stroke-width="8" stroke-linejoin="round">
+    <use href="#pataplouf-main-loin" fill="#1d1a16"/>
+    <use href="#pataplouf-main-loin-coussinets" fill="#1d1a16"/>
+  </g>
+  <use href="#pataplouf-main-loin" fill="#6fbf46"/>
+  <use href="#pataplouf-main-loin-coussinets" fill="#c4ea8a"/>
+  <ellipse cx="365" cy="256" rx="5" ry="3.2" fill="#3f9447"/>
+
+  <!-- ===== Yeux exorbités (globes derrière les coupelles du corps) ===== -->
+  <use href="#pataplouf-oeil-loin" fill="#d9d0e6"/>
+  <g clip-path="url(#pataplouf-oeil-loin-clip)">
+    <ellipse cx="251.5" cy="93" rx="38" ry="43" fill="#fffaf0"/>
+    <ellipse cx="269" cy="82" rx="13.5" ry="15.5" fill="#f0ac2a"/>
+    <path d="M255.5 82 A13.5 15.5 0 0 1 282.5 82 C277.5 75 260.5 75 255.5 82 Z" fill="#c47812"/>
+    <ellipse cx="268" cy="88" rx="7.2" ry="8" fill="#ffd96e"/>
+    <ellipse cx="269" cy="82" rx="13.5" ry="15.5" fill="none" stroke="#9c5a0e" stroke-width="2.5"/>
+    <ellipse cx="270" cy="82.5" rx="6.4" ry="4.6" fill="#1d1a16"/>
+    <circle cx="264.5" cy="76.5" r="4.8" fill="#ffffff"/>
+    <circle cx="275.5" cy="88.5" r="2.1" fill="#ffffff"/>
+  </g>
+  <use href="#pataplouf-oeil-loin" fill="none" stroke="#1d1a16" stroke-width="7"/>
+
+  <use href="#pataplouf-oeil-proche" fill="#d9d0e6"/>
+  <g clip-path="url(#pataplouf-oeil-proche-clip)">
+    <circle cx="145" cy="99" r="47" fill="#fffaf0"/>
+    <circle cx="167" cy="88" r="16" fill="#f0ac2a"/>
+    <path d="M151 88 A16 16 0 0 1 183 88 C177 80 157 80 151 88 Z" fill="#c47812"/>
+    <circle cx="166" cy="94" r="8.5" fill="#ffd96e"/>
+    <circle cx="167" cy="88" r="16" fill="none" stroke="#9c5a0e" stroke-width="2.5"/>
+    <ellipse cx="168" cy="88.5" rx="7.5" ry="5.2" fill="#1d1a16"/>
+    <circle cx="161.5" cy="82" r="5.6" fill="#ffffff"/>
+    <circle cx="174.5" cy="95" r="2.4" fill="#ffffff"/>
+  </g>
+  <use href="#pataplouf-oeil-proche" fill="none" stroke="#1d1a16" stroke-width="7"/>
+
+  <!-- ===== Corps-ballon ===== -->
+  <use href="#pataplouf-corps" fill="url(#pataplouf-volume)"/>
+  <g clip-path="url(#pataplouf-corps-clip)">
+    <!-- Ombre propre + flanc droit des coupelles. -->
+    <use href="#pataplouf-ombre" fill="#3f9447"/>
+    <path d="M277 121 C289 133 290 152 280 160 L312 178 L312 108 Z" fill="#3f9447"/>
+    <path d="M191 124 C196 130 201 135 209 136 C203 140 196 139 191 124 Z" fill="#4c9f45"/>
+    <!-- Taches : foncées dans la lumière, plus foncées encore dans l'ombre. -->
+    <use href="#pataplouf-taches" fill="#4b9a35"/>
+    <g clip-path="url(#pataplouf-ombre-clip)"><use href="#pataplouf-taches" fill="#256b3a"/></g>
+    <!-- Petites verrues claires. -->
+    <circle cx="132" cy="180" r="2.3" fill="#c2ea88"/>
+    <circle cx="190" cy="166" r="2" fill="#c2ea88"/>
+    <circle cx="287" cy="176" r="2" fill="#c2ea88"/>
+    <circle cx="226" cy="150" r="1.8" fill="#c2ea88"/>
+    <!-- Occlusion sous le bras proche (partie verte). -->
+    <path d="M92 332 C104 340 120 338 130 330 C122 348 100 350 92 332 Z" fill="#2c7340"/>
+    <!-- Reflet de ballon : grande fenêtre claire, filet blanc, point nerveux. -->
+    <path d="M74 292 C68 252 78 214 102 188 C99 216 93 252 91 294 C90 302 76 302 74 292 Z" fill="#d6f39a"/>
+    <path d="M84 236 C86 221 92 208 99 199 C97 212 94 225 92 238 C91 244 84 243 84 236 Z" fill="#ffffff"/>
+    <circle cx="89" cy="260" r="3.4" fill="#ffffff"/>
+    <!-- Ventre crème tendu et brillant. -->
+    <use href="#pataplouf-ventre" fill="url(#pataplouf-ventre-degrade)"/>
+    <g clip-path="url(#pataplouf-ventre-clip)">
+      <use href="#pataplouf-ombre" fill="#e8bd8e"/>
+      <path d="M131 209 C150 219 178 223 199 222 C221 222 243 221 262 220 C278 220 292 218 306 216 L306 223 C292 226 278 228 262 228 C243 229 221 230 199 230 C176 230 150 226 131 209 Z" fill="#e5b984"/>
+      <path d="M92 332 C104 340 120 338 130 330 C122 348 100 350 92 332 Z" fill="#dcae7e"/>
+      <path d="M156 356 C186 370 232 368 262 350" fill="none" stroke="#ecca98" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M176 380 C198 388 222 387 240 378" fill="none" stroke="#dcae7e" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M134 290 C134 268 146 250 162 240 C157 254 151 272 148 292 C147 300 134 300 134 290 Z" fill="#ffffff"/>
+      <circle cx="141" cy="312" r="4.5" fill="#ffffff"/>
+    </g>
+    <!-- Joues roses, hachures de rougissement. -->
+    <ellipse cx="160" cy="195" rx="19" ry="10.5" fill="#ff8fa6" opacity="0.85"/>
+    <ellipse cx="303" cy="199" rx="9.5" ry="9" fill="#ff8fa6" opacity="0.8"/>
+    <path d="M150 200 L155 190 M159 201 L164 191 M168 200 L173 190 M299 204 L302 195 M306 204 L309 195" fill="none" stroke="#e85d7a" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <use href="#pataplouf-corps" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+  <!-- ===== Visage ===== -->
+  <!-- Ligne des lèvres (frontière vert / crème) et coins de bouche. -->
+  <path d="M131 209 C150 219 178 223 199 222 M261 220 C278 220 292 218 306 216" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M136 202 C129 205 128 212 133 217 M302 209 C309 211 311 217 307 222" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+  <!-- Bouche : intérieur sombre, gorge plus sombre, langue. -->
+  <use href="#pataplouf-bouche" fill="#6b2231"/>
+  <g clip-path="url(#pataplouf-bouche-clip)">
+    <ellipse cx="231" cy="226" rx="30" ry="9" fill="#4a1622"/>
+    <path d="M208 251 C212 240 224 236 234 239 C243 241 249 247 251 251 C244 259 215 260 208 251 Z" fill="#ff8a9b"/>
+    <path d="M230 242 C230 247 231 251 232 255" fill="none" stroke="#d9566f" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="221" cy="245" rx="5.5" ry="2.4" transform="rotate(-12 221 245)" fill="#ffc3cb"/>
+  </g>
+  <use href="#pataplouf-bouche" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- Narines. -->
+  <ellipse cx="219" cy="191" rx="3.3" ry="2.3" transform="rotate(-20 219 191)" fill="#1d1a16"/>
+  <ellipse cx="239" cy="188" rx="3.1" ry="2.2" transform="rotate(-20 239 188)" fill="#1d1a16"/>
+  <!-- Sourcils flottants, relevés et inquiets. -->
+  <path d="M110 52 C124 37 150 29 177 28 C183 28 185 35 179 37 C155 40 134 47 118 58 C112 62 106 57 110 52 Z" fill="#1d1a16"/>
+  <path d="M229 31 C248 24 272 28 288 40 C292 44 288 50 282 47 C266 39 249 37 233 39 C226 40 224 33 229 31 Z" fill="#1d1a16"/>
+
+  <!-- ===== Patte arrière proche (devant) ===== -->
+  <use href="#pataplouf-jambe-proche" fill="#7cc84a"/>
+  <g clip-path="url(#pataplouf-jambe-proche-clip)">
+    <path d="M96 442 C100 436 106 431 114 427 C126 421 138 414 150 405 L152 398 C140 407 128 414 116 420 C106 425 98 431 92 438 Z" fill="#3f9447"/>
+    <path d="M128 400 C118 404 108 410 100 416" fill="none" stroke="#c2ea88" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <path d="M136 392 C122 397 110 404 100 412 C92 418 86 424 82 430 M96 442 C100 436 106 431 114 427 C126 421 138 414 150 405" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <g stroke="#1d1a16" stroke-width="8" stroke-linejoin="round">
+    <use href="#pataplouf-pied-proche-palme" fill="#1d1a16"/>
+    <use href="#pataplouf-pied-proche-doigts" fill="#1d1a16"/>
+    <use href="#pataplouf-pied-proche-coussinets" fill="#1d1a16"/>
+  </g>
+  <use href="#pataplouf-pied-proche-palme" fill="#b5e383"/>
+  <use href="#pataplouf-pied-proche-doigts" fill="#7cc84a"/>
+  <use href="#pataplouf-pied-proche-coussinets" fill="#c9ee8e"/>
+  <path d="M88 444 C84 448 80 451 76 452" fill="none" stroke="#3f9447" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- ===== Bras proche (devant), main grande ouverte ===== -->
+  <use href="#pataplouf-bras-proche" fill="#7cc84a"/>
+  <g clip-path="url(#pataplouf-bras-proche-clip)">
+    <path d="M53 278 C55 286 57 294 61 300 L52 302 C48 294 47 286 46 279 Z" fill="#3f9447"/>
+    <path d="M50 318 C60 324 78 324 96 321 L96 332 L46 332 Z" fill="#3f9447"/>
+    <path d="M90 309 C80 308 72 307 66 305" fill="none" stroke="#c2ea88" stroke-width="3" stroke-linecap="round"/>
+    <path d="M42 288 C43 296 45 304 48 310" fill="none" stroke="#c2ea88" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <path d="M96 304 C82 303 70 302 61 300 C57 294 55 286 53 278 M37 280 C39 294 43 310 49 320 C57 330 78 330 96 328" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <g stroke="#1d1a16" stroke-width="8" stroke-linejoin="round">
+    <use href="#pataplouf-main-proche" fill="#1d1a16"/>
+    <use href="#pataplouf-main-proche-coussinets" fill="#1d1a16"/>
+  </g>
+  <use href="#pataplouf-main-proche" fill="#7cc84a"/>
+  <use href="#pataplouf-main-proche-coussinets" fill="#c9ee8e"/>
+  <ellipse cx="48" cy="272" rx="5" ry="3.2" fill="#3f9447"/>
+
+  <!-- ===== Effets : tremblement, pattes qui battent l'air, traits de surprise ===== -->
+  <g fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linecap="round">
+    <path d="M90.5 383.5 A152 152 0 0 1 60.2 340.2"/>
+    <path d="M76.1 385.7 A164 164 0 0 1 53.2 353"/>
+    <path d="M335.8 340.2 A152 152 0 0 1 305.5 383.5"/>
+    <path d="M342.8 353 A164 164 0 0 1 319.9 385.7"/>
+    <path d="M21.9 240.4 A36 36 0 0 1 38.7 232.5"/>
+    <path d="M13.9 236.9 A44 44 0 0 1 30 226.7"/>
+    <path d="M343 219.1 A38 38 0 0 1 362 214"/>
+    <path d="M342.6 210.3 A46 46 0 0 1 366 206.2"/>
+    <path d="M47.3 416.6 A46 46 0 0 0 43.7 444"/>
+    <path d="M38.3 417.5 A54 54 0 0 0 35.5 443.5"/>
+    <path d="M347.2 425.3 A46 46 0 0 1 348.4 452.9"/>
+    <path d="M356.2 427 A54 54 0 0 1 356.8 452.2"/>
+  </g>
+  <g fill="none" stroke="#1d1a16" stroke-width="5" stroke-linecap="round">
+    <path d="M92 88.5 L70.8 82.8"/>
+    <path d="M104 65.4 L87.2 51.3"/>
+    <path d="M204 32 L206 12"/>
+    <path d="M296.4 65.3 L311.9 52.7"/>
+    <path d="M305.7 82.8 L324.8 77"/>
+    <path d="M307.8 102.5 L327.7 104.3"/>
+  </g>
+
+  <!-- Gouttes de sueur qui s'envolent de l'arrière de la tête. -->
+  <use href="#pataplouf-goutte" transform="translate(72 132) rotate(124)" fill="#73c2ec"/>
+  <g clip-path="url(#pataplouf-goutte-a-clip)">
+    <circle cx="69" cy="129" r="10" fill="#c4ebfc"/>
+    <ellipse cx="68" cy="128" rx="3" ry="4.5" transform="rotate(30 68 128)" fill="#ffffff"/>
+  </g>
+  <use href="#pataplouf-goutte" transform="translate(72 132) rotate(124)" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linejoin="round"/>
+  <use href="#pataplouf-goutte" transform="translate(50 172) rotate(113) scale(0.8)" fill="#73c2ec"/>
+  <g clip-path="url(#pataplouf-goutte-b-clip)">
+    <circle cx="47.6" cy="169.6" r="8" fill="#c4ebfc"/>
+    <ellipse cx="46.5" cy="168.5" rx="2.4" ry="3.6" transform="rotate(30 46.5 168.5)" fill="#ffffff"/>
+  </g>
+  <use href="#pataplouf-goutte" transform="translate(50 172) rotate(113) scale(0.8)" fill="none" stroke="#1d1a16" stroke-width="3.7" stroke-linejoin="round"/>
+  <use href="#pataplouf-goutte" transform="translate(40 104) rotate(102) scale(0.65)" fill="#73c2ec"/>
+  <g clip-path="url(#pataplouf-goutte-c-clip)">
+    <circle cx="38" cy="102" r="6.5" fill="#c4ebfc"/>
+    <ellipse cx="37.2" cy="101" rx="2" ry="3" transform="rotate(30 37.2 101)" fill="#ffffff"/>
+  </g>
+  <use href="#pataplouf-goutte" transform="translate(40 104) rotate(102) scale(0.65)" fill="none" stroke="#1d1a16" stroke-width="4.6" stroke-linejoin="round"/>
+
+  <!-- ===== La coupable : une coccinelle souriante ===== -->
+  <g stroke="#1d1a16" stroke-width="2.2" stroke-linejoin="round">
+    <ellipse cx="364" cy="24" rx="14" ry="7" transform="rotate(-40 364 24)" fill="#eef8ff" fill-opacity="0.85"/>
+    <ellipse cx="376" cy="35" rx="13" ry="6.5" transform="rotate(-8 376 35)" fill="#eef8ff" fill-opacity="0.85"/>
+  </g>
+  <path d="M356 31 L372 18 M366 36 L388 33" fill="none" stroke="#9fc6e6" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="348" cy="46" r="17" fill="#b4213a"/>
+  <g clip-path="url(#pataplouf-coccinelle-clip)">
+    <circle cx="345" cy="43" r="17" fill="#e8412f"/>
+    <path d="M337 57 C344 48 352 40 362 33" fill="none" stroke="#1d1a16" stroke-width="2.5"/>
+    <circle cx="342" cy="43" r="3" fill="#1d1a16"/>
+    <circle cx="353" cy="52" r="3.6" fill="#1d1a16"/>
+    <circle cx="357.5" cy="38.5" r="2.7" fill="#1d1a16"/>
+    <circle cx="346" cy="58" r="2.3" fill="#1d1a16"/>
+    <ellipse cx="337.5" cy="34" rx="4.5" ry="2.5" transform="rotate(-45 337.5 34)" fill="#ffffff"/>
+  </g>
+  <circle cx="348" cy="46" r="17" fill="none" stroke="#1d1a16" stroke-width="3"/>
+  <path d="M341 62 L338 68 M347 63.5 L346 70 M353 62 L355 68" fill="none" stroke="#1d1a16" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M329 49 C326 44 323 40 320 38 M335 48 C335 43 334 38 332 34" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="320" cy="38" r="2.4" fill="#1d1a16"/>
+  <circle cx="332" cy="34" r="2.4" fill="#1d1a16"/>
+  <circle cx="333" cy="57" r="9.5" fill="#1d1a16"/>
+  <circle cx="329.5" cy="55.5" r="3" fill="#fffaf0"/>
+  <circle cx="336.5" cy="54" r="2.7" fill="#fffaf0"/>
+  <circle cx="328.8" cy="56.6" r="1.5" fill="#1d1a16"/>
+  <circle cx="335.8" cy="55.1" r="1.4" fill="#1d1a16"/>
+  <path d="M328 61.5 Q332 64.8 336.5 61" fill="none" stroke="#fffaf0" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

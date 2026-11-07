@@ -1,0 +1,426 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 640" width="360" height="640">
+  <!-- Fond de l'écran de tirage (charte § 8, fiche bg-main) : ciel de rêve pastel en fin
+       d'après-midi. Lumière en haut à gauche, contours colorés (jamais l'encre pure) pour
+       rester en retrait. Valeurs claires et calmes là où l'interface écrit : lignes y ≈ 252
+       et 272, message y ≈ 436–480. L'orbe (180, 182, r 54) repose sur le socle flottant. -->
+  <defs>
+    <linearGradient id="bg-main-ciel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d6c7ef"/>
+      <stop offset="0.14" stop-color="#e2ccef"/>
+      <stop offset="0.3" stop-color="#f1d1e8"/>
+      <stop offset="0.43" stop-color="#fbd8de"/>
+      <stop offset="0.56" stop-color="#ffdfd3"/>
+      <stop offset="0.75" stop-color="#ffe9d7"/>
+      <stop offset="1" stop-color="#fff3dd"/>
+    </linearGradient>
+    <radialGradient id="bg-main-soleil">
+      <stop offset="0" stop-color="#fff3dc" stop-opacity="0.75"/>
+      <stop offset="0.5" stop-color="#ffeedd" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#ffeedd" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bg-main-rayon" gradientUnits="userSpaceOnUse" cx="180" cy="182" r="180">
+      <stop offset="0" stop-color="#fffdf6" stop-opacity="0.9"/>
+      <stop offset="0.35" stop-color="#fffbf0" stop-opacity="0.7"/>
+      <stop offset="0.7" stop-color="#fff7ee" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#fff7ee" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bg-main-halo" gradientUnits="userSpaceOnUse" cx="180" cy="182" r="120">
+      <stop offset="0" stop-color="#fffef8"/>
+      <stop offset="0.5" stop-color="#fffbea"/>
+      <stop offset="0.62" stop-color="#fff4dc" stop-opacity="0.8"/>
+      <stop offset="0.8" stop-color="#ffeedf" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#ffeedf" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bg-main-brume">
+      <stop offset="0" stop-color="#fffaf5" stop-opacity="0.8"/>
+      <stop offset="0.55" stop-color="#fff7f2" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#fff7f2" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bg-main-cascade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f2faff" stop-opacity="0.95"/>
+      <stop offset="0.7" stop-color="#e6f5fd" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#e6f5fd" stop-opacity="0.2"/>
+    </linearGradient>
+
+    <!-- Étincelle à quatre branches (posée à l'échelle voulue). -->
+    <path id="bg-main-etincelle" d="M0,-10C1.3,-2.6 2.6,-1.3 10,0C2.6,1.3 1.3,2.6 0,10C-1.3,2.6 -2.6,1.3 -10,0C-2.6,-1.3 -1.3,-2.6 0,-10Z"/>
+
+    <!-- Nuages : chaque masse = union de bouffées (sous-chemins de même sens). -->
+    <path id="bg-main-nuages-loin" d="M-38,318a34,34 0 1 0 68,0a34,34 0 1 0-68,0ZM-4,338a28,28 0 1 0 56,0a28,28 0 1 0-56,0ZM30,344a26,26 0 1 0 52,0a26,26 0 1 0-52,0ZM62,338a30,30 0 1 0 60,0a30,30 0 1 0-60,0ZM104,344a26,26 0 1 0 52,0a26,26 0 1 0-52,0ZM136,336a30,30 0 1 0 60,0a30,30 0 1 0-60,0ZM176,342a28,28 0 1 0 56,0a28,28 0 1 0-56,0ZM210,338a30,30 0 1 0 60,0a30,30 0 1 0-60,0ZM250,344a26,26 0 1 0 52,0a26,26 0 1 0-52,0ZM280,336a30,30 0 1 0 60,0a30,30 0 1 0-60,0ZM316,318a34,34 0 1 0 68,0a34,34 0 1 0-68,0ZM-10,340V640H370V340Z"/>
+    <clipPath id="bg-main-nuages-loin-clip"><use href="#bg-main-nuages-loin"/></clipPath>
+    <path id="bg-main-nuage-gauche" d="M-16,214a18,18 0 1 0 36,0a18,18 0 1 0-36,0ZM1,236a17,17 0 1 0 34,0a17,17 0 1 0-34,0ZM-38,258a30,30 0 1 0 60,0a30,30 0 1 0-60,0ZM-8,290a22,22 0 1 0 44,0a22,22 0 1 0-44,0ZM-34,328a28,28 0 1 0 56,0a28,28 0 1 0-56,0Z"/>
+    <clipPath id="bg-main-nuage-gauche-clip"><use href="#bg-main-nuage-gauche"/></clipPath>
+    <path id="bg-main-nuage-droite" d="M340,200a16,16 0 1 0 32,0a16,16 0 1 0-32,0ZM324,226a16,16 0 1 0 32,0a16,16 0 1 0-32,0ZM340,252a32,32 0 1 0 64,0a32,32 0 1 0-64,0ZM326,286a20,20 0 1 0 40,0a20,20 0 1 0-40,0ZM336,326a30,30 0 1 0 60,0a30,30 0 1 0-60,0Z"/>
+    <clipPath id="bg-main-nuage-droite-clip"><use href="#bg-main-nuage-droite"/></clipPath>
+    <path id="bg-main-nuage-coin" d="M337,4a15,15 0 1 0 30,0a15,15 0 1 0-30,0ZM323,-6a13,13 0 1 0 26,0a13,13 0 1 0-26,0ZM351,24a11,11 0 1 0 22,0a11,11 0 1 0-22,0Z"/>
+    <clipPath id="bg-main-nuage-coin-clip"><use href="#bg-main-nuage-coin"/></clipPath>
+    <path id="bg-main-nuages-bas1" d="M-36,420a30,30 0 1 0 60,0a30,30 0 1 0-60,0ZM8,452a22,22 0 1 0 44,0a22,22 0 1 0-44,0ZM46,462a24,24 0 1 0 48,0a24,24 0 1 0-48,0ZM86,458a26,26 0 1 0 52,0a26,26 0 1 0-52,0ZM132,466a24,24 0 1 0 48,0a24,24 0 1 0-48,0ZM172,458a26,26 0 1 0 52,0a26,26 0 1 0-52,0ZM218,464a24,24 0 1 0 48,0a24,24 0 1 0-48,0ZM258,456a26,26 0 1 0 52,0a26,26 0 1 0-52,0ZM302,448a24,24 0 1 0 48,0a24,24 0 1 0-48,0ZM334,418a30,30 0 1 0 60,0a30,30 0 1 0-60,0ZM-10,462V640H370V462Z"/>
+    <clipPath id="bg-main-nuages-bas1-clip"><use href="#bg-main-nuages-bas1"/></clipPath>
+    <path id="bg-main-nuages-bas2" d="M-28,522a26,26 0 1 0 52,0a26,26 0 1 0-52,0ZM-18,556a20,20 0 1 0 40,0a20,20 0 1 0-40,0ZM10,566a24,24 0 1 0 48,0a24,24 0 1 0-48,0ZM52,570a26,26 0 1 0 52,0a26,26 0 1 0-52,0ZM100,564a24,24 0 1 0 48,0a24,24 0 1 0-48,0ZM142,570a26,26 0 1 0 52,0a26,26 0 1 0-52,0ZM190,564a24,24 0 1 0 48,0a24,24 0 1 0-48,0ZM232,570a26,26 0 1 0 52,0a26,26 0 1 0-52,0ZM278,564a24,24 0 1 0 48,0a24,24 0 1 0-48,0ZM318,556a22,22 0 1 0 44,0a22,22 0 1 0-44,0ZM338,520a26,26 0 1 0 52,0a26,26 0 1 0-52,0ZM-10,575V640H370V575Z"/>
+    <clipPath id="bg-main-nuages-bas2-clip"><use href="#bg-main-nuages-bas2"/></clipPath>
+    <path id="bg-main-nuages-bas3" d="M-36,604a32,32 0 1 0 64,0a32,32 0 1 0-64,0ZM10,640a30,30 0 1 0 60,0a30,30 0 1 0-60,0ZM60,648a32,32 0 1 0 64,0a32,32 0 1 0-64,0ZM114,638a26,26 0 1 0 52,0a26,26 0 1 0-52,0ZM152,626a30,30 0 1 0 60,0a30,30 0 1 0-60,0ZM200,640a28,28 0 1 0 56,0a28,28 0 1 0-56,0ZM244,648a32,32 0 1 0 64,0a32,32 0 1 0-64,0ZM294,638a28,28 0 1 0 56,0a28,28 0 1 0-56,0ZM336,604a30,30 0 1 0 60,0a30,30 0 1 0-60,0ZM-10,632V650H370V632Z"/>
+    <clipPath id="bg-main-nuages-bas3-clip"><use href="#bg-main-nuages-bas3"/></clipPath>
+
+    <!-- Îles flottantes. -->
+    <path id="bg-main-ileg-roc" d="M24,166C24,174 29,178 31,184C33,190 38,193 41,198C44,204 47,207 50,212C52,216 55,220 58,223C60,218 63,214 66,210C69,206 71,201 74,197C78,192 81,188 84,183C88,177 93,172 93,165Z"/>
+    <clipPath id="bg-main-ileg-roc-clip"><use href="#bg-main-ileg-roc"/></clipPath>
+    <path id="bg-main-ileg-herbe" d="M21,163C21,155 38,151 58,151C78,151 95,155 95,163C95,168 92,171 89,170C87,174 82,175 79,172C76,176 70,177 67,173C64,177 58,177 55,173C52,177 46,177 43,173C40,176 34,176 32,172C28,174 23,172 22,168C21,166 21,164 21,163Z"/>
+    <clipPath id="bg-main-ileg-herbe-clip"><use href="#bg-main-ileg-herbe"/></clipPath>
+    <path id="bg-main-ileg-arbre" d="M27,146a6.5,6.5 0 1 0 13,0a6.5,6.5 0 1 0-13,0ZM35,145a6.5,6.5 0 1 0 13,0a6.5,6.5 0 1 0-13,0ZM31,139a7,7 0 1 0 14,0a7,7 0 1 0-14,0Z"/>
+    <clipPath id="bg-main-ileg-arbre-clip"><use href="#bg-main-ileg-arbre"/></clipPath>
+    <path id="bg-main-iled-roc" d="M273,182C274,188 278,192 281,197C284,202 289,206 292,210C294,213 296,216 297,219C299,215 302,211 305,207C308,202 312,197 315,192C318,188 320,185 320,181Z"/>
+    <clipPath id="bg-main-iled-roc-clip"><use href="#bg-main-iled-roc"/></clipPath>
+    <path id="bg-main-iled-herbe" d="M271,180C271,174 283,171 296,171C309,171 321,174 321,180C321,184 318,186 315,185C313,188 309,188 307,186C304,189 299,189 297,186C294,189 289,189 287,186C284,188 280,188 278,185C275,187 271,185 271,182Z"/>
+    <clipPath id="bg-main-iled-herbe-clip"><use href="#bg-main-iled-herbe"/></clipPath>
+
+    <!-- Socle : dessous en dôme, bandeau d'or, plateau de pierre claire. -->
+    <path id="bg-main-socle-dome" d="M134,239C136,245.5 158,252.5 180,252.5C202,252.5 224,245.5 226,239A46,6.5 0 0 1 134,239Z"/>
+    <clipPath id="bg-main-socle-dome-clip"><use href="#bg-main-socle-dome"/></clipPath>
+    <path id="bg-main-socle-bande" d="M134,235.5A46,6.5 0 0 0 226,235.5L226,239A46,6.5 0 0 1 134,239Z"/>
+    <clipPath id="bg-main-socle-bande-clip"><use href="#bg-main-socle-bande"/></clipPath>
+  </defs>
+
+  <!-- 1. Ciel : lilas pâle en haut, pêche, crème en bas ; soleil bas hors champ en haut à gauche. -->
+  <rect x="0" y="0" width="360" height="640" fill="url(#bg-main-ciel)"/>
+  <circle cx="10" cy="40" r="240" fill="url(#bg-main-soleil)"/>
+
+  <!-- 2. Étoiles et scintillements du haut (visibles autour de l'en-tête). -->
+  <g fill="#ffffff">
+    <use href="#bg-main-etincelle" transform="translate(9 9) scale(0.5)"/>
+    <use href="#bg-main-etincelle" transform="translate(124 10) scale(0.38)"/>
+    <use href="#bg-main-etincelle" transform="translate(236 9) scale(0.45)"/>
+    <use href="#bg-main-etincelle" transform="translate(300 6) scale(0.32)"/>
+    <use href="#bg-main-etincelle" transform="translate(7 104) scale(0.36)"/>
+    <use href="#bg-main-etincelle" transform="translate(353 62) scale(0.4)"/>
+    <use href="#bg-main-etincelle" transform="translate(8 150) scale(0.38)"/>
+  </g>
+  <g fill="#fff3c4">
+    <use href="#bg-main-etincelle" transform="translate(64 6) scale(0.32)"/>
+    <use href="#bg-main-etincelle" transform="translate(178 5) scale(0.3)"/>
+    <use href="#bg-main-etincelle" transform="translate(8 52) scale(0.42)"/>
+    <use href="#bg-main-etincelle" transform="translate(352 104) scale(0.32)"/>
+  </g>
+  <g fill="#ffffff" opacity="0.9">
+    <circle cx="36" cy="12" r="1.2"/>
+    <circle cx="98" cy="4" r="1"/>
+    <circle cx="152" cy="12" r="1.1"/>
+    <circle cx="206" cy="4" r="1.2"/>
+    <circle cx="270" cy="12" r="1"/>
+    <circle cx="8" cy="30" r="1"/>
+    <circle cx="6" cy="78" r="0.9"/>
+    <circle cx="352" cy="88" r="1.1"/>
+    <circle cx="100" cy="72" r="1"/>
+    <circle cx="200" cy="72" r="1.1"/>
+    <circle cx="300" cy="71" r="0.9"/>
+  </g>
+
+  <!-- 3. Rayons doux et halo derrière l'orbe (éventail vers le haut : rien sous les lignes de texte). -->
+  <path d="M180,182L-17.8,252.4L-26.6,219.9ZM180,182L-29.8,191.5L-29.8,172.5ZM180,182L-26.6,144.1L-17.8,111.6ZM180,182L-6.4,85.4L3.1,68.9ZM180,182L20.1,45.9L43.9,22.1ZM180,182L66.9,5.1L83.4,-4.4ZM180,182L109.6,-15.8L142.1,-24.6ZM180,182L170.5,-27.8L189.5,-27.8ZM180,182L217.9,-24.6L250.4,-15.8ZM180,182L276.6,-4.4L293.1,5.1ZM180,182L316.1,22.1L339.9,45.9ZM180,182L356.9,68.9L366.4,85.4ZM180,182L377.8,111.6L386.6,144.1ZM180,182L389.8,172.5L389.8,191.5ZM180,182L386.6,219.9L377.8,252.4Z" fill="url(#bg-main-rayon)"/>
+  <circle cx="180" cy="182" r="120" fill="url(#bg-main-halo)"/>
+  <!-- Brume claire sous l'orbe : fond calme et lumineux pour les lignes y ≈ 252 et 272. -->
+  <ellipse cx="180" cy="262" rx="170" ry="34" fill="url(#bg-main-brume)"/>
+
+  <!-- 4. Lointains : îlot minuscule, oiseaux, île de droite posée sur un voile de nuage. -->
+  <path d="M325.5,139.5C327,144 331,147.5 334.5,152C337,147.5 341,143.5 342.5,139.5Z" fill="#e7dbec" stroke="#b6a1c8" stroke-width="0.9" stroke-linejoin="round"/>
+  <path d="M324,138C324,134.5 329,133 334,133C339,133 344,134.5 344,138C344,140.5 341,141 339,140C337,142 333,142 331,140.5C329,141.5 325,141 324,139Z" fill="#d3ebd5" stroke="#9cbcae" stroke-width="0.9" stroke-linejoin="round"/>
+  <path d="M329.5,133.5L329.5,135.5" fill="none" stroke="#b8a0b0" stroke-width="1" stroke-linecap="round"/>
+  <circle cx="329.5" cy="130.5" r="3" fill="#c3e4c6" stroke="#9cbcae" stroke-width="0.9"/>
+
+  <path d="M277,130C278.5,128 280,128 281,130C282,128 283.5,128 285,130M288,125.5C289.2,124 290.4,124 291.2,125.5C292,124 293.2,124 294.4,125.5M293.5,134.5C294.5,133.2 295.5,133.2 296.2,134.5C296.9,133.2 297.9,133.2 298.9,134.5" fill="none" stroke="#a58fbd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <use href="#bg-main-iled-roc" fill="#e2d2e7"/>
+  <g clip-path="url(#bg-main-iled-roc-clip)">
+    <path d="M300,180L322,180L322,190C314,198 306,208 298,220L296,220C300,208 303,194 300,180Z" fill="#cdb9d9"/>
+    <path d="M270,180L322,180L322,188.5C306,191.5 288,191.5 270,188.5Z" fill="#c8b2d5"/>
+    <path d="M281,197C287,199 293,199 299,197M291,209C294,210.3 298,210.3 301,209" fill="none" stroke="#b39cc7" stroke-width="0.9" stroke-linecap="round"/>
+  </g>
+  <use href="#bg-main-iled-roc" fill="none" stroke="#a48cba" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M283,189C282,193 284,196 282.5,199M310,189C311.5,192 310,195 311.5,198" fill="none" stroke="#a48cba" stroke-width="0.9" stroke-linecap="round"/>
+  <use href="#bg-main-iled-herbe" fill="#c3e6c6"/>
+  <g clip-path="url(#bg-main-iled-herbe-clip)">
+    <path d="M270,181C282,184.5 310,184.5 322,181L322,190L270,190Z" fill="#acd6b5"/>
+    <path d="M274,178C276,174 286,173 296,173C302,173 308,174 312,175C302,175 290,176 282,178C279,179 276,179 274,178Z" fill="#dcf2d6"/>
+  </g>
+  <use href="#bg-main-iled-herbe" fill="none" stroke="#80ab96" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M284.6,180.5L285.2,175L287,175L287.6,180.5Z" fill="#cba8b6"/>
+  <circle cx="283.5" cy="172.5" r="5" fill="#b0dcb9" stroke="#80ab96" stroke-width="1"/>
+  <circle cx="289" cy="170.5" r="4.2" fill="#b0dcb9" stroke="#80ab96" stroke-width="1"/>
+  <ellipse cx="281.8" cy="170.6" rx="1.8" ry="1.1" transform="rotate(-30 281.8 170.6)" fill="#d6f0d2"/>
+  <!-- Moulin -->
+  <path d="M300.5,179.5L302.2,166.5L307.3,166.5L309,179.5Z" fill="#fbf1e9" stroke="#a988a8" stroke-width="1" stroke-linejoin="round"/>
+  <path d="M305.6,167L307,167L308.4,179L306.4,179Z" fill="#ebd8e3"/>
+  <path d="M303.6,179.5L303.6,176.8A1.3,1.3 0 0 1 306.2,176.8L306.2,179.5Z" fill="#b896c2"/>
+  <path d="M301.5,167C301.5,162.2 308,162.2 308,167Z" fill="#eea6b7" stroke="#a988a8" stroke-width="1" stroke-linejoin="round"/>
+  <path d="M299.3,159.5L310.3,170.5M310.3,159.5L299.3,170.5" fill="none" stroke="#a988a8" stroke-width="3" stroke-linecap="round"/>
+  <path d="M299.3,159.5L310.3,170.5M310.3,159.5L299.3,170.5" fill="none" stroke="#fff7ef" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="304.8" cy="165" r="1.3" fill="#a988a8"/>
+  <path d="M309,214L313,213.5L313.5,217L310.5,219L308.5,216.5Z" fill="#dccbe2" stroke="#a48cba" stroke-width="0.9" stroke-linejoin="round"/>
+  <!-- Voile de nuage sous l'île de droite -->
+  <path d="M254,219C256,213 264,210 272,212C277,206 290,205 296,210C303,207 314,208 317,213C322,213 326,216 325,219Z" fill="#fdeff3" stroke="#ead0e1" stroke-width="1" stroke-linejoin="round"/>
+  <path d="M262,216.5C276,215.5 300,215.5 318,216.8" fill="none" stroke="#f1dbe8" stroke-width="1.6" stroke-linecap="round"/>
+
+  <!-- 5. Île de gauche (plus proche) : chaumière, arbre, cascade qui se perd dans le nuage. -->
+  <use href="#bg-main-ileg-roc" fill="#dcc8e0"/>
+  <g clip-path="url(#bg-main-ileg-roc-clip)">
+    <path d="M64,163L96,163L96,186C88,192 80,200 74,206C69,212 63,218 58,225L56,225C60,214 66,204 68,194C70,184 68,174 64,163Z" fill="#c6afd3"/>
+    <path d="M26,170C30,178 35,186 40,193C36,192 31,186 27,180Z" fill="#ecdfee"/>
+    <path d="M20,163L96,163L96,176C80,180.5 40,180.5 20,176Z" fill="#bea5cc"/>
+    <path d="M31,184C40,187 50,188 58,186M41,198C48,201 56,201 63,199M51,211C54,212.5 58,212.5 61,211M58,186L61,198M74,197L70,189" fill="none" stroke="#a98fbd" stroke-width="1" stroke-linecap="round"/>
+    <path d="M45.5,196L48,191.5L50.5,196L48,199.5Z" fill="#cdeef6" stroke="#8fb3cc" stroke-width="0.8" stroke-linejoin="round"/>
+  </g>
+  <use href="#bg-main-ileg-roc" fill="none" stroke="#9a80b0" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M36,177C35,182 37,186 35,191M81,178C83,183 81,187 83,191M70,180C70,184 71.5,186 70.5,189" fill="none" stroke="#9a80b0" stroke-width="1" stroke-linecap="round"/>
+  <path d="M73,212L79,211L80,215L76,218L72,215Z" fill="#d6c2dd" stroke="#9a80b0" stroke-width="1" stroke-linejoin="round"/>
+  <path d="M86,198L89.5,197.5L90,200.5L87.5,202L85.5,200Z" fill="#d6c2dd" stroke="#9a80b0" stroke-width="0.9" stroke-linejoin="round"/>
+  <!-- Cascade -->
+  <path d="M26.5,168C26.5,182 25.5,200 25,226L33,226C33,200 33,182 32.5,168Z" fill="url(#bg-main-cascade)"/>
+  <path d="M28.5,172C28.3,185 28,200 27.8,214M31,174C31,188 31,200 31.2,210" fill="none" stroke="#c3e2f4" stroke-width="0.9" stroke-linecap="round"/>
+  <path d="M26.5,168C26.5,182 25.5,200 25,222M32.5,168C32.5,182 33,200 33,222" fill="none" stroke="#a9cfe4" stroke-width="0.9" stroke-linecap="round"/>
+  <!-- Herbe -->
+  <use href="#bg-main-ileg-herbe" fill="#b8e1bb"/>
+  <g clip-path="url(#bg-main-ileg-herbe-clip)">
+    <path d="M20,165C36,170.5 80,170.5 96,165L96,180L20,180Z" fill="#a1cfad"/>
+    <path d="M74,167.5C82,167 90,165.5 96,163L96,180L70,180Z" fill="#8dbf9e"/>
+    <path d="M25,160C28,155 41,153.5 56,153.5C66,153.5 76,154.5 84,157C70,156.5 53,157.5 41,160C35,161.5 29,162 25,160Z" fill="#d6f0cd"/>
+  </g>
+  <use href="#bg-main-ileg-herbe" fill="none" stroke="#6f9d86" stroke-width="1.5" stroke-linejoin="round"/>
+  <circle cx="30" cy="161" r="1.1" fill="#ffb3c6"/>
+  <circle cx="48" cy="164.5" r="1.1" fill="#ffe28a"/>
+  <circle cx="54" cy="158.5" r="1" fill="#ffb3c6"/>
+  <circle cx="85" cy="162" r="1.1" fill="#ffb3c6"/>
+  <circle cx="80" cy="165.5" r="1" fill="#ffe28a"/>
+  <!-- Arbre -->
+  <path d="M35.5,163L36.5,151L39.5,151L40.5,163Z" fill="#c9a2b1" stroke="#8f7088" stroke-width="0.9" stroke-linejoin="round"/>
+  <use href="#bg-main-ileg-arbre" fill="none" stroke="#6f9d86" stroke-width="2.4"/>
+  <use href="#bg-main-ileg-arbre" fill="#86c29b"/>
+  <g clip-path="url(#bg-main-ileg-arbre-clip)">
+    <use href="#bg-main-ileg-arbre" x="-1.6" y="-2.2" fill="#a6d9b1"/>
+    <ellipse cx="34.5" cy="136.5" rx="3" ry="1.7" transform="rotate(-30 34.5 136.5)" fill="#d3f0cd"/>
+  </g>
+  <!-- Chaumière : toit corail, fenêtre allumée, fumée -->
+  <path d="M71.5,147L71.5,140.5L74.5,140.5L74.5,147Z" fill="#ead0d3" stroke="#a3779a" stroke-width="1" stroke-linejoin="round"/>
+  <path d="M62.5,162L62.5,150L75.5,150L75.5,162Z" fill="#fff3e6" stroke="#a3779a" stroke-width="1.1" stroke-linejoin="round"/>
+  <path d="M71,150.6L75,150.6L75,161.5L71,161.5Z" fill="#efdbe2"/>
+  <path d="M66,162L66,157.5A2,2 0 0 1 70,157.5L70,162Z" fill="#b48bc0" stroke="#a3779a" stroke-width="0.9" stroke-linejoin="round"/>
+  <circle cx="73" cy="155.5" r="1.4" fill="#ffe08a" stroke="#a3779a" stroke-width="0.8"/>
+  <path d="M60,151.5L69,140L78,151.5Z" fill="#f3a3a8" stroke="#a3779a" stroke-width="1.1" stroke-linejoin="round"/>
+  <path d="M69,141.2L76.6,150.9L69,150.9Z" fill="#dc8b9a"/>
+  <path d="M62.6,149.6L68.4,142.2" fill="none" stroke="#fbc7c3" stroke-width="1" stroke-linecap="round"/>
+  <g fill="#ffffff">
+    <circle cx="75" cy="137" r="1.5" opacity="0.8"/>
+    <circle cx="77" cy="133.5" r="2" opacity="0.75"/>
+    <circle cx="80.5" cy="130.2" r="2.5" opacity="0.7"/>
+  </g>
+
+  <!-- 6. Nuages lointains (derrière les boutons de tirage, vus dans les marges). -->
+  <use href="#bg-main-nuages-loin" fill="none" stroke="#e4c6dc" stroke-width="2.6"/>
+  <use href="#bg-main-nuages-loin" fill="#f1d6e6"/>
+  <g clip-path="url(#bg-main-nuages-loin-clip)">
+    <use href="#bg-main-nuages-loin" x="-2" y="-3" fill="#fbe6ed"/>
+  </g>
+
+  <!-- 7. Gros nuages des côtés : cadrent la scène sans toucher les lignes de texte. -->
+  <use href="#bg-main-nuage-gauche" fill="none" stroke="#d4b3d6" stroke-width="3.6"/>
+  <use href="#bg-main-nuage-gauche" fill="#f0d6e7"/>
+  <g clip-path="url(#bg-main-nuage-gauche-clip)">
+    <g fill="#fff4f2">
+      <circle cx="-0.2" cy="211.1" r="14.4"/>
+      <circle cx="16" cy="233.3" r="13.6"/>
+      <circle cx="-11.6" cy="253.2" r="24"/>
+      <circle cx="11.4" cy="286.5" r="17.6"/>
+      <circle cx="-9.4" cy="323.5" r="22.4"/>
+    </g>
+    <path d="M2.6,228.8A17,17 0 0 1 18,219M-5.9,280.7A22,22 0 0 1 17.8,268.3M1.2,301A28,28 0 0 1 15.4,310" fill="none" stroke="#dcbedc" stroke-width="1.2" stroke-linecap="round"/>
+    <g fill="#ffffff" opacity="0.7">
+      <ellipse cx="-2" cy="203" rx="5" ry="2.4" transform="rotate(-30 -2 203)"/>
+      <ellipse cx="12" cy="226" rx="4.5" ry="2.2" transform="rotate(-35 12 226)"/>
+      <ellipse cx="6" cy="279" rx="5" ry="2.4" transform="rotate(-30 6 279)"/>
+    </g>
+  </g>
+  <g fill="#ffffff">
+    <circle cx="23" cy="221" r="0.9"/>
+    <circle cx="35.5" cy="219" r="0.8"/>
+  </g>
+  <use href="#bg-main-nuage-droite" fill="none" stroke="#d4b3d6" stroke-width="3.6"/>
+  <use href="#bg-main-nuage-droite" fill="#f0d6e7"/>
+  <g clip-path="url(#bg-main-nuage-droite-clip)">
+    <g fill="#fff4f2">
+      <circle cx="354.1" cy="197.4" r="12.8"/>
+      <circle cx="338.1" cy="223.4" r="12.8"/>
+      <circle cx="368.2" cy="246.9" r="25.6"/>
+      <circle cx="343.6" cy="282.8" r="16"/>
+      <circle cx="362.4" cy="321.2" r="24"/>
+    </g>
+    <path d="M344.1,210.5A16,16 0 0 1 353.1,216.8M344.3,266.1A20,20 0 0 1 363.3,276M345.2,304.4A30,30 0 0 1 366,296" fill="none" stroke="#dcbedc" stroke-width="1.2" stroke-linecap="round"/>
+    <g fill="#ffffff" opacity="0.7">
+      <ellipse cx="333" cy="216" rx="4.5" ry="2.2" transform="rotate(-35 333 216)"/>
+      <ellipse cx="350" cy="233" rx="6" ry="2.6" transform="rotate(-35 350 233)"/>
+      <ellipse cx="337" cy="275" rx="4.5" ry="2.2" transform="rotate(-30 337 275)"/>
+    </g>
+  </g>
+  <use href="#bg-main-nuage-coin" fill="none" stroke="#d4b3d6" stroke-width="3.2"/>
+  <use href="#bg-main-nuage-coin" fill="#f0d6e7"/>
+  <g clip-path="url(#bg-main-nuage-coin-clip)">
+    <g fill="#fff4f2">
+      <circle cx="350.2" cy="1.6" r="12"/>
+      <circle cx="334.4" cy="-8.1" r="10.4"/>
+      <circle cx="360.7" cy="22.2" r="8.8"/>
+    </g>
+    <ellipse cx="343" cy="4" rx="4" ry="1.8" transform="rotate(-30 343 4)" fill="#ffffff"/>
+  </g>
+
+  <!-- 8. Aura de l'orbe : liseré lumineux, anneau fin et anneau pointillé d'or (moitié haute). -->
+  <circle cx="180" cy="182" r="58" fill="none" stroke="#ffffff" stroke-width="6" opacity="0.5"/>
+  <path d="M118,204.6A66,66 0 1 1 242,204.6" fill="none" stroke="#fffbf0" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>
+  <path d="M113.3,220.5A77,77 0 1 1 246.7,220.5" fill="none" stroke="#f3cd78" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="0 7.5" opacity="0.8"/>
+  <g fill="#fff7d6">
+    <use href="#bg-main-etincelle" transform="translate(104 140) scale(0.55)"/>
+    <use href="#bg-main-etincelle" transform="translate(100 226) scale(0.42)"/>
+  </g>
+  <g fill="#ffffff">
+    <use href="#bg-main-etincelle" transform="translate(258 146) scale(0.7)"/>
+    <use href="#bg-main-etincelle" transform="translate(264 232) scale(0.45)"/>
+    <use href="#bg-main-etincelle" transform="translate(14 186) scale(0.35)"/>
+  </g>
+  <g fill="#f6d27f">
+    <circle cx="96" cy="182" r="1.1"/>
+    <circle cx="266" cy="190" r="1"/>
+    <circle cx="120" cy="118" r="1"/>
+    <circle cx="242" cy="118" r="0.9"/>
+    <circle cx="88" cy="206" r="1"/>
+  </g>
+
+  <!-- 9. Socle flottant : volutes d'or, dessous en dôme de pierre claire, bandeau d'or perlé. -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M146,236C139,231 133,222 130,213C127,205 120,201 115.5,204.5C112,207.5 114,213 118.5,212.5C121.5,212 122,208 119.5,207.5" stroke="#b07c34" stroke-width="4.4"/>
+    <path d="M146,236C139,231 133,222 130,213C127,205 120,201 115.5,204.5C112,207.5 114,213 118.5,212.5C121.5,212 122,208 119.5,207.5" stroke="#f4c65e" stroke-width="2.4"/>
+    <path d="M141,232C136,226 132,219 130,213" stroke="#ffeab0" stroke-width="1"/>
+    <path d="M140,238.5C132,239.5 124,237 120.5,232C118,228 121,224.5 124.5,226.5" stroke="#b07c34" stroke-width="3.6"/>
+    <path d="M140,238.5C132,239.5 124,237 120.5,232C118,228 121,224.5 124.5,226.5" stroke="#f4c65e" stroke-width="1.8"/>
+    <path d="M214,236C221,231 227,222 230,213C233,205 240,201 244.5,204.5C248,207.5 246,213 241.5,212.5C238.5,212 238,208 240.5,207.5" stroke="#b07c34" stroke-width="4.4"/>
+    <path d="M214,236C221,231 227,222 230,213C233,205 240,201 244.5,204.5C248,207.5 246,213 241.5,212.5C238.5,212 238,208 240.5,207.5" stroke="#f4c65e" stroke-width="2.4"/>
+    <path d="M219,232C224,226 228,219 230,213" stroke="#ffeab0" stroke-width="1"/>
+    <path d="M220,238.5C228,239.5 236,237 239.5,232C242,228 239,224.5 235.5,226.5" stroke="#b07c34" stroke-width="3.6"/>
+    <path d="M220,238.5C228,239.5 236,237 239.5,232C242,228 239,224.5 235.5,226.5" stroke="#f4c65e" stroke-width="1.8"/>
+  </g>
+  <circle cx="118.8" cy="209" r="1.5" fill="#9fdcf2" stroke="#5f9fbf" stroke-width="0.7"/>
+  <circle cx="241.2" cy="209" r="1.5" fill="#9fdcf2" stroke="#5f9fbf" stroke-width="0.7"/>
+  <use href="#bg-main-socle-dome" fill="#f2e8f1"/>
+  <g clip-path="url(#bg-main-socle-dome-clip)">
+    <path d="M190,236L230,236L230,256L180,256C192,250 196,244 190,236Z" fill="#e3d4eb"/>
+    <path d="M134,238C146,244 160,247.5 172,248.5C158,249.5 144,246 134,240Z" fill="#fbf7fa"/>
+  </g>
+  <use href="#bg-main-socle-dome" fill="none" stroke="#b7a2cb" stroke-width="1.3" stroke-linejoin="round"/>
+  <use href="#bg-main-socle-bande" fill="#f4c65e"/>
+  <g clip-path="url(#bg-main-socle-bande-clip)">
+    <path d="M130,233L168,233L162,250L130,250Z" fill="#ffe29a"/>
+    <path d="M206,233L230,233L230,250L200,250Z" fill="#dc9f48"/>
+  </g>
+  <g fill="#fff1c8">
+    <circle cx="146" cy="241.6" r="0.9"/>
+    <circle cx="158" cy="243" r="0.9"/>
+    <circle cx="170" cy="243.6" r="0.9"/>
+    <circle cx="190" cy="243.6" r="0.9"/>
+    <circle cx="202" cy="243" r="0.9"/>
+    <circle cx="214" cy="241.6" r="0.9"/>
+  </g>
+  <use href="#bg-main-socle-bande" fill="none" stroke="#b07c34" stroke-width="1.3" stroke-linejoin="round"/>
+  <ellipse cx="180" cy="235.5" rx="46" ry="6.5" fill="#fcf7f3"/>
+  <path d="M206,230.1A46,6.5 0 0 1 206,240.9Z" fill="#efe6f1"/>
+  <ellipse cx="180" cy="235.5" rx="39" ry="4.6" fill="none" stroke="#e9bf63" stroke-width="1.1"/>
+  <ellipse cx="180" cy="237.6" rx="23" ry="3" fill="#dccbe5"/>
+  <ellipse cx="180" cy="235.5" rx="46" ry="6.5" fill="none" stroke="#ad95c4" stroke-width="1.3"/>
+
+  <!-- 10. Mer de nuages, du plus lointain au plus proche (vue entre les boutons). -->
+  <use href="#bg-main-nuages-bas1" fill="none" stroke="#e8cade" stroke-width="3"/>
+  <use href="#bg-main-nuages-bas1" fill="#f5dce8"/>
+  <g clip-path="url(#bg-main-nuages-bas1-clip)">
+    <g fill="#fdeaee">
+      <circle cx="-8.7" cy="416.4" r="25.5"/>
+      <circle cx="28" cy="449.4" r="18.7"/>
+      <circle cx="67.8" cy="459.1" r="20.4"/>
+      <circle cx="109.7" cy="454.9" r="22.1"/>
+      <circle cx="153.8" cy="463.1" r="20.4"/>
+      <circle cx="195.7" cy="454.9" r="22.1"/>
+      <circle cx="239.8" cy="461.1" r="20.4"/>
+      <circle cx="281.7" cy="452.9" r="22.1"/>
+      <circle cx="323.8" cy="445.1" r="20.4"/>
+      <circle cx="361.3" cy="414.4" r="25.5"/>
+      <use href="#bg-main-nuages-bas1" y="12"/>
+    </g>
+    <g fill="#fff7f6">
+      <ellipse cx="20" cy="440" rx="5" ry="2.2" transform="rotate(-25 20 440)"/>
+      <ellipse cx="100" cy="440" rx="6" ry="2.4" transform="rotate(-20 100 440)"/>
+      <ellipse cx="186" cy="440" rx="6" ry="2.4" transform="rotate(-20 186 440)"/>
+      <ellipse cx="272" cy="438" rx="6" ry="2.4" transform="rotate(-20 272 438)"/>
+    </g>
+  </g>
+  <use href="#bg-main-nuages-bas2" fill="none" stroke="#d9b8d9" stroke-width="3.6"/>
+  <use href="#bg-main-nuages-bas2" fill="#f1d6e7"/>
+  <g clip-path="url(#bg-main-nuages-bas2-clip)">
+    <g fill="#fff5f3">
+      <circle cx="-5.1" cy="517.8" r="20.8"/>
+      <circle cx="-0.4" cy="552.8" r="16"/>
+      <circle cx="31.1" cy="562.2" r="19.2"/>
+      <circle cx="74.9" cy="565.8" r="20.8"/>
+      <circle cx="121.1" cy="560.2" r="19.2"/>
+      <circle cx="164.9" cy="565.8" r="20.8"/>
+      <circle cx="211.1" cy="560.2" r="19.2"/>
+      <circle cx="254.9" cy="565.8" r="20.8"/>
+      <circle cx="299.1" cy="560.2" r="19.2"/>
+      <circle cx="337.4" cy="552.5" r="17.6"/>
+      <circle cx="360.9" cy="515.8" r="20.8"/>
+      <use href="#bg-main-nuages-bas2" y="14"/>
+    </g>
+    <g fill="#ffffff">
+      <ellipse cx="25" cy="550" rx="6" ry="2.4" transform="rotate(-25 25 550)"/>
+      <ellipse cx="68" cy="554" rx="4.5" ry="1.9" transform="rotate(-20 68 554)"/>
+      <ellipse cx="115" cy="548" rx="6" ry="2.4" transform="rotate(-25 115 548)"/>
+      <ellipse cx="158" cy="554" rx="4.5" ry="1.9" transform="rotate(-20 158 554)"/>
+      <ellipse cx="205" cy="548" rx="6" ry="2.4" transform="rotate(-25 205 548)"/>
+      <ellipse cx="248" cy="554" rx="4.5" ry="1.9" transform="rotate(-20 248 554)"/>
+      <ellipse cx="293" cy="548" rx="6" ry="2.4" transform="rotate(-25 293 548)"/>
+      <ellipse cx="333" cy="542" rx="4.5" ry="1.9" transform="rotate(-25 333 542)"/>
+    </g>
+  </g>
+  <use href="#bg-main-nuages-bas3" fill="none" stroke="#cba8cf" stroke-width="4.4"/>
+  <use href="#bg-main-nuages-bas3" fill="#efd2e4"/>
+  <g clip-path="url(#bg-main-nuages-bas3-clip)">
+    <g fill="#fffaf6">
+      <circle cx="-7.8" cy="598.9" r="25.6"/>
+      <circle cx="36.4" cy="635.2" r="24"/>
+      <circle cx="88.2" cy="642.9" r="25.6"/>
+      <circle cx="136.9" cy="633.8" r="20.8"/>
+      <circle cx="178.4" cy="621.2" r="24"/>
+      <circle cx="224.6" cy="635.5" r="22.4"/>
+      <circle cx="272.2" cy="642.9" r="25.6"/>
+      <circle cx="318.6" cy="633.5" r="22.4"/>
+      <circle cx="362.4" cy="599.2" r="24"/>
+    </g>
+    <g fill="#ffffff">
+      <ellipse cx="29" cy="621" rx="7" ry="2.8" transform="rotate(-25 29 621)"/>
+      <ellipse cx="82" cy="628" rx="5.5" ry="2.2" transform="rotate(-20 82 628)"/>
+      <ellipse cx="131" cy="622" rx="5.5" ry="2.2" transform="rotate(-25 131 622)"/>
+      <ellipse cx="184" cy="604" rx="5" ry="2.2" transform="rotate(-30 184 604)"/>
+      <ellipse cx="219" cy="623" rx="6" ry="2.4" transform="rotate(-25 219 623)"/>
+      <ellipse cx="266" cy="628" rx="5.5" ry="2.2" transform="rotate(-20 266 628)"/>
+      <ellipse cx="312" cy="620" rx="6" ry="2.4" transform="rotate(-25 312 620)"/>
+    </g>
+  </g>
+
+  <!-- 11. Scintillements dorés sur la mer de nuages. -->
+  <g fill="#ffe3a0">
+    <use href="#bg-main-etincelle" transform="translate(8 470) scale(0.45)"/>
+    <use href="#bg-main-etincelle" transform="translate(352 452) scale(0.4)"/>
+    <use href="#bg-main-etincelle" transform="translate(176 548) scale(0.4)"/>
+    <use href="#bg-main-etincelle" transform="translate(124 626) scale(0.45)"/>
+    <use href="#bg-main-etincelle" transform="translate(300 628) scale(0.38)"/>
+    <use href="#bg-main-etincelle" transform="translate(232 632) scale(0.3)"/>
+  </g>
+  <g fill="#ffe3a0">
+    <circle cx="60" cy="630" r="1"/>
+    <circle cx="204" cy="634" r="1.1"/>
+    <circle cx="352" cy="540" r="1"/>
+    <circle cx="9" cy="520" r="1"/>
+  </g>
+</svg>

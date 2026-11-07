@@ -17,7 +17,7 @@ Vocabulaire : la « présentation » de la spec est la fenêtre `splash` du code
 ## Phase 1: Setup
 
 - [x] T001 Charte, fiches, exemple de technique (`docs/art/`) ; `scripts/art/check.mjs` (format, éléments interdits, identifiants, cadrages) et `scripts/art/preview.mjs` (aperçu aux tailles du jeu, maquettes, galerie) ; scripts npm `art:check`, `art:preview`
-- [x] T002 Produire les 20 illustrations et les visuels d'interface (un agent par visuel, charte + fiche) dans `public/art/` ; `npm run art:check` vert
+- [ ] T002 (18/20 : manquent Ronronflette et Coquillard) Produire les 20 illustrations et les visuels d'interface (un agent par visuel, charte + fiche) dans `public/art/` ; `npm run art:check` vert
 - [x] T003 `scripts/art/contrast.mjs` (research R6) + script npm `art:contrast` ; CI : `art:check` et `art:contrast` dans le job du jeu
 
 ---

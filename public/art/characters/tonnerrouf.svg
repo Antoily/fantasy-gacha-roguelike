@@ -1,0 +1,334 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <!-- Tonnerrouf (créature, Légendaire) : « Chien-orage dont chaque aboiement fait un éclair. »
+       Charte docs/art/charte.md. Lumière en haut à gauche ; l'éclair part vers elle. -->
+  <defs>
+    <filter id="tonnerrouf-flou" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7"/></filter>
+    <filter id="tonnerrouf-flou-large" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="16"/></filter>
+    <radialGradient id="tonnerrouf-halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff7c8" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#ffd43b" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#ffb320" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Masses : chaque forme une fois, réutilisée pour l'aplat, la découpe et le contour. -->
+    <path id="tonnerrouf-queue" d="M320 322 L345 262 L318 226 L384 124 L344 220 L379 263 L350 332 Z"/>
+    <clipPath id="tonnerrouf-queue-clip"><use href="#tonnerrouf-queue"/></clipPath>
+    <path id="tonnerrouf-corps" d="M196 252 C246 240 306 262 338 292 C366 318 374 356 364 390 C356 418 326 432 292 430 L248 426 C208 420 172 400 158 366 C144 328 150 268 196 252 Z"/>
+    <clipPath id="tonnerrouf-corps-clip"><use href="#tonnerrouf-corps"/></clipPath>
+    <path id="tonnerrouf-cuisse" d="M294 330 C314 300 364 302 374 344 C382 378 368 402 354 414 C356 426 358 438 356 448 L312 448 C312 432 306 420 296 408 C280 388 276 356 294 330 Z"/>
+    <clipPath id="tonnerrouf-cuisse-clip"><use href="#tonnerrouf-cuisse"/></clipPath>
+    <path id="tonnerrouf-patte-ar" d="M298 448 C296 434 314 430 334 431 C354 432 366 440 364 452 C362 464 346 469 326 469 C306 469 299 461 298 448 Z"/>
+    <clipPath id="tonnerrouf-patte-ar-clip"><use href="#tonnerrouf-patte-ar"/></clipPath>
+    <path id="tonnerrouf-jambe-fond" d="M140 300 C128 340 106 386 94 428 L148 432 C154 398 168 356 186 312 Z"/>
+    <clipPath id="tonnerrouf-jambe-fond-clip"><use href="#tonnerrouf-jambe-fond"/></clipPath>
+    <path id="tonnerrouf-patte-fond" d="M70 442 C68 426 88 418 112 420 C136 421 152 428 152 444 C152 458 136 464 112 464 C86 464 71 458 70 442 Z"/>
+    <clipPath id="tonnerrouf-patte-fond-clip"><use href="#tonnerrouf-patte-fond"/></clipPath>
+    <path id="tonnerrouf-jambe" d="M206 318 C204 356 210 398 212 440 L270 440 C274 398 270 352 262 316 Z"/>
+    <clipPath id="tonnerrouf-jambe-clip"><use href="#tonnerrouf-jambe"/></clipPath>
+    <path id="tonnerrouf-patte" d="M196 454 C194 436 214 430 240 430 C266 430 286 436 286 454 C286 470 266 478 240 478 C214 478 196 470 196 454 Z"/>
+    <clipPath id="tonnerrouf-patte-clip"><use href="#tonnerrouf-patte"/></clipPath>
+    <path id="tonnerrouf-jabot" d="M120 258 C102 272 102 300 122 314 C114 334 134 352 158 346 C168 366 198 372 214 356 C230 370 262 366 268 344 C290 348 306 328 298 308 C318 298 320 270 302 256 C296 240 276 232 258 238 L152 234 C134 236 120 244 120 258 Z"/>
+    <clipPath id="tonnerrouf-jabot-clip"><use href="#tonnerrouf-jabot"/></clipPath>
+    <path id="tonnerrouf-collier" d="M116 262 C136 282 160 292 186 292 C232 292 278 280 308 260 L312 280 C280 302 232 312 186 312 C156 312 130 302 112 282 Z"/>
+    <clipPath id="tonnerrouf-collier-clip"><use href="#tonnerrouf-collier"/></clipPath>
+    <path id="tonnerrouf-oreille-fond" d="M146 92 C146 62 166 36 198 20 C204 42 208 60 214 74 C190 70 166 76 146 92 Z"/>
+    <clipPath id="tonnerrouf-oreille-fond-clip"><use href="#tonnerrouf-oreille-fond"/></clipPath>
+    <path id="tonnerrouf-oreille" d="M238 72 C256 44 296 24 336 22 C338 52 322 88 298 110 C280 96 260 82 238 72 Z"/>
+    <clipPath id="tonnerrouf-oreille-clip"><use href="#tonnerrouf-oreille"/></clipPath>
+    <path id="tonnerrouf-tete" d="M130 108 C138 76 174 56 214 56 C256 56 290 80 298 114 C302 130 304 144 302 156 C314 158 326 166 332 176 C320 178 312 180 306 184 C318 190 326 202 326 214 C314 211 302 213 294 218 C298 228 294 238 284 244 C262 252 234 250 216 244 C196 248 160 240 140 222 C124 206 120 182 122 158 C122 138 124 122 130 108 Z"/>
+    <clipPath id="tonnerrouf-tete-clip"><use href="#tonnerrouf-tete"/></clipPath>
+    <path id="tonnerrouf-museau" d="M192 124 C176 122 156 130 148 146 C142 158 136 166 128 172 C148 168 166 164 176 166 C192 168 214 178 228 184 C226 162 214 138 192 124 Z"/>
+    <clipPath id="tonnerrouf-museau-clip"><use href="#tonnerrouf-museau"/></clipPath>
+    <path id="tonnerrouf-menton" d="M124 172 C120 214 140 254 170 256 C206 256 232 222 234 184 C210 180 150 168 124 172 Z"/>
+    <clipPath id="tonnerrouf-menton-clip"><use href="#tonnerrouf-menton"/></clipPath>
+    <path id="tonnerrouf-bouche" d="M128 172 C148 168 166 164 176 166 C194 168 214 180 228 184 C224 212 202 238 170 240 C146 240 130 210 128 172 Z"/>
+    <clipPath id="tonnerrouf-bouche-clip"><use href="#tonnerrouf-bouche"/></clipPath>
+    <path id="tonnerrouf-oeil-fond" d="M143 106 C152 99 168 102 177 112 C181 128 172 142 160 142 C147 142 139 126 143 106 Z"/>
+    <clipPath id="tonnerrouf-oeil-fond-clip"><use href="#tonnerrouf-oeil-fond"/></clipPath>
+    <path id="tonnerrouf-oeil" d="M203 116 C214 104 236 98 248 106 C256 122 248 150 226 150 C208 150 198 134 203 116 Z"/>
+    <clipPath id="tonnerrouf-oeil-clip"><use href="#tonnerrouf-oeil"/></clipPath>
+    <!-- Éclair dans un repère local : u le long du jet (gueule → pointe), v en travers. -->
+    <path id="tonnerrouf-eclair" d="M0 -15 L90 -44 L90 -14 L165 -38 L165 -12 L240 -36 L150 12 L150 -8 L75 12 L75 -9 L0 15 Z"/>
+    <clipPath id="tonnerrouf-eclair-clip"><use href="#tonnerrouf-eclair"/></clipPath>
+    <!-- Mini-éclair des décharges (et non des « Z » qu'on lirait comme un ronflement). -->
+    <path id="tonnerrouf-mini" d="M2 -13 L-6 2 L-1 2 L-4 13 L7 -3 L2 -3 L6 -13 Z"/>
+    <!-- Manchettes de nuage aux chevilles : touffes en volutes. -->
+    <path id="tonnerrouf-manchette" d="M197 446 C194 430 206 418 220 422 C224 410 242 408 248 418 C256 410 274 414 274 426 C284 428 288 440 285 446 Z"/>
+    <clipPath id="tonnerrouf-manchette-clip"><use href="#tonnerrouf-manchette"/></clipPath>
+    <path id="tonnerrouf-manchette-fond" d="M69 437 C68 422 82 412 94 416 C98 404 116 402 122 410 C130 402 148 406 148 418 C156 420 156 432 152 438 Z"/>
+    <clipPath id="tonnerrouf-manchette-fond-clip"><use href="#tonnerrouf-manchette-fond"/></clipPath>
+    <path id="tonnerrouf-manchette-ar" d="M298 446 C296 434 306 426 316 430 C320 420 336 418 342 426 C350 420 364 424 364 436 C368 440 367 446 365 447 Z"/>
+    <clipPath id="tonnerrouf-manchette-ar-clip"><use href="#tonnerrouf-manchette-ar"/></clipPath>
+  </defs>
+
+  <!-- Lueur de l'aboiement, derrière tout. -->
+  <ellipse cx="112" cy="128" rx="104" ry="110" fill="url(#tonnerrouf-halo)" opacity="0.45"/>
+
+  <!-- Ombre portée au sol. -->
+  <ellipse cx="226" cy="468" rx="152" ry="15" fill="#1d1a16" opacity="0.18"/>
+
+  <!-- Queue en éclair : fourrure d'orage, pointe électrique. -->
+  <use href="#tonnerrouf-queue" fill="#4a4c9c"/>
+  <g clip-path="url(#tonnerrouf-queue-clip)">
+    <path d="M384 124 L344 220 L379 263 L350 332" fill="none" stroke="#33307c" stroke-width="26" stroke-linejoin="miter"/>
+    <path d="M320 322 L345 262 L318 226 L384 124" fill="none" stroke="#7174c2" stroke-width="12" stroke-linejoin="miter"/>
+    <path d="M300 240 L322 230 L334 234 L352 216 L400 196 L400 100 L300 100 Z" fill="#ffd43b"/>
+    <path d="M384 124 L344 220 L352 216" fill="none" stroke="#f29b1d" stroke-width="18" stroke-linejoin="miter"/>
+    <path d="M330 222 L374 140" fill="none" stroke="#fff6c4" stroke-width="5" stroke-linecap="round"/>
+    <path d="M384 124 L344 220 L379 263 L350 332" fill="none" stroke="#ffe27a" stroke-width="11" stroke-linejoin="miter"/>
+  </g>
+  <use href="#tonnerrouf-queue" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+  <!-- Corps (croupe et flanc), derrière les pattes et le jabot. -->
+  <use href="#tonnerrouf-corps" fill="#4a4c9c"/>
+  <g clip-path="url(#tonnerrouf-corps-clip)">
+    <path d="M150 380 C210 420 300 420 380 360 L390 440 L140 440 Z" fill="#33307c"/>
+    <path d="M300 268 C330 282 352 300 362 330" fill="none" stroke="#ffe27a" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <use href="#tonnerrouf-corps" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+  <!-- Touffe de nuage à la racine de la queue. -->
+  <path d="M314 302 C306 288 320 276 332 282 C336 270 354 268 360 280 C372 280 378 294 370 304 C352 314 330 314 314 302 Z" fill="#4a4c9c"/>
+  <path d="M362 284 C374 290 372 304 362 308 C350 312 336 312 326 310 C346 306 360 298 362 284 Z" fill="#33307c"/>
+  <path d="M322 288 C326 282 332 280 338 282" fill="none" stroke="#7174c2" stroke-width="4" stroke-linecap="round"/>
+  <path d="M314 302 C306 288 320 276 332 282 C336 270 354 268 360 280 C372 280 378 294 370 304" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M340 296 C336 288 344 282 350 288" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Patte arrière (cuisse) avec marque en éclair. -->
+  <use href="#tonnerrouf-cuisse" fill="#4a4c9c"/>
+  <g clip-path="url(#tonnerrouf-cuisse-clip)">
+    <path d="M318 318 L354 314 L338 346 L362 344 L322 398 L334 360 L312 362 Z" fill="#ffd43b"/>
+    <path d="M374 330 C362 372 344 398 316 420 L330 460 L390 460 L390 320 Z" fill="#33307c"/>
+    <path d="M360 344 L322 398 L334 372 L352 360 Z" fill="#f29b1d"/>
+    <path d="M300 334 C312 316 332 308 350 310" fill="none" stroke="#7174c2" stroke-width="7" stroke-linecap="round"/>
+    <path d="M372 340 C378 368 370 392 356 408" fill="none" stroke="#ffe27a" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <use href="#tonnerrouf-cuisse" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+  <use href="#tonnerrouf-patte-ar" fill="#b3b8d8"/>
+  <g clip-path="url(#tonnerrouf-patte-ar-clip)">
+    <path d="M296 458 C320 466 348 462 366 446 L370 476 L296 476 Z" fill="#8288ba"/>
+    <path d="M296 446 C304 450 310 450 314 447 C322 452 336 452 342 447 C350 451 360 450 368 445 L368 455 C346 461 320 461 296 455 Z" fill="#8288ba"/>
+    <path d="M306 456 C310 452 316 451 322 452" fill="none" stroke="#e3e5f4" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#tonnerrouf-patte-ar" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M316 454 L318 465 M333 454 L334 467" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <use href="#tonnerrouf-manchette-ar" fill="#b3b8d8"/>
+  <g clip-path="url(#tonnerrouf-manchette-ar-clip)">
+    <path d="M344 420 C354 430 356 440 348 450 L370 450 L370 420 Z" fill="#8288ba"/>
+    <path d="M304 434 C306 428 312 426 318 428" fill="none" stroke="#e3e5f4" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <path d="M298 446 C296 434 306 426 316 430 C320 420 336 418 342 426 C350 420 364 424 364 436 C368 440 367 446 365 447" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M316 430 C318 436 322 440 326 442 M342 426 C344 432 346 436 350 438" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Patte avant du fond (gauche de l'image). -->
+  <use href="#tonnerrouf-jambe-fond" fill="#4a4c9c"/>
+  <g clip-path="url(#tonnerrouf-jambe-fond-clip)">
+    <path d="M168 300 C160 350 146 392 136 440 L170 440 L190 300 Z" fill="#33307c"/>
+    <path d="M136 320 C124 352 112 384 104 414" fill="none" stroke="#7174c2" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <use href="#tonnerrouf-jambe-fond" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <use href="#tonnerrouf-patte-fond" fill="#b3b8d8"/>
+  <g clip-path="url(#tonnerrouf-patte-fond-clip)">
+    <path d="M68 452 C96 462 130 460 156 440 L160 470 L64 470 Z" fill="#8288ba"/>
+    <path d="M66 437 C74 442 84 442 90 438 C100 444 114 444 122 439 C130 444 142 443 156 436 L156 448 C130 454 92 454 66 448 Z" fill="#8288ba"/>
+    <path d="M78 448 C82 444 88 443 94 444" fill="none" stroke="#e3e5f4" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#tonnerrouf-patte-fond" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M92 448 L88 459 M110 449 L108 462" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <use href="#tonnerrouf-manchette-fond" fill="#b3b8d8"/>
+  <g clip-path="url(#tonnerrouf-manchette-fond-clip)">
+    <path d="M126 404 C138 414 140 428 130 440 L160 440 L160 400 Z" fill="#8288ba"/>
+    <path d="M76 426 C78 418 84 414 92 415 M100 410 C104 405 110 404 116 406" fill="none" stroke="#e3e5f4" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <path d="M69 437 C68 422 82 412 94 416 C98 404 116 402 122 410 C130 402 148 406 148 418 C156 420 156 432 152 438" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M94 416 C96 424 100 428 106 430 M122 410 C124 418 128 422 134 424" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Patte avant de devant. -->
+  <use href="#tonnerrouf-jambe" fill="#4a4c9c"/>
+  <g clip-path="url(#tonnerrouf-jambe-clip)">
+    <path d="M246 320 C250 360 252 400 248 444 L280 444 L280 316 Z" fill="#33307c"/>
+    <path d="M214 340 C212 372 216 402 218 428" fill="none" stroke="#7174c2" stroke-width="8" stroke-linecap="round"/>
+    <path d="M226 372 L252 368 L238 392 L258 390 L230 424 L238 400 L220 402 Z" fill="#ffd43b"/>
+    <path d="M266 330 C270 370 270 400 268 430" fill="none" stroke="#ffe27a" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <use href="#tonnerrouf-jambe" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <use href="#tonnerrouf-patte" fill="#b3b8d8"/>
+  <g clip-path="url(#tonnerrouf-patte-clip)">
+    <path d="M194 462 C226 474 262 472 290 448 L292 482 L194 482 Z" fill="#8288ba"/>
+    <path d="M194 446 C204 452 214 452 220 448 C230 454 246 454 254 448 C262 453 276 452 288 445 L288 457 C262 464 222 464 194 457 Z" fill="#8288ba"/>
+    <path d="M208 462 C212 457 218 456 224 457" fill="none" stroke="#e3e5f4" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#tonnerrouf-patte" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M228 461 L226 473 M247 461 L247 475 M265 459 L267 471" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <use href="#tonnerrouf-manchette" fill="#b3b8d8"/>
+  <g clip-path="url(#tonnerrouf-manchette-clip)">
+    <path d="M254 412 C266 424 266 438 254 448 L292 448 L292 410 Z" fill="#8288ba"/>
+    <path d="M204 432 C206 424 212 420 220 421 M226 418 C230 412 238 411 244 414" fill="none" stroke="#e3e5f4" stroke-width="4" stroke-linecap="round"/>
+    <path d="M274 422 C280 430 282 438 280 446" fill="none" stroke="#fff3b8" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <path d="M197 446 C194 430 206 418 220 422 C224 410 242 408 248 418 C256 410 274 414 274 426 C284 428 288 440 285 446" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M220 422 C222 430 226 434 232 436 M248 418 C250 426 254 430 260 432" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Jabot de nuage. -->
+  <use href="#tonnerrouf-jabot" fill="#b3b8d8"/>
+  <g clip-path="url(#tonnerrouf-jabot-clip)">
+    <path d="M300 250 C300 300 280 340 230 352 C200 360 170 356 150 350 L150 380 L330 380 L330 240 Z" fill="#8288ba"/>
+    <path d="M110 240 C160 262 240 262 310 236 L310 220 L110 220 Z" fill="#61649c"/>
+    <path d="M114 276 C118 296 128 310 140 316" fill="none" stroke="#e3e5f4" stroke-width="7" stroke-linecap="round"/>
+    <path d="M150 330 C160 340 176 344 190 342" fill="none" stroke="#e3e5f4" stroke-width="6" stroke-linecap="round"/>
+    <path d="M296 270 C302 290 300 306 292 318" fill="none" stroke="#fff3b8" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <use href="#tonnerrouf-jabot" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M128 336 C124 322 138 314 146 320 C152 326 146 334 140 330 M222 352 C218 340 230 332 240 338 C246 344 240 352 234 348 M262 340 C260 328 272 322 280 328 C284 334 278 340 274 336 M290 312 C288 302 298 296 304 302 M248 276 C246 266 256 262 262 268" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Collier d'or et médaille (ornement légendaire). -->
+  <g clip-path="url(#tonnerrouf-jabot-clip)">
+    <use href="#tonnerrouf-collier" fill="#e4a034"/>
+    <g clip-path="url(#tonnerrouf-collier-clip)">
+      <path d="M220 290 C260 288 290 276 320 256 L320 300 L220 320 Z" fill="#a95f1a"/>
+      <path d="M120 270 C140 286 162 294 186 295" fill="none" stroke="#ffd36e" stroke-width="5" stroke-linecap="round"/>
+    </g>
+    <use href="#tonnerrouf-collier" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  </g>
+  <g stroke="#1d1a16" stroke-width="2.5">
+    <circle cx="140" cy="290" r="4.5" fill="#fff1c2"/>
+    <circle cx="160" cy="298" r="4.5" fill="#fff1c2"/>
+    <circle cx="214" cy="300" r="4.5" fill="#ffd36e"/>
+    <circle cx="240" cy="296" r="4.5" fill="#ffd36e"/>
+    <circle cx="264" cy="288" r="4.5" fill="#e4a034"/>
+    <circle cx="286" cy="277" r="4.5" fill="#e4a034"/>
+  </g>
+  <circle cx="186" cy="312" r="6" fill="none" stroke="#1d1a16" stroke-width="7"/>
+  <circle cx="186" cy="312" r="6" fill="none" stroke="#e4a034" stroke-width="3"/>
+  <circle cx="186" cy="334" r="19" fill="#e4a034"/>
+  <path d="M200 322 C208 336 202 350 186 353 C200 346 204 334 200 322 Z" fill="#a95f1a"/>
+  <circle cx="186" cy="334" r="10" fill="#ff9f1c" stroke="#1d1a16" stroke-width="2.5"/>
+  <circle cx="182" cy="330" r="3.5" fill="#ffffff"/>
+  <circle cx="186" cy="334" r="19" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+
+  <!-- Oreilles balayées par le souffle, derrière la tête. -->
+  <use href="#tonnerrouf-oreille-fond" fill="#4a4c9c"/>
+  <g clip-path="url(#tonnerrouf-oreille-fond-clip)">
+    <path d="M198 20 C204 42 208 60 214 74 L230 80 L230 10 Z" fill="#33307c"/>
+    <path d="M152 84 C152 62 168 42 190 28" fill="none" stroke="#7174c2" stroke-width="7" stroke-linecap="round"/>
+  </g>
+  <use href="#tonnerrouf-oreille-fond" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+  <use href="#tonnerrouf-oreille" fill="#4a4c9c"/>
+  <g clip-path="url(#tonnerrouf-oreille-clip)">
+    <path d="M252 74 C270 54 300 38 326 32 C322 56 310 80 294 98 C282 88 268 80 252 74 Z" fill="#c9b8e6"/>
+    <path d="M300 40 C314 56 306 80 294 98 C300 80 302 60 300 40 Z" fill="#9a88c8"/>
+    <path d="M336 22 C338 52 322 88 298 110" fill="none" stroke="#ffe27a" stroke-width="10"/>
+    <path d="M244 68 C262 48 292 32 324 26" fill="none" stroke="#7174c2" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <use href="#tonnerrouf-oreille" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M262 74 C276 62 292 54 306 50 M270 84 C282 76 292 72 302 70" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Tête : masque clair, calotte indigo, touffes de joues. -->
+  <use href="#tonnerrouf-tete" fill="#b3b8d8"/>
+  <g clip-path="url(#tonnerrouf-tete-clip)">
+    <path d="M300 150 C306 196 290 232 252 248 L300 260 L340 200 Z" fill="#8288ba"/>
+    <path d="M104 134 C122 130 130 112 144 100 C156 90 176 92 186 106 C190 112 192 118 194 122 C197 110 203 100 214 95 C232 88 252 96 262 112 C272 128 284 148 302 160 L340 154 L340 40 L100 40 Z" fill="#4a4c9c"/>
+    <path d="M250 60 C286 74 302 110 300 160 L320 160 L320 50 Z" fill="#33307c"/>
+    <path d="M150 82 C170 66 198 60 222 64" fill="none" stroke="#7174c2" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="238" cy="68" r="4" fill="#9c9fe0"/>
+    <path d="M296 110 C302 126 304 142 302 156" fill="none" stroke="#ffe27a" stroke-width="5" stroke-linecap="round"/>
+    <path d="M128 180 C128 200 136 216 148 226" fill="none" stroke="#e3e5f4" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <use href="#tonnerrouf-tete" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M302 172 C310 176 318 178 324 178 M296 206 C306 208 314 210 320 212" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Menton et gueule ouverte. -->
+  <use href="#tonnerrouf-menton" fill="#b3b8d8"/>
+  <g clip-path="url(#tonnerrouf-menton-clip)">
+    <path d="M232 190 C228 230 204 252 170 256 L240 270 L250 180 Z" fill="#8288ba"/>
+    <path d="M127 196 C130 222 142 242 158 250" fill="none" stroke="#ffe27a" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <use href="#tonnerrouf-menton" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <use href="#tonnerrouf-bouche" fill="#5a1a3a"/>
+  <g clip-path="url(#tonnerrouf-bouche-clip)">
+    <ellipse cx="190" cy="196" rx="34" ry="22" fill="#3a0f2a"/>
+    <path d="M146 236 C150 214 186 202 212 212 C216 228 198 248 170 248 C158 248 148 242 146 236 Z" fill="#f2728f"/>
+    <path d="M186 214 C204 210 214 216 214 226 C204 236 190 240 178 238 Z" fill="#c4486c"/>
+    <path d="M160 222 C168 214 180 210 190 210" fill="none" stroke="#ff9fb4" stroke-width="4" stroke-linecap="round"/>
+    <path d="M176 220 C178 228 178 236 176 242" fill="none" stroke="#a13a5c" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <use href="#tonnerrouf-bouche" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M204 178 L213 197 L221 182 Z" fill="#fffaf0" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M200 226 L207 211 L214 222 Z" fill="#fffaf0" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+
+  <!-- Museau et truffe. -->
+  <use href="#tonnerrouf-museau" fill="#b3b8d8"/>
+  <g clip-path="url(#tonnerrouf-museau-clip)">
+    <path d="M200 128 C214 140 222 160 226 186 L240 186 L240 120 Z" fill="#8288ba"/>
+    <path d="M150 150 C158 136 172 128 186 126" fill="none" stroke="#e3e5f4" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <use href="#tonnerrouf-museau" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Yeux pétillants : regard vers la pointe de l'éclair. -->
+  <use href="#tonnerrouf-oeil-fond" fill="#fffaf0"/>
+  <g clip-path="url(#tonnerrouf-oeil-fond-clip)">
+    <circle cx="155" cy="121" r="14" fill="#ffc72e"/>
+    <path d="M141 124 C146 134 162 138 170 128 L170 140 L140 140 Z" fill="#f08c19"/>
+    <circle cx="154" cy="120" r="8" fill="#1d1a16"/>
+    <path d="M140 104 C152 100 168 104 178 114 L178 100 L140 100 Z" fill="#c9cde6"/>
+  </g>
+  <use href="#tonnerrouf-oeil-fond" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <circle cx="149" cy="114" r="5" fill="#ffffff"/>
+  <use href="#tonnerrouf-mini" transform="translate(160 127) rotate(18) scale(0.36)" fill="#ffffff"/>
+
+  <use href="#tonnerrouf-oeil" fill="#fffaf0"/>
+  <g clip-path="url(#tonnerrouf-oeil-clip)">
+    <circle cx="219" cy="123" r="17" fill="#ffc72e"/>
+    <path d="M202 128 C208 140 228 144 238 132 L238 150 L200 150 Z" fill="#f08c19"/>
+    <circle cx="218" cy="122" r="10" fill="#1d1a16"/>
+    <path d="M200 112 C214 104 236 100 250 108 L250 96 L200 96 Z" fill="#c9cde6"/>
+  </g>
+  <use href="#tonnerrouf-oeil" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <circle cx="212" cy="115" r="6.5" fill="#ffffff"/>
+  <use href="#tonnerrouf-mini" transform="translate(228 131) rotate(18) scale(0.44)" fill="#ffffff"/>
+
+  <!-- Truffe, après les yeux : de trois quarts, le museau passe devant l'œil du fond. -->
+  <path d="M154 144 C154 136 168 132 180 133 C192 134 197 140 192 148 C187 156 178 161 171 161 C162 160 155 152 154 144 Z" fill="#2a2648" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <ellipse cx="167" cy="140" rx="7" ry="3.5" fill="#8d8ac4"/>
+  <circle cx="162" cy="141" r="2" fill="#ffffff"/>
+
+  <!-- Sourcils : froncés, l'aboiement est sérieux. -->
+  <path d="M136 94 C150 86 168 90 182 102" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linecap="round"/>
+  <path d="M204 104 C220 90 238 86 254 90" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- L'éclair de l'aboiement : lueur, corps, cœur blanc, contour. -->
+  <g transform="translate(158 208) rotate(-119.1) scale(0.905)">
+    <!-- Fourches qui se détachent du jet, sous le corps de l'éclair. -->
+    <path d="M88 -40 L96 -56 L91 -60 L101 -72 L97 -76 L112 -86 M160 -34 L170 -46 L166 -50 L176 -58 L172 -62 L186 -70" fill="none" stroke="#ffe066" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" filter="url(#tonnerrouf-flou)" opacity="0.8"/>
+    <path d="M88 -40 L96 -56 L91 -60 L101 -72 L97 -76 L112 -86 M160 -34 L170 -46 L166 -50 L176 -58 L172 -62 L186 -70" fill="none" stroke="#1d1a16" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M88 -40 L96 -56 L91 -60 L101 -72 L97 -76 L112 -86 M160 -34 L170 -46 L166 -50 L176 -58 L172 -62 L186 -70" fill="none" stroke="#ffd43b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <use href="#tonnerrouf-eclair" fill="#ffe066" filter="url(#tonnerrouf-flou)" opacity="0.9"/>
+    <use href="#tonnerrouf-eclair" fill="#ffd43b"/>
+    <g clip-path="url(#tonnerrouf-eclair-clip)">
+      <path d="M0 -6 L92 -22 L92 -6 L166 -20 L166 -4 L232 -28 L152 6 L152 -2 L76 6 L76 -2 L0 6 Z" fill="#fff6c4"/>
+      <path d="M8 -2 L100 -12 L170 -10 L226 -26" fill="none" stroke="#ffffff" stroke-width="3" stroke-linejoin="round"/>
+    </g>
+    <path d="M0 -15 L90 -44 L90 -14 L165 -38 L165 -12 L240 -36 L150 12 L150 -8 L75 12 L75 -9 L0 15" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  </g>
+  <ellipse cx="160" cy="204" rx="16" ry="12" fill="#fff6c4" filter="url(#tonnerrouf-flou)"/>
+
+  <!-- Décharges qui crépitent autour de lui : mini-éclairs cernés sur une petite lueur. -->
+  <g fill="#ffe066" opacity="0.75" filter="url(#tonnerrouf-flou)">
+    <circle cx="242" cy="36" r="12"/>
+    <circle cx="358" cy="62" r="11"/>
+    <circle cx="381" cy="186" r="10"/>
+    <circle cx="50" cy="408" r="11"/>
+    <circle cx="382" cy="446" r="10"/>
+  </g>
+  <g fill="#ffd43b" stroke="#1d1a16" stroke-width="2.2" stroke-linejoin="round">
+    <use href="#tonnerrouf-mini" transform="translate(242 36) rotate(24) scale(1.2)"/>
+    <use href="#tonnerrouf-mini" transform="translate(358 62) rotate(36) scale(1.1)"/>
+    <use href="#tonnerrouf-mini" transform="translate(381 186) rotate(-12) scale(0.95)"/>
+    <use href="#tonnerrouf-mini" transform="translate(50 408) rotate(-24) scale(1.1)"/>
+    <use href="#tonnerrouf-mini" transform="translate(382 446) rotate(20) scale(0.95)"/>
+  </g>
+  <path d="M120 40 L126 54 L140 60 L126 66 L120 80 L114 66 L100 60 L114 54 Z" fill="#fff6c4" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M52 212 L56 222 L66 226 L56 230 L52 240 L48 230 L38 226 L48 222 Z" fill="#fff6c4" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+</svg>

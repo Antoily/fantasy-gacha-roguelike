@@ -1,0 +1,467 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <!-- Zigzag (Peu commun) : « Coursier en patins qui ne freine jamais. »
+       Il file vers la droite, penché en avant, jambe arrière tendue, bras en balancier ;
+       l'écharpe et les lettres s'envolent derrière lui. Lumière unique en haut à gauche.
+       Construction (docs/art/charte.md § 3) : formes en defs, aplat, ombres et lumières
+       découpées par clipPath, contour par-dessus, traits intérieurs ensuite. -->
+  <defs>
+    <!-- ===== Écharpe : grand pan flottant, rayures, tour de cou ===== -->
+    <path id="zigzag-pan" d="M190 204 C166 200 148 178 120 168 C96 160 80 170 58 158 C44 150 34 134 28 118 L10 128 C16 150 30 172 52 182 C76 194 98 186 118 194 C140 202 158 228 186 230 Z"/>
+    <clipPath id="zigzag-pan-clip"><use href="#zigzag-pan"/></clipPath>
+    <clipPath id="zigzag-rayures-clip">
+      <path d="M51 196 L80 143 L89 148 L60 201 Z"/>
+      <path d="M19 163 L64 140 L61 133 L16 156 Z"/>
+    </clipPath>
+    <path id="zigzag-col" d="M182 214 C204 200 254 204 284 220 C294 228 292 242 280 246 C252 236 212 234 186 242 C174 236 172 222 182 214 Z"/>
+    <clipPath id="zigzag-col-clip"><use href="#zigzag-col"/></clipPath>
+
+    <!-- ===== Jambes, short, genouillères ===== -->
+    <path id="zigzag-jambe-loin" d="M170 322 L70 389 C66 395 72 406 82 405 L182 338 Z"/>
+    <clipPath id="zigzag-jambe-loin-clip"><use href="#zigzag-jambe-loin"/></clipPath>
+    <clipPath id="zigzag-chaussette-loin-clip"><path d="M101 363 L117 387 L60 430 L40 380 Z"/></clipPath>
+    <path id="zigzag-jambe" d="M214 323 L282 371 C288 375 289 382 285 386 L265 431 L246 423 L263 384 L202 341 Z"/>
+    <clipPath id="zigzag-jambe-clip"><use href="#zigzag-jambe"/></clipPath>
+    <clipPath id="zigzag-chaussette-clip"><path d="M236 394 L304 394 L304 444 L236 444 Z"/></clipPath>
+    <path id="zigzag-short" d="M146 302 C180 314 226 326 262 326 C264 332 262 338 258 342 C252 356 244 366 234 374 C228 364 220 358 210 354 C194 358 178 361 161 363 C154 353 146 342 140 331 C141 321 143 311 146 302 Z"/>
+    <clipPath id="zigzag-short-clip"><use href="#zigzag-short"/></clipPath>
+    <path id="zigzag-genou" d="M-14 -7 C-14 -15 -6 -18 1 -18 C9 -18 15 -14 15 -6 L15 6 C15 13 8 18 0 18 C-8 18 -14 13 -14 6 Z"/>
+    <clipPath id="zigzag-genou-clip"><use href="#zigzag-genou"/></clipPath>
+    <g id="zigzag-genouillere">
+      <use href="#zigzag-genou" fill="#e8433b"/>
+      <g clip-path="url(#zigzag-genou-clip)">
+        <path d="M5 -20 C14 -8 14 8 3 20 L20 20 L20 -20 Z" fill="#b3223e"/>
+        <path d="M-10 -8 C-9 -13 -4 -15 1 -15 C-3 -11 -6 -7 -7 -1 Z" fill="#ff8d6a"/>
+      </g>
+      <use href="#zigzag-genou" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+      <ellipse cx="1" cy="0" rx="8" ry="11" fill="none" stroke="#1d1a16" stroke-width="2.5"/>
+      <path d="M-3 -6 C-1.5 -8.5 1 -9.5 4 -9" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+
+    <!-- ===== Patin (repère local : haut de la tige à l'origine, pointe vers +x) ===== -->
+    <path id="zigzag-botte" d="M-17 0 C-6 -3 6 -3 15 0 L18 12 C32 12 46 16 53 24 C57 28 57 33 53 35 L-22 35 C-25 35 -27 32 -26 28 L-21 5 C-20 2 -19 1 -17 0 Z"/>
+    <clipPath id="zigzag-botte-clip"><use href="#zigzag-botte"/></clipPath>
+    <clipPath id="zigzag-roue-clip"><circle cx="0" cy="0" r="10.5"/></clipPath>
+    <g id="zigzag-roue">
+      <circle cx="0" cy="0" r="10.5" fill="#ffcc33"/>
+      <g clip-path="url(#zigzag-roue-clip)">
+        <path d="M-12 3 C-5 9 5 8 12 -3 L12 12 L-12 12 Z" fill="#e39528"/>
+        <path d="M-7 -4 C-5.5 -7.5 -1.5 -9 2.5 -8.5" fill="none" stroke="#fff3a0" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+      <circle cx="0" cy="0" r="10.5" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+      <circle cx="0" cy="0" r="3.8" fill="#fffaf0" stroke="#1d1a16" stroke-width="2.5"/>
+    </g>
+    <g id="zigzag-patin">
+      <!-- roues du fond, essieux, butée (intacte : il ne freine jamais) -->
+      <circle cx="-3" cy="45" r="10" fill="#e39528" stroke="#1d1a16" stroke-width="4.5"/>
+      <circle cx="41" cy="45" r="10" fill="#e39528" stroke="#1d1a16" stroke-width="4.5"/>
+      <path d="M-14 41 L-2 41 L-5 48 L-11 48 Z M30 41 L42 41 L39 48 L33 48 Z" fill="#646d92" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M47 40 L57 40 C59.5 40 61 41.5 61 44 L60.5 50 C60.3 52.5 58.5 54 56 54 L51 54 C48.5 54 46.6 52.4 46.4 50 L46 43 Z" fill="#e8433b" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+      <!-- platine -->
+      <path d="M-28 34 L56 34 C58.5 34 60 35.5 60 38 C60 40.5 58.5 42 56 42 L-28 42 C-30.5 42 -32 40.5 -32 38 C-32 35.5 -30.5 34 -28 34 Z" fill="#9aa3bf" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+      <path d="M-26 36.5 L52 36.5" fill="none" stroke="#d3daee" stroke-width="2" stroke-linecap="round"/>
+      <!-- languette -->
+      <path d="M12 -1 C13 -8 20 -10 24 -7 C24 -2 21 3 18 6 Z" fill="#e8433b" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+      <!-- botte crème, éclair sur le flanc, lacets rouges -->
+      <use href="#zigzag-botte" fill="#fffaf0"/>
+      <g clip-path="url(#zigzag-botte-clip)">
+        <path d="M-30 25 C0 29 30 29 60 21 L60 40 L-30 40 Z" fill="#e2d0c6"/>
+        <path d="M-6 9 L6 9 L1 16 L9 16 L-6 30 L-2 20 L-10 20 Z" fill="#ffcc33" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M36 17 C43 18 48 21 51 25 C45 23 40 21 36 20 Z" fill="#ffffff"/>
+        <path d="M-17 7 L-14 7 L-17 22 L-20 22 Z" fill="#ffffff"/>
+        <path d="M13.5 10.5 L18.5 15.5 M18.5 10.5 L13.5 15.5 M21.5 14.5 L26.5 19.5 M26.5 14.5 L21.5 19.5 M29.5 17.5 L34.5 22.5 M34.5 17.5 L29.5 22.5" fill="none" stroke="#e8433b" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+      <use href="#zigzag-botte" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+      <!-- col rembourré turquoise -->
+      <path d="M-20 -1 C-10 -6 8 -6 18 -1 L19 7 C8 4 -10 4 -22 8 Z" fill="#2bbcb0" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+      <path d="M-13 0 C-6 -2.5 5 -2.5 11 -1" fill="none" stroke="#8de9d3" stroke-width="2.5" stroke-linecap="round"/>
+      <use href="#zigzag-roue" transform="translate(-8 48)"/>
+      <use href="#zigzag-roue" transform="translate(36 48)"/>
+    </g>
+
+    <path id="zigzag-poussiere" d="M238 476 C240 466 232 457 222 460 C220 449 206 444 197 451 C190 443 176 445 173 457 C163 455 155 463 158 471 C158 475 160 478 164 478 L234 478 C236 478 238 477 238 476 Z"/>
+    <clipPath id="zigzag-poussiere-clip"><use href="#zigzag-poussiere"/></clipPath>
+
+    <!-- ===== Lettres (repère local centré) ===== -->
+    <path id="zigzag-env" d="M-21 -14 L21 -14 C22.7 -14 23 -13.7 23 -12 L23 12 C23 13.7 22.7 14 21 14 L-21 14 C-22.7 14 -23 13.7 -23 12 L-23 -12 C-23 -13.7 -22.7 -14 -21 -14 Z"/>
+    <clipPath id="zigzag-env-clip"><use href="#zigzag-env"/></clipPath>
+    <g id="zigzag-lettre-dos">
+      <use href="#zigzag-env" fill="#fffaf0"/>
+      <g clip-path="url(#zigzag-env-clip)">
+        <path d="M-24 -15 L0 3 L24 -15 Z" fill="#f3e9df"/>
+        <path d="M-24 15 L-6 1 L6 1 L24 15 Z" fill="#e2d0c6"/>
+      </g>
+      <path d="M-21 -12 L0 3 L21 -12 M-21 12 L-6 1 M21 12 L6 1" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <use href="#zigzag-env" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+      <path d="M0 9 C-7 4 -7 -2 -3 -2 C-1.5 -2 0 -1 0 0.5 C0 -1 1.5 -2 3 -2 C7 -2 7 4 0 9 Z" fill="#e8433b" stroke="#1d1a16" stroke-width="2" stroke-linejoin="round"/>
+    </g>
+    <g id="zigzag-lettre-face">
+      <use href="#zigzag-env" fill="#fffaf0"/>
+      <g clip-path="url(#zigzag-env-clip)">
+        <path d="M-24 6 C-8 10 8 10 24 4 L24 16 L-24 16 Z" fill="#e2d0c6"/>
+      </g>
+      <path d="M-15 1 L4 1 M-15 7 L-2 7" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+      <use href="#zigzag-env" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    </g>
+
+    <!-- ===== Torse, sacoche, bras ===== -->
+    <path id="zigzag-veste" d="M186 234 C210 222 250 224 276 250 C284 276 276 306 260 330 C226 336 178 328 144 312 L120 318 C130 296 140 274 150 256 C160 242 172 236 186 234 Z"/>
+    <clipPath id="zigzag-veste-clip"><use href="#zigzag-veste"/></clipPath>
+    <path id="zigzag-eclair" d="M120 270 L180 262 L170 280 L238 272 L228 290 L292 280 L292 302 L236 312 L246 294 L176 302 L186 284 L120 292 Z"/>
+    <clipPath id="zigzag-eclair-clip"><use href="#zigzag-eclair"/></clipPath>
+    <path id="zigzag-sangle" d="M262 236 L278 246 C246 264 204 284 172 302 L162 290 C194 272 232 254 262 236 Z"/>
+    <path id="zigzag-cou" d="M222 198 C232 204 248 206 258 202 L256 236 C246 240 230 238 220 234 Z"/>
+    <clipPath id="zigzag-cou-clip"><use href="#zigzag-cou"/></clipPath>
+    <path id="zigzag-sac" d="M108 300 C130 292 156 290 170 294 C174 310 174 328 170 340 C150 348 124 350 110 344 C104 330 102 314 108 300 Z"/>
+    <clipPath id="zigzag-sac-clip"><use href="#zigzag-sac"/></clipPath>
+    <path id="zigzag-rabat" d="M110 300 C104 292 94 286 82 284 C76 290 74 300 76 310 C84 314 98 310 110 304 Z"/>
+    <clipPath id="zigzag-rabat-clip"><use href="#zigzag-rabat"/></clipPath>
+    <path id="zigzag-manche" d="M210 246 C208 232 196 225 180 226 C164 227 150 230 138 234 C126 236 114 234 103 231 L99 255 C112 258 126 262 142 262 C164 262 188 260 206 260 C210 256 211 251 210 246 Z"/>
+    <clipPath id="zigzag-manche-clip"><use href="#zigzag-manche"/></clipPath>
+    <path id="zigzag-poignet" d="M105 233 C99 233 93 233 89 234 C87 241 87 248 89 255 C94 256 99 256 104 256 C102 248 103 240 105 233 Z"/>
+    <path id="zigzag-main" d="M92 234 C86 230 82 226 80 220 C78 212 70 209 67 215 C65 220 67 226 69 230 C62 229 54 226 48 226 C42 226 40 233 45 236 C51 238 58 238 64 239 C57 241 50 243 45 247 C41 251 45 257 51 255 C57 253 63 251 67 249 C62 253 58 258 57 262 C56 268 62 270 67 266 C71 262 75 258 78 256 C84 259 90 258 93 255 Z"/>
+    <clipPath id="zigzag-main-clip"><use href="#zigzag-main"/></clipPath>
+    <path id="zigzag-manche-loin" d="M254 236 C272 238 290 246 300 252 C310 248 320 240 328 232 L338 254 C328 262 316 272 302 276 C286 272 268 266 254 262 Z"/>
+    <clipPath id="zigzag-manche-loin-clip"><use href="#zigzag-manche-loin"/></clipPath>
+    <path id="zigzag-poignet-loin" d="M325 232 C329 228 334 225 339 223 C345 230 349 238 350 246 C346 250 342 253 337 256 C334 247 330 239 325 232 Z"/>
+    <path id="zigzag-poing" d="M342 236 C346 226 360 224 366 232 C372 240 370 252 360 256 C350 260 342 254 340 246 Z"/>
+    <clipPath id="zigzag-poing-clip"><use href="#zigzag-poing"/></clipPath>
+
+    <!-- ===== Tête ===== -->
+    <path id="zigzag-tete" d="M238 54 C290 52 324 88 325 134 C326 162 320 184 306 200 C292 215 270 224 250 222 C220 219 194 202 181 178 C168 154 166 120 176 94 C188 68 210 55 238 54 Z"/>
+    <clipPath id="zigzag-tete-clip"><use href="#zigzag-tete"/></clipPath>
+    <path id="zigzag-oreille" d="M194 140 C186 130 168 131 166 148 C164 166 178 178 195 172 Z"/>
+    <clipPath id="zigzag-oreille-clip"><use href="#zigzag-oreille"/></clipPath>
+    <path id="zigzag-cheveux" d="M192 150 C180 156 166 158 154 154 C144 151 136 146 128 140 C132 152 140 160 150 164 C142 167 132 166 124 162 C132 174 150 180 168 178 C180 176 188 170 194 164 Z"/>
+    <clipPath id="zigzag-cheveux-clip"><use href="#zigzag-cheveux"/></clipPath>
+    <path id="zigzag-frange" d="M210 100 C226 92 252 88 280 90 C296 91 310 95 320 100 C310 100 302 102 294 106 C290 102 282 100 274 102 C266 104 260 108 256 112 C252 106 246 102 238 102 C230 102 224 106 218 112 C216 106 214 102 210 100 Z"/>
+    <path id="zigzag-casque" d="M162 160 C148 128 150 90 171 66 C195 40 238 31 276 41 C306 50 326 72 330 96 C331 100 330 103 327 105 C302 92 268 85 236 89 C214 92 199 104 191 122 C185 140 175 156 162 160 Z"/>
+    <clipPath id="zigzag-casque-clip"><use href="#zigzag-casque"/></clipPath>
+    <ellipse id="zigzag-oeil-g" cx="234" cy="150" rx="21" ry="26"/>
+    <clipPath id="zigzag-oeil-g-clip"><use href="#zigzag-oeil-g"/></clipPath>
+    <ellipse id="zigzag-oeil-d" cx="294" cy="148" rx="15.5" ry="25"/>
+    <clipPath id="zigzag-oeil-d-clip"><use href="#zigzag-oeil-d"/></clipPath>
+    <path id="zigzag-bouche" d="M240 184 C258 192 288 190 308 178 C306 198 294 211 276 212 C257 213 244 202 240 184 Z"/>
+    <clipPath id="zigzag-bouche-clip"><use href="#zigzag-bouche"/></clipPath>
+  </defs>
+
+  <!-- ================= Traits de vitesse (derrière tout) ================= -->
+  <g fill="none" stroke="#1d1a16" stroke-linecap="round">
+    <path d="M62 74 L132 74" stroke-width="4.5"/>
+    <path d="M92 94 L140 94" stroke-width="2.5"/>
+    <path d="M8 262 L30 262" stroke-width="4.5"/>
+    <path d="M6 418 L32 418" stroke-width="4.5"/>
+    <path d="M14 438 L30 438" stroke-width="2.5"/>
+    <path d="M150 414 L200 414" stroke-width="4.5"/>
+    <path d="M166 432 L204 432" stroke-width="2.5"/>
+  </g>
+
+  <!-- Ombres au sol : patin posé, patin levé (plus pâle) -->
+  <ellipse cx="262" cy="477" rx="64" ry="8" fill="#1d1a16" opacity="0.18"/>
+  <ellipse cx="88" cy="478" rx="34" ry="5" fill="#1d1a16" opacity="0.1"/>
+
+  <!-- ================= Écharpe : le grand pan qui flotte loin derrière ================= -->
+  <use href="#zigzag-pan" fill="#ffcc33"/>
+  <g clip-path="url(#zigzag-pan-clip)">
+    <path d="M188 221 C160 219 140 193 118 185 C98 178 76 186 54 173 C38 164 26 146 18 126 L0 126 L0 260 L200 260 Z" fill="#e39528"/>
+    <path d="M188 206 C164 202 146 180 120 171 C96 163 80 173 58 161 C46 154 37 140 31 126 L36 123 C42 137 50 149 60 155 C80 165 96 157 120 164 C146 172 166 194 190 198 Z" fill="#fff3a0"/>
+    <path d="M51 196 L80 143 L89 148 L60 201 Z M19 163 L64 140 L61 133 L16 156 Z" fill="#2bbcb0"/>
+    <g clip-path="url(#zigzag-rayures-clip)">
+      <path d="M188 221 C160 219 140 193 118 185 C98 178 76 186 54 173 C38 164 26 146 18 126 L0 126 L0 260 L200 260 Z" fill="#1c8497"/>
+    </g>
+    <path d="M51 196 L80 143 M89 148 L60 201 M19 163 L64 140 M61 133 L16 156" fill="none" stroke="#1d1a16" stroke-width="2.5"/>
+    <path d="M100 163 C95 172 95 182 101 190" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M150 186 C146 194 146 204 152 212" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <use href="#zigzag-pan" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <!-- franges -->
+  <path d="M25 120 L20 109 M19 123 L13 112 M13 126 L7 116" fill="none" stroke="#1d1a16" stroke-width="8" stroke-linecap="round"/>
+  <path d="M24 117 L20 109 M18 120 L13 112 M12 123 L7 116" fill="none" stroke="#ffcc33" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- ================= Jambe gauche, tendue en arrière ================= -->
+  <use href="#zigzag-jambe-loin" fill="#ffd8bc"/>
+  <g clip-path="url(#zigzag-jambe-loin-clip)">
+    <path d="M190 326 L178 333 L78 400 L60 420 L200 420 Z" fill="#f0a58c"/>
+    <g clip-path="url(#zigzag-chaussette-loin-clip)">
+      <path d="M101 363 L117 387 L60 430 L40 380 Z" fill="#fffaf0"/>
+      <path d="M96 367 L112 390" fill="none" stroke="#2bbcb0" stroke-width="5"/>
+      <path d="M91 370 L106 394" fill="none" stroke="#e8433b" stroke-width="4"/>
+      <path d="M190 326 L178 333 L78 400 L60 420 L200 420 Z" fill="#e2d0c6" opacity="0.8"/>
+    </g>
+  </g>
+  <use href="#zigzag-jambe-loin" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <use href="#zigzag-genouillere" transform="translate(127 369) rotate(56)"/>
+  <!-- patin levé, roues qui tournent dans le vide -->
+  <use href="#zigzag-patin" transform="translate(88 388) rotate(32)"/>
+  <g transform="translate(88 388) rotate(32)" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round">
+    <path d="M-23 42 C-25 50 -22 58 -16 63"/>
+    <path d="M21 53 C22 58 27 62 33 65"/>
+  </g>
+
+  <!-- ================= Bras droit tendu vers l'avant : la lettre à livrer ================= -->
+  <use href="#zigzag-lettre-face" transform="translate(366 212) rotate(-14)"/>
+  <g transform="translate(366 212) rotate(-14)">
+    <rect x="8" y="-10" width="10" height="12" rx="1" fill="#e8433b" stroke="#1d1a16" stroke-width="2"/>
+    <path d="M10.5 -7 L15.5 -7 L15.5 -1 L10.5 -1 Z" fill="#ff8d6a"/>
+    <circle cx="6" cy="-4" r="6.5" fill="none" stroke="#1d1a16" stroke-width="1.8"/>
+  </g>
+  <use href="#zigzag-manche-loin" fill="#2bbcb0"/>
+  <g clip-path="url(#zigzag-manche-loin-clip)">
+    <path d="M250 252 C276 258 300 266 340 246 L340 290 L250 290 Z" fill="#1c8497"/>
+    <path d="M256 242 C276 244 290 250 300 256 C310 252 318 246 326 240 L328 246 C318 252 310 258 300 262 C290 256 276 250 256 248 Z" fill="#ffcc33"/>
+    <path d="M256 242 C276 244 290 250 300 256 C310 252 318 246 326 240 M328 246 C318 252 310 258 300 262 C290 256 276 250 256 248" fill="none" stroke="#1d1a16" stroke-width="2"/>
+  </g>
+  <use href="#zigzag-manche-loin" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M300 264 C303 268 304 272 302 276" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+  <use href="#zigzag-poing" fill="#ffd8bc"/>
+  <g clip-path="url(#zigzag-poing-clip)">
+    <path d="M338 250 C350 256 362 254 374 244 L374 264 L338 264 Z" fill="#f0a58c"/>
+  </g>
+  <use href="#zigzag-poing" fill="none" stroke="#1d1a16" stroke-width="5.5" stroke-linejoin="round"/>
+  <path d="M362 236 C358 239 358 244 362 247 M364 247 C360 250 360 254 362 256" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M346 230 C348 222 356 218 362 220 C366 224 363 230 357 232 Z" fill="#ffd8bc" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <use href="#zigzag-poignet-loin" fill="#1f7c8c" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M331 232 L339 228 M335 240 L344 236 M337 248 L346 245" fill="none" stroke="#165e78" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- ================= Poussière derrière la roue ================= -->
+  <use href="#zigzag-poussiere" fill="#efe2cc"/>
+  <g clip-path="url(#zigzag-poussiere-clip)">
+    <path d="M150 472 C182 476 214 474 242 462 L242 482 L150 482 Z" fill="#d2bea2"/>
+    <path d="M178 455 C182 451 188 450 192 452 M203 450 C208 448 214 449 217 453" fill="none" stroke="#fffaf0" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <use href="#zigzag-poussiere" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <circle cx="146" cy="470" r="6.5" fill="#efe2cc" stroke="#1d1a16" stroke-width="3.5"/>
+  <circle cx="132" cy="463" r="4" fill="#efe2cc" stroke="#1d1a16" stroke-width="2.5"/>
+  <circle cx="123" cy="472" r="2.5" fill="#1d1a16"/>
+
+  <!-- ================= Jambe droite, pliée, patin au sol ================= -->
+  <use href="#zigzag-jambe" fill="#ffd8bc"/>
+  <g clip-path="url(#zigzag-jambe-clip)">
+    <path d="M196 336 L282 386 L282 420 L196 420 Z" fill="#f0a58c"/>
+    <g clip-path="url(#zigzag-chaussette-clip)">
+      <rect x="236" y="390" width="68" height="54" fill="#fffaf0"/>
+      <path d="M279 382 L304 382 L284 440 L259 432 Z" fill="#e2d0c6"/>
+      <path d="M248 398 L284 413" fill="none" stroke="#2bbcb0" stroke-width="5"/>
+      <path d="M246 405 L282 420" fill="none" stroke="#e8433b" stroke-width="4"/>
+    </g>
+  </g>
+  <use href="#zigzag-jambe" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <use href="#zigzag-patin" transform="translate(256 419)"/>
+  <use href="#zigzag-genouillere" transform="translate(283 380) rotate(12)"/>
+
+  <!-- ================= Short indigo, revers roulés ================= -->
+  <use href="#zigzag-short" fill="#424d92"/>
+  <g clip-path="url(#zigzag-short-clip)">
+    <path d="M140 300 C180 312 226 324 266 324 L266 334 C226 336 180 324 140 312 Z" fill="#1f2250"/>
+    <path d="M204 344 C226 352 248 344 270 330 L270 380 L200 380 Z" fill="#2b316b"/>
+    <path d="M150 352 C172 360 192 358 212 352 L212 380 L140 380 Z" fill="#2b316b"/>
+    <path d="M144 316 C143 326 145 336 150 346" fill="none" stroke="#6e7cc0" stroke-width="3" stroke-linecap="round"/>
+    <path d="M262 340 C256 356 246 368 236 378 L228 370 C238 362 246 350 252 336 Z" fill="#6e7cc0"/>
+    <path d="M161 363 C156 355 148 342 140 331 L146 327 C153 338 160 350 167 359 Z" fill="#6e7cc0"/>
+  </g>
+  <use href="#zigzag-short" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M252 337 C246 350 238 362 229 370 M146 327 C153 338 160 350 167 359" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M210 354 C211 346 213 338 216 330" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- ================= Cou, veste turquoise barrée de l'éclair ================= -->
+  <use href="#zigzag-cou" fill="#ffd8bc"/>
+  <g clip-path="url(#zigzag-cou-clip)">
+    <path d="M216 196 C232 212 252 214 262 206 L262 240 L216 240 Z" fill="#d47e74"/>
+  </g>
+  <use href="#zigzag-cou" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <use href="#zigzag-veste" fill="#2bbcb0"/>
+  <g clip-path="url(#zigzag-veste-clip)">
+    <!-- liseré de lumière côté dos -->
+    <path d="M150 256 C142 276 134 296 124 314 L136 314 C144 294 152 276 160 258 Z" fill="#8de9d3"/>
+    <!-- ombre propre, côté avant -->
+    <path d="M256 230 C268 258 266 292 242 326 L300 340 L300 230 Z" fill="#1c8497"/>
+    <!-- l'éclair en zigzag -->
+    <use href="#zigzag-eclair" fill="#ffcc33"/>
+    <g clip-path="url(#zigzag-eclair-clip)">
+      <path d="M256 230 C268 258 266 292 242 326 L300 340 L300 230 Z" fill="#e39528"/>
+      <path d="M124 274 L178 266 M174 284 L234 276 M232 294 L288 284" fill="none" stroke="#fff3a0" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <use href="#zigzag-eclair" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <!-- occlusions : sous l'écharpe, sous le bras -->
+    <path d="M176 242 C210 234 254 238 286 250 L288 262 C254 250 212 248 178 254 Z" fill="#165e78"/>
+    <path d="M146 262 C170 260 190 262 210 264 L210 274 C190 272 168 274 146 278 Z" fill="#165e78"/>
+    <!-- bord-côte -->
+    <path d="M112 304 L120 307 C130 303 138 301 144 301 C160 308 178 316 196 320 C214 324 240 324 264 318 L274 350 L112 350 Z" fill="#1f7c8c"/>
+    <path d="M120 307 C130 303 138 301 144 301 C160 308 178 316 196 320 C214 324 240 324 264 318" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M134 306 L132 316 M150 309 L148 320 M166 315 L164 326 M184 320 L183 330 M202 323 L201 333 M220 325 L220 335 M238 325 L239 334 M254 322 L256 331" fill="none" stroke="#165e78" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- pli -->
+    <path d="M198 303 C202 308 203 313 201 318" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <use href="#zigzag-veste" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+  <!-- bandoulière de cuir, surpiqûre, boucle -->
+  <use href="#zigzag-sangle" fill="#c88649" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M267 243 C237 260 200 280 168 297" fill="none" stroke="#f6d7a7" stroke-width="2" stroke-dasharray="4 4"/>
+  <g transform="translate(226 265) rotate(-28)">
+    <rect x="-8" y="-10" width="16" height="20" rx="3" fill="none" stroke="#1d1a16" stroke-width="7"/>
+    <rect x="-8" y="-10" width="16" height="20" rx="3" fill="none" stroke="#ffcc33" stroke-width="3"/>
+    <path d="M0 -8 L0 8" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- ================= Sacoche de coursier, rabat soufflé, lettres qui s'échappent ================= -->
+  <use href="#zigzag-rabat" fill="#a86a3c"/>
+  <g clip-path="url(#zigzag-rabat-clip)">
+    <path d="M70 300 C84 306 98 306 112 298 L112 320 L70 320 Z" fill="#683127"/>
+    <path d="M84 287 C80 292 78 298 78 304" fill="none" stroke="#edb97c" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <use href="#zigzag-rabat" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M80 306 L72 318" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linecap="round"/>
+  <path d="M80 306 L72 318" fill="none" stroke="#8f4f34" stroke-width="3" stroke-linecap="round"/>
+  <path d="M106 302 C124 288 154 284 172 292 C172 297 170 300 167 300 C150 296 126 298 110 306 Z" fill="#3a1f1a" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <use href="#zigzag-lettre-dos" transform="translate(128 288) rotate(-30) scale(0.85)"/>
+  <use href="#zigzag-sac" fill="#c88649"/>
+  <g clip-path="url(#zigzag-sac-clip)">
+    <path d="M100 330 C130 338 160 334 180 320 L180 352 L100 352 Z" fill="#8f4f34"/>
+    <path d="M108 310 C108 322 110 332 114 340 L119 339 C116 330 114 320 114 310 Z" fill="#edb97c"/>
+  </g>
+  <use href="#zigzag-sac" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M115 306 C132 300 154 298 164 301 C167 314 167 326 164 335 C150 341 128 343 117 338 C113 328 112 316 115 306 Z" fill="none" stroke="#f6d7a7" stroke-width="2" stroke-dasharray="4 3.5"/>
+  <!-- écusson vert (peu commun) -->
+  <circle cx="148" cy="320" r="8.5" fill="#6fcf74" stroke="#1d1a16" stroke-width="2.5"/>
+  <path d="M146 313 L152 313 L149 318 L154 318 L145 327 L147 321 L143 321 Z" fill="#fffaf0" stroke="#1d1a16" stroke-width="1.5" stroke-linejoin="round"/>
+  <circle cx="168" cy="297" r="5" fill="none" stroke="#1d1a16" stroke-width="6.5"/>
+  <circle cx="168" cy="297" r="5" fill="none" stroke="#e39528" stroke-width="2.5"/>
+
+  <!-- ================= Bras gauche lancé en arrière, main ouverte ================= -->
+  <use href="#zigzag-main" fill="#ffd8bc"/>
+  <g clip-path="url(#zigzag-main-clip)">
+    <path d="M40 250 C56 252 70 256 96 250 L96 280 L40 280 Z" fill="#f0a58c"/>
+    <path d="M82 222 C84 216 80 212 75 212" fill="none" stroke="#fff2e4" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <use href="#zigzag-main" fill="none" stroke="#1d1a16" stroke-width="5.5" stroke-linejoin="round"/>
+  <use href="#zigzag-manche" fill="#2bbcb0"/>
+  <g clip-path="url(#zigzag-manche-clip)">
+    <path d="M214 250 C190 248 160 250 140 254 C124 256 110 252 98 248 L98 270 L214 270 Z" fill="#1c8497"/>
+    <path d="M212 238 C186 236 162 238 141 243 C126 246 114 245 101 242 L101 248 C114 251 127 252 142 249 C164 245 188 244 212 245 Z" fill="#ffcc33"/>
+    <path d="M212 238 C186 236 162 238 141 243 C126 246 114 245 101 242 M101 248 C114 251 127 252 142 249 C164 245 188 244 212 245" fill="none" stroke="#1d1a16" stroke-width="2"/>
+    <path d="M200 230 C184 228 162 230 142 234 C160 233 182 233 198 236 Z" fill="#8de9d3"/>
+  </g>
+  <use href="#zigzag-manche" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M146 262 C140 258 134 257 128 259 M140 235 C136 239 131 241 125 241" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+  <use href="#zigzag-poignet" fill="#1f7c8c" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M100 236 L101 254 M95 236 L96 254" fill="none" stroke="#165e78" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- ================= Tour de cou de l'écharpe ================= -->
+  <use href="#zigzag-col" fill="#ffcc33"/>
+  <g clip-path="url(#zigzag-col-clip)">
+    <path d="M170 236 C200 228 250 230 296 242 L296 260 L170 260 Z" fill="#e39528"/>
+    <path d="M228 200 C240 212 262 220 296 222 L296 200 Z" fill="#b7651d"/>
+    <path d="M186 214 C200 206 222 204 240 206 C222 210 202 214 190 222 Z" fill="#fff3a0"/>
+  </g>
+  <use href="#zigzag-col" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M206 214 C214 222 216 230 214 238 M246 216 C252 224 254 232 252 240" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- ================= Tête ================= -->
+  <!-- mèches de la nuque, soufflées par le vent -->
+  <use href="#zigzag-cheveux" fill="#a65a2e"/>
+  <g clip-path="url(#zigzag-cheveux-clip)">
+    <path d="M118 166 C140 174 166 178 198 168 L198 200 L110 200 Z" fill="#6f2f24"/>
+    <path d="M136 148 C146 154 158 156 172 154" fill="none" stroke="#d98d52" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#zigzag-cheveux" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <use href="#zigzag-tete" fill="#ffd8bc"/>
+  <g clip-path="url(#zigzag-tete-clip)">
+    <!-- ombre propre côté avant, occlusion sous le casque -->
+    <path d="M330 100 L330 232 L222 232 C248 224 276 216 293 202 C309 188 313 168 313 146 C313 128 317 114 330 100 Z" fill="#f0a58c"/>
+    <path d="M327 105 C302 92 268 85 236 89 C214 92 199 104 191 122 C185 140 175 156 162 160" fill="none" stroke="#d47e74" stroke-width="16"/>
+    <path d="M196 178 C198 168 204 163 211 163 C206 169 204 176 204 184 Z" fill="#fff2e4"/>
+    <ellipse cx="210" cy="181" rx="15" ry="8.5" fill="#ff8f8f" opacity="0.55"/>
+    <ellipse cx="317" cy="173" rx="8" ry="6" fill="#ff8f8f" opacity="0.55"/>
+  </g>
+  <use href="#zigzag-tete" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+  <use href="#zigzag-oreille" fill="#ffd8bc"/>
+  <g clip-path="url(#zigzag-oreille-clip)">
+    <path d="M194 136 C182 140 176 150 178 162 C180 170 186 174 196 172 Z" fill="#f0a58c"/>
+  </g>
+  <use href="#zigzag-oreille" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M186 146 C178 147 176 156 181 162" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- jugulaire -->
+  <path d="M190 124 C191 154 198 186 218 216" fill="none" stroke="#1d1a16" stroke-width="9" stroke-linecap="round"/>
+  <path d="M190 124 C191 154 198 186 218 216" fill="none" stroke="#2d3561" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- frange qui dépasse du casque -->
+  <use href="#zigzag-frange" fill="#a65a2e" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- casque rouge brillant -->
+  <use href="#zigzag-casque" fill="#e8433b"/>
+  <g clip-path="url(#zigzag-casque-clip)">
+    <path d="M286 36 C312 54 320 82 300 96 L345 110 L345 30 Z" fill="#b3223e"/>
+    <path d="M327 105 C302 92 268 85 236 89 C214 92 199 104 191 122 C185 140 175 156 162 160 L158 151 C170 147 180 132 186 116 C194 98 210 85 234 81 C266 77 300 83 330 95 Z" fill="#7d1736"/>
+    <path d="M178 86 C186 64 206 48 230 43 C210 54 196 68 188 92 Z" fill="#ff8d6a"/>
+    <path d="M192 74 C198 64 208 56 218 52 C211 60 205 68 200 78 Z" fill="#ffffff"/>
+    <circle cx="232" cy="46" r="3" fill="#ffffff"/>
+    <path d="M322 64 C326 72 328 80 328 88" fill="none" stroke="#ff8d6a" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#zigzag-casque" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M330 95 C300 83 266 77 234 81 C210 85 194 98 186 116 C180 132 170 147 158 151" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+  <!-- aérations -->
+  <path d="M244 44 C250 40 260 40 264 44 C260 48 250 48 244 44 Z M272 52 C278 50 286 52 290 57 C284 59 276 57 272 52 Z M294 68 C300 68 306 72 308 78 C302 78 296 74 294 68 Z" fill="#7d1736" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- pansement en croix : il ne freine jamais -->
+  <g transform="translate(178 104) rotate(-38)">
+    <rect x="-13" y="-4.5" width="26" height="9" rx="4.5" fill="#ffd9a8" stroke="#1d1a16" stroke-width="2.5"/>
+  </g>
+  <g transform="translate(178 104) rotate(38)">
+    <rect x="-13" y="-4.5" width="26" height="9" rx="4.5" fill="#ffd9a8" stroke="#1d1a16" stroke-width="2.5"/>
+    <rect x="-4" y="-4.5" width="8" height="9" fill="#f2b98a" stroke="#1d1a16" stroke-width="2"/>
+  </g>
+
+  <!-- yeux grands ouverts, grisés par la vitesse -->
+  <use href="#zigzag-oeil-g" fill="#fffaf0"/>
+  <g clip-path="url(#zigzag-oeil-g-clip)">
+    <path d="M210 118 C222 132 248 132 258 118 Z" fill="#e2d0c6"/>
+    <ellipse cx="242" cy="154" rx="13.5" ry="17.5" fill="#2f9fc0" stroke="#17507a" stroke-width="2"/>
+    <ellipse cx="242" cy="160" rx="12.8" ry="11.5" fill="#1d6a95"/>
+    <ellipse cx="243.5" cy="155" rx="7" ry="9.5" fill="#1d1a16"/>
+    <circle cx="237" cy="145" r="5.5" fill="#ffffff"/>
+    <circle cx="249" cy="164" r="2.5" fill="#ffffff"/>
+  </g>
+  <use href="#zigzag-oeil-g" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+  <path d="M214 141 C216 130 224 124 234 124 C240 124 245 126 248 130" fill="none" stroke="#1d1a16" stroke-width="6.5" stroke-linecap="round"/>
+
+  <use href="#zigzag-oeil-d" fill="#fffaf0"/>
+  <g clip-path="url(#zigzag-oeil-d-clip)">
+    <path d="M276 116 C286 128 304 128 312 116 Z" fill="#e2d0c6"/>
+    <ellipse cx="299" cy="152" rx="10.5" ry="16.5" fill="#2f9fc0" stroke="#17507a" stroke-width="2"/>
+    <ellipse cx="299" cy="158" rx="10" ry="11" fill="#1d6a95"/>
+    <ellipse cx="300.5" cy="153" rx="5.8" ry="8.5" fill="#1d1a16"/>
+    <circle cx="295" cy="143" r="4.5" fill="#ffffff"/>
+    <circle cx="304" cy="162" r="2.2" fill="#ffffff"/>
+  </g>
+  <use href="#zigzag-oeil-d" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+  <path d="M279 138 C281 128 287 123 294 123 C299 123 302 125 305 129" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- sourcils haut levés -->
+  <path d="M212 116 C220 106 236 102 252 108" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linecap="round"/>
+  <path d="M283 106 C292 100 304 100 313 106" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- nez -->
+  <path d="M277 161 C285 164 288 172 281 176" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+  <circle cx="278" cy="166" r="2.2" fill="#fff2e4"/>
+
+  <!-- grand sourire grisé -->
+  <use href="#zigzag-bouche" fill="#6e2430"/>
+  <g clip-path="url(#zigzag-bouche-clip)">
+    <path d="M236 180 C258 190 290 188 312 174 L312 194 C290 204 258 206 236 198 Z" fill="#fffaf0"/>
+    <path d="M250 216 C254 202 276 196 296 202 C302 210 292 220 270 220 Z" fill="#ff8d9e"/>
+    <path d="M264 207 C271 204 280 204 287 207" fill="none" stroke="#e0607a" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <use href="#zigzag-bouche" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M237 180 C234 184 234 189 237 192 M310 175 C313 178 313 182 311 185" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- ================= Lettres qui s'envolent ================= -->
+  <use href="#zigzag-lettre-face" transform="translate(52 314) rotate(16) scale(0.9)"/>
+  <g transform="translate(52 314) rotate(16) scale(0.9)">
+    <rect x="8" y="-10" width="10" height="12" rx="1" fill="#6fcf74" stroke="#1d1a16" stroke-width="2"/>
+    <path d="M10.5 -7 L15.5 -7 L15.5 -1 L10.5 -1 Z" fill="#c0f2b0"/>
+  </g>
+  <use href="#zigzag-lettre-dos" transform="translate(26 356) rotate(-20) scale(0.72)"/>
+  <path d="M78 296 C82 298 84 302 84 306 M48 342 C52 344 54 348 54 352" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

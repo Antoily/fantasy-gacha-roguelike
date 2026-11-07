@@ -1,0 +1,523 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <!-- Mirette (Commun) : marchande de bonbons qui croque en douce dans sa sucette géante.
+       Construction de docs/art/charte.md : aplat, ombre et lumières découpées par la forme,
+       contour encre par-dessus, traits intérieurs. Lumière unique en haut à gauche.
+       Ombre des petits volumes : la forme remplie d'ombre puis recouverte par sa copie
+       décalée vers la lumière, d'où un croissant net du côté opposé. -->
+  <defs>
+    <radialGradient id="mirette-peau-volume" cx="0.34" cy="0.3" r="0.8">
+      <stop offset="0" stop-color="#cd8f61"/>
+      <stop offset="1" stop-color="#b9784f"/>
+    </radialGradient>
+
+    <!-- Sucette géante : disque croqué, l'encoche des dents tournée vers sa joue. -->
+    <path id="mirette-sucette" d="M90 120A78 78 0 0 1 165.7 179.1A8 8 0 0 0 153 186A8 8 0 0 0 147 199A8 8 0 0 0 151 214A10 10 0 0 0 162.3 227.2A78 78 0 1 1 90 120Z"/>
+    <clipPath id="mirette-sucette-clip"><use href="#mirette-sucette"/></clipPath>
+    <clipPath id="mirette-sucette-ombre-clip"><path clip-rule="evenodd" d="M-10 100H190V300H-10ZM2 186A76 76 0 1 0 154 186A76 76 0 1 0 2 186Z"/></clipPath>
+    <path id="mirette-spirale" d="M84.5 198A11 11 0 0 1 106.5 198A22 22 0 0 1 62.5 198A33 33 0 0 1 128.5 198A44 44 0 0 1 40.5 198A55 55 0 0 1 150.5 198A66 66 0 0 1 18.5 198A77 77 0 0 1 172.5 198A88 88 0 0 1 -3.5 198"/>
+    <path id="mirette-encoche" d="M165.7 179.1A8 8 0 0 0 153 186A8 8 0 0 0 147 199A8 8 0 0 0 151 214A10 10 0 0 0 162.3 227.2"/>
+    <path id="mirette-baton" d="M128.8 253.2L170.8 325.2A5.5 5.5 0 0 1 161.3 330.8L119.3 258.8Z"/>
+    <clipPath id="mirette-baton-clip"><use href="#mirette-baton"/></clipPath>
+
+    <!-- Bras du fond et poing qui tient la sucette. -->
+    <path id="mirette-bras-g" d="M206 296C206 308 204 320 198 326C192 331 182 326 176 322C172 319 168 316 164 313L158 296C166 299 176 304 184 306C186 302 187 298 188 294Z"/>
+    <clipPath id="mirette-bras-g-clip"><use href="#mirette-bras-g"/></clipPath>
+    <path id="mirette-poing" d="M136 296C136 286 148 281 157 285C165 289 167 301 163 309C159 317 147 319 140 313C136 309 135 302 136 296Z"/>
+    <clipPath id="mirette-poing-clip"><use href="#mirette-poing"/></clipPath>
+
+    <!-- Corps : cou, robe menthe, manches ballon, col claudine, sangle du plateau. -->
+    <path id="mirette-cou" d="M232 226C232 240 233 252 231 264L259 264C257 252 257 240 258 226Z"/>
+    <clipPath id="mirette-cou-clip"><use href="#mirette-cou"/></clipPath>
+    <path id="mirette-buste" d="M226 256C210 258 198 266 196 282C194 298 196 314 200 332L298 332C302 314 304 298 302 282C298 266 286 258 270 256Z"/>
+    <clipPath id="mirette-buste-clip"><use href="#mirette-buste"/></clipPath>
+    <path id="mirette-manche-g" d="M208 262C192 258 180 270 181 287C182 300 196 307 209 302C220 297 223 273 208 262Z"/>
+    <clipPath id="mirette-manche-g-clip"><use href="#mirette-manche-g"/></clipPath>
+    <path id="mirette-manche-d" d="M288 262C304 257 318 268 318 285C318 299 305 306 292 301C281 296 276 270 288 262Z"/>
+    <clipPath id="mirette-manche-d-clip"><use href="#mirette-manche-d"/></clipPath>
+    <path id="mirette-col-g" d="M240 258C228 254 212 258 206 266C202 276 220 286 240 278Z"/>
+    <path id="mirette-col-d" d="M240 258C254 254 274 256 280 264C284 276 264 286 240 278Z"/>
+    <clipPath id="mirette-col-clip"><use href="#mirette-col-g"/><use href="#mirette-col-d"/></clipPath>
+    <path id="mirette-sangle" d="M290.6 255C296 252 302 253 305 257L295.4 265L188.4 317.5L183.6 307.5Z"/>
+    <clipPath id="mirette-sangle-clip"><use href="#mirette-sangle"/></clipPath>
+    <path id="mirette-bras-d" d="M296 290C308 289 322 295 330 303C336 309 340 315 342 322L328 328C324 320 318 315 310 313C302 311 294 309 290 304Z"/>
+    <clipPath id="mirette-bras-d-clip"><use href="#mirette-bras-d"/></clipPath>
+    <path id="mirette-main-d" d="M328 307C336 301 350 303 354 313C358 323 352 335 342 336C332 337 325 329 326 318Z"/>
+    <clipPath id="mirette-main-d-clip"><use href="#mirette-main-d"/></clipPath>
+
+    <!-- Plateau de vendeuse : creux, bord sucre d'orge, façade, flanc. -->
+    <path id="mirette-plateau-creux" d="M162 315L170 300L350 300L342 315Z"/>
+    <rect id="mirette-plateau-bord" x="154" y="315" width="188" height="14" rx="4"/>
+    <clipPath id="mirette-plateau-bord-clip"><use href="#mirette-plateau-bord"/></clipPath>
+    <path id="mirette-plateau-face" d="M158 329L338 329L335 366C335 369 333 371 330 371L166 371C163 371 161 369 161 366Z"/>
+    <clipPath id="mirette-plateau-face-clip"><use href="#mirette-plateau-face"/></clipPath>
+    <path id="mirette-plateau-cote" d="M342 316L350 302L350 352L336 371L338 329L342 329Z"/>
+
+    <!-- Bas : jupon, robe, tablier rayé, poche, jambes, chaussettes, babies. -->
+    <path id="mirette-jupe" d="M202 352C198 370 192 388 184 404C192 410 202 406 210 410C218 414 226 408 234 412C242 416 250 410 258 413C266 416 274 410 282 412C290 414 298 408 306 410C312 410 316 406 314 402C308 386 302 368 298 352Z"/>
+    <clipPath id="mirette-jupe-clip"><use href="#mirette-jupe"/></clipPath>
+    <path id="mirette-tablier" d="M212 352C208 368 204 384 201 396C212 400 222 398 230 401C240 404 250 400 258 402C268 404 278 400 286 401C292 401 296 398 297 394C294 380 292 366 290 352Z"/>
+    <clipPath id="mirette-tablier-clip"><use href="#mirette-tablier"/></clipPath>
+    <path id="mirette-poche" d="M262 368L286 365C287 372 287 380 285 386C279 391 267 391 263 386C261 380 261 374 262 368Z"/>
+    <clipPath id="mirette-poche-clip"><use href="#mirette-poche"/></clipPath>
+    <path id="mirette-jambe-g" d="M214 392C213 412 215 432 217 452L239 452C240 432 242 412 244 392Z"/>
+    <clipPath id="mirette-jambe-g-clip"><use href="#mirette-jambe-g"/></clipPath>
+    <path id="mirette-jambe-d" d="M262 392C262 410 266 426 274 436C282 446 296 444 306 434C312 428 318 422 324 418L314 404C308 410 302 416 296 420C290 424 286 420 288 412C290 404 292 398 292 392Z"/>
+    <clipPath id="mirette-jambe-d-clip"><use href="#mirette-jambe-d"/></clipPath>
+    <path id="mirette-chaussure-g" d="M242 456C249 462 249 474 240 478L204 478C193 478 189 469 196 463C203 457 216 455 230 455C236 455 240 455 242 456Z"/>
+    <clipPath id="mirette-chaussure-g-clip"><use href="#mirette-chaussure-g"/></clipPath>
+    <path id="mirette-chaussure-d" d="M316 400C322 391 339 389 349 394C358 399 358 411 350 416C342 421 327 422 319 418C312 414 311 406 316 400Z"/>
+    <clipPath id="mirette-chaussure-d-clip"><use href="#mirette-chaussure-d"/></clipPath>
+
+    <!-- Tête : chignons, mèche, visage, œil ouvert, bouche, frange. -->
+    <circle id="mirette-chignon-g" cx="190" cy="70" r="33"/>
+    <clipPath id="mirette-chignon-g-clip"><use href="#mirette-chignon-g"/></clipPath>
+    <circle id="mirette-chignon-d" cx="308" cy="64" r="36"/>
+    <clipPath id="mirette-chignon-d-clip"><use href="#mirette-chignon-d"/></clipPath>
+    <path id="mirette-meche" d="M318 100C336 120 346 152 344 186C342 206 334 220 320 224C328 210 330 196 326 180C322 160 316 140 306 124Z"/>
+    <clipPath id="mirette-meche-clip"><use href="#mirette-meche"/></clipPath>
+    <path id="mirette-visage" d="M178 118C170 136 168 156 170 172C160 186 158 210 172 226C186 240 208 248 230 246C254 245 282 234 302 218C320 203 330 182 330 160C330 128 318 98 296 84C276 72 254 68 238 68C214 68 192 88 178 118Z"/>
+    <clipPath id="mirette-visage-clip"><use href="#mirette-visage"/></clipPath>
+    <ellipse id="mirette-oeil" cx="274" cy="180" rx="21" ry="25.5"/>
+    <clipPath id="mirette-oeil-clip"><use href="#mirette-oeil"/></clipPath>
+    <ellipse id="mirette-iris" cx="281" cy="185" rx="15" ry="19.5"/>
+    <clipPath id="mirette-iris-clip"><use href="#mirette-iris"/></clipPath>
+    <path id="mirette-bouche" d="M225 222C236 226 252 224 265 214C266 228 256 238 244 238C234 238 228 232 225 222Z"/>
+    <clipPath id="mirette-bouche-clip"><use href="#mirette-bouche"/></clipPath>
+    <path id="mirette-frange" d="M170 164C158 140 156 110 172 88C188 64 216 50 244 50C278 50 310 62 328 88C344 110 346 142 336 166C334 150 330 134 322 122C322 132 314 138 306 138C302 130 298 118 296 108C296 122 288 128 278 128C272 120 268 112 266 104C266 118 256 126 246 126C240 118 238 110 236 102C236 118 224 128 212 130C208 122 206 114 206 106C204 126 194 140 184 144C182 150 176 156 170 164Z"/>
+    <clipPath id="mirette-frange-clip"><use href="#mirette-frange"/></clipPath>
+    <path id="mirette-ruban-g" d="M158 96C168 74 188 58 212 47L217 57C195 67 179 81 169 101Z"/>
+    <path id="mirette-ruban-d" d="M274 44C300 42 326 56 341 80L331 91C318 70 298 58 273 55Z"/>
+    <clipPath id="mirette-rubans-clip"><use href="#mirette-ruban-g"/><use href="#mirette-ruban-d"/></clipPath>
+  </defs>
+
+  <g transform="translate(12 0)">
+    <!-- Ombre portée et papiers de bonbons déjà mangés, au sol. -->
+    <ellipse cx="238" cy="476" rx="70" ry="9" fill="#1d1a16" opacity="0.18"/>
+    <ellipse cx="150" cy="476" rx="20" ry="3.5" fill="#1d1a16" opacity="0.14"/>
+    <ellipse cx="318" cy="482" rx="20" ry="3.5" fill="#1d1a16" opacity="0.14"/>
+    <g stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M145 468L134 461C132 466 132 472 135 477Z" fill="#ff8fbb"/>
+      <path d="M157 467L168 462C170 467 170 473 167 477Z" fill="#da5d9e"/>
+      <path d="M144 467C146 462 156 462 158 466C160 471 154 475 148 474C143 473 142 470 144 467Z" fill="#ff8fbb"/>
+      <path d="M311 473L300 467C298 472 298 477 301 481Z" fill="#7edcc2"/>
+      <path d="M323 472L334 468C336 473 336 478 333 482Z" fill="#46a9a6"/>
+      <path d="M310 472C312 467 322 467 324 471C326 476 320 480 314 479C309 478 308 475 310 472Z" fill="#7edcc2"/>
+    </g>
+    <g fill="none" stroke="#1d1a16" stroke-width="1.5" stroke-linecap="round">
+      <path d="M137 466L143 468M137 472L143 470M162 466L157 469M163 472L157 471M147 467C150 466 153 468 154 470"/>
+      <path d="M303 472L309 474M303 477L309 476M329 472L323 474M330 477L324 476"/>
+    </g>
+    <path d="M147 465C149 464 152 464 154 465M313 470C315 469 318 469 320 470" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- Jambe levée (talon en l'air, derrière la jupe). -->
+    <g clip-path="url(#mirette-jambe-d-clip)">
+      <use href="#mirette-jambe-d" fill="#8c4f48"/>
+      <use href="#mirette-jambe-d" transform="translate(-5 -5)" fill="#b9784f"/>
+      <path d="M258 388L296 388L296 402C282 406 270 404 258 400Z" fill="#6b3445"/>
+      <path d="M268 408C268 420 272 430 278 436" fill="none" stroke="#d49867" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
+    <use href="#mirette-jambe-d" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M318 396C326 386 344 385 354 391C358 393 359 397 357 399C346 393 330 393 320 401Z" fill="#a3306b" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+    <g clip-path="url(#mirette-chaussure-d-clip)">
+      <use href="#mirette-chaussure-d" fill="#a3306b"/>
+      <use href="#mirette-chaussure-d" transform="translate(-4 -5)" fill="#d64b88"/>
+      <path d="M326 398C334 394 344 394 350 398" fill="none" stroke="#f282b3" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="343" cy="399" r="2" fill="#ffffff"/>
+    </g>
+    <use href="#mirette-chaussure-d" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M306 425C310 418 314 410 318 404C322 406 328 414 330 420C324 426 318 432 314 436C312 432 310 428 306 425Z" fill="#fffaf0" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M313 414C316 418 318 422 320 428" fill="none" stroke="#ecd0df" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Jambe d'appui, socquette à volant, babies framboise. -->
+    <g clip-path="url(#mirette-jambe-g-clip)">
+      <use href="#mirette-jambe-g" fill="#8c4f48"/>
+      <use href="#mirette-jambe-g" transform="translate(-6 0)" fill="#b9784f"/>
+      <path d="M208 388L250 388L250 404C238 408 222 408 208 404Z" fill="#6b3445"/>
+      <path d="M220 410C219 422 220 432 221 442" fill="none" stroke="#d49867" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
+    <use href="#mirette-jambe-g" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+    <g clip-path="url(#mirette-chaussure-g-clip)">
+      <use href="#mirette-chaussure-g" fill="#a3306b"/>
+      <use href="#mirette-chaussure-g" transform="translate(-4 -4)" fill="#d64b88"/>
+      <path d="M200 466C204 462 210 460 216 460" fill="none" stroke="#f282b3" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="203" cy="468" r="2.2" fill="#ffffff"/>
+    </g>
+    <use href="#mirette-chaussure-g" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M213 440C217 436 221 444 225 440C229 436 233 444 237 440C241 436 245 442 243 446L241 461L215 461L213 446C211 444 211 442 213 440Z" fill="#fffaf0" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M234 448L234 459" fill="none" stroke="#ecd0df" stroke-width="4" stroke-linecap="round"/>
+    <path d="M216 460C224 457 234 457 243 459" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="236" cy="459" r="2.6" fill="#fffaf0" stroke="#1d1a16" stroke-width="1.5"/>
+
+    <!-- Jupon de dentelle, robe menthe, tablier rayé rose et blanc. -->
+    <path d="M188 400L312 398L314 410C308 416 302 410 296 415C290 420 284 412 278 417C272 422 266 414 258 418C252 422 246 414 238 418C232 422 226 414 218 418C212 422 206 414 198 417C192 418 186 414 188 400Z" fill="#fffaf0" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <g fill="#ecd0df">
+      <circle cx="207" cy="411" r="1.8"/><circle cx="227" cy="412" r="1.8"/><circle cx="247" cy="412" r="1.8"/><circle cx="267" cy="411" r="1.8"/><circle cx="287" cy="410" r="1.8"/>
+    </g>
+    <g clip-path="url(#mirette-jupe-clip)">
+      <use href="#mirette-jupe" fill="#7edcc2"/>
+      <path d="M290 350C296 372 302 392 308 412L320 412L320 350Z" fill="#46a9a6"/>
+      <path d="M182 404C196 406 232 412 260 412C282 412 302 408 316 404L316 420L182 420Z" fill="#46a9a6"/>
+      <path d="M196 380C194 388 192 396 189 402" fill="none" stroke="#c7f5dc" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
+    <use href="#mirette-jupe" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+    <g clip-path="url(#mirette-tablier-clip)">
+      <use href="#mirette-tablier" fill="#fffaf0"/>
+      <path d="M214 350L220 350L210.5 404L203 404ZM226 350L232 350L225.5 404L218 404ZM238 350L244 350L240.5 404L233 404ZM250 350L256 350L255.5 404L248 404ZM262 350L268 350L270.5 404L263 404ZM274 350L280 350L285.5 404L278 404ZM286 350L292 350L300.5 404L293 404Z" fill="#ff8fbb"/>
+      <path d="M282 350C286 368 290 384 292 400L304 400L304 350Z" fill="#da5d9e" opacity="0.55"/>
+      <path d="M200 394C214 398 226 398 232 400C242 404 252 400 260 402C270 404 280 400 288 401C292 401 296 398 298 394L298 406L200 406Z" fill="#e8b4cf"/>
+    </g>
+    <use href="#mirette-tablier" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M205 389C222 394 268 394 293 387" fill="none" stroke="#1d1a16" stroke-width="2" stroke-dasharray="4 4" stroke-linecap="round"/>
+    <!-- Poche du tablier, un bonbon menthe y est caché. -->
+    <path d="M276 362L268 358L268 368ZM282 362L290 358L290 368Z" fill="#46a9a6" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+    <ellipse cx="279" cy="363" rx="6" ry="5" fill="#7edcc2" stroke="#1d1a16" stroke-width="2.5"/>
+    <g clip-path="url(#mirette-poche-clip)">
+      <use href="#mirette-poche" fill="#fffaf0"/>
+      <path d="M258 362L292 362L292 372L258 374Z" fill="#ff8fbb"/>
+      <path d="M282 364L290 364L290 392L280 392Z" fill="#ecd0df"/>
+    </g>
+    <use href="#mirette-poche" fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M262 373C270 372 278 371 286 370" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Bâton de la sucette (sous le poing), bras du fond, poing. -->
+    <g clip-path="url(#mirette-baton-clip)">
+      <use href="#mirette-baton" fill="#fffaf0"/>
+      <path d="M125 250L140 244L180 318L168 334Z" fill="#ecd0df"/>
+    </g>
+    <use href="#mirette-baton" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <g clip-path="url(#mirette-bras-g-clip)">
+      <use href="#mirette-bras-g" fill="#8c4f48"/>
+      <use href="#mirette-bras-g" transform="translate(-5 -5)" fill="#b9784f"/>
+      <path d="M190 296C189 302 188 306 186 308" fill="none" stroke="#d49867" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <use href="#mirette-bras-g" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+    <g clip-path="url(#mirette-poing-clip)">
+      <use href="#mirette-poing" fill="#8c4f48"/>
+      <use href="#mirette-poing" transform="translate(-4 -4)" fill="#b9784f"/>
+      <path d="M140 291C143 286 149 284 154 285" fill="none" stroke="#e6b386" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <use href="#mirette-poing" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M139 300C144 298 150 300 153 304M140 307C145 306 150 308 152 311M146 287C152 286 158 290 160 295" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Cou (dans l'ombre du menton). -->
+    <g clip-path="url(#mirette-cou-clip)">
+      <use href="#mirette-cou" fill="#8c4f48"/>
+      <path d="M228 244C238 250 250 250 262 244L262 270L228 270Z" fill="#b9784f"/>
+      <path d="M228 222L262 222L262 240C250 248 238 248 228 240Z" fill="#6b3445"/>
+    </g>
+    <use href="#mirette-cou" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+
+    <!-- Buste de la robe menthe. -->
+    <g clip-path="url(#mirette-buste-clip)">
+      <use href="#mirette-buste" fill="#7edcc2"/>
+      <path d="M284 256C296 278 300 306 296 334L310 334L310 250Z" fill="#46a9a6"/>
+      <use href="#mirette-col-g" transform="translate(3 7)" fill="#46a9a6"/>
+      <use href="#mirette-col-d" transform="translate(3 7)" fill="#46a9a6"/>
+      <path d="M206 290C206 302 208 314 210 324" fill="none" stroke="#c7f5dc" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
+    <use href="#mirette-buste" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+    <!-- Manche ballon du fond. -->
+    <g clip-path="url(#mirette-manche-g-clip)">
+      <use href="#mirette-manche-g" fill="#46a9a6"/>
+      <use href="#mirette-manche-g" transform="translate(-5 -5)" fill="#7edcc2"/>
+      <path d="M178 298C190 308 206 309 222 298" fill="none" stroke="#fffaf0" stroke-width="9"/>
+      <path d="M188 272C192 266 198 263 204 263" fill="none" stroke="#c7f5dc" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <use href="#mirette-manche-g" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M182 294C192 301 206 303 218 296M196 268C194 274 194 280 196 285M207 266C207 272 208 278 210 283" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Bras de devant, puis sa manche ballon. -->
+    <g clip-path="url(#mirette-bras-d-clip)">
+      <use href="#mirette-bras-d" fill="#8c4f48"/>
+      <use href="#mirette-bras-d" transform="translate(-3 -6)" fill="#b9784f"/>
+      <path d="M300 294C312 294 322 299 330 306" fill="none" stroke="#d49867" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <use href="#mirette-bras-d" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+    <g clip-path="url(#mirette-manche-d-clip)">
+      <use href="#mirette-manche-d" fill="#46a9a6"/>
+      <use href="#mirette-manche-d" transform="translate(-5 -5)" fill="#7edcc2"/>
+      <path d="M280 296C292 307 308 306 320 295" fill="none" stroke="#fffaf0" stroke-width="9"/>
+      <path d="M286 268C292 262 300 261 306 263" fill="none" stroke="#c7f5dc" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <use href="#mirette-manche-d" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M283 292C292 300 306 301 316 293M296 265C298 271 298 277 296 282M306 265C308 271 309 277 308 283" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Col claudine blanc. -->
+    <g clip-path="url(#mirette-col-clip)">
+      <use href="#mirette-col-g" fill="#fffaf0"/>
+      <use href="#mirette-col-d" fill="#fffaf0"/>
+      <path d="M244 276C258 278 272 274 282 264L290 290L240 290Z" fill="#ecd0df"/>
+      <path d="M212 268C220 262 230 260 238 261" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <use href="#mirette-col-g" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <use href="#mirette-col-d" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+    <!-- Sangle du plateau en bandoulière, boucle grise. -->
+    <g clip-path="url(#mirette-sangle-clip)">
+      <use href="#mirette-sangle" fill="#3ea69c"/>
+      <path d="M180 316L300 258L310 266L190 326Z" fill="#2b7b82"/>
+    </g>
+    <use href="#mirette-sangle" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M296 260L187 312.5" fill="none" stroke="#c7f5dc" stroke-width="1.6" stroke-dasharray="4 4" stroke-linecap="round"/>
+    <g transform="rotate(-25.9 241 286)">
+      <rect x="233" y="278" width="16" height="16" rx="3" fill="#b8b2a7" stroke="#1d1a16" stroke-width="3"/>
+      <rect x="237" y="282" width="8" height="8" rx="1.5" fill="#3ea69c" stroke="#1d1a16" stroke-width="2"/>
+      <path d="M235 280L246 280" stroke="#e6e1d8" stroke-width="2" stroke-linecap="round"/>
+    </g>
+
+    <!-- Plateau : creux et paroi du fond. -->
+    <use href="#mirette-plateau-creux" fill="#2f7d88" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M170 300L350 300L349 305L168 305Z" fill="#46a9a6"/>
+    <!-- Bonbons dans le plateau (de l'arrière vers l'avant). -->
+    <g stroke="#1d1a16" stroke-linecap="round">
+      <path d="M262 314L274 264M270 314L288 268M278 314L300 274" fill="none" stroke-width="12"/>
+      <path d="M262 314L274 264M270 314L288 268M278 314L300 274" fill="none" stroke="#352a3c" stroke-width="5.5"/>
+    </g>
+    <path d="M265 300L267 297M268 288L270 285M271 276L273 273M275 302L277 299M279 291L281 288M283 280L285 277M284 304L286 301M289 294L291 291M294 284L296 281" fill="none" stroke="#9b8ba6" stroke-width="2" stroke-linecap="round"/>
+    <path d="M273 268L272 272M287 272L285 276M299 278L297 281" fill="none" stroke="#9b8ba6" stroke-width="2" stroke-linecap="round"/>
+    <!-- Mini-sucette menthe. -->
+    <path d="M187 284L193 284L196 314L190 314Z" fill="#fffaf0" stroke="#1d1a16" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="190" cy="271" r="14" fill="#7edcc2"/>
+    <path d="M188 271A2.5 2.5 0 0 1 193 271A5 5 0 0 1 183 271A7.5 7.5 0 0 1 198 271A10 10 0 0 1 178 271A12.5 12.5 0 0 1 203 271" fill="none" stroke="#fffaf0" stroke-width="3"/>
+    <path d="M200 278A14 14 0 0 1 182 283" fill="none" stroke="#46a9a6" stroke-width="4"/>
+    <circle cx="190" cy="271" r="14" fill="none" stroke="#1d1a16" stroke-width="3.5"/>
+    <path d="M181 266C182 262 185 260 188 259" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Guimauve rose debout. -->
+    <path d="M202 298L202 311C202 318 226 318 226 311L226 298Z" fill="#ff8fbb" stroke="#1d1a16" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M220 300L220 315C223 314 225 313 226 311L226 300Z" fill="#da5d9e"/>
+    <ellipse cx="214" cy="298" rx="12" ry="5" fill="#ffc4d8" stroke="#1d1a16" stroke-width="3"/>
+    <path d="M206 303L206 310" stroke="#ffe4ee" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Berlingots rayés (rose, menthe, citron) et dragées. -->
+    <g stroke="#1d1a16" stroke-width="3" stroke-linejoin="round">
+      <circle cx="252" cy="311" r="5.5" fill="#ff8fbb"/>
+      <circle cx="320" cy="310" r="5.5" fill="#7edcc2"/>
+      <circle cx="200" cy="312" r="5" fill="#ffd84d"/>
+      <path d="M165 314L173 296L184 311C178 316 170 317 165 314Z" fill="#ff8fbb"/>
+      <path d="M230 314L240 292L252 312C246 317 236 317 230 314Z" fill="#7edcc2"/>
+      <path d="M298 315L307 295L319 313C313 318 303 318 298 315Z" fill="#ffd84d"/>
+    </g>
+    <g fill="none" stroke="#fffaf0" stroke-width="2.5" stroke-linecap="round">
+      <path d="M172 299L169 313M174 300L179 313M239 296L235 314M241 296L246 314M306 299L303 315M308 299L313 315"/>
+    </g>
+    <path d="M181 309C178 313 173 314 169 313M249 310C245 314 238 315 233 314M316 311C312 315 306 316 301 315" fill="none" stroke="#1d1a16" stroke-width="0" />
+    <circle cx="250" cy="309" r="1.6" fill="#ffffff"/><circle cx="318" cy="308" r="1.6" fill="#ffffff"/><circle cx="198" cy="310" r="1.5" fill="#ffffff"/>
+
+    <!-- Bord sucre d'orge, façade menthe à festons, flanc. -->
+    <g clip-path="url(#mirette-plateau-bord-clip)">
+      <use href="#mirette-plateau-bord" fill="#fffaf0"/>
+      <path d="M146 329L152 329L161 315L155 315ZM160 329L166 329L175 315L169 315ZM174 329L180 329L189 315L183 315ZM188 329L194 329L203 315L197 315ZM202 329L208 329L217 315L211 315ZM216 329L222 329L231 315L225 315ZM230 329L236 329L245 315L239 315ZM244 329L250 329L259 315L253 315ZM258 329L264 329L273 315L267 315ZM272 329L278 329L287 315L281 315ZM286 329L292 329L301 315L295 315ZM300 329L306 329L315 315L309 315ZM314 329L320 329L329 315L323 315ZM328 329L334 329L343 315L337 315Z" fill="#ff8fbb"/>
+      <path d="M150 325L346 325L346 332L150 332Z" fill="#da5d9e" opacity="0.45"/>
+      <path d="M160 318L336 318" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+    </g>
+    <use href="#mirette-plateau-bord" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+    <use href="#mirette-plateau-cote" fill="#46a9a6" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M346 312L346 350" fill="none" stroke="#2f7d88" stroke-width="3" stroke-linecap="round"/>
+    <g clip-path="url(#mirette-plateau-face-clip)">
+      <use href="#mirette-plateau-face" fill="#7edcc2"/>
+      <path d="M320 329L340 329L340 372L312 372C318 360 320 344 320 329Z" fill="#46a9a6"/>
+      <path d="M158 329H338V333A6 6 0 0 1 326 333A6 6 0 0 1 314 333A6 6 0 0 1 302 333A6 6 0 0 1 290 333A6 6 0 0 1 278 333A6 6 0 0 1 266 333A6 6 0 0 1 254 333A6 6 0 0 1 242 333A6 6 0 0 1 230 333A6 6 0 0 1 218 333A6 6 0 0 1 206 333A6 6 0 0 1 194 333A6 6 0 0 1 182 333A6 6 0 0 1 170 333A6 6 0 0 1 158 333Z" fill="#ff8fbb" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M166 346C168 358 170 362 176 364" fill="none" stroke="#c7f5dc" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M160 366L340 366L340 374L160 374Z" fill="#2f7d88"/>
+    </g>
+    <use href="#mirette-plateau-face" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+    <!-- Emblème : bonbon emballé, rivets gris (accent Commun). -->
+    <g stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M239 353L226 345L226 361ZM257 353L270 345L270 361Z" fill="#da5d9e"/>
+      <circle cx="248" cy="353" r="10" fill="#ff8fbb"/>
+    </g>
+    <path d="M247 353A1.8 1.8 0 0 1 250.6 353A3.6 3.6 0 0 1 243.4 353A5.4 5.4 0 0 1 254.2 353" fill="none" stroke="#fffaf0" stroke-width="2" stroke-linecap="round"/>
+    <path d="M229 349L235 352M229 357L235 354M267 349L261 352M267 357L261 354" fill="none" stroke="#1d1a16" stroke-width="1.5" stroke-linecap="round"/>
+    <g fill="#b8b2a7" stroke="#1d1a16" stroke-width="1.8">
+      <circle cx="168" cy="344" r="3.2"/><circle cx="328" cy="344" r="3.2"/><circle cx="170" cy="361" r="3.2"/><circle cx="326" cy="361" r="3.2"/>
+    </g>
+    <g fill="#ffffff"><circle cx="167" cy="343" r="1"/><circle cx="327" cy="343" r="1"/><circle cx="169" cy="360" r="1"/><circle cx="325" cy="360" r="1"/></g>
+    <!-- Bonbons qui débordent sur le bord : guimauve croquée, bonbon citron emballé. -->
+    <path d="M213 316C213 309 236 308 239 313A4 4 0 0 0 237 319A4 4 0 0 0 239 325C236 331 213 331 213 324Z" fill="#fffaf0" stroke="#1d1a16" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M215 324C222 327 230 327 236 325" fill="none" stroke="#ecd0df" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="218" cy="318" rx="3" ry="5" fill="none" stroke="#ecd0df" stroke-width="2"/>
+    <g stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M282 323L272 316L272 330ZM300 323L310 316L310 330Z" fill="#e4a52f"/>
+      <ellipse cx="291" cy="323" rx="9.5" ry="7.5" fill="#ffd84d"/>
+    </g>
+    <path d="M286 320C288 318 291 317 294 318" fill="none" stroke="#fff2a8" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Main de devant agrippée au plateau. -->
+    <g clip-path="url(#mirette-main-d-clip)">
+      <use href="#mirette-main-d" fill="#8c4f48"/>
+      <use href="#mirette-main-d" transform="translate(-4 -4)" fill="#b9784f"/>
+      <path d="M332 309C336 305 342 304 347 306" fill="none" stroke="#e6b386" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <use href="#mirette-main-d" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M338 316C344 316 349 320 350 325M335 323C341 323 346 327 347 331M330 311C334 307 340 307 344 310" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- ===== Tête ===== -->
+    <!-- Chignons (macarons) enroulés. -->
+    <g clip-path="url(#mirette-chignon-g-clip)">
+      <use href="#mirette-chignon-g" fill="#3f2027"/>
+      <circle cx="184" cy="64" r="33" fill="#5b3223"/>
+      <path d="M190 70A4.5 4.5 0 0 1 199 70A9 9 0 0 1 181 70A13.5 13.5 0 0 1 208 70A18 18 0 0 1 172 70A22.5 22.5 0 0 1 217 70A27 27 0 0 1 163 70" fill="none" stroke="#3f2027" stroke-width="3.5"/>
+      <path d="M168 58C173 47 184 41 196 42" fill="none" stroke="#7e4a2e" stroke-width="6" stroke-linecap="round"/>
+      <path d="M174 54C178 49 183 47 188 46" fill="none" stroke="#a46e47" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+    <use href="#mirette-chignon-g" fill="none" stroke="#1d1a16" stroke-width="7"/>
+    <g clip-path="url(#mirette-chignon-d-clip)">
+      <use href="#mirette-chignon-d" fill="#3f2027"/>
+      <circle cx="301" cy="57" r="36" fill="#5b3223"/>
+      <path d="M308 64A5 5 0 0 1 318 64A10 10 0 0 1 298 64A15 15 0 0 1 328 64A20 20 0 0 1 288 64A25 25 0 0 1 338 64A30 30 0 0 1 278 64" fill="none" stroke="#3f2027" stroke-width="3.5"/>
+      <path d="M284 50C290 38 302 33 314 34" fill="none" stroke="#7e4a2e" stroke-width="6" stroke-linecap="round"/>
+      <path d="M291 44C295 39 301 37 307 37" fill="none" stroke="#a46e47" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+    <use href="#mirette-chignon-d" fill="none" stroke="#1d1a16" stroke-width="7"/>
+
+    <!-- Mèche de côté (derrière la joue). -->
+    <g clip-path="url(#mirette-meche-clip)">
+      <use href="#mirette-meche" fill="#3f2027"/>
+      <path d="M318 100C330 116 336 140 336 166L326 170C324 150 318 130 308 116Z" fill="#5b3223"/>
+    </g>
+    <use href="#mirette-meche" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M330 150C334 168 334 190 328 206" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Visage : joue gauche gonflée de bonbon. -->
+    <g clip-path="url(#mirette-visage-clip)">
+      <use href="#mirette-visage" fill="url(#mirette-peau-volume)"/>
+      <path d="M326 96C316 122 314 160 307 186C299 214 268 236 226 248L345 252L345 90Z" fill="#8c4f48"/>
+      <path d="M163 214C170 230 190 242 214 247L156 252Z" fill="#8c4f48"/>
+      <use href="#mirette-frange" transform="translate(4 8)" fill="#8c4f48"/>
+      <path d="M168 198C170 186 177 179 185 180C179 186 176 196 176 206Z" fill="#e6b386"/>
+      <circle cx="181" cy="214" r="2.5" fill="#e6b386"/>
+      <path d="M296 196C302 194 308 196 310 200" fill="none" stroke="#d49867" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <use href="#mirette-visage" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+    <!-- Joues roses. -->
+    <ellipse cx="190" cy="211" rx="15" ry="9" fill="#ff6f8e" opacity="0.5"/>
+    <ellipse cx="303" cy="208" rx="13" ry="8" fill="#ff6f8e" opacity="0.45"/>
+    <!-- Clin d'œil coupable (œil gauche fermé, cils). -->
+    <path d="M193 184C199 172 219 169 228 181" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linecap="round"/>
+    <path d="M195 182L186 177M197 178L190 170" fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- Œil ouvert : regard en coin vers le joueur. -->
+    <use href="#mirette-oeil" fill="#fffaf0"/>
+    <g clip-path="url(#mirette-oeil-clip)">
+      <ellipse cx="274" cy="164" rx="26" ry="13" fill="#e6d8e6"/>
+      <use href="#mirette-iris" fill="#b4692a"/>
+      <g clip-path="url(#mirette-iris-clip)">
+        <ellipse cx="281" cy="175" rx="16" ry="11" fill="#6e3615"/>
+        <ellipse cx="281" cy="199" rx="11" ry="6" fill="#e9a94f"/>
+      </g>
+      <ellipse cx="282" cy="186" rx="7.5" ry="10.5" fill="#1d1a16"/>
+      <circle cx="274" cy="175" r="6.5" fill="#ffffff"/>
+      <circle cx="289" cy="196" r="3" fill="#ffffff"/>
+    </g>
+    <use href="#mirette-oeil" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+    <path d="M252 176C254 160 264 152 276 152C287 152 295 160 297 170" fill="none" stroke="#1d1a16" stroke-width="6.5" stroke-linecap="round"/>
+    <path d="M296 166L306 158M297 172L307 171" fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- Sourcils penauds (bouts intérieurs relevés). -->
+    <path d="M254 141C266 135 284 139 295 149" fill="none" stroke="#1d1a16" stroke-width="6.5" stroke-linecap="round"/>
+    <path d="M191 162C199 155 213 151 227 152" fill="none" stroke="#1d1a16" stroke-width="6.5" stroke-linecap="round"/>
+    <!-- Nez. -->
+    <path d="M242 199C238 203 239 209 245 209" fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="240" cy="201" r="1.8" fill="#e6b386"/>
+    <!-- Bouche de travers, bout de langue, miettes au coin. -->
+    <g clip-path="url(#mirette-bouche-clip)">
+      <use href="#mirette-bouche" fill="#6e2430"/>
+      <path d="M224 220C236 226 252 224 266 212L266 218C254 229 238 231 226 228Z" fill="#fffaf0"/>
+    </g>
+    <use href="#mirette-bouche" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M250 234C253 242 262 244 266 236C268 229 261 225 255 227Z" fill="#ff8d9e" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M258 230L260 238" fill="none" stroke="#e0607a" stroke-width="2" stroke-linecap="round"/>
+    <path d="M225 222C221 219 219 214 220 210" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+    <g stroke="#1d1a16" stroke-width="1.8" stroke-linejoin="round">
+      <path d="M216 226L222 224L220 230Z" fill="#ff8fbb"/>
+      <path d="M211 219L216 218L214 223Z" fill="#fffaf0"/>
+      <path d="M220 233L225 233L222 237Z" fill="#7edcc2"/>
+    </g>
+
+    <!-- Frange et dessus de la tête. -->
+    <g clip-path="url(#mirette-frange-clip)">
+      <use href="#mirette-frange" fill="#5b3223"/>
+      <path d="M296 52C326 70 342 110 336 166L352 170L352 46Z" fill="#3f2027"/>
+      <path d="M182 100C192 80 212 66 236 62" fill="none" stroke="#7e4a2e" stroke-width="8" stroke-linecap="round"/>
+      <path d="M250 61C262 61 274 64 284 69" fill="none" stroke="#7e4a2e" stroke-width="6" stroke-linecap="round"/>
+      <path d="M190 92C197 82 207 75 220 71" fill="none" stroke="#a46e47" stroke-width="3" stroke-linecap="round"/>
+      <path d="M176 120C176 132 178 142 182 150M212 108C210 116 210 122 212 128M244 104C244 112 244 118 246 124" fill="none" stroke="#7e4a2e" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <use href="#mirette-frange" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M296 108C294 96 288 86 278 80M266 104C264 92 258 84 248 80M236 102C234 92 228 84 218 82M206 106C204 98 198 90 190 88M322 122C322 110 318 100 312 94" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Rubans roses à pois noués autour des chignons. -->
+    <g clip-path="url(#mirette-rubans-clip)">
+      <use href="#mirette-ruban-g" fill="#ff8fbb"/>
+      <use href="#mirette-ruban-d" fill="#ff8fbb"/>
+      <path d="M160 102C170 82 190 66 214 56L222 66L170 108ZM272 58C298 60 320 72 334 94L344 84L276 40Z" fill="#da5d9e"/>
+      <g fill="#fffaf0"><circle cx="176" cy="78" r="2"/><circle cx="196" cy="62" r="2"/><circle cx="290" cy="50" r="2"/><circle cx="312" cy="58" r="2"/><circle cx="330" cy="72" r="2"/></g>
+    </g>
+    <use href="#mirette-ruban-g" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <use href="#mirette-ruban-d" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <g stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round">
+      <!-- Nœud du chignon gauche. -->
+      <path d="M160 102C158 112 154 120 148 126L156 131C162 122 164 112 165 102Z" fill="#da5d9e"/>
+      <path d="M162 94C152 76 134 74 132 86C130 98 146 102 162 94Z" fill="#ff8fbb"/>
+      <path d="M162 98C146 102 136 112 141 121C147 129 160 116 162 98Z" fill="#ff8fbb"/>
+      <ellipse cx="162" cy="96" rx="7" ry="8" fill="#ff8fbb"/>
+      <!-- Nœud du chignon droit. -->
+      <path d="M334 90C330 102 326 112 318 120L328 124C334 114 338 104 340 92ZM342 92C348 102 352 112 352 124L360 120C358 108 352 98 346 90Z" fill="#da5d9e"/>
+      <path d="M338 84C340 64 360 54 368 66C374 76 360 88 338 84Z" fill="#ff8fbb"/>
+      <path d="M338 86C356 84 372 94 366 106C360 116 342 104 338 86Z" fill="#ff8fbb"/>
+      <ellipse cx="338" cy="86" rx="7" ry="8" fill="#ff8fbb"/>
+    </g>
+    <g fill="none" stroke-linecap="round">
+      <path d="M140 84C144 80 150 80 154 84M346 74C352 68 358 66 362 68" stroke="#ffc4d8" stroke-width="3"/>
+      <path d="M150 112C153 108 157 104 158 100M350 100C346 96 344 92 342 90" stroke="#da5d9e" stroke-width="3.5"/>
+      <path d="M159 92C161 91 163 91 165 92M335 82C337 81 339 81 341 82" stroke="#ffe4ee" stroke-width="2"/>
+    </g>
+
+    <!-- ===== Sucette géante, croquée ===== -->
+    <g clip-path="url(#mirette-sucette-clip)">
+      <use href="#mirette-sucette" fill="#fffaf0"/>
+      <use href="#mirette-spirale" fill="none" stroke="#ff8fbb" stroke-width="11"/>
+      <use href="#mirette-spirale" transform="rotate(180 90 198)" fill="none" stroke="#7edcc2" stroke-width="4.5"/>
+      <g clip-path="url(#mirette-sucette-ombre-clip)">
+        <rect x="0" y="110" width="180" height="180" fill="#ecc6da"/>
+        <use href="#mirette-spirale" fill="none" stroke="#da5d9e" stroke-width="11"/>
+        <use href="#mirette-spirale" transform="rotate(180 90 198)" fill="none" stroke="#46a9a6" stroke-width="4.5"/>
+      </g>
+      <use href="#mirette-encoche" fill="none" stroke="#ffd2e2" stroke-width="10"/>
+      <path d="M26 178C30 150 50 130 76 124C58 136 44 154 38 180Z" fill="#ffffff"/>
+      <circle cx="58" cy="148" r="5" fill="#ffffff"/>
+      <circle cx="123" cy="135" r="3" fill="#ffffff"/>
+      <path d="M48 238C56 252 70 262 86 266" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+    </g>
+    <use href="#mirette-sucette" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+    <!-- Nœud menthe au pied de la sucette, étiquette de prix encore attachée. -->
+    <path d="M127 271C122 280 115 284 108 286" fill="none" stroke="#1d1a16" stroke-width="2" stroke-linecap="round"/>
+    <path d="M100 280L112 286L108 304L90 300L92 284Z" fill="#fffaf0" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M92 296L107 299L108 304L90 300Z" fill="#ecd0df"/>
+    <circle cx="103" cy="286" r="1.8" fill="#1d1a16"/>
+    <circle cx="100" cy="294" r="5" fill="#ffd84d" stroke="#1d1a16" stroke-width="1.8"/>
+    <path d="M100 291.5L100 296.5" stroke="#e4a52f" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M100 280L112 286L108 304L90 300L92 284Z" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+    <g stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round">
+      <path d="M128 272C124 282 118 288 114 294L120 297C126 290 130 282 131 274ZM134 272C140 280 146 284 150 286L148 292C142 290 136 284 133 276Z" fill="#46a9a6"/>
+      <path d="M129 266C117 254 105 259 108 269C111 277 122 274 129 268Z" fill="#7edcc2"/>
+      <path d="M133 268C145 262 156 268 151 278C147 286 136 279 133 270Z" fill="#7edcc2"/>
+      <ellipse cx="131" cy="269" rx="5.5" ry="6.5" fill="#7edcc2"/>
+    </g>
+    <path d="M112 264C115 261 119 260 122 262M141 268C144 267 147 268 149 270" fill="none" stroke="#c7f5dc" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Miettes qui volent entre la sucette et la joue. -->
+    <g stroke="#1d1a16" stroke-width="2" stroke-linejoin="round">
+      <path d="M167 187L174 186L172 193Z" fill="#ff8fbb"/>
+      <path d="M174 169L180 171L176 176Z" fill="#fffaf0"/>
+      <path d="M163 233L170 234L166 240Z" fill="#ff8fbb"/>
+      <path d="M153 247L159 247L157 253Z" fill="#7edcc2"/>
+      <path d="M172 246L178 248L174 253Z" fill="#fffaf0"/>
+    </g>
+
+    <!-- Éclats de brillance et goutte de gêne. -->
+    <path d="M30 108L33 117L42 120L33 123L30 132L27 123L18 120L27 117Z" fill="#ffd84d" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M338 258L340 265L347 267L340 269L338 276L336 269L329 267L336 265Z" fill="#ffd84d" stroke="#1d1a16" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M356 140C362 150 366 156 366 162C366 168 361 172 356 172C351 172 346 168 346 162C346 156 350 150 356 140Z" fill="#a9defa" stroke="#1d1a16" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M362 160C362 165 359 168 355 168" fill="none" stroke="#67b5e6" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="352.5" cy="159" rx="1.8" ry="3.5" fill="#ffffff"/>
+  </g>
+</svg>

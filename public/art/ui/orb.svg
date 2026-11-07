@@ -1,0 +1,177 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <!-- Orbe du gacha : sphère de cristal (r = 100, centre 120,120) où tourbillonne une nébuleuse
+       rose, bleue et or autour d'une étoile-joyau. Lumière en haut à gauche. Pas de socle. -->
+  <defs>
+    <circle id="orb-sphere" cx="120" cy="120" r="100"/>
+    <clipPath id="orb-clip"><use href="#orb-sphere"/></clipPath>
+    <!-- Étincelle fine et étoile dodue à quatre branches (±10), mises à l'échelle. -->
+    <path id="orb-etincelle" d="M0 -10 C 1.2 -3 3 -1.2 10 0 C 3 1.2 1.2 3 0 10 C -1.2 3 -3 1.2 -10 0 C -3 -1.2 -1.2 -3 0 -10 Z"/>
+    <path id="orb-etoile" d="M0 -10 C 2 -3.6 3.6 -2 10 0 C 3.6 2 2 3.6 0 10 C -2 3.6 -3.6 2 -10 0 C -3.6 -2 -2 -3.6 0 -10 Z"/>
+    <!-- Étoile-joyau centrale : pointes à 31 (haut, bas) et 27 (côtés). -->
+    <path id="orb-astre" d="M120 89 Q 124.5 115.5 147 120 Q 124.5 124.5 120 151 Q 115.5 124.5 93 120 Q 115.5 115.5 120 89 Z"/>
+    <clipPath id="orb-astre-clip"><use href="#orb-astre"/></clipPath>
+
+    <radialGradient id="orb-aura" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0.84" stop-color="#ffe6fb" stop-opacity="0.85"/>
+      <stop offset="0.9" stop-color="#f3c6ff" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#d9b0ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="orb-nuit" cx="0.45" cy="0.42" r="0.6">
+      <stop offset="0" stop-color="#6448d0"/>
+      <stop offset="0.5" stop-color="#3f2ca0"/>
+      <stop offset="1" stop-color="#24186a"/>
+    </radialGradient>
+    <radialGradient id="orb-voile" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0.7" stop-color="#140a42" stop-opacity="0"/>
+      <stop offset="0.92" stop-color="#140a42" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#0f0836" stop-opacity="0.6"/>
+    </radialGradient>
+    <radialGradient id="orb-coeur" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.22" stop-color="#fff6cf" stop-opacity="0.95"/>
+      <stop offset="0.5" stop-color="#ffd76a" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#ffc93c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="orb-ruban-rose" gradientUnits="userSpaceOnUse" x1="140" y1="118" x2="42" y2="88">
+      <stop offset="0" stop-color="#ffe3f6"/>
+      <stop offset="0.35" stop-color="#ffa6df"/>
+      <stop offset="1" stop-color="#e46cc3"/>
+    </linearGradient>
+    <linearGradient id="orb-ruban-bleu" gradientUnits="userSpaceOnUse" x1="100" y1="122" x2="198" y2="152">
+      <stop offset="0" stop-color="#e3f7ff"/>
+      <stop offset="0.35" stop-color="#9ad6ff"/>
+      <stop offset="1" stop-color="#4f9fe2"/>
+    </linearGradient>
+    <linearGradient id="orb-irise" gradientUnits="userSpaceOnUse" x1="30" y1="30" x2="210" y2="210">
+      <stop offset="0" stop-color="#ff8fdc"/>
+      <stop offset="0.3" stop-color="#ffe07a"/>
+      <stop offset="0.6" stop-color="#7ff0ff"/>
+      <stop offset="1" stop-color="#b49bff"/>
+    </linearGradient>
+    <linearGradient id="orb-contrejour" gradientUnits="userSpaceOnUse" x1="141" y1="141" x2="187" y2="187">
+      <stop offset="0" stop-color="#8fe6ff" stop-opacity="0"/>
+      <stop offset="0.6" stop-color="#8fe6ff" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#e6fbff" stop-opacity="0.95"/>
+    </linearGradient>
+    <filter id="orb-brume" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+    <filter id="orb-lueur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.6" result="flou"/>
+      <feMerge><feMergeNode in="flou"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Aura douce autour du verre (sépare l'orbe du fond, surtout la nuit). -->
+  <circle cx="120" cy="120" r="119" fill="url(#orb-aura)"/>
+
+  <!-- Intérieur : nuit profonde -->
+  <use href="#orb-sphere" fill="url(#orb-nuit)"/>
+  <g clip-path="url(#orb-clip)">
+    <!-- Nébuleuse vaporeuse : deux bras en spirale (rose en haut, bleu en bas) autour d'un cœur d'or. -->
+    <g filter="url(#orb-brume)">
+      <circle cx="120" cy="120" r="40" fill="#8b5bd9" opacity="0.7"/>
+      <path d="M131.3,124.1 C132.6,123.5 136.9,122.5 139.2,120.5 C141.5,118.5 143.9,115.6 145.2,112.3 C146.6,108.9 147.6,104.7 147.4,100.5 C147.1,96.3 146.1,91.4 144,87 C141.8,82.6 138.6,77.9 134.4,74.2 C130.3,70.5 124.9,67 119,64.8 C113.2,62.6 106.2,61.1 99.2,61.2 C92.2,61.2 84.4,62.4 77.1,65.2 C69.9,67.9 62.3,72.1 56,77.6 C49.6,83.1 41.7,94.8 38.9,98.3" fill="none" stroke="#d65db1" stroke-width="34" stroke-linecap="round" opacity="0.9"/>
+      <path d="M108.7,115.9 C107.4,116.5 103.1,117.5 100.8,119.5 C98.5,121.5 96.1,124.4 94.8,127.7 C93.4,131.1 92.4,135.3 92.6,139.5 C92.9,143.7 93.9,148.6 96,153 C98.2,157.4 101.4,162.1 105.6,165.8 C109.7,169.5 115.1,173 121,175.2 C126.8,177.4 133.8,178.9 140.8,178.8 C147.8,178.8 155.6,177.6 162.9,174.8 C170.1,172.1 177.7,167.9 184,162.4 C190.4,156.9 198.3,145.2 201.1,141.7" fill="none" stroke="#4d9de0" stroke-width="34" stroke-linecap="round" opacity="0.9"/>
+      <ellipse cx="150" cy="62" rx="26" ry="18" fill="#e46cc0" opacity="0.6"/>
+      <ellipse cx="58" cy="96" rx="18" ry="26" fill="#b9479e" opacity="0.55"/>
+      <ellipse cx="90" cy="174" rx="26" ry="18" fill="#3f8fd8" opacity="0.6"/>
+      <ellipse cx="180" cy="150" rx="18" ry="24" fill="#5fb8f0" opacity="0.5"/>
+      <ellipse cx="164" cy="168" rx="30" ry="18" transform="rotate(-45 164 168)" fill="#ff9be0" opacity="0.35"/>
+      <circle cx="120" cy="120" r="24" fill="#ffd56a" opacity="0.75"/>
+    </g>
+
+    <!-- Traînées d'or fines, intercalées entre les bras -->
+    <g fill="#ffd76a" opacity="0.9">
+      <path d="M123.3,96.2 C122.7,95.4 121,92.6 119.3,91.1 C117.6,89.6 115.4,88.3 113.1,87.3 C110.8,86.4 108.2,85.6 105.5,85.2 C102.8,84.8 99.8,84.7 96.9,85 C93.9,85.4 90.8,86 87.8,87.1 C84.8,88.2 81.7,89.6 78.9,91.5 C76,93.3 73.2,95.6 70.6,98.1 C68.1,100.7 65.6,103.7 63.6,107 C61.5,110.2 59.7,113.9 58.3,117.7 C56.9,121.5 55.8,125.7 55.2,129.9 C54.7,134.2 54.5,138.7 54.8,143.2 C55.1,147.6 55.8,152.3 57.1,156.9 C58.4,161.4 60.1,166 62.4,170.4 C64.7,174.7 69.4,180.9 70.7,183 C69.5,180.9 65.4,174.4 63.4,169.9 C61.4,165.5 59.9,160.9 58.9,156.4 C57.9,151.9 57.4,147.4 57.3,143 C57.2,138.7 57.6,134.4 58.4,130.4 C59.1,126.4 60.3,122.5 61.7,119 C63.2,115.5 65,112.2 67,109.2 C69,106.2 71.3,103.5 73.7,101.2 C76,98.9 78.7,96.9 81.3,95.2 C83.9,93.6 86.7,92.3 89.3,91.3 C92,90.3 94.8,89.7 97.4,89.3 C100,88.9 102.6,88.9 105.1,89.1 C107.5,89.3 109.8,89.8 112,90.4 C114.2,91 116.2,92 118,93 C119.9,93.9 122.5,95.7 123.3,96.2Z"/>
+      <path d="M116.7,143.8 C117.3,144.6 119,147.4 120.7,148.9 C122.4,150.4 124.6,151.7 126.9,152.7 C129.2,153.6 131.8,154.4 134.5,154.8 C137.2,155.2 140.2,155.3 143.1,155 C146.1,154.6 149.2,154 152.2,152.9 C155.2,151.8 158.3,150.4 161.1,148.5 C164,146.7 166.8,144.4 169.4,141.9 C171.9,139.3 174.4,136.3 176.4,133 C178.5,129.8 180.3,126.1 181.7,122.3 C183.1,118.5 184.2,114.3 184.8,110.1 C185.3,105.8 185.5,101.3 185.2,96.8 C184.9,92.4 184.2,87.7 182.9,83.1 C181.6,78.6 179.9,74 177.6,69.6 C175.3,65.3 170.6,59.1 169.3,57 C170.5,59.1 174.6,65.6 176.6,70.1 C178.6,74.5 180.1,79.1 181.1,83.6 C182.1,88.1 182.6,92.6 182.7,97 C182.8,101.3 182.4,105.6 181.6,109.6 C180.9,113.6 179.7,117.5 178.3,121 C176.8,124.5 175,127.8 173,130.8 C171,133.8 168.7,136.5 166.3,138.8 C164,141.1 161.3,143.1 158.7,144.8 C156.1,146.4 153.3,147.7 150.7,148.7 C148,149.7 145.2,150.3 142.6,150.7 C140,151.1 137.4,151.1 134.9,150.9 C132.5,150.7 130.2,150.2 128,149.6 C125.8,149 123.8,148 122,147 C120.1,146.1 117.5,144.3 116.7,143.8Z"/>
+    </g>
+
+    <!-- Rubans nets du tourbillon (lisibles en petit), clairs près du cœur -->
+    <path d="M137.8,122.5 C139.2,122.3 143.6,122.5 146,121.2 C148.4,119.9 150.6,117.4 152.3,114.8 C154,112.2 155.3,109 156.1,105.6 C156.8,102.3 157.1,98.5 156.7,94.7 C156.3,91 155.3,87 153.8,83.3 C152.2,79.6 150,75.8 147.3,72.4 C144.6,69 141.3,65.8 137.6,63.1 C133.9,60.4 129.6,57.9 125.1,56.2 C120.6,54.4 115.6,53 110.5,52.4 C105.5,51.8 100,51.7 94.7,52.3 C89.4,52.9 83.9,54.2 78.7,56.1 C73.5,58.1 68.2,60.7 63.4,63.9 C58.6,67.1 53.8,71 49.8,75.5 C45.8,79.9 41,88.1 39.2,90.6 C41.4,88.6 48,81.9 52.6,78.5 C57.2,75.1 62.1,72.3 66.9,70.1 C71.7,67.9 76.7,66.4 81.4,65.4 C86.2,64.5 90.9,64.2 95.4,64.3 C99.8,64.3 104.1,65 108,66 C112,67 115.6,68.5 118.9,70.2 C122.1,71.9 125,73.9 127.6,76 C130.1,78.1 132.2,80.5 134,82.9 C135.8,85.2 137.2,87.7 138.3,90.1 C139.4,92.4 140.1,94.9 140.7,97.2 C141.2,99.4 141.4,101.7 141.5,103.8 C141.5,105.9 141.3,107.9 141,109.9 C140.7,111.9 140.1,113.5 139.6,115.6 C139.1,117.7 138.1,121.4 137.8,122.5Z" fill="url(#orb-ruban-rose)" opacity="0.88"/>
+    <path d="M102.2,117.5 C100.8,117.7 96.4,117.5 94,118.8 C91.6,120.1 89.4,122.6 87.7,125.2 C86,127.8 84.7,131 83.9,134.4 C83.2,137.7 82.9,141.5 83.3,145.3 C83.7,149 84.7,153 86.2,156.7 C87.8,160.4 90,164.2 92.7,167.6 C95.4,171 98.7,174.2 102.4,176.9 C106.1,179.6 110.4,182.1 114.9,183.8 C119.4,185.6 124.4,187 129.5,187.6 C134.5,188.2 140,188.3 145.3,187.7 C150.6,187.1 156.1,185.8 161.3,183.9 C166.5,181.9 171.8,179.3 176.6,176.1 C181.4,172.9 186.2,169 190.2,164.5 C194.2,160.1 199,151.9 200.8,149.4 C198.6,151.4 192,158.1 187.4,161.5 C182.8,164.9 177.9,167.7 173.1,169.9 C168.3,172.1 163.3,173.6 158.6,174.6 C153.8,175.5 149.1,175.8 144.6,175.7 C140.2,175.7 135.9,175 132,174 C128,173 124.4,171.5 121.1,169.8 C117.9,168.1 115,166.1 112.4,164 C109.9,161.9 107.8,159.5 106,157.1 C104.2,154.8 102.8,152.3 101.7,149.9 C100.6,147.6 99.9,145.1 99.3,142.8 C98.8,140.6 98.6,138.3 98.5,136.2 C98.5,134.1 98.7,132.1 99,130.1 C99.3,128.1 99.9,126.5 100.4,124.4 C100.9,122.3 101.9,118.6 102.2,117.5Z" fill="url(#orb-ruban-bleu)" opacity="0.88"/>
+    <g fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.85">
+      <path d="M144,111.6 C144.2,110.4 145.3,106.8 145.5,104.3 C145.7,101.8 145.6,99.2 145.1,96.5 C144.6,93.8 143.8,91 142.5,88.2 C141.3,85.5 139.7,82.6 137.7,80 C135.6,77.4 133.2,74.7 130.3,72.5 C127.5,70.2 124.2,68 120.6,66.3 C117,64.6 113,63.2 108.7,62.3 C104.4,61.4 97.2,61.2 94.9,61"/>
+      <path d="M96,128.4 C95.8,129.6 94.7,133.2 94.5,135.7 C94.3,138.2 94.4,140.8 94.9,143.5 C95.4,146.2 96.2,149 97.5,151.8 C98.7,154.5 100.3,157.4 102.3,160 C104.4,162.6 106.8,165.3 109.7,167.5 C112.5,169.8 115.8,172 119.4,173.7 C123,175.4 127,176.8 131.3,177.7 C135.6,178.6 142.8,178.8 145.1,179"/>
+    </g>
+
+    <!-- Petites étoiles prises dans le tourbillon -->
+    <g fill="#fff8e0" filter="url(#orb-lueur)">
+      <use href="#orb-etincelle" transform="translate(163 58) scale(0.55)"/>
+      <use href="#orb-etincelle" transform="translate(184 128) scale(0.5)"/>
+      <use href="#orb-etincelle" transform="translate(64 150) scale(0.45)"/>
+      <use href="#orb-etincelle" transform="translate(106 190) scale(0.6)"/>
+      <use href="#orb-etincelle" transform="translate(190 92) scale(0.4)"/>
+      <use href="#orb-etincelle" transform="translate(148 196) scale(0.35)"/>
+      <circle cx="150" cy="72" r="1.8"/>
+      <circle cx="172" cy="82" r="1.4"/>
+      <circle cx="196" cy="118" r="1.6"/>
+      <circle cx="162" cy="172" r="1.6"/>
+      <circle cx="134" cy="204" r="1.4"/>
+      <circle cx="88" cy="168" r="1.8"/>
+      <circle cx="50" cy="128" r="1.5"/>
+      <circle cx="74" cy="124" r="1.3"/>
+      <circle cx="136" cy="44" r="1.6"/>
+      <circle cx="178" cy="186" r="1.5"/>
+      <circle cx="58" cy="178" r="1.4"/>
+      <circle cx="176" cy="108" r="1.2"/>
+    </g>
+    <g fill="#ffe08a">
+      <circle cx="92" cy="140" r="1.6"/>
+      <circle cx="168" cy="100" r="1.5"/>
+      <circle cx="126" cy="176" r="1.4"/>
+      <circle cx="110" cy="84" r="1.3"/>
+    </g>
+
+    <!-- Cœur : halo d'or, éclat diagonal puis étoile-joyau facettée -->
+    <circle cx="120" cy="120" r="52" fill="url(#orb-coeur)"/>
+    <use href="#orb-etincelle" transform="translate(120 120) rotate(45) scale(2.4)" fill="#fffbe6" stroke="#1d1a16" stroke-width="1.2" stroke-linejoin="round"/>
+    <use href="#orb-astre" fill="#ffc93c"/>
+    <g clip-path="url(#orb-astre-clip)">
+      <path d="M120 120 L120 75 L89.9 86.6 Z" fill="#fff4c4"/>
+      <path d="M120 120 L120 75 L150.1 86.6 Z" fill="#ffd24d"/>
+      <path d="M120 120 L165 120 L150.1 86.6 Z" fill="#ffe486"/>
+      <path d="M120 120 L165 120 L150.1 153.4 Z" fill="#f09a24"/>
+      <path d="M120 120 L120 165 L150.1 153.4 Z" fill="#e2801c"/>
+      <path d="M120 120 L120 165 L89.9 153.4 Z" fill="#ffc93c"/>
+      <path d="M120 120 L75 120 L89.9 153.4 Z" fill="#f7ae30"/>
+      <path d="M120 120 L75 120 L89.9 86.6 Z" fill="#ffe9a0"/>
+      <path d="M118.4 96 Q 117 106 112.6 112.4" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+      <circle cx="120" cy="120" r="2.6" fill="#ffffff" opacity="0.8"/>
+    </g>
+    <use href="#orb-astre" fill="none" stroke="#1d1a16" stroke-width="3.6" stroke-linejoin="round"/>
+
+    <!-- Verre : ombre propre (bas droite, bord net), profondeur sur le pourtour -->
+    <path d="M20,120 A100,100 0 1,0 220,120 A100,100 0 1,0 20,120 Z M8,104 A98,98 0 1,0 204,104 A98,98 0 1,0 8,104 Z" fill="#1a0f52" fill-rule="evenodd" opacity="0.35"/>
+    <use href="#orb-sphere" fill="url(#orb-voile)"/>
+
+    <!-- Liseré irisé et contre-jour (lumière qui traverse le verre, bas droite) -->
+    <circle cx="120" cy="120" r="94.5" fill="none" stroke="url(#orb-irise)" stroke-width="3" opacity="0.55"/>
+    <path d="M182.9,50.1 A94,94 0 1,1 50.1,182.9 A94,94 0 0,0 182.9,50.1 Z" fill="url(#orb-contrejour)"/>
+    <path d="M194.2,159.4 A84,84 0 0,1 171.7,186.2" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" opacity="0.75"/>
+    <circle cx="162" cy="192.7" r="2" fill="#ffffff" opacity="0.7"/>
+
+    <!-- Grande fenêtre en haut à gauche : vitres courbées sur la sphère, plus vives vers le bord -->
+    <g fill="#ffffff" stroke="#ffffff" stroke-width="2" stroke-linejoin="round">
+      <path d="M86,39.9A87,87 0 0,0 56.4,60.7L65.9,69.5A74,74 0 0,1 91.1,51.9Z" opacity="0.92"/>
+      <path d="M50.5,67.6A87,87 0 0,0 35.2,100.4L47.9,103.4A74,74 0 0,1 60.9,75.5Z" opacity="0.85"/>
+      <path d="M92.6,55.6A70,70 0 0,0 68.8,72.3L79.8,82.5A55,55 0 0,1 98.5,69.4Z" opacity="0.5"/>
+      <path d="M64.1,77.9A70,70 0 0,0 51.8,104.3L66.4,107.6A55,55 0 0,1 76.1,86.9Z" opacity="0.42"/>
+    </g>
+    <!-- Liseré de reflet le long du bord éclairé -->
+    <path d="M103.9,28.4 A93,93 0 0,0 32.6,151.8" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.85"/>
+  </g>
+
+  <!-- Contour encre, plus appuyé du côté de l'ombre -->
+  <use href="#orb-sphere" fill="none" stroke="#1d1a16" stroke-width="6.5"/>
+  <path d="M16.8,120 A103.2,103.2 0 1,0 223.2,120 A103.2,103.2 0 1,0 16.8,120 Z M18.8,122 A103.2,103.2 0 1,0 225.2,122 A103.2,103.2 0 1,0 18.8,122 Z" fill="#1d1a16" fill-rule="evenodd"/>
+
+  <!-- Éclat sur le verre et étoiles autour -->
+  <use href="#orb-etoile" transform="translate(61 44.4) scale(0.95)" fill="#ffffff" stroke="#1d1a16" stroke-width="1.8" stroke-linejoin="round"/>
+  <g fill="#ffd34d" stroke="#1d1a16" stroke-linejoin="round">
+    <use href="#orb-etoile" transform="translate(206 32) scale(1.15)" stroke-width="2.2"/>
+    <use href="#orb-etoile" transform="translate(33 207) scale(0.85)" stroke-width="2.6"/>
+    <circle cx="222" cy="64" r="2.6" stroke-width="1.6"/>
+    <circle cx="16" cy="176" r="2.4" stroke-width="1.6"/>
+  </g>
+</svg>

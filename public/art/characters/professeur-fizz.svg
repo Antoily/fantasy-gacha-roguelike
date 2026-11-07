@@ -1,0 +1,494 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <!-- Professeur Fizz (Rare) : charte docs/art/charte.md. Lumière principale en haut à gauche ;
+       la potion, à droite, pose un liseré turquoise / magenta sur les bords ombrés. -->
+  <defs>
+    <filter id="professeur-fizz-flou" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+    <radialGradient id="professeur-fizz-halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff0fb" stop-opacity="0.85"/>
+      <stop offset="0.45" stop-color="#ff8fd8" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#6ff0e4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="professeur-fizz-liquide" cx="0.38" cy="0.4" r="0.65">
+      <stop offset="0" stop-color="#e8fffb"/>
+      <stop offset="0.45" stop-color="#6ff0e4"/>
+      <stop offset="1" stop-color="#1fb4bf"/>
+    </radialGradient>
+    <radialGradient id="professeur-fizz-rose" cx="0.45" cy="0.55" r="0.6">
+      <stop offset="0" stop-color="#fff0fa"/>
+      <stop offset="0.4" stop-color="#ff9ad8"/>
+      <stop offset="1" stop-color="#ff4fbf"/>
+    </radialGradient>
+
+    <!-- Cheveux : couronne en éruption derrière le crâne. -->
+    <path id="professeur-fizz-cheveux" d="M124 228 C 104 232 80 224 64 204 C 78 202 88 194 94 182 C 74 176 56 164 46 146 C 62 146 80 138 90 126 C 72 116 60 102 60 84 C 78 92 98 94 112 92 C 104 74 104 56 112 40 C 124 56 140 66 154 72 C 154 54 160 38 172 26 C 178 42 188 56 202 66 C 208 52 218 42 232 34 C 230 50 232 64 240 78 C 250 72 260 70 270 72 C 262 82 258 94 258 106 C 268 108 278 114 284 124 C 276 128 270 134 268 144 L 210 170 L 140 210 Z"/>
+    <clipPath id="professeur-fizz-cheveux-clip"><use href="#professeur-fizz-cheveux"/></clipPath>
+
+    <!-- Bras du fond (main levée, paume ouverte). -->
+    <path id="professeur-fizz-bras-g" d="M132 298 C 116 300 100 314 90 330 C 82 342 74 352 72 360 C 66 350 60 336 58 320 L 60 310 L 90 306 C 92 320 96 332 100 342 C 106 336 114 330 120 326 L 128 318 Z"/>
+    <clipPath id="professeur-fizz-bras-g-clip"><use href="#professeur-fizz-bras-g"/></clipPath>
+    <path id="professeur-fizz-main-g" d="M66 312 C 60 304 58 294 60 286 C 54 280 50 272 52 266 C 54 260 62 260 64 266 L 67 276 C 66 266 64 256 66 250 C 68 244 76 244 77 250 L 78 272 C 80 262 82 252 86 248 C 90 244 96 246 95 252 L 90 274 C 94 268 98 264 102 264 C 106 264 108 270 105 274 C 102 280 98 284 95 288 C 100 287 106 288 108 292 C 110 298 104 302 98 302 C 94 306 90 310 88 312 Z"/>
+    <clipPath id="professeur-fizz-main-g-clip"><use href="#professeur-fizz-main-g"/></clipPath>
+
+    <!-- Jambes et chaussures. -->
+    <path id="professeur-fizz-jambe-g" d="M122 410 L 162 410 C 158 426 154 442 152 458 L 118 458 C 118 442 120 426 122 410 Z"/>
+    <path id="professeur-fizz-jambe-d" d="M196 410 L 240 410 C 244 426 248 442 250 458 L 216 460 C 210 444 204 426 196 410 Z"/>
+    <clipPath id="professeur-fizz-jambes-clip"><use href="#professeur-fizz-jambe-g"/><use href="#professeur-fizz-jambe-d"/></clipPath>
+    <path id="professeur-fizz-chaussure-g" d="M146 452 C 130 448 110 450 100 460 C 94 468 100 476 112 476 L 150 476 C 154 468 152 458 146 452 Z"/>
+    <path id="professeur-fizz-chaussure-d" d="M218 454 C 236 450 258 452 268 462 C 274 470 268 478 256 478 L 216 478 C 212 470 212 460 218 454 Z"/>
+    <clipPath id="professeur-fizz-chaussures-clip"><use href="#professeur-fizz-chaussure-g"/><use href="#professeur-fizz-chaussure-d"/></clipPath>
+
+    <!-- Blouse : corps et pans, fente devant entre les pans. -->
+    <path id="professeur-fizz-blouse" d="M160 282 C 146 284 132 290 124 298 C 114 308 110 326 110 346 C 108 374 102 402 94 430 C 116 436 142 438 166 434 L 177 404 L 190 436 C 224 440 260 438 290 428 C 282 402 272 374 268 346 C 266 324 264 306 260 292 C 250 284 232 280 216 280 Z"/>
+    <clipPath id="professeur-fizz-blouse-clip"><use href="#professeur-fizz-blouse"/></clipPath>
+    <path id="professeur-fizz-gilet" d="M160 284 L 216 282 L 184 370 Z"/>
+    <clipPath id="professeur-fizz-gilet-clip"><use href="#professeur-fizz-gilet"/></clipPath>
+    <path id="professeur-fizz-revers-g" d="M162 282 L 144 298 L 152 308 C 160 326 170 348 184 370 C 176 344 168 314 162 282 Z"/>
+    <path id="professeur-fizz-revers-d" d="M214 280 L 240 292 L 230 302 L 236 310 C 220 330 202 350 184 370 C 194 342 204 312 214 280 Z"/>
+    <clipPath id="professeur-fizz-revers-clip"><use href="#professeur-fizz-revers-g"/><use href="#professeur-fizz-revers-d"/></clipPath>
+
+    <!-- Tête (trois quarts vers la droite), oreille, nez, moustache, bouche. -->
+    <path id="professeur-fizz-tete" d="M122 174 C 118 126 152 92 196 92 C 242 92 272 122 272 168 C 272 196 266 220 256 238 C 244 260 224 272 202 272 C 172 272 142 258 130 232 C 124 218 122 196 122 174 Z"/>
+    <clipPath id="professeur-fizz-tete-clip"><use href="#professeur-fizz-tete"/></clipPath>
+    <path id="professeur-fizz-oreille" d="M138 184 C 130 172 110 174 108 192 C 106 208 116 222 134 220 C 140 212 140 198 138 184 Z"/>
+    <clipPath id="professeur-fizz-oreille-clip"><use href="#professeur-fizz-oreille"/></clipPath>
+    <path id="professeur-fizz-nez" d="M206 190 C 212 192 218 194 222 196 C 232 198 236 208 232 216 C 228 224 216 226 208 222 C 202 219 200 212 204 208 C 206 202 206 196 206 190 Z"/>
+    <clipPath id="professeur-fizz-nez-clip"><use href="#professeur-fizz-nez"/></clipPath>
+    <path id="professeur-fizz-moustache" d="M218 216 C 206 214 192 218 184 224 C 176 230 168 230 162 224 C 162 236 172 244 184 244 C 192 245 198 242 204 244 C 210 246 216 244 220 242 C 228 245 238 244 246 240 C 254 236 260 230 262 222 C 256 226 250 224 244 220 C 236 215 226 214 218 216 Z"/>
+    <clipPath id="professeur-fizz-moustache-clip"><use href="#professeur-fizz-moustache"/></clipPath>
+    <path id="professeur-fizz-bouche" d="M198 242 C 208 244 228 244 240 240 C 240 254 232 264 219 264 C 206 264 198 254 198 242 Z"/>
+    <clipPath id="professeur-fizz-bouche-clip"><use href="#professeur-fizz-bouche"/></clipPath>
+    <path id="professeur-fizz-sourcil-g" d="M132 146 C 132 134 142 124 156 120 C 166 116 178 116 186 112 C 192 110 198 106 202 102 C 206 110 204 120 196 126 C 186 132 172 132 160 134 C 150 136 140 140 132 146 Z"/>
+    <path id="professeur-fizz-sourcil-d" d="M214 106 C 224 104 238 106 250 114 C 258 120 264 128 266 136 C 258 134 248 132 240 132 C 228 130 218 126 214 118 C 212 114 212 110 214 106 Z"/>
+    <clipPath id="professeur-fizz-sourcils-clip"><use href="#professeur-fizz-sourcil-g"/><use href="#professeur-fizz-sourcil-d"/></clipPath>
+    <ellipse id="professeur-fizz-oeil-g" cx="170" cy="178" rx="16" ry="18.5"/>
+    <clipPath id="professeur-fizz-oeil-g-clip"><use href="#professeur-fizz-oeil-g"/></clipPath>
+    <ellipse id="professeur-fizz-oeil-d" cx="237" cy="176" rx="12" ry="17.5"/>
+    <clipPath id="professeur-fizz-oeil-d-clip"><use href="#professeur-fizz-oeil-d"/></clipPath>
+
+    <!-- Bras tendu et fiole. -->
+    <path id="professeur-fizz-bras-d" d="M238 296 C 250 284 264 274 278 264 C 290 256 300 248 308 238 L 330 256 C 320 268 306 280 294 292 C 284 302 270 312 258 318 L 246 312 Z"/>
+    <clipPath id="professeur-fizz-bras-d-clip"><use href="#professeur-fizz-bras-d"/></clipPath>
+    <path id="professeur-fizz-main-d" d="M316 252 C 312 244 312 234 318 228 C 320 220 326 214 332 214 C 338 214 340 220 336 224 C 334 228 332 232 334 236 C 340 234 346 236 350 238 C 356 240 356 248 350 248 C 346 252 340 252 336 252 C 334 258 326 260 320 258 Z"/>
+    <clipPath id="professeur-fizz-main-d-clip"><use href="#professeur-fizz-main-d"/></clipPath>
+    <path id="professeur-fizz-fiole" d="M334 162 L 334 191 C 322 195 316 204 316 214 C 316 228.4 327.6 240 342 240 C 356.4 240 368 228.4 368 214 C 368 204 362 195 350 191 L 350 162 Z"/>
+    <clipPath id="professeur-fizz-fiole-clip"><use href="#professeur-fizz-fiole"/></clipPath>
+
+    <!-- Mousse : colonne turquoise qui s'épanouit en nuage magenta. -->
+    <path id="professeur-fizz-mousse-t" d="M328 160 C 320 154 318 144 324 136 C 316 130 314 118 322 112 C 314 104 316 90 326 86 C 330 76 344 72 352 78 C 362 74 372 82 370 92 C 380 98 378 112 368 116 C 374 124 372 136 362 140 C 366 148 362 158 354 160 C 346 164 336 164 328 160 Z"/>
+    <clipPath id="professeur-fizz-mousse-t-clip"><use href="#professeur-fizz-mousse-t"/></clipPath>
+    <path id="professeur-fizz-mousse-m" d="M302 100 A 8.5 8.5 0 0 1 290 89 A 12.5 12.5 0 0 1 286 67 A 13 13 0 0 1 297 47 A 13 13 0 0 1 315 33 A 13.5 13.5 0 0 1 337 23 A 13.5 13.5 0 0 1 361 27 A 13 13 0 0 1 377 43 A 13.5 13.5 0 0 1 382 66 A 13 13 0 0 1 372 88 A 13 13 0 0 1 352 100 A 13 13 0 0 1 329 104 A 15 15 0 0 1 302 100 Z"/>
+    <clipPath id="professeur-fizz-mousse-m-clip"><use href="#professeur-fizz-mousse-m"/></clipPath>
+
+    <!-- Étincelle à quatre branches, réutilisée à plusieurs tailles. -->
+    <path id="professeur-fizz-etincelle" d="M0 -10 C 1.5 -3 3 -1.5 10 0 C 3 1.5 1.5 3 0 10 C -1.5 3 -3 1.5 -10 0 C -3 -1.5 -1.5 -3 0 -10 Z"/>
+  </defs>
+
+  <!-- Halo de la potion (derrière tout). -->
+  <circle cx="336" cy="96" r="104" fill="url(#professeur-fizz-halo)"/>
+
+  <!-- Ombre portée. -->
+  <ellipse cx="186" cy="474" rx="104" ry="12" fill="#1d1a16" opacity="0.18"/>
+
+  <!-- ===== Cheveux (arrière) ===== -->
+  <use href="#professeur-fizz-cheveux" fill="#f5f3fb"/>
+  <g clip-path="url(#professeur-fizz-cheveux-clip)">
+    <!-- Ombre propre : dessous et côté droit des mèches, et cœur près du crâne. -->
+    <path d="M60 210 C 90 214 110 206 126 196 L 140 240 L 50 240 Z" fill="#c6c0e2"/>
+    <path d="M44 160 C 64 168 84 170 100 160 L 104 186 L 40 190 Z" fill="#c6c0e2"/>
+    <path d="M58 100 C 74 112 94 116 110 110 L 112 130 L 50 130 Z" fill="#c6c0e2"/>
+    <path d="M150 76 C 168 82 186 82 204 72 L 290 80 L 290 200 L 140 200 Z" fill="#c6c0e2"/>
+    <path d="M112 96 C 140 80 196 76 250 96 C 270 104 280 120 280 140 L 280 200 L 110 200 Z" fill="#9c94c8"/>
+    <!-- Lumières sur les pointes, côté haut gauche. -->
+    <path d="M66 92 C 74 98 84 100 94 100" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+    <path d="M114 46 C 112 58 114 68 120 76" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+    <path d="M170 32 C 166 44 166 54 170 62" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+    <path d="M50 148 C 60 152 72 152 82 148" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+    <!-- Liseré de contre-jour (la potion) sur les mèches de droite. -->
+    <path d="M232 40 C 232 54 236 66 242 76" fill="none" stroke="#9ff3ec" stroke-width="4" stroke-linecap="round"/>
+    <path d="M266 76 C 260 86 258 96 258 106" fill="none" stroke="#9ff3ec" stroke-width="4" stroke-linecap="round"/>
+    <path d="M280 122 C 274 128 270 134 268 142" fill="none" stroke="#ffb3ea" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#professeur-fizz-cheveux" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <!-- Mèches intérieures. -->
+  <g fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linecap="round">
+    <path d="M96 196 C 86 202 78 204 70 204"/>
+    <path d="M94 150 C 80 152 68 150 56 146"/>
+    <path d="M100 104 C 88 104 76 98 68 92"/>
+    <path d="M132 78 C 124 66 120 56 116 46"/>
+    <path d="M186 70 C 180 58 176 46 174 34"/>
+    <path d="M226 74 C 228 62 230 50 232 40"/>
+    <path d="M150 104 C 142 96 136 90 132 82"/>
+    <path d="M132 124 C 122 118 116 110 112 100"/>
+  </g>
+
+  <!-- ===== Bras du fond : manche, poignet roussi, main levée ===== -->
+  <use href="#professeur-fizz-bras-g" fill="#fffaf0"/>
+  <g clip-path="url(#professeur-fizz-bras-g-clip)">
+    <path d="M96 300 C 104 320 108 340 104 362 L 140 362 L 140 296 Z" fill="#cdc6e4"/>
+    <path d="M86 346 C 92 352 100 352 106 346 L 106 366 L 80 366 Z" fill="#a59dcc"/>
+    <path d="M66 330 C 68 344 70 352 74 358" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+    <!-- Poignet roussi : bande charbonneuse à bord déchiqueté. -->
+    <path d="M56 306 L 92 302 L 92 322 L 86 318 L 82 326 L 76 318 L 70 328 L 66 318 L 58 324 Z" fill="#6b4a3a"/>
+    <path d="M56 306 L 92 302 L 92 312 L 86 310 L 80 315 L 74 309 L 68 316 L 62 310 L 56 314 Z" fill="#3b2a24"/>
+  </g>
+  <use href="#professeur-fizz-bras-g" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M100 342 C 96 334 94 326 92 318" fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linecap="round"/>
+
+  <use href="#professeur-fizz-main-g" fill="#ffd9bf"/>
+  <g clip-path="url(#professeur-fizz-main-g-clip)">
+    <path d="M96 286 C 92 296 84 304 72 308 L 92 316 L 112 300 Z" fill="#e7a493"/>
+    <path d="M58 270 C 58 264 62 262 63 266" fill="none" stroke="#fff1e4" stroke-width="3" stroke-linecap="round"/>
+    <path d="M68 254 C 68 248 72 247 74 249" fill="none" stroke="#fff1e4" stroke-width="3" stroke-linecap="round"/>
+    <path d="M87 253 C 88 248 92 248 93 250" fill="none" stroke="#fff1e4" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#professeur-fizz-main-g" fill="none" stroke="#1d1a16" stroke-width="5.5" stroke-linejoin="round"/>
+  <path d="M72 296 C 78 300 86 300 92 296" fill="none" stroke="#c98274" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- ===== Jambes, chaussettes, chaussures ===== -->
+  <use href="#professeur-fizz-jambe-g" fill="#5a4a7e"/>
+  <use href="#professeur-fizz-jambe-d" fill="#5a4a7e"/>
+  <g clip-path="url(#professeur-fizz-jambes-clip)">
+    <path d="M146 410 C 148 430 146 446 142 460 L 170 460 L 170 410 Z" fill="#3e3262"/>
+    <path d="M226 410 C 232 428 236 446 236 462 L 256 462 L 256 410 Z" fill="#3e3262"/>
+    <rect x="110" y="410" width="150" height="12" fill="#2c2348"/>
+    <path d="M128 424 C 126 436 124 446 124 454" fill="none" stroke="#7d6ca8" stroke-width="4" stroke-linecap="round"/>
+    <path d="M206 424 C 210 436 214 446 218 454" fill="none" stroke="#7d6ca8" stroke-width="4" stroke-linecap="round"/>
+    <!-- Chaussettes rayées. -->
+    <rect x="110" y="446" width="150" height="16" fill="#4fd8cf"/>
+    <rect x="110" y="451" width="150" height="4" fill="#fffaf0"/>
+  </g>
+  <use href="#professeur-fizz-jambe-g" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <use href="#professeur-fizz-jambe-d" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+  <use href="#professeur-fizz-chaussure-g" fill="#8d4f2f"/>
+  <use href="#professeur-fizz-chaussure-d" fill="#8d4f2f"/>
+  <g clip-path="url(#professeur-fizz-chaussures-clip)">
+    <rect x="90" y="469" width="190" height="10" fill="#3a2418"/>
+    <path d="M150 452 C 146 462 138 468 126 470 L 160 470 Z" fill="#5e301e"/>
+    <path d="M250 454 C 262 460 268 466 268 470 L 280 470 L 280 450 Z" fill="#5e301e"/>
+    <path d="M106 462 C 112 456 122 454 130 454" fill="none" stroke="#c47e52" stroke-width="4" stroke-linecap="round"/>
+    <path d="M226 458 C 236 455 246 455 254 457" fill="none" stroke="#c47e52" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#professeur-fizz-chaussure-g" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <use href="#professeur-fizz-chaussure-d" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M100 469 L 150 469 M 214 470 L 268 470" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- ===== Blouse ===== -->
+  <use href="#professeur-fizz-blouse" fill="#fffaf0"/>
+  <g clip-path="url(#professeur-fizz-blouse-clip)">
+    <!-- Ombre propre : flanc droit et bas des pans. -->
+    <path d="M228 282 C 246 330 250 380 240 440 L 300 440 L 300 280 Z" fill="#cdc6e4"/>
+    <path d="M90 418 C 130 424 160 420 180 410 L 200 420 C 230 428 262 424 292 412 L 300 450 L 90 450 Z" fill="#cdc6e4"/>
+    <!-- Occlusion : sous le bras tendu, sous le col, sous les revers. -->
+    <path d="M238 300 C 250 312 262 318 272 320 L 272 342 C 258 338 246 328 236 316 Z" fill="#a59dcc"/>
+    <path d="M154 286 C 176 298 200 298 220 284 L 220 276 L 154 276 Z" fill="#a59dcc"/>
+    <path d="M150 304 C 158 326 168 348 182 372 L 172 372 C 160 352 152 330 146 308 Z" fill="#cdc6e4"/>
+    <path d="M236 310 C 222 330 206 350 188 372 L 200 374 C 216 356 230 336 242 316 Z" fill="#a59dcc"/>
+    <!-- Lumières : épaule du fond et pan gauche. -->
+    <path d="M128 302 C 138 294 150 290 160 290 C 148 298 140 308 134 322 Z" fill="#ffffff"/>
+    <path d="M118 340 C 116 370 112 396 106 420" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+    <!-- Liseré de contre-jour. -->
+    <path d="M268 330 C 272 370 280 400 286 424" fill="none" stroke="#9ff3ec" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <use href="#professeur-fizz-blouse" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <!-- Plis et coutures. -->
+  <g fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linecap="round">
+    <path d="M122 392 C 118 406 116 418 116 428"/>
+    <path d="M240 384 C 246 400 248 416 246 432"/>
+    <path d="M182 372 L 177 404"/>
+  </g>
+  <!-- Poche basse et crayon. -->
+  <path d="M244 380 L 246 372 L 252 372 L 250 380" fill="#ffd23f" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M244 372 L 249 362 L 252 372" fill="#ffe7b0" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M226 380 L 262 378 L 264 402 C 252 406 238 406 228 404 Z" fill="#fffaf0" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M230 386 L 260 384" fill="none" stroke="#a59dcc" stroke-width="2.5" stroke-dasharray="4 4" stroke-linecap="round"/>
+  <!-- Boutons. -->
+  <circle cx="191" cy="384" r="4.5" fill="#fffaf0" stroke="#1d1a16" stroke-width="2.5"/>
+  <circle cx="187" cy="402" r="4.5" fill="#fffaf0" stroke="#1d1a16" stroke-width="2.5"/>
+  <!-- Brûlure au bas du pan. -->
+  <path d="M100 418 C 106 410 116 410 120 418 C 124 424 120 430 112 430 C 104 432 96 426 100 418 Z" fill="#6b4a3a"/>
+  <path d="M106 420 C 108 416 114 416 115 420 C 116 424 110 426 106 420 Z" fill="#1d1a16"/>
+
+  <!-- ===== Gilet, col, nœud papillon, revers ===== -->
+  <use href="#professeur-fizz-gilet" fill="#22818a"/>
+  <g clip-path="url(#professeur-fizz-gilet-clip)">
+    <path d="M196 282 C 194 310 190 340 184 372 L 220 372 L 220 282 Z" fill="#155a68"/>
+    <path d="M168 300 C 172 320 176 340 180 356" fill="none" stroke="#43aaa8" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#professeur-fizz-gilet" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M186 324 C 196 330 204 330 210 324" fill="none" stroke="#1d1a16" stroke-width="5"/>
+  <path d="M186 324 C 196 330 204 330 210 324" fill="none" stroke="#f7c64f" stroke-width="2.5"/>
+  <circle cx="186" cy="318" r="3.4" fill="#f7c64f" stroke="#1d1a16" stroke-width="2"/>
+  <circle cx="184" cy="338" r="3.4" fill="#f7c64f" stroke="#1d1a16" stroke-width="2"/>
+
+  <use href="#professeur-fizz-revers-g" fill="#fffaf0"/>
+  <use href="#professeur-fizz-revers-d" fill="#fffaf0"/>
+  <g clip-path="url(#professeur-fizz-revers-clip)">
+    <path d="M214 280 C 210 310 200 340 186 372 L 250 372 L 250 280 Z" fill="#cdc6e4"/>
+    <path d="M150 296 L 160 300" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#professeur-fizz-revers-g" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <use href="#professeur-fizz-revers-d" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Col de chemise. -->
+  <path d="M188 280 L 166 278 L 170 298 Z" fill="#fffaf0" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M190 280 L 212 276 L 210 296 Z" fill="#fffaf0" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- Nœud papillon magenta à pois. -->
+  <path d="M188 290 C 178 282 168 278 160 280 C 156 288 156 296 160 302 C 168 302 178 298 188 292 Z" fill="#e2489f" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M190 290 C 200 282 210 278 218 280 C 222 288 222 296 218 302 C 210 302 200 298 190 292 Z" fill="#c9338a" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+  <circle cx="168" cy="288" r="2.2" fill="#fffaf0"/>
+  <circle cx="176" cy="295" r="2.2" fill="#fffaf0"/>
+  <circle cx="210" cy="288" r="2.2" fill="#fffaf0"/>
+  <circle cx="204" cy="296" r="2.2" fill="#fffaf0"/>
+  <rect x="182" y="283" width="14" height="14" rx="4" fill="#e2489f" stroke="#1d1a16" stroke-width="3.5"/>
+
+  <!-- Poche de poitrine pleine d'éprouvettes, sous l'aisselle : la manche tendue ne les cache pas. -->
+  <g stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round">
+    <rect x="219" y="312" width="9" height="34" rx="4.5" fill="#e8fbff"/>
+    <rect x="219" y="323" width="9" height="23" fill="#a6e34a"/>
+    <rect x="218" y="307" width="11" height="7" rx="2" fill="#a8693a"/>
+    <rect x="230" y="317" width="9" height="30" rx="4.5" fill="#e8fbff"/>
+    <rect x="230" y="327" width="9" height="20" fill="#ff4fbf"/>
+    <rect x="229" y="312" width="11" height="7" rx="2" fill="#a8693a"/>
+    <rect x="241" y="320" width="7.5" height="27" rx="3.7" fill="#e8fbff"/>
+    <rect x="241" y="328" width="7.5" height="19" fill="#ffd23f"/>
+  </g>
+  <path d="M216 336 L 251 332 L 252 357 C 241 360 229 360 218 358 Z" fill="#fffaf0" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M220 341 L 248 338" fill="none" stroke="#a59dcc" stroke-width="2.5" stroke-dasharray="4 4" stroke-linecap="round"/>
+
+  <!-- ===== Tête ===== -->
+  <use href="#professeur-fizz-tete" fill="#ffd9bf"/>
+  <g clip-path="url(#professeur-fizz-tete-clip)">
+    <!-- Ombre propre côté droit, occlusion sous les lunettes et sous la moustache. -->
+    <path d="M246 98 C 266 140 266 196 244 236 C 228 260 200 272 168 268 L 280 290 L 290 90 Z" fill="#e7a493"/>
+    <path d="M136 210 C 150 216 166 216 184 210 L 186 222 C 168 228 150 226 136 218 Z" fill="#e7a493"/>
+    <path d="M212 210 C 228 212 244 210 262 204 L 262 216 C 246 220 228 222 212 220 Z" fill="#e7a493"/>
+    <path d="M176 246 C 196 254 230 254 252 244 L 252 280 L 176 280 Z" fill="#e7a493"/>
+    <!-- Joues. -->
+    <ellipse cx="152" cy="226" rx="15" ry="9" fill="#ff7f96" opacity="0.5"/>
+    <ellipse cx="258" cy="222" rx="8" ry="7" fill="#ff7f96" opacity="0.5"/>
+    <!-- Reflet du crâne chauve, puis petit reflet nerveux. -->
+    <ellipse cx="160" cy="112" rx="22" ry="9" transform="rotate(-28 160 112)" fill="#fff1e4"/>
+    <circle cx="186" cy="100" r="4" fill="#ffffff"/>
+    <!-- Liseré de contre-jour. -->
+    <path d="M268 140 C 272 180 266 214 250 240" fill="none" stroke="#9ff3ec" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <use href="#professeur-fizz-tete" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <!-- Rides du front (sourcils levés). -->
+  <g fill="none" stroke="#c98274" stroke-width="2.5" stroke-linecap="round">
+    <path d="M182 100 C 192 96 204 96 214 100"/>
+    <path d="M196 108 C 206 104 218 104 228 108"/>
+  </g>
+
+  <!-- Oreille. -->
+  <use href="#professeur-fizz-oreille" fill="#ffd9bf"/>
+  <g clip-path="url(#professeur-fizz-oreille-clip)">
+    <path d="M124 186 C 116 190 116 204 124 210 C 130 206 132 196 124 186 Z" fill="#e88a86"/>
+    <path d="M136 206 C 130 214 122 218 114 216 L 140 230 Z" fill="#e7a493"/>
+  </g>
+  <use href="#professeur-fizz-oreille" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M128 186 C 118 186 116 200 124 208" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+  <path d="M120 200 C 114 198 110 196 106 192 M 120 202 C 114 204 110 206 106 208" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Sangle de cuir des lunettes. -->
+  <path d="M142 164 C 134 162 126 160 118 160 L 116 178 C 124 178 132 180 142 184 Z" fill="#8a5236" stroke="#1d1a16" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M138 170 C 132 169 126 168 120 168" fill="none" stroke="#c48a5e" stroke-width="2" stroke-dasharray="3 3"/>
+
+  <!-- Nez (sous le pont des lunettes). -->
+  <use href="#professeur-fizz-nez" fill="#ffc7ad"/>
+  <g clip-path="url(#professeur-fizz-nez-clip)">
+    <path d="M232 200 C 230 214 222 222 206 222 L 240 232 Z" fill="#e7a493"/>
+    <ellipse cx="222" cy="210" rx="9" ry="7" fill="#ff8f9a" opacity="0.55"/>
+    <ellipse cx="219" cy="203" rx="4" ry="3" fill="#ffffff"/>
+  </g>
+  <use href="#professeur-fizz-nez" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M209 213 C 212 216 216 216 218 214" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Bouche ouverte (émerveillée), puis moustache par-dessus. -->
+  <use href="#professeur-fizz-bouche" fill="#5b1d35"/>
+  <g clip-path="url(#professeur-fizz-bouche-clip)">
+    <path d="M200 240 L 238 238 L 237 248 C 226 249 212 249 201 248 Z" fill="#fffaf0"/>
+    <path d="M206 259 C 212 253 226 253 234 257 C 228 265 212 266 206 259 Z" fill="#ff7f9a"/>
+  </g>
+  <use href="#professeur-fizz-bouche" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <use href="#professeur-fizz-moustache" fill="#f5f3fb"/>
+  <g clip-path="url(#professeur-fizz-moustache-clip)">
+    <path d="M160 236 C 180 244 200 240 216 236 C 230 240 248 238 264 226 L 264 250 L 160 250 Z" fill="#c6c0e2"/>
+    <path d="M176 226 C 186 220 198 218 208 218" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#professeur-fizz-moustache" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M218 218 L 220 240 M 196 228 C 192 232 188 236 184 238 M 236 226 C 240 230 244 234 248 236" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- ===== Lunettes de laboratoire ===== -->
+  <!-- Intérieur des verres : yeux grossis. -->
+  <use href="#professeur-fizz-oeil-g" fill="#fffaf0"/>
+  <g clip-path="url(#professeur-fizz-oeil-g-clip)">
+    <ellipse cx="176" cy="174" rx="9.5" ry="11.5" fill="#4a86e0"/>
+    <path d="M166 168 C 170 160 182 160 186 168 L 186 160 L 166 160 Z" fill="#2f58b0"/>
+    <path d="M168 180 C 172 186 180 186 184 180 L 184 190 L 168 190 Z" fill="#8fe8f0"/>
+    <ellipse cx="177.5" cy="173" rx="5.8" ry="7.2" fill="#1d1a16"/>
+    <circle cx="172.5" cy="167" r="4" fill="#ffffff"/>
+    <circle cx="181.5" cy="179" r="1.8" fill="#ffffff"/>
+  </g>
+  <use href="#professeur-fizz-oeil-g" fill="none" stroke="#1d1a16" stroke-width="4" stroke-linejoin="round"/>
+  <use href="#professeur-fizz-oeil-d" fill="#fffaf0"/>
+  <g clip-path="url(#professeur-fizz-oeil-d-clip)">
+    <ellipse cx="242" cy="172" rx="8" ry="10.5" fill="#4a86e0"/>
+    <path d="M233 166 C 236 159 246 159 250 166 L 250 158 L 233 158 Z" fill="#2f58b0"/>
+    <path d="M235 177 C 238 182 245 182 249 177 L 249 186 L 235 186 Z" fill="#8fe8f0"/>
+    <ellipse cx="243.5" cy="171" rx="4.8" ry="6.4" fill="#1d1a16"/>
+    <circle cx="239.5" cy="165.5" r="3.3" fill="#ffffff"/>
+    <circle cx="246.5" cy="176.5" r="1.5" fill="#ffffff"/>
+  </g>
+  <use href="#professeur-fizz-oeil-d" fill="none" stroke="#1d1a16" stroke-width="4" stroke-linejoin="round"/>
+  <!-- Reflets de verre (fenêtre en haut à gauche, reflet coloré de la potion à droite). -->
+  <path d="M152 166 C 154 160 158 156 164 154" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" opacity="0.9"/>
+  <path d="M186 186 C 188 182 189 178 189 174" fill="none" stroke="#ff9ad8" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+  <path d="M224 164 C 226 159 229 156 233 154" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
+  <path d="M250 186 C 252 182 253 178 253 172" fill="none" stroke="#7ff0e4" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
+  <!-- Montures en laiton. -->
+  <circle cx="168" cy="176" r="27" fill="none" stroke="#f2b84b" stroke-width="9"/>
+  <ellipse cx="236" cy="174" rx="21" ry="26.5" fill="none" stroke="#f2b84b" stroke-width="8"/>
+  <path d="M187.1 195.1 A 27 27 0 0 1 148.9 195.1" fill="none" stroke="#b8762d" stroke-width="9"/>
+  <path d="M195 176 A 27 27 0 0 1 187.1 195.1" fill="none" stroke="#b8762d" stroke-width="9"/>
+  <path d="M257 174 A 21 26.5 0 0 1 221.2 192.7" fill="none" stroke="#b8762d" stroke-width="8"/>
+  <path d="M146 162 A 26 26 0 0 1 166 150" fill="none" stroke="#fff0a8" stroke-width="3" stroke-linecap="round"/>
+  <path d="M218 164 A 20 25 0 0 1 234 148" fill="none" stroke="#fff0a8" stroke-width="3" stroke-linecap="round"/>
+  <path d="M195 176 C 200 170 206 170 215 172" fill="none" stroke="#1d1a16" stroke-width="10" stroke-linecap="round"/>
+  <path d="M195 176 C 200 170 206 170 215 172" fill="none" stroke="#f2b84b" stroke-width="4.5" stroke-linecap="round"/>
+  <g fill="none" stroke="#1d1a16">
+    <circle cx="168" cy="176" r="31.5" stroke-width="5"/>
+    <circle cx="168" cy="176" r="22.5" stroke-width="3.5"/>
+    <ellipse cx="236" cy="174" rx="25" ry="30.5" stroke-width="5"/>
+    <ellipse cx="236" cy="174" rx="17" ry="22.5" stroke-width="3.5"/>
+  </g>
+  <g fill="#fff0a8" stroke="#1d1a16" stroke-width="1.5">
+    <circle cx="149" cy="157" r="2.4"/>
+    <circle cx="187" cy="157" r="2.4"/>
+    <circle cx="149" cy="195" r="2.4"/>
+    <circle cx="187" cy="195" r="2.4"/>
+    <circle cx="221" cy="155" r="2.2"/>
+    <circle cx="251" cy="155" r="2.2"/>
+  </g>
+
+  <!-- Sourcils broussailleux, levés et inquiets. -->
+  <use href="#professeur-fizz-sourcil-g" fill="#f5f3fb"/>
+  <use href="#professeur-fizz-sourcil-d" fill="#f5f3fb"/>
+  <g clip-path="url(#professeur-fizz-sourcils-clip)">
+    <path d="M130 146 C 150 134 176 130 206 116 L 206 140 L 130 150 Z" fill="#c6c0e2"/>
+    <path d="M214 120 C 230 128 250 130 268 134 L 268 140 L 210 140 Z" fill="#c6c0e2"/>
+  </g>
+  <use href="#professeur-fizz-sourcil-g" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <use href="#professeur-fizz-sourcil-d" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Goutte d'inquiétude. -->
+  <path d="M278 100 C 284 110 288 116 288 121 C 288 127 283 130 278 130 C 273 130 268 127 268 121 C 268 116 272 110 278 100 Z" fill="#bff3ff" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <ellipse cx="274.5" cy="121" rx="2" ry="3.5" fill="#ffffff"/>
+
+  <!-- ===== Bras tendu ===== -->
+  <use href="#professeur-fizz-bras-d" fill="#fffaf0"/>
+  <g clip-path="url(#professeur-fizz-bras-d-clip)">
+    <path d="M240 312 C 270 298 300 278 324 250 L 340 270 L 250 330 Z" fill="#cdc6e4"/>
+    <path d="M250 286 C 266 276 284 264 300 248" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+    <path d="M262 312 C 280 300 298 286 316 266" fill="none" stroke="#ffb3ea" stroke-width="4" stroke-linecap="round"/>
+    <!-- Poignet roussi. -->
+    <path d="M300 236 L 334 262 L 318 270 L 316 262 L 308 266 L 308 256 L 298 258 L 300 248 L 292 248 Z" fill="#6b4a3a"/>
+    <path d="M304 236 L 334 260 L 324 264 L 320 256 L 314 258 L 314 250 L 306 250 L 306 244 L 300 244 Z" fill="#3b2a24"/>
+  </g>
+  <use href="#professeur-fizz-bras-d" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M276 296 C 282 290 286 284 288 278" fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- ===== Fiole ===== -->
+  <use href="#professeur-fizz-fiole" fill="url(#professeur-fizz-liquide)"/>
+  <g clip-path="url(#professeur-fizz-fiole-clip)">
+    <path d="M360 196 C 370 214 364 232 346 240 L 380 250 L 380 190 Z" fill="#1fb4bf"/>
+    <circle cx="332" cy="222" r="3" fill="#e8fffb"/>
+    <circle cx="342" cy="208" r="4" fill="#e8fffb"/>
+    <circle cx="350" cy="226" r="2.5" fill="#e8fffb"/>
+    <circle cx="340" cy="180" r="2.5" fill="#e8fffb"/>
+    <path d="M324 206 C 326 200 330 196 336 194" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M338 168 L 338 186" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#professeur-fizz-fiole" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="329" y="154" width="26" height="9" rx="4.5" fill="#e8fbff" stroke="#1d1a16" stroke-width="4.5"/>
+
+  <!-- Main qui tient la fiole. -->
+  <use href="#professeur-fizz-main-d" fill="#ffd9bf"/>
+  <g clip-path="url(#professeur-fizz-main-d-clip)">
+    <path d="M318 246 C 330 250 342 250 354 244 L 356 262 L 316 262 Z" fill="#e7a493"/>
+    <path d="M322 228 C 324 222 328 218 332 217" fill="none" stroke="#fff1e4" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#professeur-fizz-main-d" fill="none" stroke="#1d1a16" stroke-width="5.5" stroke-linejoin="round"/>
+  <path d="M335 244 C 340 246 345 248 349 248 M 324 240 C 328 238 331 237 334 236" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- ===== Mousse lumineuse ===== -->
+  <use href="#professeur-fizz-mousse-t" fill="#7ff0e4" filter="url(#professeur-fizz-flou)" opacity="0.9"/>
+  <use href="#professeur-fizz-mousse-m" fill="#ff8fd8" filter="url(#professeur-fizz-flou)" opacity="0.9"/>
+
+  <use href="#professeur-fizz-mousse-t" fill="#3fe3d6"/>
+  <g clip-path="url(#professeur-fizz-mousse-t-clip)">
+    <path d="M370 96 C 360 118 362 140 350 162 L 380 162 L 380 90 Z" fill="#1ea8b4"/>
+    <path d="M330 150 C 334 130 336 112 340 92" fill="none" stroke="#c9fff8" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="352" cy="124" r="4" fill="#c9fff8"/>
+    <circle cx="346" cy="144" r="3" fill="#c9fff8"/>
+    <circle cx="355" cy="104" r="5.5" fill="none" stroke="#e8fffb" stroke-width="2.2"/>
+    <circle cx="336" cy="128" r="4" fill="none" stroke="#e8fffb" stroke-width="2"/>
+    <circle cx="362" cy="134" r="3.5" fill="none" stroke="#8ff3ea" stroke-width="2"/>
+    <circle cx="341" cy="96" r="2.5" fill="#ffffff"/>
+  </g>
+  <use href="#professeur-fizz-mousse-t" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+
+  <use href="#professeur-fizz-mousse-m" fill="url(#professeur-fizz-rose)"/>
+  <g clip-path="url(#professeur-fizz-mousse-m-clip)">
+    <!-- Ombre des lobes du bas : bord festonné net, un dôme par bulle. -->
+    <path d="M282 98 Q 294 84 306 98 Q 318 86 332 100 Q 344 88 356 98 Q 368 86 374 82 Q 382 74 388 62 L 396 120 L 276 120 Z" fill="#e0369f"/>
+    <!-- Bulles prises dans la mousse (cercles de lumière, quelques-unes turquoise). -->
+    <circle cx="318" cy="68" r="9" fill="none" stroke="#fff0fa" stroke-width="2.5"/>
+    <circle cx="352" cy="52" r="6.5" fill="none" stroke="#fff0fa" stroke-width="2.5"/>
+    <circle cx="341" cy="82" r="5" fill="#8ff3ea" stroke="#e8fffb" stroke-width="2"/>
+    <circle cx="300" cy="80" r="4" fill="#8ff3ea" stroke="#e8fffb" stroke-width="2"/>
+    <circle cx="368" cy="70" r="4.5" fill="none" stroke="#fff0fa" stroke-width="2"/>
+    <circle cx="303" cy="60" r="2.5" fill="#ffffff"/>
+    <circle cx="334" cy="44" r="2.5" fill="#ffffff"/>
+    <circle cx="315" cy="65" r="2.2" fill="#ffffff"/>
+    <!-- Reflets nets en haut à gauche des lobes. -->
+    <path d="M292 62 A 12 12 0 0 1 299 50" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M311 39 A 12 12 0 0 1 322 32" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M335 28 A 12 12 0 0 1 346 25" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <use href="#professeur-fizz-mousse-m" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  <!-- Lobes avant, articulés en magenta sombre plutôt qu'à l'encre (pas de « plis »). -->
+  <g fill="none" stroke="#b8237f" stroke-width="2.5" stroke-linecap="round">
+    <path d="M306 98 A 13 13 0 0 1 326 90"/>
+    <path d="M356 96 A 12 12 0 0 1 370 84"/>
+    <path d="M346 30 A 13 13 0 0 1 358 42"/>
+  </g>
+
+  <!-- Coulures sur le col de la fiole. -->
+  <path d="M332 160 C 332 168 330 174 332 178 C 334 183 340 181 339 175 C 338 169 340 164 343 161 Z" fill="#3fe3d6" stroke="#1d1a16" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M349 160 C 353 168 352 178 354 186 C 356 192 362 190 361 184 C 359 176 358 168 357 160 Z" fill="#3fe3d6" stroke="#1d1a16" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- ===== Bulles et étincelles ===== -->
+  <g stroke="#1d1a16" stroke-width="2.5">
+    <circle cx="296" cy="182" r="6" fill="#ffd6f2"/>
+    <circle cx="384" cy="118" r="6" fill="#c9fff8"/>
+    <circle cx="300" cy="140" r="5" fill="#c9fff8"/>
+    <circle cx="380" cy="152" r="8" fill="#ffd6f2"/>
+    <circle cx="294" cy="16" r="5" fill="#c9fff8"/>
+    <circle cx="262" cy="56" r="4" fill="#ffd6f2"/>
+  </g>
+  <g fill="#ffffff">
+    <circle cx="294" cy="180" r="2"/>
+    <circle cx="382" cy="116" r="1.8"/>
+    <circle cx="377" cy="149" r="2.6"/>
+  </g>
+  <g fill="#fff6b0" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round">
+    <use href="#professeur-fizz-etincelle" transform="translate(266 30) scale(1)"/>
+    <use href="#professeur-fizz-etincelle" transform="translate(388 96) scale(0.8)"/>
+    <use href="#professeur-fizz-etincelle" transform="translate(298 120) scale(0.7)"/>
+    <use href="#professeur-fizz-etincelle" transform="translate(380 190) scale(0.9)"/>
+  </g>
+</svg>

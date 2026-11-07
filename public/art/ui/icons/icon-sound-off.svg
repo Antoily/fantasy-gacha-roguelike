@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Haut-parleur coupé : même corps que icon-sound-on, les ondes remplacées par une croix rouge
+       (#ff6b6b, couleur « danger » de l'interface) cernée d'encre. Contour 5, ombre portée 20 %. -->
+  <defs>
+    <path id="icon-sound-off-corps" d="M9 23 L16 23 L24 13 Q24 9.5 27.5 9.5 Q31 9.5 31 13 L31 51 Q31 54.5 27.5 54.5 Q24 54.5 24 51 L16 41 L9 41 Q6 41 6 38 L6 26 Q6 23 9 23 Z"/>
+    <clipPath id="icon-sound-off-clip"><use href="#icon-sound-off-corps"/></clipPath>
+    <path id="icon-sound-off-croix" d="M40 24.5 L55 39.5 M55 24.5 L40 39.5"/>
+  </defs>
+
+  <!-- Ombre portée du haut-parleur et de la croix. -->
+  <g transform="translate(1.5 3)" opacity="0.2">
+    <use href="#icon-sound-off-corps" fill="#1d1a16"/>
+    <use href="#icon-sound-off-croix" fill="none" stroke="#1d1a16" stroke-width="12" stroke-linecap="round"/>
+  </g>
+
+  <!-- Corps. -->
+  <use href="#icon-sound-off-corps" fill="#7ec8e3"/>
+  <g clip-path="url(#icon-sound-off-clip)">
+    <path d="M0 35.5 L16 35.5 L24 38 L24 64 L0 64 Z" fill="#5ca6dd"/>
+    <path d="M0 23 L16 23 L24 13 L24 18.5 L16 27.5 L0 27.5 Z" fill="#c4ecf9"/>
+    <rect x="24" y="0" width="8" height="38" fill="#a3daf0"/>
+    <rect x="24" y="38" width="8" height="26" fill="#7ec8e3"/>
+    <path d="M24 46 L32 46 L32 64 L24 64 Z" fill="#5ca6dd"/>
+    <path d="M19.9 23.6 L23 19.7" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M26.9 16.5 L26.9 24" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+    <circle cx="10" cy="27.8" r="1.2" fill="#ffffff"/>
+  </g>
+  <path d="M16 23.5 L16 40.5 M24 14 L24 50" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <use href="#icon-sound-off-corps" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- Croix : encre, cœur rouge, reflet sur la branche tournée vers la lumière. -->
+  <use href="#icon-sound-off-croix" fill="none" stroke="#1d1a16" stroke-width="12" stroke-linecap="round"/>
+  <use href="#icon-sound-off-croix" fill="none" stroke="#ff6b6b" stroke-width="6" stroke-linecap="round"/>
+  <path d="M52.6 24.6 L49 28.2" fill="none" stroke="#ffd0d0" stroke-width="1.6" stroke-linecap="round"/>
+  <circle cx="41.4" cy="25.2" r="1.1" fill="#ffd0d0"/>
+</svg>
