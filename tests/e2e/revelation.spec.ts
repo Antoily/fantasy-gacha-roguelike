@@ -114,7 +114,12 @@ test('×10 : palier du meilleur, puis cartes une à une, OK à la fin (US5, FR-0
   expect(await modal(page)).toBeNull();
 });
 
+// Dix communs (le dixième devient Rare par la garantie) : aucune présentation plein écran
+// (007) ne vient s'intercaler dans les mesures de temps.
+const TEN_COMMONS = [...Array.from({ length: 10 }, () => [rarityRoll('common'), 0]).flat(), DIRECT, 0.5];
+
 test('passer l’animation : cartes en moins de 0,5 s, rien de changé (US2, FR-006)', async ({ page }) => {
+  await scriptRng(page, TEN_COMMONS);
   await tap(page, GACHA.pullTen);
   await waitModal(page, 'reveal');
   const before = await save(page);
@@ -131,6 +136,7 @@ test('passer l’animation : cartes en moins de 0,5 s, rien de changé (US2, FR-
 });
 
 test('appui pendant le retournement : tout se retourne, seul OK ferme', async ({ page }) => {
+  await scriptRng(page, TEN_COMMONS);
   await tap(page, GACHA.pullTen);
   await waitModal(page, 'flip');
   await page.mouse.click(180, 320);
@@ -144,6 +150,7 @@ test('appui pendant le retournement : tout se retourne, seul OK ferme', async ({
 
 test('verrou : un seul tirage, l’écran de tirage ne répond pas pendant l’animation (FR-007)', async ({ page }) => {
   const { x, y } = center(GACHA.pullSingle);
+  await scriptRng(page, [rarityRoll('common'), 0, DIRECT]);
   await page.mouse.dblclick(x, y);
   await waitModal(page, 'reveal');
   expect((await save(page))!.currency).toBe(8900);

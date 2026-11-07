@@ -109,6 +109,9 @@ export const ART_FX = {
   splashText: toCss(palette.panel),
   splashStroke: toCss(palette.ink),
   ribbon: palette.paper,
+  // Bandeau clair derrière les textes posés sur le fond illustré (FR-008, contraste ≥ 4,5:1).
+  textPlate: palette.paper,
+  textPlateAlpha: 0.82,
 } as const;
 
 export const STROKE = { thin: 2, base: 3, thick: 4 } as const;

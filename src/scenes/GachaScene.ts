@@ -24,7 +24,7 @@ import { Particles } from '../ui/particles';
 import { celebrateSingle, playFlip, playReveal, sparkleBest, type Sequence } from '../ui/reveal';
 import { playSplash } from '../ui/splash';
 import { Sfx } from '../ui/sfx';
-import { COLORS, CSS, FONT_SIZE, STROKE } from '../ui/theme';
+import { ART_FX, COLORS, CSS, FONT_SIZE, STROKE } from '../ui/theme';
 import {
   makeButton, makeEmblem, makeModal, makeOrb, makePanel, makePortrait, makeResultCard, makeShardAmount, makeShardIcon,
   textStyle, type Button,
@@ -53,6 +53,8 @@ export class GachaScene extends Phaser.Scene {
   // Icônes illustrées du son (007), à la place du dessin quand elles existent.
   private muteImages: { on: Phaser.GameObjects.Image; off: Phaser.GameObjects.Image } | null = null;
   private bannerPortrait: Phaser.GameObjects.Container | null = null;
+  // Bandeaux clairs sous les textes posés sur le fond (FR-008), redessinés à chaque refresh.
+  private textPlates!: Phaser.GameObjects.Graphics;
   private currencyText!: Phaser.GameObjects.Text;
   private counterText!: Phaser.GameObjects.Text;
   private shardsText!: Phaser.GameObjects.Text;
@@ -89,6 +91,7 @@ export class GachaScene extends Phaser.Scene {
       { ...textStyle(FONT_SIZE.body, CSS.textDim), align: 'center', wordWrap: { width: GACHA.pullSingle.w } })
       .setOrigin(0.5, 0);
 
+    this.textPlates = this.add.graphics();
     this.pityText = this.add.text(GACHA.orb.x, GACHA.pityLineY, '', textStyle(FONT_SIZE.body, CSS.textDim)).setOrigin(0.5);
     this.featuredText = this.add.text(GACHA.orb.x, GACHA.featuredLineY, '', textStyle(FONT_SIZE.body)).setOrigin(0.5);
     makeButton(this, GACHA.collection, 'Collection', COLORS.btn.secondary, () => this.showCollection());
@@ -236,6 +239,7 @@ export class GachaScene extends Phaser.Scene {
       ? `Prochain ${rarityLabel(vedette.rarity)} garanti\u00a0: ${vedette.name}`
       : '');
     document.body.dataset.featuredLine = this.featuredText.text;
+    this.drawTextPlates();
     const single = canAfford(p, 1);
     const ten = canAfford(p, 10);
     this.singleButton.setEnabled(single);
@@ -248,6 +252,20 @@ export class GachaScene extends Phaser.Scene {
           ? `Pas assez de pièces pour un ×10 (il en faut ${formatAmount(GACHA_CONFIG.costTen)}).`
           : '',
     );
+  }
+
+  // Un bandeau par bloc de texte non vide, à la largeur du texte.
+  private drawTextPlates() {
+    const g = this.textPlates.clear().fillStyle(ART_FX.textPlate, ART_FX.textPlateAlpha);
+    const lines = [this.pityText, this.featuredText].filter(t => t.text !== '');
+    if (lines.length > 0) {
+      const w = Math.max(...lines.map(t => t.width)) + 24;
+      const top = Math.min(...lines.map(t => t.y - t.height / 2)) - 4;
+      const bottom = Math.max(...lines.map(t => t.y + t.height / 2)) + 4;
+      g.fillRoundedRect(GACHA.orb.x - w / 2, top, w, bottom - top, (bottom - top) / 2 > 12 ? 12 : (bottom - top) / 2);
+    }
+    const s = this.shortageText;
+    if (s.text !== '') g.fillRoundedRect(s.x - s.width / 2 - 12, s.y - 4, s.width + 24, s.height + 8, 12);
   }
 
   private onPull(count: PullCount) {

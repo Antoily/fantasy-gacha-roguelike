@@ -31,24 +31,24 @@ async function pullOne(page: Page, rarity: Rarity, reveal: readonly number[]) {
 
 test('palier direct : suspense puis le son du palier (FR-001)', async ({ page }) => {
   await pullOne(page, 'ultra', [DIRECT]);
-  expect(await sounds(page)).toBe('suspense tier:ultra');
+  expect(await sounds(page)).toBe('suspense crack crack crack tier:ultra');
   await tap(page, RESULTS.ok);
   await pullOne(page, 'common', [DIRECT]);
-  expect(await sounds(page)).toBe('suspense tier:common');
+  expect(await sounds(page)).toBe('suspense crack crack crack tier:common');
 });
 
 test('montée : son de montée entre les deux paliers (FR-002)', async ({ page }) => {
   await pullOne(page, 'legendary', [0.1]);
-  expect(await sounds(page)).toBe('suspense tier:rare rise tier:legendary');
+  expect(await sounds(page)).toBe('suspense crack crack crack tier:rare rise tier:legendary');
 });
 
 test('leurre : le rire diabolique à la retombée (FR-003)', async ({ page }) => {
   await pullOne(page, 'rare', [0.05, 0.5]);
-  expect(await sounds(page)).toBe('suspense tier:legendary laugh tier:rare');
+  expect(await sounds(page)).toBe('suspense crack crack crack tier:legendary laugh tier:rare');
   await tap(page, RESULTS.ok);
   // Même rareté sans leurre : pas de rire.
   await pullOne(page, 'rare', [DIRECT]);
-  expect(await sounds(page)).toBe('suspense tier:rare');
+  expect(await sounds(page)).toBe('suspense crack crack crack tier:rare');
 });
 
 test('×10 : un bruit par carte, la vedette en dernier (FR-004)', async ({ page }) => {
@@ -58,7 +58,7 @@ test('×10 : un bruit par carte, la vedette en dernier (FR-004)', async ({ page 
   await tap(page, GACHA.pullTen);
   await waitModal(page, 'results');
   await page.waitForTimeout(100);
-  expect(await sounds(page)).toBe(['suspense', 'tier:legendary', ...Array<string>(9).fill('card'), 'star'].join(' '));
+  expect(await sounds(page)).toBe(['suspense', 'crack', 'crack', 'crack', 'tier:legendary', ...Array<string>(9).fill('card'), 'star'].join(' '));
 });
 
 test('passer : plus aucun son après l’appui (FR-005, SC-003)', async ({ page }) => {
@@ -97,7 +97,7 @@ test('couper le son : silence, mémorisé, survit à « Recommencer » (FR-006, 
   await tap(page, GACHA.mute);
   expect(await muted(page)).toBe('0');
   await pullOne(page, 'common', [DIRECT]);
-  expect(await sounds(page)).toBe('suspense tier:common');
+  expect(await sounds(page)).toBe('suspense crack crack crack tier:common');
 });
 
 test('le bouton son ne réagit pas pendant l’animation', async ({ page }) => {
@@ -123,7 +123,7 @@ test('un son qui plante ne perturbe pas le jeu (FR-008)', async ({ page }) => {
   });
   await load(page);
   await pullOne(page, 'ultra', [DIRECT]);
-  expect(await sounds(page)).toBe('suspense tier:ultra');
+  expect(await sounds(page)).toBe('suspense crack crack crack tier:ultra');
   await tap(page, RESULTS.ok);
   expect(errors).toEqual([]);
 });

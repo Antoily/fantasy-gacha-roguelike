@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { LAUGH } from '../data/sounds';
-import { buildVignettes, queueArt } from '../ui/art';
+import { queueArt, rasterizeArt } from '../ui/art';
 import { parseSave, SAVE_KEY } from '../logic/save';
 import { parseSettings, SETTINGS_KEY } from '../logic/settings';
 
@@ -19,10 +19,15 @@ export class BootScene extends Phaser.Scene {
   }
 
   create() {
-    // Signal pour l'e2e : les illustrations en repli (FR-010).
-    const missing = buildVignettes(this);
-    if (missing.length > 0) document.body.dataset.artMissing = missing.join(',');
-    else delete document.body.dataset.artMissing;
+    void rasterizeArt(this).then(missing => {
+      // Signal pour l'e2e : les illustrations en repli (FR-010).
+      if (missing.length > 0) document.body.dataset.artMissing = missing.join(',');
+      else delete document.body.dataset.artMissing;
+      this.startGacha();
+    });
+  }
+
+  private startGacha() {
     let raw: string | null = null;
     let settings: string | null = null;
     try {

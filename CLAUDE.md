@@ -28,7 +28,8 @@ Remise à zéro le 2026-10-19 (ADR 0002). L'ancien prototype « Fantasy Roguelik
 Gacha » est sous le tag `legacy-v1` et la branche `legacy` (ne pas supprimer). On
 construit d'abord **le gacha seul** ; le gameplay viendra après. Stack : Phaser 4 +
 TS 6 + Vite 8 sur Node 24, local-only (ADR 0004). Features livrées : 001 Tirage,
-002 Pity & doublons, 003 Collection, 004 Révélation, 005 Son, 006 Bannières.
+002 Pity & doublons, 003 Collection, 004 Révélation, 005 Son, 006 Bannières,
+007 Illustrations (avec la révision 2 de 004).
 
 ## Commandes
 
@@ -41,6 +42,8 @@ source ~/.nvm/nvm.sh && nvm use
 npm run lint && npm run typecheck && npm test   # logique pure (Vitest)
 npm run e2e        # build + vite preview + Playwright ; captures dans test-results/captures/
 npm run dev        # jeu en local (pour vérifier un rendu : e2e ou preview, pas dev)
+npm run art:check  # visuels SVG conformes à la charte (CI) ; art:contrast : textes sur le fond (CI)
+npm run art:preview -- character <id> | ui <fichier.svg> [--mock main|reveal|cards] | gallery
 scripts/mutate.sh <fichier> '<ancien>' '<nouveau>' [filtre]   # validation par mutation
 scripts/mutate-e2e.sh <fichier> '<ancien>' '<nouveau>' <spec e2e> [-g titre]   # idem pour une scène
 ```
@@ -50,10 +53,12 @@ scripts/mutate-e2e.sh <fichier> '<ancien>' '<nouveau>' <spec e2e> [-g titre]   #
 ```
 src/data/     contenu : catalogue.ts (20 éléments), gachaConfig.ts (raretés, poids, coûts), revealConfig.ts (fausses pistes, durées), sounds.ts (recettes des bruitages)
 src/logic/    TS pur, testé : rng, rates, gacha, banners, progression, save, format, collection, reveal, soundCues, settings (lint : ni phaser ni navigateur)
-src/ui/       theme.ts (SEULES couleurs/polices), layout.ts (géométrie, partagée avec l'e2e), widgets.ts, reveal.ts (animation), sfx.ts (son)
+src/ui/       theme.ts (SEULES couleurs/polices), layout.ts (géométrie, partagée avec l'e2e), widgets.ts, reveal.ts (animation), sfx.ts (son),
+              art.ts (chargement des visuels, vignettes), display.ts (échelle de rendu R), splash.ts (présentation plein écran)
 src/scenes/   BootScene (lit la sauvegarde) → GachaScene (écran + fenêtres)
 tests/e2e/    parcours Playwright du quickstart, critère de merge
 public/sounds/ enregistrements CC0 seulement, chacun listé dans CREDITS.md (ADR 0006)
+public/art/   SVG faits main (ADR 0007) : characters/<id>.svg + <id>.json (cadrages), ui/ ; charte et fiches dans docs/art/
 ```
 
 - Positions : toute zone cliquable vient de `src/ui/layout.ts`, que le test e2e
@@ -222,6 +227,26 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
   et Phaser borne alors son delta (page « hors focus ») : le jeu passe au ralenti.
   Remplacer `requestAnimationFrame` et `performance.now` par une horloge virtuelle,
   avancer de 1/30 s, `page.screenshot()` à chaque image, puis `ffmpeg -framerate 30`.
+
+## Leçons de la feature 007 (illustrations)
+
+- **Produire des visuels** : un agent par visuel, dans son propre contexte, avec la charte
+  (`docs/art/charte.md`) et sa fiche (`docs/art/briefs.md`) ; il boucle dessiner →
+  `art:preview` → regarder le PNG → corriger. Vingt agents Opus en parallèle épuisent la
+  limite d'usage en ~20 min (trois fois de suite) : en lancer 3 à 6 à la fois, avec un prompt
+  compact (règles de la charte recopiées), une à deux passes de correction.
+- **Chargeurs Phaser fragiles** : `load.svg` / `load.json` lèvent une exception et bloquent
+  le démarrage quand le serveur renvoie `index.html` pour un fichier absent (repli SPA de
+  `vite preview`). Les visuels sont chargés en texte, validés, puis rastérisés par
+  `src/ui/art.ts` ; un fichier invalide laisse le dessin d'avant (FR-010).
+- **Netteté** : canvas 360R × 640R, caméra ×R, textes en `resolution: R` (`textStyle`). Tout
+  nouveau texte passe par `textStyle`, toute image se charge à sa taille d'affichage × R.
+  L'e2e (densité 1) garde R = 1 ; un test tourne à densité 2.
+- **Présentations dans l'e2e** : `waitModal` passe d'elles-mêmes les fenêtres `splash` ; un
+  test chronométré tire au hasard scripté, sinon un Légendaire aléatoire décale la mesure.
+- Le journal des sons compte trois `crack` après `suspense` (révision 2 de 004).
+- `pkill -f "<motif>"` tue aussi le shell dont la ligne de commande contient le motif :
+  écrire `pkill -f "vite preview --port 418[3]"`.
 
 ## Conventions de code
 

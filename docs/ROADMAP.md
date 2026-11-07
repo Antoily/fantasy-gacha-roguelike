@@ -6,7 +6,7 @@ mergée et jouable.
 
 ## En cours
 
-- **007 Illustrations** (`specs/007-illustrations/`) : une illustration cartoon détaillée par élément (cartes, collection en silhouettes, bannière), présentation plein écran des Légendaires et Ultra rares, écran de tirage habillé ; avec la révision 2 de 004 (suspense de 1,6 s en trois temps, deux fois plus de particules).
+_Rien : prochaine étape à choisir avec l'utilisateur (« Plus tard »)._
 
 ## Ensuite — le gacha
 
@@ -38,6 +38,12 @@ résultat du tirage ; le joueur devine ce qu'il a eu avant de voir les cartes.
 
 ## Fait
 
+- 2026-11-05 — **007 Illustrations** et **révision 2 de 004** : une illustration cartoon
+  détaillée par élément (SVG faits main sous une charte, ADR 0007), cartes illustrées,
+  collection en portraits et silhouettes, portrait de la vedette, présentation plein écran
+  des Légendaires et Ultra rares, écran habillé (ciel de rêve, orbe, icônes, emblèmes, dos
+  de carte), rendu net à toute densité ; révélation de nuit, cercle magique, orbe qui se
+  fissure trois fois puis éclate, temps figé, deux fois plus de particules.
 - 2026-10-26 — **Révision de 004** : particules faites main (aspiration pendant le
   suspense, explosion par palier, pluie dès Légendaire), cartes du ×10 une à une avec
   anticipation selon la rareté, vedette qui bat pendant que les autres s'assombrissent,

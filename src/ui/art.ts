@@ -55,23 +55,66 @@ export const hasArt = (scene: Phaser.Scene, item: Item) => scene.textures.exists
 export const orbSize = (sphereRadius: number) => sphereRadius * 2.4;
 export const hasUi = (scene: Phaser.Scene, name: UiArt) => scene.textures.exists(uiKey(name));
 
-// À appeler dans un preload : tout est chargé avant l'écran de tirage.
+const textKey = (key: string) => `text:${key}`;
+
+// À appeler dans un preload. Tout est chargé en TEXTE : les chargeurs SVG et JSON de
+// Phaser lèvent une exception (et bloquent le démarrage) quand un serveur renvoie sa page
+// d'accueil à la place d'un fichier absent ; ici, un fichier invalide est juste ignoré.
 export function queueArt(load: Phaser.Loader.LoaderPlugin) {
   for (const { id } of CATALOGUE) {
-    load.svg(artKey(id), `art/characters/${id}.svg`, { width: ART.full.w * R, height: ART.full.h * R });
-    load.json(cropKey(id), `art/characters/${id}.json`);
+    load.text(textKey(artKey(id)), `art/characters/${id}.svg`);
+    load.text(textKey(cropKey(id)), `art/characters/${id}.json`);
   }
-  for (const [name, a] of Object.entries(UI_ART)) {
-    load.svg(uiKey(name as UiArt), `art/${a.file}`, { width: a.w * R, height: a.h * R });
+  for (const [name, a] of Object.entries(UI_ART)) load.text(textKey(uiKey(name as UiArt)), `art/${a.file}`);
+}
+
+// Rastérise les SVG chargés à leur taille d'affichage × R, puis fabrique les vignettes ;
+// rend les ids des illustrations restées absentes (repli, FR-010).
+export async function rasterizeArt(scene: Phaser.Scene): Promise<string[]> {
+  const jobs: [string, number, number][] = [
+    ...CATALOGUE.map(({ id }): [string, number, number] => [artKey(id), ART.full.w, ART.full.h]),
+    ...Object.entries(UI_ART).map(([name, a]): [string, number, number] => [uiKey(name as UiArt), a.w, a.h]),
+  ];
+  await Promise.all(jobs.map(([key, w, h]) => addSvg(scene, key, w * R, h * R)));
+  return buildVignettes(scene);
+}
+
+async function addSvg(scene: Phaser.Scene, key: string, w: number, h: number) {
+  const text: unknown = scene.cache.text.get(textKey(key));
+  if (typeof text !== 'string') return;
+  const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
+  const svg = doc.documentElement;
+  if (svg.nodeName !== 'svg' || doc.getElementsByTagName('parsererror').length > 0) return;
+  svg.setAttribute('width', String(Math.round(w)));
+  svg.setAttribute('height', String(Math.round(h)));
+  const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml' }));
+  try {
+    const img = new Image();
+    img.src = url;
+    await img.decode();
+    scene.textures.addImage(key, img);
+  } catch {
+    // Illisible par le navigateur : le dessin d'avant reste à sa place.
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+function readCrop(scene: Phaser.Scene, id: string): Crop | null {
+  try {
+    const crop = JSON.parse(String(scene.cache.text.get(textKey(cropKey(id))))) as Partial<Crop>;
+    return crop.bust && crop.head ? (crop as Crop) : null;
+  } catch {
+    return null;
   }
 }
 
 // Fabrique les vignettes de chaque illustration ; rend les ids restés sans illustration.
-export function buildVignettes(scene: Phaser.Scene): string[] {
+function buildVignettes(scene: Phaser.Scene): string[] {
   const missing: string[] = [];
   for (const { id } of CATALOGUE) {
-    const crop = scene.cache.json.get(cropKey(id)) as Crop | undefined;
-    if (!scene.textures.exists(artKey(id)) || !crop?.bust || !crop.head) {
+    const crop = readCrop(scene, id);
+    if (!scene.textures.exists(artKey(id)) || !crop) {
       missing.push(id);
       continue;
     }

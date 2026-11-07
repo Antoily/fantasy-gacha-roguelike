@@ -13,7 +13,8 @@
     "test:watch": "vitest",
     "e2e": "playwright test",
     "art:check": "node --no-warnings scripts/art/check.mjs",
-    "art:preview": "node --no-warnings scripts/art/preview.mjs"
+    "art:preview": "node --no-warnings scripts/art/preview.mjs",
+    "art:contrast": "node --no-warnings scripts/art/contrast.mjs"
   },
   "dependencies": {
     "phaser": "4.2.1"
