@@ -115,11 +115,16 @@ test('illustration manquante : pastille en repli, sans erreur (FR-010)', async (
 });
 
 test('écran prêt en moins de 3 s (SC-004)', async ({ page }) => {
-  await page.evaluate(() => delete document.body.dataset.ready);
+  await page.evaluate(() => {
+    delete document.body.dataset.ready;
+    delete document.body.dataset.art;
+  });
   const t0 = Date.now();
   await page.reload();
   await page.waitForSelector('body[data-ready="gacha"]');
   expect(Date.now() - t0).toBeLessThan(3_000);
+  // Les illustrations suivent avant qu'un tirage ait le temps de finir sa révélation.
+  await page.waitForSelector('body[data-art="ready"]', { timeout: 3_000 });
 });
 
 test('densité 2 : canvas ×2, appuis aux mêmes endroits (FR-009, SC-006)', async ({ browser }) => {

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { LAUGH } from '../data/sounds';
-import { queueArt, rasterizeArt } from '../ui/art';
+import { ART_READY, queueArt, rasterizeCharacters, rasterizeUi } from '../ui/art';
 import { parseSave, SAVE_KEY } from '../logic/save';
 import { parseSettings, SETTINGS_KEY } from '../logic/settings';
 
@@ -19,11 +19,16 @@ export class BootScene extends Phaser.Scene {
   }
 
   create() {
-    void rasterizeArt(this).then(missing => {
-      // Signal pour l'e2e : les illustrations en repli (FR-010).
+    void rasterizeUi(this).then(() => {
+      this.startGacha();
+      // Les gestionnaires de textures et de cache sont ceux du jeu : ils survivent à cette scène.
+      return rasterizeCharacters(this);
+    }).then(missing => {
+      // Signaux pour l'e2e : illustrations prêtes, et celles en repli (FR-010).
       if (missing.length > 0) document.body.dataset.artMissing = missing.join(',');
       else delete document.body.dataset.artMissing;
-      this.startGacha();
+      document.body.dataset.art = 'ready';
+      this.game.events.emit(ART_READY);
     });
   }
 

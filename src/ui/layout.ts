@@ -57,7 +57,7 @@ export const RESULTS = {
   card: { w: half, h: 92 },
   gap: 8,
   // Carte du ×1 (007) : fenêtre d'illustration en haut, textes dessous.
-  single: { x: (WIDTH - 260) / 2, y: 100, w: 260, h: 420 },
+  single: { x: (WIDTH - 260) / 2, y: 112, w: 260, h: 420 },
   singleArt: { pad: 12, h: 272 },
   ok: { x: MARGIN * 2, y: 568, w: CONTENT_W - 2 * MARGIN, h: 44 },
 } as const;

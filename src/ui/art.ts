@@ -68,16 +68,21 @@ export function queueArt(load: Phaser.Loader.LoaderPlugin) {
   for (const [name, a] of Object.entries(UI_ART)) load.text(textKey(uiKey(name as UiArt)), `art/${a.file}`);
 }
 
-// Rastérise les SVG chargés à leur taille d'affichage × R, puis fabrique les vignettes ;
-// rend les ids des illustrations restées absentes (repli, FR-010).
-export async function rasterizeArt(scene: Phaser.Scene): Promise<string[]> {
-  const jobs: [string, number, number][] = [
-    ...CATALOGUE.map(({ id }): [string, number, number] => [artKey(id), ART.full.w, ART.full.h]),
-    ...Object.entries(UI_ART).map(([name, a]): [string, number, number] => [uiKey(name as UiArt), a.w, a.h]),
-  ];
-  await Promise.all(jobs.map(([key, w, h]) => addSvg(scene, key, w * R, h * R)));
+// Rastérise les SVG chargés à leur taille d'affichage × R, en deux temps (SC-004) : d'abord
+// l'interface, dont l'écran de tirage a besoin tout de suite ; puis les illustrations et
+// leurs vignettes, prêtes bien avant la fin de la première révélation. Rend les ids des
+// illustrations restées absentes (repli, FR-010).
+export async function rasterizeUi(scene: Phaser.Scene) {
+  await Promise.all(Object.entries(UI_ART).map(([name, a]) => addSvg(scene, uiKey(name as UiArt), a.w * R, a.h * R)));
+}
+
+export async function rasterizeCharacters(scene: Phaser.Scene): Promise<string[]> {
+  await Promise.all(CATALOGUE.map(({ id }) => addSvg(scene, artKey(id), ART.full.w * R, ART.full.h * R)));
   return buildVignettes(scene);
 }
+
+// Émis sur game.events quand les illustrations sont prêtes.
+export const ART_READY = 'art-ready';
 
 async function addSvg(scene: Phaser.Scene, key: string, w: number, h: number) {
   const text: unknown = scene.cache.text.get(textKey(key));

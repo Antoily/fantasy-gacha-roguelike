@@ -14,7 +14,7 @@ import { presentations } from '../logic/presentation';
 import { flipSchedule, planReveal } from '../logic/reveal';
 import { SETTINGS_KEY, serializeSettings, type Settings } from '../logic/settings';
 import { SAVE_KEY, serializeSave, type SaveStatus } from '../logic/save';
-import { uiImage } from '../ui/art';
+import { ART_READY, uiImage } from '../ui/art';
 import { R } from '../ui/display';
 import {
   COLLECTION, CONFIRM_DIALOG_H, DIALOG, GACHA, HEIGHT, RESULTS, REVEAL, WARNING_DIALOG_H, WIDTH,
@@ -99,6 +99,10 @@ export class GachaScene extends Phaser.Scene {
     makeButton(this, GACHA.reset, 'Recommencer', COLORS.btn.neutral, () => this.showResetConfirm());
 
     this.refresh();
+    // Les illustrations arrivent juste après l'écran (SC-004) : le portrait de la vedette suit.
+    const onArt = () => this.refresh();
+    this.game.events.on(ART_READY, onArt);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.game.events.off(ART_READY, onArt));
     // Signal pour le test de bout en bout : l'écran est prêt à recevoir des appuis.
     document.body.dataset.ready = 'gacha';
     if (data.status === 'corrupted') {
@@ -396,7 +400,8 @@ export class GachaScene extends Phaser.Scene {
       modal.add(makeButton(this, RESULTS.ok, 'OK', COLORS.btn.primary, () => this.closeModal(modal)).container);
     if (results.length === 1) {
       const r = RESULTS.single;
-      modal.add(this.add.text(r.x + r.w / 2, r.y - 40, 'Tu as obtenu…', textStyle(FONT_SIZE.big)).setOrigin(0.5));
+      // Titre entre l'en-tête et la carte agrandie (007), sans chevaucher l'en-tête.
+      modal.add(this.add.text(r.x + r.w / 2, r.y - 22, 'Tu as obtenu…', textStyle(FONT_SIZE.big)).setOrigin(0.5));
       const card = makeResultCard(this, r, results[0]!, counts[0]!, true);
       modal.add(card);
       celebrateSingle(this, modal, card, r, results[0]!.item.rarity);

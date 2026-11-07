@@ -28,15 +28,25 @@ export async function save(page: Page): Promise<Save | null> {
   return raw === null ? null : (JSON.parse(raw) as Save);
 }
 
-export async function load(page: Page) {
-  await page.evaluate(() => delete document.body.dataset.ready);
-  await page.reload();
+// Écran prêt ET illustrations prêtes (elles arrivent juste après l'écran, 007 SC-004) :
+// les captures et les tests d'illustrations voient toujours le rendu final.
+async function ready(page: Page) {
   await page.waitForSelector('body[data-ready="gacha"]');
+  await page.waitForSelector('body[data-art="ready"]');
+}
+
+export async function load(page: Page) {
+  await page.evaluate(() => {
+    delete document.body.dataset.ready;
+    delete document.body.dataset.art;
+  });
+  await page.reload();
+  await ready(page);
 }
 
 export async function start(page: Page) {
   await page.goto('/');
-  await page.waitForSelector('body[data-ready="gacha"]');
+  await ready(page);
 }
 
 // Écrit une sauvegarde puis recharge : l'écran repart de cet état.
@@ -89,7 +99,12 @@ export async function waitModal(page: Page, name: string, timeout = 10_000) {
       const m = document.body.dataset.modal;
       return m === n || m === 'splash' ? m : null;
     }, name, { timeout: Math.max(1, deadline - Date.now()) });
-    if ((await seen.jsonValue()) === name) return;
+    if ((await seen.jsonValue()) === name) {
+      // Deux images : Phaser n'inscrit ses nouvelles zones d'appui qu'à l'image suivante,
+      // un appui dans la même image que l'ouverture de la fenêtre serait perdu.
+      await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
+      return;
+    }
     await passSplash(page);
   }
 }
