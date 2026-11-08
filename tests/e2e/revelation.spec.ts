@@ -5,8 +5,7 @@ import { REVEAL_TIMING } from '../../src/data/revealConfig';
 import { flipOrder, flipSchedule } from '../../src/logic/reveal';
 import { GACHA, RESULTS, center } from '../../src/ui/layout';
 import {
-  FRESH, capture, installRng, load, loadWith, modal, rarityRoll, revealSteps, save, scriptRng, start, tap,
-  waitModal,
+  FRESH, armedSkip, capture, installRng, load, loadWith, modal, rarityRoll, revealSteps, save, scriptRng, start, tap, waitModal,
 } from './helpers';
 
 // Scénarios de specs/004-revelation/quickstart.md, joués sur le build. Le hasard est
@@ -41,8 +40,14 @@ test('un palier par rareté, puis la carte obtenue (US1, FR-003)', async ({ page
     // Capture en pleine révélation du palier (relue avant merge, SC-005).
     await page.waitForTimeout(T.suspense + 250 - (Date.now() - t0));
     await capture(page, `palier-${id}`);
+    // SC-003 mesure l'animation : elle s'arrête à la carte, ou à la présentation plein écran
+    // d'un Légendaire / Ultra rare (007), qui attend ensuite l'appui du joueur.
+    // Marge large : les deux captures prises pendant l'animation figent le rendu logiciel. La
+    // borne exacte (FR-010) est vérifiée par les tests unitaires de revealDuration, et sans
+    // capture par le test « regardé jusqu'au bout avec le vrai hasard ».
+    await page.waitForFunction(() => ['results', 'splash'].includes(document.body.dataset.modal ?? ''));
+    expect(Date.now() - t0).toBeLessThan(8_000); // SC-003, avec captures
     await waitModal(page, 'results');
-    expect(Date.now() - t0).toBeLessThan(5_500); // SC-003
     if (id === 'legendary') {
       await page.waitForTimeout(150);
       await capture(page, 'x1-carte-legendaire');
@@ -104,21 +109,27 @@ test('×10 : palier du meilleur, puis cartes une à une, OK à la fin (US5, FR-0
   await at(star.at + star.anticipation + star.turn * 0.8);
   await capture(page, 'x10-vedette');
   await waitModal(page, 'results');
-  // Marge large : les 4 captures prises pendant le retournement ralentissent le runner
-  // de la CI (4,5 s mesurées pour 3,9 s prévues). La borne exacte de FR-010 est vérifiée
-  // par les tests unitaires de flipSchedule ; ici, on vérifie que la fin suit le calendrier.
-  expect(Date.now() - t0).toBeLessThan(duration + 1500);
+  // Marge large : les 4 captures prises pendant le retournement et le rendu logiciel des
+  // visuels de 007 ralentissent le runner de la CI (5,7 s mesurées pour 3,9 s prévues). La
+  // borne exacte de FR-010 est vérifiée par les tests unitaires de flipSchedule ; ici, on
+  // vérifie que la fin suit le calendrier.
+  expect(Date.now() - t0).toBeLessThan(duration + 3000);
   await page.waitForTimeout(400);
   await capture(page, 'x10-fin');
   await tap(page, RESULTS.ok);
   expect(await modal(page)).toBeNull();
 });
 
+// Dix communs (le dixième devient Rare par la garantie) : aucune présentation plein écran
+// (007) ne vient s'intercaler dans les mesures de temps.
+const TEN_COMMONS = [...Array.from({ length: 10 }, () => [rarityRoll('common'), 0]).flat(), DIRECT, 0.5];
+
 test('passer l’animation : cartes en moins de 0,5 s, rien de changé (US2, FR-006)', async ({ page }) => {
+  await scriptRng(page, TEN_COMMONS);
   await tap(page, GACHA.pullTen);
   await waitModal(page, 'reveal');
   const before = await save(page);
-  await page.waitForTimeout(250);
+  await armedSkip(page);
   const t0 = Date.now();
   await page.mouse.click(180, 320);
   await waitModal(page, 'results', 500);
@@ -131,6 +142,7 @@ test('passer l’animation : cartes en moins de 0,5 s, rien de changé (US2, FR-
 });
 
 test('appui pendant le retournement : tout se retourne, seul OK ferme', async ({ page }) => {
+  await scriptRng(page, TEN_COMMONS);
   await tap(page, GACHA.pullTen);
   await waitModal(page, 'flip');
   await page.mouse.click(180, 320);
@@ -144,16 +156,17 @@ test('appui pendant le retournement : tout se retourne, seul OK ferme', async ({
 
 test('verrou : un seul tirage, l’écran de tirage ne répond pas pendant l’animation (FR-007)', async ({ page }) => {
   const { x, y } = center(GACHA.pullSingle);
+  await scriptRng(page, [rarityRoll('common'), 0, DIRECT]);
   await page.mouse.dblclick(x, y);
   await waitModal(page, 'reveal');
   expect((await save(page))!.currency).toBe(8900);
   // Avant l'armement du passage (200 ms), un appui sur un bouton ne fait rien du tout.
   await page.mouse.click(center(GACHA.collection).x, center(GACHA.collection).y);
   expect(await modal(page)).toBe('reveal');
-  await page.waitForTimeout(250);
+  await armedSkip(page);
   // Ensuite, il passe l'animation : jamais de tirage ni d'autre fenêtre.
   await tap(page, GACHA.pullSingle);
-  expect(await modal(page)).toBe('results');
+  await waitModal(page, 'results', 2_000);
   expect((await save(page))!.currency).toBe(8900);
 });
 

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Éclat de cristal turquoise (#7fe0e8), prisme à pointes incliné de 14°, facettes à bords nets :
+       pans tournés vers la lumière (haut gauche) pâles et réchauffés, pans opposés bleuis.
+       Même langage que tout le jeu d'icônes (contour 5, ombre portée 20 %, reflets blancs). -->
+  <defs>
+    <path id="icon-shard-forme" d="M39 5.4 L51.9 24.1 L45.3 46.2 L25.1 57.1 L12.1 38.9 L18.3 16.2 Z"/>
+    <clipPath id="icon-shard-clip"><use href="#icon-shard-forme"/></clipPath>
+  </defs>
+
+  <!-- Ombre portée. -->
+  <use href="#icon-shard-forme" transform="translate(1.5 3)" fill="#1d1a16" opacity="0.2"/>
+
+  <!-- Face centrale (couleur de base), puis les autres facettes, découpées par la silhouette. -->
+  <use href="#icon-shard-forme" fill="#7fe0e8"/>
+  <g clip-path="url(#icon-shard-clip)">
+    <polygon points="39,5.4 18.3,16.2 28.1,22.3" fill="#effffa"/>
+    <polygon points="39,5.4 28.1,22.3 41.2,25.6" fill="#c3f6ef"/>
+    <polygon points="39,5.4 41.2,25.6 51.9,24.1" fill="#8fe5ec"/>
+    <polygon points="18.3,16.2 28.1,22.3 22.1,44.5 12.1,38.9" fill="#a6eef1"/>
+    <polygon points="41.2,25.6 51.9,24.1 45.3,46.2 35,48.2" fill="#4dbadb"/>
+    <polygon points="12.1,38.9 22.1,44.5 25.1,57.1" fill="#6cd0e4"/>
+    <polygon points="22.1,44.5 35,48.2 25.1,57.1" fill="#43a5d5"/>
+    <polygon points="35,48.2 45.3,46.2 25.1,57.1" fill="#3a7fcb"/>
+    <!-- Liseré de contre-jour le long de l'arête basse, dans l'ombre. -->
+    <path d="M40.7 44.9 L31.6 49.8" fill="none" stroke="#8fe3ee" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Reflets : arête éclairée, long reflet sur le pan gauche, point, étincelle sur le pan sombre. -->
+    <path d="M27.6 24.2 L24.6 35.3" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity="0.9"/>
+    <path d="M20.9 21.8 L18.3 31.3" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"/>
+    <circle cx="17.4" cy="35" r="1.3" fill="#ffffff"/>
+    <path d="M44.5 28.5 Q44.9 32.6 49 33 Q44.9 33.4 44.5 37.5 Q44.1 33.4 40 33 Q44.1 32.6 44.5 28.5 Z" fill="#ffffff"/>
+  </g>
+
+  <use href="#icon-shard-forme" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+</svg>

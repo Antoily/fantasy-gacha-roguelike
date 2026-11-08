@@ -1,0 +1,249 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <!-- Orbulle (Ultra rare, créature) : baleine-bulle qui nage entre les étoiles. -->
+  <defs>
+    <!-- Silhouette : tête-dôme, dos, pédoncule et caudale d'un seul tenant. -->
+    <path id="orbulle-corps" d="M58 236 C 50 192 62 146 98 114 C 132 84 178 70 222 76 C 276 84 318 118 336 170 C 352 214 356 266 350 306 C 344 350 326 384 300 412 C 284 428 268 440 262 450 C 288 436 316 422 338 414 C 352 408 366 410 360 422 C 348 446 318 466 288 472 C 272 476 258 472 248 466 C 238 476 222 480 204 476 C 170 470 142 450 128 432 C 122 422 130 414 144 416 C 172 420 204 432 228 448 C 214 432 196 420 176 408 C 138 384 98 352 80 314 C 70 296 62 270 58 236 Z"/>
+    <clipPath id="orbulle-corps-clip"><use href="#orbulle-corps"/></clipPath>
+    <!-- Ventre nacré : sous la ligne de la bouche, côté avant. -->
+    <path id="orbulle-ventre" d="M30 230 L 60 240 C 92 256 124 264 156 263 C 192 262 222 252 244 236 C 254 272 250 318 238 356 C 228 390 226 422 232 452 L 30 470 Z"/>
+    <clipPath id="orbulle-ventre-clip"><use href="#orbulle-ventre"/></clipPath>
+    <!-- Caudale (zone nacrée dans la silhouette). -->
+    <path id="orbulle-queue" d="M96 388 L 228 446 C 240 453 252 453 262 448 L 392 380 L 392 500 L 96 500 Z"/>
+    <clipPath id="orbulle-queue-clip"><use href="#orbulle-queue"/></clipPath>
+    <!-- Nageoire proche (levée) et nageoire lointaine. -->
+    <path id="orbulle-nageoire" d="M296 304 C 324 292 350 268 368 238 C 380 218 392 198 384 186 C 376 174 358 180 346 192 C 330 206 312 226 300 244 C 292 256 286 266 284 278 C 282 290 286 302 296 304 Z"/>
+    <clipPath id="orbulle-nageoire-clip"><use href="#orbulle-nageoire"/></clipPath>
+    <path id="orbulle-nageoire-loin" d="M100 300 C 80 300 54 316 38 336 C 28 348 28 362 40 362 C 58 360 82 346 102 330 Z"/>
+    <clipPath id="orbulle-nageoire-loin-clip"><use href="#orbulle-nageoire-loin"/></clipPath>
+    <!-- Yeux. -->
+    <ellipse id="orbulle-oeil-loin" cx="112" cy="182" rx="19" ry="29"/>
+    <clipPath id="orbulle-oeil-loin-clip"><use href="#orbulle-oeil-loin"/></clipPath>
+    <ellipse id="orbulle-oeil" cx="196" cy="186" rx="27" ry="33"/>
+    <clipPath id="orbulle-oeil-clip"><use href="#orbulle-oeil"/></clipPath>
+    <!-- Bouche. -->
+    <path id="orbulle-bouche" d="M122 260 C 140 264 170 264 192 257 C 186 284 132 288 122 260 Z"/>
+    <clipPath id="orbulle-bouche-clip"><use href="#orbulle-bouche"/></clipPath>
+    <!-- Jet de l'évent (fontaine de poussière d'étoiles). -->
+    <!-- Colonne, panache et jets qui retombent, rejetés vers l'arrière (la baleine monte vers la gauche).
+         Tous les sous-chemins tournent dans le même sens : pas de trou au recouvrement. -->
+    <path id="orbulle-jet" d="M225 88 C 227 72 231 60 238 50 L 250 50 C 245 62 242 74 242 88 Z M238 54 C 236 44 242 36 254 30 C 258 40 256 48 250 54 Z M238 58 C 220 50 202 54 191 65 C 186 67 184 61 188 56 C 202 40 224 40 240 52 Z M248 50 C 268 36 298 40 314 62 C 318 68 316 74 310 71 C 298 56 274 52 252 58 Z M250 58 C 280 56 314 72 330 100 C 332 106 328 110 324 105 C 310 84 282 70 248 66 Z"/>
+    <!-- Étincelle à quatre branches (réutilisée, mise à l'échelle). -->
+    <path id="orbulle-etincelle" d="M0 -10 C 1.2 -3 3 -1.2 10 0 C 3 1.2 1.2 3 0 10 C -1.2 3 -3 1.2 -10 0 C -3 -1.2 -1.2 -3 0 -10 Z"/>
+    <path id="orbulle-etoile" d="M0 -10 C 2 -3.6 3.6 -2 10 0 C 3.6 2 2 3.6 0 10 C -2 3.6 -3.6 2 -10 0 C -3.6 -2 -2 -3.6 0 -10 Z"/>
+
+    <radialGradient id="orbulle-nuit" cx="0.36" cy="0.22" r="0.85">
+      <stop offset="0" stop-color="#6e5de2"/>
+      <stop offset="0.35" stop-color="#4a37b8"/>
+      <stop offset="0.75" stop-color="#30238a"/>
+      <stop offset="1" stop-color="#271c72"/>
+    </radialGradient>
+    <linearGradient id="orbulle-nacre" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff0d8"/>
+      <stop offset="0.3" stop-color="#ffd9f2"/>
+      <stop offset="0.65" stop-color="#e4d9ff"/>
+      <stop offset="1" stop-color="#bfeeff"/>
+    </linearGradient>
+    <linearGradient id="orbulle-irise-2" gradientUnits="userSpaceOnUse" x1="60" y1="100" x2="340" y2="420">
+      <stop offset="0" stop-color="#ffd36b"/>
+      <stop offset="0.33" stop-color="#ff7ad8"/>
+      <stop offset="0.66" stop-color="#7af0ff"/>
+      <stop offset="1" stop-color="#b28cff"/>
+    </linearGradient>
+    <linearGradient id="orbulle-bulle-irise" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff8fe0"/>
+      <stop offset="0.35" stop-color="#ffe08a"/>
+      <stop offset="0.7" stop-color="#7af0ff"/>
+      <stop offset="1" stop-color="#b28cff"/>
+    </linearGradient>
+    <linearGradient id="orbulle-irise" gradientUnits="userSpaceOnUse" x1="60" y1="80" x2="360" y2="480">
+      <stop offset="0" stop-color="#ff7ad8"/>
+      <stop offset="0.25" stop-color="#ffd36b"/>
+      <stop offset="0.5" stop-color="#6ff0ff"/>
+      <stop offset="0.75" stop-color="#a98bff"/>
+      <stop offset="1" stop-color="#ff7ad8"/>
+    </linearGradient>
+    <linearGradient id="orbulle-jet-degrade" gradientUnits="userSpaceOnUse" x1="233" y1="84" x2="233" y2="28">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.5" stop-color="#fff3b8"/>
+      <stop offset="1" stop-color="#ffb8ec"/>
+    </linearGradient>
+    <linearGradient id="orbulle-trainee-a" gradientUnits="userSpaceOnUse" x1="384" y1="190" x2="356" y2="330">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="0.35" stop-color="#7af0ff" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#a98bff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="orbulle-trainee-b" gradientUnits="userSpaceOnUse" x1="128" y1="434" x2="24" y2="322">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="0.3" stop-color="#ff9be6" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#a98bff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="orbulle-trainee-c" gradientUnits="userSpaceOnUse" x1="126" y1="420" x2="44" y2="350">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="0.4" stop-color="#7af0ff" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#7af0ff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="orbulle-coeur-a" gradientUnits="userSpaceOnUse" x1="384" y1="196" x2="364" y2="330">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="orbulle-coeur-b" gradientUnits="userSpaceOnUse" x1="126" y1="428" x2="30" y2="340">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="orbulle-lueur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="flou"/>
+      <feMerge><feMergeNode in="flou"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="orbulle-brume" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+  </defs>
+
+  <!-- Traînées de lumière (derrière) -->
+  <path d="M384 190 C 400 230 396 290 356 330 C 372 290 376 240 366 206 Z" fill="url(#orbulle-trainee-a)"/>
+  <path d="M134 440 C 80 440 34 400 30 300 C 50 380 90 420 140 428 Z" fill="url(#orbulle-trainee-b)"/>
+
+  <!-- Nageoire lointaine -->
+  <use href="#orbulle-nageoire-loin" fill="#c9bdf6"/>
+  <g clip-path="url(#orbulle-nageoire-loin-clip)">
+    <path d="M40 364 C 60 350 84 336 104 324 L 104 370 Z" fill="#9a85e4"/>
+    <path d="M44 340 C 60 324 76 314 92 308" fill="none" stroke="#fffaf0" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#orbulle-nageoire-loin" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+  <!-- Corps : aplat nuit -->
+  <use href="#orbulle-corps" fill="url(#orbulle-nuit)" opacity="0.95"/>
+  <g clip-path="url(#orbulle-corps-clip)">
+    <!-- Nébuleuses -->
+    <g filter="url(#orbulle-brume)">
+      <ellipse cx="282" cy="128" rx="58" ry="32" fill="#ff5fc8" opacity="0.45"/>
+      <ellipse cx="160" cy="104" rx="50" ry="22" fill="#8f7cff" opacity="0.5"/>
+      <ellipse cx="304" cy="384" rx="44" ry="34" fill="#4fd8ff" opacity="0.4"/>
+    </g>
+    <!-- Ombre propre (côté droit) -->
+    <path d="M286 72 C 306 124 318 200 310 268 C 302 330 270 392 226 452 L 400 500 L 400 60 Z" fill="#23196b"/>
+    <!-- Occlusion sous la nageoire -->
+    <path d="M280 300 C 300 310 330 300 352 280 L 352 330 C 330 340 300 332 280 300 Z" fill="#170f4c"/>
+    <!-- Galaxie spirale -->
+    <g transform="translate(292 350) rotate(-22) scale(1 0.58)" filter="url(#orbulle-lueur)">
+      <ellipse cx="0" cy="0" rx="30" ry="30" fill="#ff8fe0" opacity="0.35"/>
+      <path d="M4 -6 C 24 -14 42 -2 40 16 C 38 32 18 40 -6 36" fill="none" stroke="#ff9be6" stroke-width="8" stroke-linecap="round" opacity="0.7"/>
+      <path d="M-4 6 C -24 14 -42 2 -40 -16 C -38 -32 -18 -40 6 -36" fill="none" stroke="#7af0ff" stroke-width="8" stroke-linecap="round" opacity="0.7"/>
+      <path d="M4 -6 C 22 -12 36 -2 34 14" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      <path d="M-4 6 C -22 12 -36 2 -34 -14" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="0" cy="0" r="9" fill="#fff6d0"/>
+      <circle cx="0" cy="0" r="5" fill="#ffffff"/>
+    </g>
+    <!-- Étoiles intérieures -->
+    <g fill="#fff6d0" filter="url(#orbulle-lueur)">
+      <use href="#orbulle-etincelle" transform="translate(262 108) scale(0.7)"/>
+      <use href="#orbulle-etincelle" transform="translate(304 150) scale(0.5)"/>
+      <use href="#orbulle-etincelle" transform="translate(322 214) scale(0.45)"/>
+      <use href="#orbulle-etincelle" transform="translate(316 404) scale(0.5)"/>
+      <use href="#orbulle-etincelle" transform="translate(196 100) scale(0.4)"/>
+      <circle cx="232" cy="120" r="2"/>
+      <circle cx="282" cy="168" r="1.6"/>
+      <circle cx="334" cy="262" r="1.8"/>
+      <circle cx="270" cy="404" r="1.6"/>
+      <circle cx="330" cy="330" r="1.5"/>
+      <circle cx="150" cy="116" r="1.6"/>
+    </g>
+    <!-- Ventre nacré -->
+    <use href="#orbulle-ventre" fill="url(#orbulle-nacre)" opacity="0.95"/>
+    <g clip-path="url(#orbulle-ventre-clip)">
+      <path d="M60 330 C 110 380 170 420 240 430 L 240 470 L 40 470 Z" fill="#b7a5f0"/>
+      <path d="M58 244 C 92 260 124 268 156 267 C 192 266 222 256 246 240 L 246 250 C 222 264 190 274 156 275 C 120 276 90 268 58 254 Z" fill="#c2b2f4"/>
+      <!-- Plis de la gorge -->
+      <g fill="none" stroke="#a893ea" stroke-width="3" stroke-linecap="round">
+        <path d="M96 292 C 120 330 160 370 206 400"/>
+        <path d="M126 286 C 146 320 180 356 220 384"/>
+        <path d="M158 284 C 174 314 200 344 232 366"/>
+        <path d="M192 280 C 204 304 222 328 240 344"/>
+      </g>
+      <path d="M78 270 C 84 300 100 326 120 346" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.8"/>
+    </g>
+    <!-- Caudale nacrée -->
+    <use href="#orbulle-queue" fill="url(#orbulle-nacre)"/>
+    <g clip-path="url(#orbulle-queue-clip)">
+      <path d="M130 446 C 170 470 220 478 248 470 C 280 480 330 466 362 436 L 380 500 L 120 500 Z" fill="#b7a5f0"/>
+    </g>
+    <!-- Film irisé sur le bord de la bulle -->
+    <use href="#orbulle-corps" fill="none" stroke="url(#orbulle-irise)" stroke-width="26" opacity="0.5"/>
+    <use href="#orbulle-corps" fill="none" stroke="url(#orbulle-irise)" stroke-width="11" opacity="0.9"/>
+    <!-- Liseré de contre-jour -->
+    <path d="M340 190 C 350 240 350 300 336 346" fill="none" stroke="#7af0ff" stroke-width="5" stroke-linecap="round"/>
+    <!-- Reflet principal de la bulle (haut gauche) -->
+    <path d="M86 176 C 90 146 108 118 140 100" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round"/>
+    <circle cx="164" cy="92" r="6" fill="#ffffff"/>
+    <path d="M110 178 C 114 158 124 142 140 130" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  </g>
+  <use href="#orbulle-corps" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <!-- Jonction pédoncule / caudale -->
+  <path d="M230 449 C 240 455 252 455 260 451" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- Évent -->
+  <ellipse cx="233" cy="84" rx="13" ry="5" fill="#170f4c" stroke="#1d1a16" stroke-width="2.5"/>
+
+  <!-- Jet de poussière d'étoiles -->
+  <use href="#orbulle-jet" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <use href="#orbulle-jet" fill="url(#orbulle-jet-degrade)"/>
+
+  <!-- Yeux -->
+  <use href="#orbulle-oeil-loin" fill="#fffaf0"/>
+  <g clip-path="url(#orbulle-oeil-loin-clip)">
+    <ellipse cx="118" cy="188" rx="13" ry="19" fill="#4c55e0"/>
+    <ellipse cx="118" cy="196" rx="13" ry="11" fill="#7fdcff"/>
+    <ellipse cx="119" cy="190" rx="7" ry="10" fill="#1d1a16"/>
+    <circle cx="113" cy="180" r="5" fill="#ffffff"/>
+    <circle cx="124" cy="199" r="2.2" fill="#ffffff"/>
+  </g>
+  <use href="#orbulle-oeil-loin" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+  <use href="#orbulle-oeil" fill="#fffaf0"/>
+  <g clip-path="url(#orbulle-oeil-clip)">
+    <ellipse cx="202" cy="192" rx="18" ry="22" fill="#4c55e0"/>
+    <ellipse cx="202" cy="202" rx="18" ry="13" fill="#7fdcff"/>
+    <ellipse cx="203" cy="194" rx="9" ry="12" fill="#1d1a16"/>
+    <circle cx="194" cy="182" r="7" fill="#ffffff"/>
+    <circle cx="210" cy="206" r="3" fill="#ffffff"/>
+  </g>
+  <use href="#orbulle-oeil" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+  <!-- Sourcils -->
+  <path d="M176 140 C 188 132 204 132 216 138" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linecap="round"/>
+  <path d="M98 138 C 106 132 116 130 126 132" fill="none" stroke="#1d1a16" stroke-width="5.5" stroke-linecap="round"/>
+  <!-- Joues -->
+  <ellipse cx="236" cy="226" rx="16" ry="8" fill="#ff7fd0" opacity="0.7"/>
+  <ellipse cx="80" cy="222" rx="10" ry="7" fill="#ff7fd0" opacity="0.7"/>
+  <!-- Bouche -->
+  <use href="#orbulle-bouche" fill="#3d0f3a"/>
+  <g clip-path="url(#orbulle-bouche-clip)">
+    <path d="M136 280 C 146 270 170 270 182 276 C 174 290 144 290 136 280 Z" fill="#ff7fae"/>
+  </g>
+  <use href="#orbulle-bouche" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M60 240 C 82 252 104 258 122 260" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M192 257 C 214 252 232 244 244 236 C 248 232 250 228 250 224" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- Nageoire proche (levée, elle fait coucou) -->
+  <use href="#orbulle-nageoire" fill="url(#orbulle-nacre)"/>
+  <g clip-path="url(#orbulle-nageoire-clip)">
+    <path d="M300 310 C 330 290 360 260 392 200 L 400 320 Z" fill="#b7a5f0"/>
+    <path d="M300 260 C 316 236 336 214 356 200" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <use href="#orbulle-nageoire" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+  <!-- Bulles autour -->
+  <g fill="#c8ecff" fill-opacity="0.25" stroke="#1d1a16" stroke-width="2.5">
+    <circle cx="62" cy="76" r="16"/>
+    <circle cx="96" cy="44" r="8"/>
+    <circle cx="364" cy="120" r="14"/>
+    <circle cx="44" cy="452" r="12"/>
+    <circle cx="372" cy="470" r="9"/>
+  </g>
+
+  <!-- Étoiles autour -->
+  <g fill="#ffd34d" stroke="#1d1a16" stroke-linejoin="round">
+    <use href="#orbulle-etoile" transform="translate(338 52) scale(1.4)" stroke-width="1.8"/>
+    <use href="#orbulle-etoile" transform="translate(40 200) scale(1)" stroke-width="2.5"/>
+    <use href="#orbulle-etoile" transform="translate(150 30) scale(0.8)" stroke-width="3"/>
+    <use href="#orbulle-etoile" transform="translate(30 420) scale(0.9)" stroke-width="2.8"/>
+  </g>
+</svg>

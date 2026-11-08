@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Emblème Peu commun : gemme verte taillée en goutte (taille poire).
+       Deuxième échelon : la pierre est taillée (table et facettes nettes), sans éclat encore.
+       Lumière en haut à gauche, contour encre 5. -->
+  <defs>
+    <path id="rarity-uncommon-goutte" d="M32 5 C35 12 49 25 49 38 C49 47.4 41.4 55 32 55 C22.6 55 15 47.4 15 38 C15 25 29 12 32 5 Z"/>
+    <clipPath id="rarity-uncommon-goutte-clip"><use href="#rarity-uncommon-goutte"/></clipPath>
+  </defs>
+
+  <!-- Aplat de base -->
+  <use href="#rarity-uncommon-goutte" fill="#6fcf74"/>
+  <g clip-path="url(#rarity-uncommon-goutte-clip)">
+    <!-- Facettes autour de la table : claires vers la lumière, sombres à l'opposé -->
+    <polygon points="32,18.5 32,0 0,0 0,21.9 26,28.5" fill="#c3f0a2"/>
+    <polygon points="32,18.5 32,0 64,0 64,21.9 38,28.5" fill="#8fdc7e"/>
+    <polygon points="26,28.5 0,21.9 0,38 23.5,38" fill="#a7e98e"/>
+    <polygon points="38,28.5 64,21.9 64,38 40.5,38" fill="#35a468"/>
+    <polygon points="23.5,38 0,38 0,64 8.3,64 26.5,45.5" fill="#6fcf74"/>
+    <polygon points="40.5,38 64,38 64,64 55.7,64 37.5,45.5" fill="#1c7256"/>
+    <polygon points="26.5,45.5 8.3,64 32,64 32,47.5" fill="#4cb36c"/>
+    <polygon points="37.5,45.5 55.7,64 32,64 32,47.5" fill="#2a9363"/>
+    <!-- Table -->
+    <polygon points="32,18.5 38,28.5 40.5,38 37.5,45.5 32,47.5 26.5,45.5 23.5,38 26,28.5" fill="#93df82"/>
+    <!-- Arêtes -->
+    <path d="M32 18.5 L32 4 M38 28.5 L46.9 26.2 M40.5 38 L50 38 M37.5 45.5 L43.6 51.7 M32 47.5 L32 56 M26.5 45.5 L20.4 51.7 M23.5 38 L14 38 M26 28.5 L17.1 26.2" fill="none" stroke="#1c7256" stroke-width="1.2" stroke-linecap="round" stroke-opacity="0.5"/>
+    <polygon points="32,18.5 38,28.5 40.5,38 37.5,45.5 32,47.5 26.5,45.5 23.5,38 26,28.5" fill="none" stroke="#1c7256" stroke-width="1.2" stroke-linejoin="round" stroke-opacity="0.5"/>
+    <!-- Reflets : long reflet sur l'arête éclairée, petit reflet sur la table -->
+    <path d="M29.6 13.4 C27.6 17.8 24.6 22.4 21 27.6 C23.4 27.4 24.9 26.3 26.3 24.4 C28 21.6 29.5 18 30.3 14.6 Z" fill="#ffffff"/>
+    <circle cx="29.2" cy="31.5" r="1.6" fill="#ffffff"/>
+  </g>
+  <!-- Contour de silhouette -->
+  <use href="#rarity-uncommon-goutte" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+</svg>

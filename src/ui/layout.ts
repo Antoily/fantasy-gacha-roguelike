@@ -10,6 +10,22 @@ export interface Rect { readonly x: number; readonly y: number; readonly w: numb
 
 export const center = (r: Rect) => ({ x: r.x + r.w / 2, y: r.y + r.h / 2 });
 
+// Échelle de rendu (007, ADR 0007) : densité de l'écran × agrandissement du mode FIT,
+// arrondie au-dessus et bornée à [1, 3]. La tolérance évite de doubler le rendu pour un
+// écart d'arrondi (fenêtre à peine plus grande que 360 × 640).
+export function renderScale(dpr: number, viewportW: number, viewportH: number): number {
+  const fit = Math.min(viewportW / WIDTH, viewportH / HEIGHT);
+  return Math.min(3, Math.max(1, Math.ceil(dpr * fit - 0.05)));
+}
+
+// Illustrations (007) : plus grandes tailles d'affichage, pour les rastériser assez net.
+// `full` sert à la présentation plein écran ; la carte ×1 l'affiche plus petite.
+export const ART = {
+  full: { w: 300, h: 375 },
+  head: 32,
+  bust: { w: 48, h: 60, radius: 7 },
+} as const;
+
 const half = (CONTENT_W - MARGIN) / 2;
 
 export const GACHA = {
@@ -40,7 +56,9 @@ export const RESULTS = {
   gridTop: 72,
   card: { w: half, h: 92 },
   gap: 8,
-  single: { x: (WIDTH - 260) / 2, y: 160, w: 260, h: 224 },
+  // Carte du ×1 (007) : fenêtre d'illustration en haut, textes dessous.
+  single: { x: (WIDTH - 260) / 2, y: 112, w: 260, h: 420 },
+  singleArt: { pad: 12, h: 272 },
   ok: { x: MARGIN * 2, y: 568, w: CONTENT_W - 2 * MARGIN, h: 44 },
 } as const;
 
@@ -55,15 +73,34 @@ export const REVEAL = {
   pulse: [1.05, 1.1, 1.18, 1.26, 1.36],
   // Particules (révision du 2026-10-26) : nombre et vitesse maximale (px/s) de
   // l'explosion du palier, puis de l'éclat d'une carte retournée.
-  burst: [16, 30, 50, 80, 120],
+  // Révision 2 (2026-10-30, FR-017) : deux fois plus qu'à la révision du 2026-10-26.
+  burst: [32, 60, 100, 160, 240],
   burstSpeed: [170, 210, 270, 330, 400],
-  cardBurst: [5, 10, 18, 30, 44],
+  cardBurst: [10, 20, 36, 60, 88],
+  // Éclats de verre de l'orbe brisée et lueurs, par rang.
+  shards: [14, 18, 24, 30, 36],
+  glows: [4, 6, 9, 12, 16],
+  // Cercle magique sous l'orbe (diamètre) et sa rotation pendant le suspense (degrés).
+  circle: 300,
+  circleTurn: 90,
   // Rebond d'une carte retournée.
   cardBounce: [1, 1.04, 1.08, 1.12, 1.16],
   labelY: 510,
   hintY: 600,
   // Toute la fenêtre : un appui n'importe où passe l'animation (FR-006).
   skip: { x: 0, y: 0, w: WIDTH, h: HEIGHT },
+} as const;
+
+// Présentation plein écran d'un Légendaire ou Ultra rare (007, FR-003).
+export const SPLASH = {
+  art: { x: WIDTH / 2, y: 262, w: ART.full.w, h: ART.full.h },
+  nameY: 470,
+  rarityY: 506,
+  blurb: { x: MARGIN * 2, y: 530, w: CONTENT_W - 2 * MARGIN, h: 52 },
+  badgeY: 84,
+  hintY: 612,
+  // Un appui ne ferme la présentation qu'une fois l'illustration entrée.
+  armMs: 400,
 } as const;
 
 // Collection (003, remplace la liste d'échange de 002) : les 20 éléments en grille

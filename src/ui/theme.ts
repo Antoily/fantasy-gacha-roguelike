@@ -88,6 +88,32 @@ export const REVEAL_FX = {
   dimAlpha: 0.35,
 } as const;
 
+// Illustrations (007) et révision 2 de la révélation (FR-016, FR-017).
+const night = 0x1b1430;
+export const ART_FX = {
+  // Silhouette d'un élément manquant (FR-004) : encre adoucie, sur le disque grisé.
+  silhouetteCss: toCss(palette.inkSoft),
+  // Nuit de la révélation et de la présentation, quand le fond illustré manque.
+  night,
+  nightAlpha: 0.94,
+  // Lumière des fissures, neutre (FR-016), et verre des éclats de l'orbe brisée.
+  crackLight: 0xfff3d6,
+  glass: 0xe6f3ff,
+  // Lueurs additives (forme « glow » des particules).
+  glowAlpha: 0.55,
+  // Fenêtre d'illustration d'une carte : teinte de la rareté sur le blanc du panneau.
+  artTint: 0.35,
+  artHalo: 0.7,
+  // Présentation : rayons, nom clair cerné d'encre, phrase sur un ruban crème.
+  splashRayAlpha: 0.35,
+  splashText: toCss(palette.panel),
+  splashStroke: toCss(palette.ink),
+  ribbon: palette.paper,
+  // Bandeau clair derrière les textes posés sur le fond illustré (FR-008, contraste ≥ 4,5:1).
+  textPlate: palette.paper,
+  textPlateAlpha: 0.82,
+} as const;
+
 export const STROKE = { thin: 2, base: 3, thick: 4 } as const;
 export const SHADOW_OFFSET = 4;
 export const RADIUS = 12;

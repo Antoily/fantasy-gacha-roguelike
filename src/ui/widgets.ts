@@ -1,11 +1,15 @@
 import Phaser from 'phaser';
+import type { Item } from '../data/catalogue';
+import { RARITIES, type Rarity } from '../data/gachaConfig';
 import type { PullResult } from '../logic/gacha';
-import { RARITIES } from '../data/gachaConfig';
-import { HEIGHT, WIDTH, type Rect } from './layout';
-import { COLORS, CSS, FONT_FAMILY, FONT_SIZE, RADIUS, SCRIM_ALPHA, SHADOW_OFFSET, STROKE } from './theme';
+import { artKey, bustKey, hasArt, headKey, orbSize, shadowKey, uiImage } from './art';
+import { R } from './display';
+import { ART, HEIGHT, RESULTS, WIDTH, type Rect } from './layout';
+import { ART_FX, COLORS, CSS, FONT_FAMILY, FONT_SIZE, RADIUS, SCRIM_ALPHA, SHADOW_OFFSET, STROKE } from './theme';
 
+// `resolution` : le texte est rastérisé à l'échelle de rendu, net sous la caméra ×R.
 export function textStyle(size: number, color: string = CSS.text): Phaser.Types.GameObjects.Text.TextStyle {
-  return { fontFamily: FONT_FAMILY, fontSize: `${size}px`, fontStyle: 'bold', color };
+  return { fontFamily: FONT_FAMILY, fontSize: `${size}px`, fontStyle: 'bold', color, resolution: R };
 }
 
 // Panneau blanc cerné de noir. Dessiné dans un Graphics ajouté au parent fourni.
@@ -90,6 +94,9 @@ export function makeModal(scene: Phaser.Scene): Phaser.GameObjects.Container {
 // Orbe de l'écran de tirage, centrée sur l'origine du conteneur : la révélation (004)
 // la déplace et la fait grossir.
 export function makeOrb(scene: Phaser.Scene, r: number): Phaser.GameObjects.Container {
+  const size = orbSize(r);
+  const img = uiImage(scene, 'orb', 0, 0, size, size);
+  if (img) return scene.add.container(0, 0, [img]);
   const g = scene.add.graphics();
   g.fillStyle(COLORS.ink, 1).fillCircle(5, 5, r);
   g.fillStyle(COLORS.rarity.ultra, 1).fillCircle(0, 0, r);
@@ -101,9 +108,84 @@ export function makeOrb(scene: Phaser.Scene, r: number): Phaser.GameObjects.Cont
 }
 
 const rarityInfo = (id: string) => RARITIES.find(r => r.id === id)!;
+const kindLabel = (item: Item) => (item.kind === 'character' ? 'Personnage' : 'Créature');
 
-// Carte d'un résultat (FR-012) : pastille de rareté + initiale, nom, type, rareté,
-// et « Nouveau ! » ou le nombre d'exemplaires possédés.
+// Emblème de rareté (007, FR-007), centré en (x, y) ; pastille de couleur en repli.
+export function makeEmblem(scene: Phaser.Scene, x: number, y: number, size: number, rarity: Rarity) {
+  const img = uiImage(scene, `rarity-${rarity}`, x, y, size, size);
+  if (img) return img;
+  const g = scene.add.graphics();
+  g.fillStyle(COLORS.rarity[rarity], 1).fillCircle(x, y, size / 2);
+  g.lineStyle(STROKE.thin, COLORS.ink, 1).strokeCircle(x, y, size / 2);
+  return g;
+}
+
+// Emblème suivi d'un texte, centré verticalement sur y. originX : 0 = à partir de x, 0,5 = centré.
+function makeRarityLine(scene: Phaser.Scene, x: number, y: number, label: string, rarity: Rarity, size: number, originX: number) {
+  const c = scene.add.container(0, 0);
+  const t = scene.add.text(0, 0, label, textStyle(size, CSS.textDim)).setOrigin(0, 0.5);
+  const icon = size + 4;
+  const w = icon + 4 + t.width;
+  const left = x - originX * w;
+  c.add(makeEmblem(scene, left + icon / 2, y, icon, rarity));
+  c.add(t.setPosition(left + icon + 4, y));
+  return c;
+}
+
+// Fond d'une fenêtre d'illustration : la teinte de la rareté, éclaircie au centre.
+function artBackdrop(scene: Phaser.Scene, r: Rect, rarity: Rarity, radius: number) {
+  const g = scene.add.graphics();
+  g.fillStyle(COLORS.panel, 1).fillRoundedRect(r.x, r.y, r.w, r.h, radius);
+  g.fillStyle(COLORS.rarity[rarity], ART_FX.artTint).fillRoundedRect(r.x, r.y, r.w, r.h, radius);
+  // Halo en paliers, plus doux qu'un seul aplat.
+  for (const k of [1, 0.75, 0.5]) {
+    g.fillStyle(COLORS.panel, ART_FX.artHalo / 3).fillEllipse(r.x + r.w / 2, r.y + r.h * 0.42, r.w * 0.9 * k, r.h * 0.7 * k);
+  }
+  return g;
+}
+
+function frame(scene: Phaser.Scene, r: Rect, radius: number) {
+  return scene.add.graphics().lineStyle(STROKE.thin, COLORS.ink, 1).strokeRoundedRect(r.x, r.y, r.w, r.h, radius);
+}
+
+// Pastille et initiale : la représentation d'avant, en repli d'une illustration (FR-010).
+function initialDisc(scene: Phaser.Scene, x: number, y: number, radius: number, item: Item, size: number, alpha = 1) {
+  const c = scene.add.container(0, 0);
+  const g = scene.add.graphics();
+  g.fillStyle(COLORS.rarity[item.rarity], alpha).fillCircle(x, y, radius);
+  g.lineStyle(STROKE.thin, COLORS.ink, alpha).strokeCircle(x, y, radius);
+  c.add([g, scene.add.text(x, y, item.name.charAt(0), textStyle(size)).setOrigin(0.5).setAlpha(alpha)]);
+  return c;
+}
+
+// Texte qui tient en `lines` lignes de `maxW` : la police rétrécit pour un mot trop long.
+function fitText(scene: Phaser.Scene, x: number, y: number, s: string, size: number, maxW: number, lines: number) {
+  const t = scene.add.text(x, y, s, { ...textStyle(size), wordWrap: { width: maxW } });
+  for (let fs = size; fs > FONT_SIZE.micro && (t.width > maxW || t.getWrappedText().length > lines); fs--) {
+    t.setFontSize(fs - 1);
+  }
+  return t;
+}
+
+// Portrait rond (collection, bannière) : la tête, ou la silhouette d'un manquant (FR-004).
+export function makePortrait(scene: Phaser.Scene, x: number, y: number, d: number, item: Item, owned: boolean) {
+  const c = scene.add.container(0, 0);
+  if (!hasArt(scene, item)) {
+    c.add(initialDisc(scene, x, y, d / 2 - 1, item, FONT_SIZE.small, owned ? 1 : 0.45));
+    return c;
+  }
+  const g = scene.add.graphics();
+  g.fillStyle(owned ? COLORS.panel : COLORS.btn.disabled, 1).fillCircle(x, y, d / 2);
+  if (owned) g.fillStyle(COLORS.rarity[item.rarity], ART_FX.artTint).fillCircle(x, y, d / 2);
+  const ring = scene.add.graphics();
+  if (owned) ring.lineStyle(STROKE.thin, COLORS.rarity[item.rarity], 1).strokeCircle(x, y, d / 2 - 2);
+  ring.lineStyle(STROKE.thin, COLORS.ink, owned ? 1 : 0.45).strokeCircle(x, y, d / 2);
+  c.add([g, scene.add.image(x, y, owned ? headKey(item.id) : shadowKey(item.id)).setDisplaySize(d, d), ring]);
+  return c;
+}
+
+// Carte d'un résultat (001, FR-012 ; 007, FR-002) : illustration entière au ×1, buste au
+// ×10 ; nom, type, rareté, et « Nouveau ! » ou le nombre d'exemplaires possédés.
 export function makeResultCard(
   scene: Phaser.Scene,
   r: Rect,
@@ -113,49 +195,55 @@ export function makeResultCard(
 ): Phaser.GameObjects.Container {
   const { item } = result;
   const info = rarityInfo(item.rarity);
-  const color = COLORS.rarity[item.rarity];
   const c = scene.add.container(0, 0);
   c.add(makePanel(scene, r));
-
-  const pad = large ? 20 : 10;
-  const radius = large ? 34 : 17;
-  const cx = large ? r.x + r.w / 2 : r.x + pad + radius;
-  const cy = r.y + pad + radius;
-  const disc = scene.add.graphics();
-  disc.fillStyle(color, 1).fillCircle(cx, cy, radius);
-  disc.lineStyle(STROKE.thin, COLORS.ink, 1).strokeCircle(cx, cy, radius);
-  c.add(disc);
-  c.add(scene.add.text(cx, cy, item.name.charAt(0), textStyle(large ? FONT_SIZE.title : FONT_SIZE.button)).setOrigin(0.5));
-
-  const kind = item.kind === 'character' ? 'Personnage' : 'Créature';
   const badge = result.isNew ? 'Nouveau !' : `Déjà possédé ×${ownedCount}`;
 
   if (large) {
-    let y = cy + radius + 14;
+    const pad = RESULTS.singleArt.pad;
+    const win = { x: r.x + pad, y: r.y + pad, w: r.w - 2 * pad, h: RESULTS.singleArt.h };
+    const cx = r.x + r.w / 2;
+    c.add(artBackdrop(scene, win, item.rarity, RADIUS - 4));
+    if (hasArt(scene, item)) {
+      const h = win.h - 8;
+      c.add(scene.add.image(cx, win.y + win.h / 2 + 2, artKey(item.id)).setDisplaySize(h * 0.8, h));
+    } else {
+      c.add(initialDisc(scene, cx, win.y + win.h / 2, 34, item, FONT_SIZE.title));
+    }
+    c.add(frame(scene, win, RADIUS - 4));
+    let y = win.y + win.h + 10;
     c.add(scene.add.text(cx, y, item.name, textStyle(FONT_SIZE.big)).setOrigin(0.5, 0));
-    y += 32;
-    c.add(scene.add.text(cx, y, `${kind} · ${info.label}`, textStyle(FONT_SIZE.body, CSS.textDim)).setOrigin(0.5, 0));
-    y += 24;
+    y += 41;
+    c.add(makeRarityLine(scene, cx, y, `${kindLabel(item)} · ${info.label}`, item.rarity, FONT_SIZE.body, 0.5));
+    y += 17;
     c.add(makeBadge(scene, cx, y, badge, result.isNew, 0.5));
     if (result.shards > 0) c.add(makeShardAmount(scene, cx, y + 34, `+${result.shards} éclats`, 0.5));
     if (result.pity || result.featuredGuarantee) c.add(makeSticker(scene, r.x + r.w - 8, r.y - 8, 'Garanti !'));
     return c;
   }
 
-  const textX = cx + radius + 8;
-  const textW = r.x + r.w - pad - textX;
-  c.add(scene.add.text(textX, r.y + pad, item.name, { ...textStyle(FONT_SIZE.body), wordWrap: { width: textW } }));
-  c.add(scene.add.text(r.x + pad, r.y + 53, `${kind} · ${info.label}`, textStyle(FONT_SIZE.micro, CSS.textDim)));
-  c.add(makeBadge(scene, r.x + pad, r.y + 70, badge, result.isNew, 0));
-  if (result.shards > 0) c.add(makeShardAmount(scene, r.x + r.w - pad, r.y + 79, `+${result.shards}`, 1));
+  const bust = { x: r.x + 6, y: r.y + 6, w: ART.bust.w, h: ART.bust.h };
+  c.add(artBackdrop(scene, bust, item.rarity, ART.bust.radius));
+  if (hasArt(scene, item)) c.add(scene.add.image(bust.x, bust.y, bustKey(item.id)).setOrigin(0).setDisplaySize(bust.w, bust.h));
+  else c.add(initialDisc(scene, bust.x + bust.w / 2, bust.y + bust.h / 2, 17, item, FONT_SIZE.button));
+  c.add(frame(scene, bust, ART.bust.radius));
+  const textX = bust.x + bust.w + 7;
+  const textW = r.x + r.w - 6 - textX;
+  c.add(fitText(scene, textX, r.y + 5, item.name, FONT_SIZE.body, textW, 2));
+  c.add(scene.add.text(textX, r.y + 39, kindLabel(item), textStyle(FONT_SIZE.micro, CSS.textDim)));
+  c.add(makeRarityLine(scene, textX, r.y + 59, info.label, item.rarity, FONT_SIZE.micro, 0));
+  c.add(makeBadge(scene, r.x + 6, r.y + 70, badge, result.isNew, 0));
+  if (result.shards > 0) c.add(makeShardAmount(scene, r.x + r.w - 8, r.y + 79, `+${result.shards}`, 1));
   // Pastille façon autocollant, à cheval sur le bord : la ligne du bas est déjà pleine
   // quand un résultat forcé est aussi un doublon.
   if (result.pity || result.featuredGuarantee) c.add(makeSticker(scene, r.x + r.w - 6, r.y - 7, 'Garanti !'));
   return c;
 }
 
-// Losange des éclats, centré en (x, y).
-export function makeShardIcon(scene: Phaser.Scene, x: number, y: number, size: number): Phaser.GameObjects.Graphics {
+// Éclat (icône illustrée, ou losange en repli), centré en (x, y) ; size = demi-hauteur.
+export function makeShardIcon(scene: Phaser.Scene, x: number, y: number, size: number) {
+  const img = uiImage(scene, 'icon-shard', x, y, size * 2.3, size * 2.3);
+  if (img) return img;
   const g = scene.add.graphics();
   const V = Phaser.Math.Vector2;
   const points = [new V(x, y - size), new V(x + size * 0.75, y), new V(x, y + size), new V(x - size * 0.75, y)];
@@ -192,7 +280,7 @@ function makeSticker(scene: Phaser.Scene, rightX: number, topY: number, label: s
   return c;
 }
 
-function makeBadge(scene: Phaser.Scene, x: number, y: number, label: string, isNew: boolean, originX: number) {
+export function makeBadge(scene: Phaser.Scene, x: number, y: number, label: string, isNew: boolean, originX: number) {
   const c = scene.add.container(0, 0);
   const t = scene.add.text(0, 0, label, textStyle(FONT_SIZE.tiny, isNew ? CSS.text : CSS.textDim));
   const w = t.width + 12;

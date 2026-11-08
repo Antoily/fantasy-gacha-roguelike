@@ -1,0 +1,342 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <!-- Mâchouille : crocodile en peluche, bras grands ouverts pour un câlin (Peu commun : nœud à pois sur la queue) -->
+  <defs>
+    <path id="machouille-queue" d="M298 398C316 408 330 406 340 398C350 388 352 370 350 352C348 338 346 324 350 314C354 302 370 300 378 312C388 328 390 354 386 382C382 414 364 440 340 452C322 459 304 458 288 452Z"/>
+    <path id="machouille-bosses-queue" d="M329 400a9 9 0 1 0 18 0a9 9 0 1 0 -18 0Z"/>
+    <path id="machouille-noeud-pans" d="M365 368C361 377 357 386 350 396L357 395L361 402C364 391 367 380 370 370ZM371 368C375 378 379 387 386 395L379 396L376 403C373 392 371 381 369 370Z"/>
+    <path id="machouille-noeud-boucles" d="M363 357C356 347 345 343 342 351C339 359 340 371 346 377C351 381 359 375 363 368ZM373 357C380 347 389 344 391 352C393 360 392 371 387 376C382 380 376 375 373 368Z"/>
+    <path id="machouille-noeud-centre" d="M362 355C366 352 371 352 375 355C377 360 377 365 375 370C371 372 366 372 362 370C360 365 360 360 362 355Z"/>
+    <path id="machouille-bosses-corps" d="M295 211a11 11 0 1 0 22 0a11 11 0 1 0 -22 0ZM317 323a12 12 0 1 0 24 0a12 12 0 1 0 -24 0ZM317 352a10 10 0 1 0 20 0a10 10 0 1 0 -20 0Z"/>
+    <path id="machouille-bras-arriere" d="M166 252C140 246 112 240 90 228C86 216 80 206 72 203C64 199 55 203 55 213C49 208 40 207 34 211C26 216 24 226 30 232C20 234 14 246 20 254C24 260 30 261 34 259C28 266 28 277 36 281C42 285 50 283 54 278C64 281 80 278 92 268C114 280 140 292 168 300L176 270Z"/>
+    <path id="machouille-jambe-arriere" d="M166 402C162 422 156 434 146 440C128 440 110 444 104 454C98 464 104 472 116 472C140 474 176 474 198 470C210 466 210 444 204 424C202 414 200 406 198 402Z"/>
+    <path id="machouille-etiquette" d="M134 366L101 371C96 372 93 376 94 381L96 391C97 395 101 397 105 396L136 390Z"/>
+    <path id="machouille-corps" d="M168 206C210 190 268 186 300 196C320 222 330 262 332 310C334 352 328 392 312 420C292 448 258 460 222 460C184 460 152 448 136 420C120 392 118 350 124 310C130 268 146 230 168 206Z"/>
+    <path id="machouille-ventre" d="M158 204C200 194 248 196 272 210C296 244 304 312 298 364C290 410 262 446 222 456C190 462 160 446 146 420C130 390 128 340 132 300C136 258 144 226 158 204Z"/>
+    <path id="machouille-jambe-avant" d="M258 398C250 418 250 436 256 446C246 450 240 459 244 466C248 473 262 473 268 469C276 474 290 474 296 469C304 474 320 473 326 467C334 461 334 450 324 444C330 430 330 412 322 396C300 384 272 386 258 398Z"/>
+    <path id="machouille-bouche" d="M44 102L240 146L236 178C210 200 150 204 100 190C80 182 66 168 58 150C50 136 46 120 44 102Z"/>
+    <path id="machouille-langue" d="M66 160C74 150 92 146 110 152C126 157 138 166 158 170C178 174 198 178 216 182L220 206L56 206Z"/>
+    <path id="machouille-dents-haut" d="M51 106C51 115 52 128 56 131C60 133 66 124 69 116ZM83 123C83 133 86 146 91 148C95 149 99 140 101 130ZM115 135C115 146 118 157 122 159C127 161 131 151 133 141ZM148 146C149 156 153 167 158 168C162 168 164 160 164 151ZM179 156C179 164 181 171 185 172C189 173 192 166 193 158Z"/>
+    <path id="machouille-dents-bas" d="M70 154C70 147 73 140 77 139C81 139 85 152 86 164ZM100 171C100 163 102 157 106 156C110 156 114 166 116 178ZM132 184C133 175 137 169 141 169C145 169 147 178 148 188ZM165 192C165 184 168 177 171 177C175 177 178 185 179 192ZM194 190C194 183 197 176 201 176C204 176 206 182 206 188Z"/>
+    <path id="machouille-machoire" d="M238 150C236 160 232 168 226 174C212 184 192 188 172 188C146 186 118 176 94 164C82 158 72 152 64 146C56 148 54 158 60 164C74 180 100 196 130 206C160 214 200 218 236 214C266 210 290 200 304 188C306 170 290 154 270 150C258 148 246 148 238 150Z"/>
+    <path id="machouille-bosses-tete" d="M304 88a12 12 0 1 0 24 0a12 12 0 1 0 -24 0ZM316 116a12 12 0 1 0 24 0a12 12 0 1 0 -24 0ZM317 149a11 11 0 1 0 22 0a11 11 0 1 0 -22 0Z"/>
+    <path id="machouille-tete" d="M38 92C38 80 42 70 52 64C60 56 74 52 86 58C96 64 104 72 118 76C134 80 150 82 164 78C166 58 180 44 198 44C214 44 226 52 232 62C240 40 256 28 274 30C296 32 310 50 308 74C324 88 332 110 332 132C332 162 320 188 298 202C284 212 262 214 252 204C244 196 240 182 240 166C240 160 239 155 238 150C234 158 226 163 212 164C186 163 150 152 112 138C82 127 56 116 42 104C38 101 38 97 38 92Z"/>
+    <ellipse id="machouille-oeil-proche" cx="270" cy="74" rx="27" ry="32"/>
+    <ellipse id="machouille-oeil-loin" cx="198" cy="80" rx="21" ry="26"/>
+    <path id="machouille-bras-avant" d="M270 300C258 286 260 262 276 254C296 246 318 236 336 222C330 214 328 204 332 196C336 186 348 186 352 194C350 182 354 172 362 170C370 168 376 174 376 182C380 174 390 174 392 182C394 190 390 196 386 198C394 202 394 214 388 220C384 226 378 228 374 226C374 240 366 254 352 262C336 274 318 290 304 304C294 314 280 312 270 300Z"/>
+    <path id="machouille-coeur" d="M0 11C-4 7-14 1-14-6C-14-11-10-14-6-14C-3-14-1-12 0-10C1-12 3-14 6-14C10-14 14-11 14-6C14 1 4 7 0 11Z"/>
+    <path id="machouille-piece-coeur" d="M0 19C-8 13-22 5-22-7C-22-15-16-20-10-20C-5-20-2-17 0-13C2-17 5-20 10-20C16-20 22-15 22-7C22 5 8 13 0 19Z"/>
+    <path id="machouille-piece-carreaux" d="M-17-13C-6-15 6-15 17-14C18-4 18 5 17 14C6 15-6 15-17 13C-18 4-18-4-17-13Z"/>
+    <path id="machouille-etincelle" d="M0-9C1-3 3-1 9 0C3 1 1 3 0 9C-1 3-3 1-9 0C-3-1-1-3 0-9Z"/>
+
+    <clipPath id="machouille-queue-clip"><use href="#machouille-queue"/></clipPath>
+    <clipPath id="machouille-bosses-queue-clip"><use href="#machouille-bosses-queue"/></clipPath>
+    <clipPath id="machouille-noeud-pans-clip"><use href="#machouille-noeud-pans"/></clipPath>
+    <clipPath id="machouille-noeud-boucles-clip"><use href="#machouille-noeud-boucles"/></clipPath>
+    <clipPath id="machouille-noeud-centre-clip"><use href="#machouille-noeud-centre"/></clipPath>
+    <clipPath id="machouille-bosses-corps-clip"><use href="#machouille-bosses-corps"/></clipPath>
+    <clipPath id="machouille-bras-arriere-clip"><use href="#machouille-bras-arriere"/></clipPath>
+    <clipPath id="machouille-jambe-arriere-clip"><use href="#machouille-jambe-arriere"/></clipPath>
+    <clipPath id="machouille-etiquette-clip"><use href="#machouille-etiquette"/></clipPath>
+    <clipPath id="machouille-corps-clip"><use href="#machouille-corps"/></clipPath>
+    <clipPath id="machouille-ventre-clip"><use href="#machouille-ventre"/></clipPath>
+    <clipPath id="machouille-jambe-avant-clip"><use href="#machouille-jambe-avant"/></clipPath>
+    <clipPath id="machouille-bouche-clip"><use href="#machouille-bouche"/></clipPath>
+    <clipPath id="machouille-langue-clip"><use href="#machouille-langue"/></clipPath>
+    <clipPath id="machouille-dents-haut-clip"><use href="#machouille-dents-haut"/></clipPath>
+    <clipPath id="machouille-dents-bas-clip"><use href="#machouille-dents-bas"/></clipPath>
+    <clipPath id="machouille-machoire-clip"><use href="#machouille-machoire"/></clipPath>
+    <clipPath id="machouille-bosses-tete-clip"><use href="#machouille-bosses-tete"/></clipPath>
+    <clipPath id="machouille-tete-clip"><use href="#machouille-tete"/></clipPath>
+    <clipPath id="machouille-oeil-proche-clip"><use href="#machouille-oeil-proche"/></clipPath>
+    <clipPath id="machouille-oeil-loin-clip"><use href="#machouille-oeil-loin"/></clipPath>
+    <clipPath id="machouille-bras-avant-clip"><use href="#machouille-bras-avant"/></clipPath>
+    <clipPath id="machouille-coeur-clip"><use href="#machouille-coeur"/></clipPath>
+    <clipPath id="machouille-piece-coeur-clip"><use href="#machouille-piece-coeur"/></clipPath>
+    <clipPath id="machouille-piece-carreaux-clip"><use href="#machouille-piece-carreaux"/></clipPath>
+
+    <!-- Petit cœur flottant : ombre en aplat, base décalée vers la lumière, reflet blanc -->
+    <g id="machouille-coeur-g">
+      <use href="#machouille-coeur" fill="#bd3e6e"/>
+      <g clip-path="url(#machouille-coeur-clip)">
+        <use href="#machouille-coeur" transform="translate(-2.5 -3)" fill="#f25c7d"/>
+        <ellipse cx="-7" cy="-6" rx="3.6" ry="2.2" transform="rotate(-40 -7 -6)" fill="#fff"/>
+      </g>
+      <use href="#machouille-coeur" fill="none" stroke="#1d1a16" stroke-width="3.2" stroke-linejoin="round"/>
+    </g>
+  </defs>
+
+  <ellipse cx="226" cy="469" rx="160" ry="13" fill="#1d1a16" opacity="0.18"/>
+
+  <!-- Silhouette : trait épais sous toutes les masses (7 au bord extérieur, 4,5 dedans) -->
+  <g fill="#1d1a16" stroke="#1d1a16" stroke-width="9.5" stroke-linejoin="round">
+    <use href="#machouille-queue"/>
+    <use href="#machouille-bosses-queue"/>
+    <use href="#machouille-noeud-pans"/>
+    <use href="#machouille-noeud-boucles"/>
+    <use href="#machouille-bosses-corps"/>
+    <use href="#machouille-bras-arriere"/>
+    <use href="#machouille-jambe-arriere"/>
+    <use href="#machouille-etiquette"/>
+    <use href="#machouille-corps"/>
+    <use href="#machouille-jambe-avant"/>
+    <use href="#machouille-bouche"/>
+    <use href="#machouille-machoire"/>
+    <use href="#machouille-bosses-tete"/>
+    <use href="#machouille-tete"/>
+    <use href="#machouille-bras-avant"/>
+  </g>
+
+  <!-- Queue -->
+  <use href="#machouille-bosses-queue" fill="#265756"/>
+  <g clip-path="url(#machouille-bosses-queue-clip)"><use href="#machouille-bosses-queue" transform="translate(-3 -3)" fill="#347a58"/></g>
+  <use href="#machouille-bosses-queue" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+
+  <use href="#machouille-queue" fill="#3d8a60"/>
+  <g clip-path="url(#machouille-queue-clip)">
+    <path d="M336 296L362 300C358 316 360 334 360 352C360 372 356 392 346 406L320 410Z" fill="#63ad6e"/>
+    <path d="M372 300C380 330 378 370 368 400C356 430 330 446 290 444L290 470L400 470L400 300Z" fill="#2b6460"/>
+    <path d="M280 390L334 396C330 420 326 440 322 460L280 460Z" fill="#2b6460"/>
+    <path d="M318 444C342 438 360 420 368 398" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 5"/>
+    <ellipse cx="358" cy="316" rx="4.5" ry="2" transform="rotate(-55 358 316)" fill="#fff"/>
+  </g>
+  <use href="#machouille-queue" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Nœud à pois (accessoire Peu commun) -->
+  <use href="#machouille-noeud-pans" fill="#f27aa2"/>
+  <g clip-path="url(#machouille-noeud-pans-clip)">
+    <path d="M350 366L390 366L390 380C380 378 370 378 350 384Z" fill="#bf4e88"/>
+    <circle cx="357" cy="389" r="1.8" fill="#ffe6ef"/>
+    <circle cx="379" cy="389" r="1.8" fill="#ffe6ef"/>
+  </g>
+  <use href="#machouille-noeud-pans" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <use href="#machouille-noeud-boucles" fill="#bf4e88"/>
+  <g clip-path="url(#machouille-noeud-boucles-clip)">
+    <use href="#machouille-noeud-boucles" transform="translate(-2 -3)" fill="#f27aa2"/>
+    <ellipse cx="347" cy="353" rx="4" ry="2" transform="rotate(-40 347 353)" fill="#ffa9c4"/>
+    <ellipse cx="381" cy="351" rx="3.5" ry="1.8" transform="rotate(-20 381 351)" fill="#fff"/>
+    <g fill="#ffe6ef">
+      <circle cx="353" cy="352" r="2.2"/>
+      <circle cx="349" cy="369" r="2"/>
+      <circle cx="386" cy="356" r="2.2"/>
+      <circle cx="385" cy="370" r="2"/>
+    </g>
+  </g>
+  <use href="#machouille-noeud-boucles" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M361 362C355 358 349 358 346 364M375 362C381 358 387 358 389 364" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <use href="#machouille-noeud-centre" fill="#f27aa2"/>
+  <g clip-path="url(#machouille-noeud-centre-clip)">
+    <path d="M360 364C366 366 372 366 378 362L378 374L360 374Z" fill="#bf4e88"/>
+    <ellipse cx="366" cy="357" rx="3" ry="1.6" fill="#fff"/>
+  </g>
+  <use href="#machouille-noeud-centre" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Écailles du dos (bosses de tissu) -->
+  <use href="#machouille-bosses-corps" fill="#265756"/>
+  <g clip-path="url(#machouille-bosses-corps-clip)"><use href="#machouille-bosses-corps" transform="translate(-3 -3)" fill="#347a58"/></g>
+  <use href="#machouille-bosses-corps" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+
+  <!-- Bras arrière -->
+  <use href="#machouille-bras-arriere" fill="#3d8a60"/>
+  <g clip-path="url(#machouille-bras-arriere-clip)">
+    <path d="M180 200L180 246C150 244 120 240 96 232C90 222 82 212 72 210C64 208 58 212 56 220C48 214 40 214 34 220C28 226 28 232 30 236L0 236L0 200Z" fill="#63ad6e"/>
+    <path d="M180 274C150 270 120 264 96 254C80 262 60 266 40 262C30 260 20 256 8 252L8 310L180 310Z" fill="#2b6460"/>
+    <path d="M152 230C142 250 138 280 142 310L180 310L180 230Z" fill="#2b6460"/>
+    <path d="M98 233C102 244 102 256 98 268" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 5"/>
+    <ellipse cx="68" cy="207" rx="5" ry="2" transform="rotate(-20 68 207)" fill="#fff"/>
+  </g>
+  <use href="#machouille-bras-arriere" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <ellipse cx="56" cy="247" rx="12" ry="10" transform="rotate(15 56 247)" fill="#ebe7b9" stroke="#1d1a16" stroke-width="2.5"/>
+  <ellipse cx="51" cy="242" rx="3" ry="1.6" transform="rotate(-20 51 242)" fill="#fff"/>
+  <path d="M55 214C57 220 60 226 62 230M30 232C36 234 40 238 44 240M34 259C38 259 42 258 46 256" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Jambe arrière -->
+  <use href="#machouille-jambe-arriere" fill="#3d8a60"/>
+  <g clip-path="url(#machouille-jambe-arriere-clip)">
+    <path d="M96 436L152 434C140 444 124 446 114 452C108 456 104 462 104 470L96 470Z" fill="#63ad6e"/>
+    <path d="M170 396C176 420 178 444 168 458C150 466 120 468 96 466L96 480L220 480L220 396Z" fill="#2b6460"/>
+    <ellipse cx="112" cy="452" rx="5" ry="2" transform="rotate(-30 112 452)" fill="#fff"/>
+  </g>
+  <use href="#machouille-jambe-arriere" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M120 449C116 455 116 463 119 470M134 446C130 453 130 462 133 470" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Étiquette de peluche à la hanche -->
+  <use href="#machouille-etiquette" fill="#fbf8f1"/>
+  <g clip-path="url(#machouille-etiquette-clip)">
+    <path d="M118 360L140 360L140 400L120 400C122 388 121 374 118 360Z" fill="#d3cfdb"/>
+    <path d="M92 390L140 382L140 400L92 400Z" fill="#d3cfdb"/>
+    <use href="#machouille-coeur" transform="translate(104 382) scale(0.32)" fill="#e0505f"/>
+    <path d="M110 378L117 377M110 385L116 384" fill="none" stroke="#9c97a6" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <use href="#machouille-etiquette" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Corps et ventre matelassé -->
+  <use href="#machouille-corps" fill="#3d8a60"/>
+  <g clip-path="url(#machouille-corps-clip)">
+    <path d="M100 200L150 200C132 260 126 330 134 400C140 430 156 452 180 466L100 466Z" fill="#63ad6e"/>
+    <path d="M290 196C312 240 318 300 312 360C306 410 282 446 240 466L340 466L340 196Z" fill="#2b6460"/>
+    <path d="M120 430C160 460 220 470 300 440L300 480L120 480Z" fill="#2b6460"/>
+    <path d="M150 196C200 214 260 222 310 210L310 186L150 186Z" fill="#2b6460"/>
+    <use href="#machouille-ventre" fill="#ebe7b9"/>
+    <g clip-path="url(#machouille-ventre-clip)">
+      <path d="M120 200L162 200C148 240 140 300 144 360C148 400 160 430 182 452L120 462Z" fill="#faf6d8"/>
+      <g fill="none" stroke-linecap="round">
+        <path d="M120 245Q205 271 310 243M118 291Q205 317 312 289M118 337Q205 363 312 335M120 383Q205 407 310 379M130 423Q205 445 300 419" stroke="#bdb8aa" stroke-width="8"/>
+        <path d="M120 257Q205 283 310 255M118 303Q205 329 312 301M118 349Q205 375 312 347M120 395Q205 419 310 391" stroke="#faf6d8" stroke-width="5"/>
+      </g>
+      <path d="M252 196C274 240 280 300 274 350C268 400 250 436 214 462L320 462L320 196Z" fill="#bdb8aa"/>
+      <path d="M130 196L300 196L300 214C260 228 220 232 180 226C160 222 144 216 130 212Z" fill="#bdb8aa"/>
+      <path d="M120 250Q205 276 310 248M118 296Q205 322 312 294M118 342Q205 368 312 340M120 388Q205 412 310 384M130 428Q205 450 300 424" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 5"/>
+      <ellipse cx="150" cy="280" rx="2.5" ry="7" transform="rotate(12 150 280)" fill="#fff"/>
+      <ellipse cx="147" cy="326" rx="2.5" ry="7" transform="rotate(8 147 326)" fill="#fff"/>
+    </g>
+    <use href="#machouille-ventre" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+    <path d="M282 214C305 246 312 312 306 366C298 414 268 452 226 464" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 5"/>
+  </g>
+  <use href="#machouille-corps" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Pièce rapiécée en cœur -->
+  <g transform="translate(186 288) rotate(-12)">
+    <use href="#machouille-piece-coeur" fill="#a8364f"/>
+    <g clip-path="url(#machouille-piece-coeur-clip)">
+      <use href="#machouille-piece-coeur" transform="translate(-3 -4)" fill="#dd4b56"/>
+      <ellipse cx="-11" cy="-11" rx="6" ry="3.4" transform="rotate(-35 -11 -11)" fill="#f58a8a"/>
+      <circle cx="-14" cy="-10" r="1.8" fill="#fff"/>
+    </g>
+    <use href="#machouille-piece-coeur" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+    <use href="#machouille-piece-coeur" transform="scale(0.76)" fill="none" stroke="#1d1a16" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="5 6"/>
+  </g>
+
+  <!-- Jambe avant -->
+  <use href="#machouille-jambe-avant" fill="#3d8a60"/>
+  <g clip-path="url(#machouille-jambe-avant-clip)">
+    <path d="M236 380L268 384C258 404 256 424 262 446C254 452 248 458 246 466L236 466Z" fill="#63ad6e"/>
+    <path d="M306 384C316 410 318 436 308 452C290 464 262 466 240 462L240 480L340 480L340 384Z" fill="#2b6460"/>
+    <path d="M266 406C280 396 302 394 318 402" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 5"/>
+    <ellipse cx="266" cy="416" rx="2.2" ry="6" transform="rotate(15 266 416)" fill="#fff"/>
+  </g>
+  <use href="#machouille-jambe-avant" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M268 467C266 462 266 458 268 454M296 467C296 462 296 458 297 454" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Pièce rapiécée à carreaux -->
+  <g transform="translate(290 420) rotate(-8)">
+    <use href="#machouille-piece-carreaux" fill="#f6f2e4"/>
+    <g clip-path="url(#machouille-piece-carreaux-clip)">
+      <path d="M-17-20h7v40h-7zM-3-20h7v40h-7zM11-20h7v40h-7z" fill="#5b86cf" fill-opacity="0.55"/>
+      <path d="M-20-15h40v7h-40zM-20-1h40v7h-40zM-20 13h40v7h-40z" fill="#5b86cf" fill-opacity="0.55"/>
+      <path d="M20-20L20 20L-20 20C-4 12 10 0 20-20Z" fill="#2e2a5a" fill-opacity="0.22"/>
+    </g>
+    <use href="#machouille-piece-carreaux" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+    <use href="#machouille-piece-carreaux" transform="scale(0.78)" fill="none" stroke="#1d1a16" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="5 6"/>
+  </g>
+
+  <!-- Bouche ouverte, langue -->
+  <use href="#machouille-bouche" fill="#7d2a3a"/>
+  <g clip-path="url(#machouille-bouche-clip)">
+    <path d="M30 90L250 140L250 176C220 176 190 172 150 162C110 150 70 136 40 118Z" fill="#521d36"/>
+    <use href="#machouille-langue" fill="#ee7d8c"/>
+    <g clip-path="url(#machouille-langue-clip)">
+      <path d="M152 160C160 168 164 178 166 196L230 206L230 160Z" fill="#c25a76"/>
+      <ellipse cx="92" cy="154" rx="10" ry="3.5" transform="rotate(12 92 154)" fill="#ffadb3"/>
+    </g>
+    <use href="#machouille-langue" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M98 160C108 162 118 166 128 172" fill="none" stroke="#c25a76" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <use href="#machouille-bouche" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Dents molles en feutrine -->
+  <use href="#machouille-dents-haut" fill="#d6d2de"/>
+  <g clip-path="url(#machouille-dents-haut-clip)"><use href="#machouille-dents-haut" transform="translate(-2.5 -1)" fill="#fdf9ee"/></g>
+  <use href="#machouille-dents-haut" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <use href="#machouille-dents-bas" fill="#d6d2de"/>
+  <g clip-path="url(#machouille-dents-bas-clip)"><use href="#machouille-dents-bas" transform="translate(-2.5 1)" fill="#fdf9ee"/></g>
+  <use href="#machouille-dents-bas" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+
+  <!-- Mâchoire inférieure (dessous en tissu clair) -->
+  <use href="#machouille-machoire" fill="#3d8a60"/>
+  <g clip-path="url(#machouille-machoire-clip)">
+    <path d="M44 140L76 146C70 156 66 166 64 178L44 172Z" fill="#63ad6e"/>
+    <path d="M205 140C216 160 222 175 224 200L320 190L320 140Z" fill="#2b6460"/>
+    <path d="M40 150C80 176 120 194 170 203C210 208 250 205 300 188L320 240L30 240Z" fill="#ebe7b9"/>
+    <path d="M40 168C90 192 150 207 200 211C240 213 280 204 310 190L320 240L30 240Z" fill="#bdb8aa"/>
+    <path d="M224 196L320 186L320 240L222 240Z" fill="#bdb8aa"/>
+    <path d="M56 158C80 176 120 194 170 203C210 208 250 205 296 190" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 5"/>
+    <ellipse cx="60" cy="155" rx="2" ry="4.5" transform="rotate(-20 60 155)" fill="#fff"/>
+  </g>
+  <use href="#machouille-machoire" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Tête -->
+  <use href="#machouille-bosses-tete" fill="#265756"/>
+  <g clip-path="url(#machouille-bosses-tete-clip)"><use href="#machouille-bosses-tete" transform="translate(-3 -3)" fill="#347a58"/></g>
+  <use href="#machouille-bosses-tete" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+
+  <use href="#machouille-tete" fill="#3d8a60"/>
+  <g clip-path="url(#machouille-tete-clip)">
+    <path d="M20 130L20 20L300 14L300 32C282 34 264 40 254 50C246 58 238 66 232 74C224 64 212 56 200 56C186 56 176 68 172 84C166 94 148 94 130 90C112 86 100 78 88 74C74 70 62 74 56 84C50 94 48 106 48 116Z" fill="#63ad6e"/>
+    <path d="M20 96C60 106 100 122 150 138C190 150 222 154 242 146C252 168 270 186 296 186C312 172 314 140 310 108C306 80 298 56 284 40L350 20L350 240L20 240Z" fill="#2b6460"/>
+    <path d="M166 92C146 97 122 95 100 83" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 5"/>
+    <ellipse cx="272" cy="162" rx="17" ry="10" transform="rotate(-10 272 162)" fill="#f39aa8"/>
+    <ellipse cx="200" cy="127" rx="12" ry="7" transform="rotate(-14 200 127)" fill="#f39aa8"/>
+    <path d="M262 168l5-9M271 169l5-9M280 168l5-9" fill="none" stroke="#e0607a" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="66" cy="59" rx="6" ry="2.4" transform="rotate(-22 66 59)" fill="#fff"/>
+    <ellipse cx="126" cy="83" rx="7" ry="2" transform="rotate(14 126 83)" fill="#fff"/>
+    <ellipse cx="258" cy="37" rx="6" ry="2" transform="rotate(-28 258 37)" fill="#fff"/>
+    <ellipse cx="190" cy="50" rx="4.5" ry="1.8" transform="rotate(-35 190 50)" fill="#fff"/>
+  </g>
+  <use href="#machouille-tete" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <ellipse cx="58" cy="67" rx="4.2" ry="2.8" transform="rotate(-30 58 67)" fill="#1d1a16"/>
+  <ellipse cx="76" cy="62" rx="4.4" ry="2.8" transform="rotate(-14 76 62)" fill="#1d1a16"/>
+  <path d="M237 151C243 147 247 141 247 134" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- Yeux brillants -->
+  <use href="#machouille-oeil-proche" fill="#fffaf0"/>
+  <g clip-path="url(#machouille-oeil-proche-clip)">
+    <path d="M236 40H304V66C294 56 282 52 270 52C258 52 246 56 236 66Z" fill="#dcd8e6"/>
+    <circle cx="268" cy="80" r="18" fill="#8a4b27"/>
+    <path d="M250 80A18 18 0 0 1 286 80Q268 68 250 80Z" fill="#57291b"/>
+    <path d="M254 91Q268 86 282 91A18 18 0 0 1 254 91Z" fill="#cf8a4c"/>
+    <circle cx="268" cy="80" r="18" fill="none" stroke="#1d1a16" stroke-width="2.5"/>
+    <circle cx="267" cy="82" r="9.5" fill="#1d1a16"/>
+    <circle cx="259" cy="72" r="6.5" fill="#fff"/>
+    <circle cx="276" cy="90" r="3" fill="#fff"/>
+  </g>
+  <use href="#machouille-oeil-proche" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+  <use href="#machouille-oeil-loin" fill="#fffaf0"/>
+  <g clip-path="url(#machouille-oeil-loin-clip)">
+    <path d="M174 50H222V72C214 64 206 61 198 61C190 61 182 64 174 72Z" fill="#dcd8e6"/>
+    <circle cx="196" cy="86" r="14" fill="#8a4b27"/>
+    <path d="M182 86A14 14 0 0 1 210 86Q196 77 182 86Z" fill="#57291b"/>
+    <path d="M185.3 95Q196 91 206.7 95A14 14 0 0 1 185.3 95Z" fill="#cf8a4c"/>
+    <circle cx="196" cy="86" r="14" fill="none" stroke="#1d1a16" stroke-width="2.5"/>
+    <circle cx="195" cy="88" r="7.5" fill="#1d1a16"/>
+    <circle cx="189" cy="80" r="5" fill="#fff"/>
+    <circle cx="202" cy="94" r="2.4" fill="#fff"/>
+  </g>
+  <use href="#machouille-oeil-loin" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+
+  <!-- Bras avant, ouvert pour le câlin -->
+  <use href="#machouille-bras-avant" fill="#3d8a60"/>
+  <g clip-path="url(#machouille-bras-avant-clip)">
+    <path d="M240 250C270 262 300 252 336 230C332 218 334 206 342 200C350 196 356 200 360 190C362 182 368 178 374 182C378 184 382 186 388 184L400 184L400 140L240 140Z" fill="#63ad6e"/>
+    <path d="M250 288C280 284 312 270 336 252C352 240 366 228 378 212C386 202 394 194 400 190L400 330L250 330Z" fill="#2b6460"/>
+    <path d="M290 252C276 258 270 272 272 286C273 296 280 304 290 308M328 228C334 240 338 252 344 266" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 5"/>
+    <ellipse cx="300" cy="249" rx="9" ry="2.2" transform="rotate(-28 300 249)" fill="#fff"/>
+    <ellipse cx="338" cy="195" rx="4" ry="2" transform="rotate(-40 338 195)" fill="#fff"/>
+    <ellipse cx="366" cy="175" rx="3.5" ry="1.8" transform="rotate(-15 366 175)" fill="#fff"/>
+  </g>
+  <use href="#machouille-bras-avant" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <ellipse cx="363" cy="214" rx="12" ry="9.5" transform="rotate(-38 363 214)" fill="#ebe7b9" stroke="#1d1a16" stroke-width="2.5"/>
+  <ellipse cx="359" cy="209" rx="3.5" ry="1.6" transform="rotate(-38 359 209)" fill="#fff"/>
+  <path d="M352 195C353 199 354 203 354 206M376 183C376 188 375 192 373 196M386 199C383 202 380 204 377 205" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Petits cœurs et étincelles -->
+  <use href="#machouille-coeur-g" transform="translate(42 40) rotate(-16) scale(1.1)"/>
+  <use href="#machouille-coeur-g" transform="translate(352 46) rotate(14) scale(0.85)"/>
+  <use href="#machouille-coeur-g" transform="translate(150 26) rotate(-6) scale(0.6)"/>
+  <use href="#machouille-coeur-g" transform="translate(40 338) rotate(-12) scale(0.8)"/>
+  <use href="#machouille-coeur-g" transform="translate(380 278) rotate(18) scale(0.65)"/>
+  <g fill="#fff" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round">
+    <use href="#machouille-etincelle" transform="translate(100 24)"/>
+    <use href="#machouille-etincelle" transform="translate(316 18) scale(0.8)"/>
+    <use href="#machouille-etincelle" transform="translate(22 180) scale(0.7)"/>
+  </g>
+</svg>

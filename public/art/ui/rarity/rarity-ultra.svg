@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Emblème Ultra rare : étoile prismatique rose-violet aux reflets arc-en-ciel.
+       Dernier échelon : la plus grande silhouette, facettes irisées, contre-jour, halo et
+       trois étincelles. Lumière en haut à gauche, contour encre 5. -->
+  <defs>
+    <radialGradient id="rarity-ultra-halo" cx="32" cy="33" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#ffc9ee" stop-opacity="0.85"/>
+      <stop offset="0.7" stop-color="#e2a6ff" stop-opacity="0.45"/>
+      <stop offset="0.88" stop-color="#a6dcff" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#a6dcff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rarity-ultra-nacre" x1="28" y1="8" x2="30" y2="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff7c4"/>
+      <stop offset="1" stop-color="#ffd0ee"/>
+    </linearGradient>
+    <path id="rarity-ultra-etoile" d="M32 6 L39.9 23.1 L58.6 25.3 L44.8 38.2 L48.5 56.7 L32 47.5 L15.5 56.7 L19.2 38.2 L5.4 25.3 L24.1 23.1 Z"/>
+    <clipPath id="rarity-ultra-etoile-clip"><use href="#rarity-ultra-etoile"/></clipPath>
+  </defs>
+
+  <!-- Halo irisé -->
+  <circle cx="32" cy="33" r="31" fill="url(#rarity-ultra-halo)"/>
+
+  <!-- Étoile biseautée : chaque branche a une moitié vers la lumière, une moitié à l'ombre -->
+  <use href="#rarity-ultra-etoile" fill="#d65db1"/>
+  <g clip-path="url(#rarity-ultra-etoile-clip)">
+    <!-- Moitiés éclairées : reflets nacrés de couleurs différentes (arc-en-ciel) -->
+    <polygon points="32,34 24.1,23.1 32,6" fill="url(#rarity-ultra-nacre)"/>
+    <polygon points="32,34 5.4,25.3 24.1,23.1" fill="#c7f3f4"/>
+    <polygon points="32,34 15.5,56.7 19.2,38.2" fill="#e3c9ff"/>
+    <polygon points="32,34 39.9,23.1 58.6,25.3" fill="#ffb8e2"/>
+    <!-- Moitiés de base -->
+    <polygon points="32,34 32,6 39.9,23.1" fill="#cc56ad"/>
+    <polygon points="32,34 19.2,38.2 5.4,25.3" fill="#d65db1"/>
+    <polygon points="32,34 48.5,56.7 32,47.5" fill="#b9479f"/>
+    <!-- Moitiés à l'ombre, décalées vers le violet -->
+    <polygon points="32,34 44.8,38.2 48.5,56.7" fill="#93339c"/>
+    <polygon points="32,34 58.6,25.3 44.8,38.2" fill="#5f2287"/>
+    <polygon points="32,34 32,47.5 15.5,56.7" fill="#6a2690"/>
+    <!-- Arêtes -->
+    <path d="M32 34 L32 6 M32 34 L58.6 25.3 M32 34 L48.5 56.7 M32 34 L15.5 56.7 M32 34 L5.4 25.3 M32 34 L39.9 23.1 M32 34 L44.8 38.2 M32 34 L32 47.5 M32 34 L19.2 38.2 M32 34 L24.1 23.1" fill="none" stroke="#4c1b6e" stroke-width="1.2" stroke-linecap="round" stroke-opacity="0.5"/>
+    <!-- Reflets -->
+    <path d="M28 22.4 L30.6 16.7" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+    <circle cx="19.5" cy="27.4" r="1.2" fill="#ffffff"/>
+    <!-- Contre-jour irisé sur les bords ombrés -->
+    <path d="M50.4 29 L44.9 34.2 M42.5 41.5 L44 49 M28.1 46.3 L21.5 50" fill="none" stroke="#9ff3ff" stroke-width="1.6" stroke-linecap="round"/>
+  </g>
+  <!-- Contour de silhouette -->
+  <use href="#rarity-ultra-etoile" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- Étincelles (blanche, cyan, jaune : le prisme) -->
+  <path d="M51.5 3.5 Q52.8 9.2 58.5 10.5 Q52.8 11.8 51.5 17.5 Q50.2 11.8 44.5 10.5 Q50.2 9.2 51.5 3.5 Z" fill="#ffffff" stroke="#1d1a16" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M11 5.5 Q11.9 9.6 16 10.5 Q11.9 11.4 11 15.5 Q10.1 11.4 6 10.5 Q10.1 9.6 11 5.5 Z" fill="#c8fbff" stroke="#1d1a16" stroke-width="1.4" stroke-linejoin="round"/>
+  <path d="M56.5 44 Q57.3 47.7 61 48.5 Q57.3 49.3 56.5 53 Q55.7 49.3 52 48.5 Q55.7 47.7 56.5 44 Z" fill="#fff3a3" stroke="#1d1a16" stroke-width="1.4" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,459 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <!-- Gribouille (Commun) : apprenti peintre qui tache tout. Charte docs/art/charte.md.
+       Lumière unique en haut à gauche. Le trait de silhouette (7) vient d'un halo d'encre
+       posé derrière tout le personnage ; chaque masse garde par-dessus son contour de 4,5. -->
+  <defs>
+    <!-- PINCEAU, repère local : poing à l'origine, poils vers -y. -->
+    <path id="gribouille-manche" d="M-5.5 46 C -5.5 51 5.5 51 5.5 46 L 9.5 -52 L -9.5 -52 Z"/>
+    <clipPath id="gribouille-manche-clip"><use href="#gribouille-manche"/></clipPath>
+    <path id="gribouille-poils" d="M-13 -80 C -26 -94 -29 -122 -17 -143 C -10 -155 -3 -162 2 -168 C 6 -159 18 -146 24 -128 C 30 -108 25 -92 13 -80 Z"/>
+    <clipPath id="gribouille-poils-clip"><use href="#gribouille-poils"/></clipPath>
+    <path id="gribouille-virole" d="M-11 -48 L 11 -48 L 14.5 -86 L -14.5 -86 Z"/>
+    <clipPath id="gribouille-virole-clip"><use href="#gribouille-virole"/></clipPath>
+    <path id="gribouille-poing" d="M-16 -14 C -18 -23 -8 -27 2 -25 C 14 -23 21 -14 20 -2 C 19 10 14 21 2 22 C -10 23 -19 15 -19 4 C -19 -2 -17 -8 -16 -14 Z"/>
+    <clipPath id="gribouille-poing-clip"><use href="#gribouille-poing"/></clipPath>
+
+    <!-- GICLÉE de peinture jaune qui s'envole du pinceau. -->
+    <path id="gribouille-giclee" d="M372 42 C 371 28 360 16 342 12 C 332 10 322 10 314 12 C 302 14 297 26 305 33 C 311 39 322 37 328 31 C 336 25 348 24 357 29 C 362 33 364 38 365 45 Z"/>
+    <clipPath id="gribouille-giclee-clip"><use href="#gribouille-giclee"/></clipPath>
+
+    <!-- TÊTE (dessinée droite, inclinée par le groupe). -->
+    <path id="gribouille-tete" d="M118 120 C 106 142 102 170 104 196 C 105 222 122 246 152 254 C 186 263 230 252 252 228 C 272 206 278 172 272 140 C 264 102 232 80 192 80 C 156 80 130 96 118 120 Z"/>
+    <clipPath id="gribouille-tete-clip"><use href="#gribouille-tete"/></clipPath>
+    <path id="gribouille-oreille" d="M254 180 C 268 166 292 172 291 196 C 290 214 274 226 256 218 C 252 206 252 192 254 180 Z"/>
+    <clipPath id="gribouille-oreille-clip"><use href="#gribouille-oreille"/></clipPath>
+    <path id="gribouille-cheveux" d="M226 116 C 254 110 284 116 294 134 C 302 148 300 160 293 166 C 297 176 293 186 285 190 C 286 178 280 170 270 166 C 260 162 252 156 248 146 C 240 140 232 130 226 116 Z"/>
+    <clipPath id="gribouille-cheveux-clip"><use href="#gribouille-cheveux"/></clipPath>
+    <path id="gribouille-meche" d="M162 128 C 156 138 154 148 157 156 C 161 148 167 142 173 138 C 173 147 177 153 183 157 C 183 147 184 137 188 128 Z"/>
+    <path id="gribouille-oeil-d" d="M178 174 C 178 152 190 144 201 144 C 213 144 223 154 223 172 C 223 184 220 190 214 192 C 206 188 192 188 184 192 C 180 188 178 182 178 174 Z"/>
+    <clipPath id="gribouille-oeil-d-clip"><use href="#gribouille-oeil-d"/></clipPath>
+    <path id="gribouille-oeil-g" d="M120 176 C 120 160 126 150 135 150 C 144 150 150 160 150 176 C 150 186 148 192 144 194 C 138 191 128 191 124 194 C 121 190 120 184 120 176 Z"/>
+    <clipPath id="gribouille-oeil-g-clip"><use href="#gribouille-oeil-g"/></clipPath>
+    <path id="gribouille-bouche" d="M136 222 C 156 228 188 226 210 212 C 208 234 192 252 168 251 C 150 250 138 238 136 222 Z"/>
+    <clipPath id="gribouille-bouche-clip"><use href="#gribouille-bouche"/></clipPath>
+    <path id="gribouille-beret" d="M94 182 C 80 160 82 120 106 96 C 134 68 190 50 244 52 C 286 54 314 70 314 92 C 314 108 296 120 276 122 C 246 120 208 118 178 126 C 158 132 148 146 144 160 C 140 174 120 188 94 182 Z"/>
+    <clipPath id="gribouille-beret-clip"><use href="#gribouille-beret"/></clipPath>
+    <path id="gribouille-queue-beret" d="M228 55 C 225 44 232 33 245 33 C 240 38 238 45 241 54 Z"/>
+    <radialGradient id="gribouille-beret-volume" cx="0.3" cy="0.25" r="0.9">
+      <stop offset="0" stop-color="#f4554a"/>
+      <stop offset="1" stop-color="#e03634"/>
+    </radialGradient>
+
+    <!-- CORPS -->
+    <path id="gribouille-cou" d="M164 236 L 222 234 L 220 270 L 166 272 Z"/>
+    <path id="gribouille-blouse" d="M148 262 C 130 266 122 282 122 300 L 126 372 C 156 384 232 384 258 372 L 262 300 C 262 280 252 266 236 262 Z"/>
+    <clipPath id="gribouille-blouse-clip"><use href="#gribouille-blouse"/></clipPath>
+    <path id="gribouille-col-g" d="M182 258 C 166 254 150 256 140 263 C 141 274 145 284 151 293 C 165 288 177 276 182 258 Z"/>
+    <path id="gribouille-col-d" d="M186 258 C 204 252 228 254 243 261 C 238 273 231 284 222 294 C 205 288 191 275 186 258 Z"/>
+    <clipPath id="gribouille-col-g-clip"><use href="#gribouille-col-g"/></clipPath>
+    <clipPath id="gribouille-col-d-clip"><use href="#gribouille-col-d"/></clipPath>
+    <path id="gribouille-salopette" d="M147 308 C 168 303 196 303 216 306 L 222 336 C 240 337 256 340 266 348 C 272 366 270 390 264 406 L 262 428 C 244 432 222 432 206 428 L 200 404 L 194 428 C 176 430 152 430 134 424 L 128 392 C 124 372 124 352 130 340 C 134 337 138 336 142 336 Z"/>
+    <clipPath id="gribouille-salopette-clip"><use href="#gribouille-salopette"/></clipPath>
+    <path id="gribouille-revers-g" d="M131 414 C 152 420 178 420 198 416 L 199 432 C 178 437 152 437 131 431 Z"/>
+    <path id="gribouille-revers-d" d="M205 418 C 226 422 248 422 265 417 L 265 432 C 248 437 226 437 205 433 Z"/>
+    <clipPath id="gribouille-revers-g-clip"><use href="#gribouille-revers-g"/></clipPath>
+    <clipPath id="gribouille-revers-d-clip"><use href="#gribouille-revers-d"/></clipPath>
+    <path id="gribouille-jambe-g" d="M150 428 L 148 456 L 176 456 L 177 428 Z"/>
+    <path id="gribouille-jambe-d" d="M220 428 L 222 456 L 249 456 L 247 428 Z"/>
+    <path id="gribouille-chaussette-g" d="M146 434 C 154 437 168 437 177 434 L 177 462 L 147 462 Z"/>
+    <clipPath id="gribouille-chaussette-g-clip"><use href="#gribouille-chaussette-g"/></clipPath>
+    <path id="gribouille-chaussette-d" d="M218 446 C 228 450 240 450 251 446 C 257 450 258 458 253 463 L 221 463 C 215 458 214 451 218 446 Z"/>
+    <clipPath id="gribouille-chaussette-d-clip"><use href="#gribouille-chaussette-d"/></clipPath>
+    <path id="gribouille-chaussure-g" d="M120 474 C 114 460 128 450 150 451 L 178 451 C 185 459 187 471 181 478 L 126 480 C 122 480 120 478 120 474 Z"/>
+    <clipPath id="gribouille-chaussure-g-clip"><use href="#gribouille-chaussure-g"/></clipPath>
+    <path id="gribouille-chaussure-d" d="M212 478 C 207 465 217 453 233 453 L 254 453 C 274 455 289 466 285 478 C 284 481 281 482 278 482 L 216 482 C 213 482 212 480 212 478 Z"/>
+    <clipPath id="gribouille-chaussure-d-clip"><use href="#gribouille-chaussure-d"/></clipPath>
+
+    <!-- BRAS -->
+    <path id="gribouille-manche-g" d="M152 268 C 128 262 106 276 102 300 C 98 320 102 336 110 348 C 118 352 130 352 138 348 C 142 334 146 320 148 304 Z"/>
+    <clipPath id="gribouille-manche-g-clip"><use href="#gribouille-manche-g"/></clipPath>
+    <path id="gribouille-manche-d" d="M248 268 C 262 258 280 254 293 255 C 291 247 289 239 290 231 L 315 215 C 327 227 337 243 336 261 C 335 281 302 293 266 298 C 256 290 248 280 248 268 Z"/>
+    <clipPath id="gribouille-manche-d-clip"><use href="#gribouille-manche-d"/></clipPath>
+
+    <!-- PALETTE, repère local centré ; trou du pouce en (38, 4). -->
+    <path id="gribouille-palette" d="M-62 -4 C -62 -30 -34 -42 0 -40 C 34 -38 62 -26 62 -2 C 62 12 54 22 42 26 C 34 18 22 18 18 28 C 14 38 -8 42 -28 38 C -50 34 -62 18 -62 -4 Z"/>
+    <clipPath id="gribouille-palette-clip"><use href="#gribouille-palette"/></clipPath>
+    <path id="gribouille-pouce" d="M32 10 C 26 2 28 -9 37 -10 C 46 -11 50 -2 46 8 Z"/>
+    <clipPath id="gribouille-pouce-clip"><use href="#gribouille-pouce"/></clipPath>
+  </defs>
+
+  <!-- Ombre au sol. -->
+  <ellipse cx="200" cy="476" rx="106" ry="11" fill="#1d1a16" opacity="0.18"/>
+
+  <!-- ============ HALO DE SILHOUETTE (encre, derrière tout) ============ -->
+  <g fill="none" stroke="#1d1a16" stroke-width="9.5" stroke-linejoin="round" stroke-linecap="round">
+    <use href="#gribouille-chaussure-g"/>
+    <use href="#gribouille-chaussure-d"/>
+    <use href="#gribouille-chaussette-g"/>
+    <use href="#gribouille-chaussette-d"/>
+    <use href="#gribouille-jambe-g"/>
+    <use href="#gribouille-jambe-d"/>
+    <use href="#gribouille-salopette"/>
+    <use href="#gribouille-revers-g"/>
+    <use href="#gribouille-revers-d"/>
+    <use href="#gribouille-blouse"/>
+    <use href="#gribouille-manche-g"/>
+    <use href="#gribouille-manche-d"/>
+    <g transform="translate(76 332) rotate(-12)"><use href="#gribouille-palette" transform="translate(0 6)"/><use href="#gribouille-palette"/></g>
+    <g transform="rotate(-4 190 250)">
+      <use href="#gribouille-tete"/>
+      <use href="#gribouille-oreille"/>
+      <use href="#gribouille-cheveux"/>
+      <use href="#gribouille-beret"/>
+      <use href="#gribouille-queue-beret"/>
+    </g>
+    <g transform="translate(318 202) rotate(17)">
+      <use href="#gribouille-manche"/>
+      <use href="#gribouille-poils"/>
+      <use href="#gribouille-virole"/>
+      <use href="#gribouille-poing"/>
+    </g>
+    <use href="#gribouille-giclee"/>
+  </g>
+
+  <!-- ============ JAMBES ET CHAUSSURES ============ -->
+  <use href="#gribouille-jambe-g" fill="#fdd5bd"/>
+  <path d="M168 428 L 168 456 L 180 456 L 180 428 Z" fill="#eda593"/>
+  <use href="#gribouille-jambe-g" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <use href="#gribouille-jambe-d" fill="#fdd5bd"/>
+  <path d="M239 428 L 240 456 L 252 456 L 250 428 Z" fill="#eda593"/>
+  <use href="#gribouille-jambe-d" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Chaussette remontée (rayée). -->
+  <use href="#gribouille-chaussette-g" fill="#fffaf0"/>
+  <g clip-path="url(#gribouille-chaussette-g-clip)">
+    <path d="M140 438 C 154 442 168 442 182 438 L 182 444 C 168 448 154 448 140 444 Z" fill="#e53935"/>
+    <path d="M140 447 C 154 451 168 451 182 447 L 182 452 C 168 456 154 456 140 452 Z" fill="#3e78d0"/>
+    <path d="M166 430 L 182 430 L 182 466 L 168 466 Z" fill="#1d1a16" opacity="0.14"/>
+  </g>
+  <use href="#gribouille-chaussette-g" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- Chaussette tombée en accordéon. -->
+  <use href="#gribouille-chaussette-d" fill="#fffaf0"/>
+  <g clip-path="url(#gribouille-chaussette-d-clip)">
+    <path d="M238 444 L 262 444 L 262 466 L 242 466 C 246 458 244 450 238 444 Z" fill="#d9cfd2"/>
+  </g>
+  <use href="#gribouille-chaussette-d" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <g fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round">
+    <path d="M219 452 C 224 455 228 451 233 454 C 238 457 243 452 248 455 C 251 456 253 454 255 452"/>
+    <path d="M218 458 C 224 461 229 457 235 460 C 241 463 246 458 254 460"/>
+  </g>
+
+  <!-- Baskets rouges. -->
+  <use href="#gribouille-chaussure-g" fill="#e53935"/>
+  <g clip-path="url(#gribouille-chaussure-g-clip)">
+    <path d="M166 448 C 176 456 180 468 176 484 L 194 484 L 194 446 Z" fill="#ab1f3b"/>
+    <path d="M110 470 L 196 470 L 196 486 L 110 486 Z" fill="#fffaf0"/>
+    <path d="M110 476 L 196 476 L 196 486 L 110 486 Z" fill="#d9cfc4"/>
+    <path d="M118 470 C 116 460 126 452 140 452 C 132 456 126 462 126 470 Z" fill="#fffaf0"/>
+    <path d="M136 456 C 142 453 150 452 156 453" fill="none" stroke="#ff8a6a" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#gribouille-chaussure-g" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M118 470 L 185 470" fill="none" stroke="#1d1a16" stroke-width="2.5"/>
+  <use href="#gribouille-chaussure-d" fill="#e53935"/>
+  <g clip-path="url(#gribouille-chaussure-d-clip)">
+    <path d="M262 452 C 276 460 282 470 280 486 L 296 486 L 296 450 Z" fill="#ab1f3b"/>
+    <path d="M200 472 L 296 472 L 296 488 L 200 488 Z" fill="#fffaf0"/>
+    <path d="M200 478 L 296 478 L 296 488 L 200 488 Z" fill="#d9cfc4"/>
+    <path d="M262 472 C 272 470 282 468 288 464 L 296 470 L 296 474 Z" fill="#fffaf0"/>
+  </g>
+  <use href="#gribouille-chaussure-d" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M210 472 L 286 472" fill="none" stroke="#1d1a16" stroke-width="2.5"/>
+  <path d="M234 458 L 246 462 M 236 464 L 248 458" fill="none" stroke="#fffaf0" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- ============ BLOUSE (torse) ============ -->
+  <use href="#gribouille-blouse" fill="#f6efdc"/>
+  <g clip-path="url(#gribouille-blouse-clip)">
+    <path d="M236 262 C 248 290 252 330 246 380 L 270 380 L 270 260 Z" fill="#c9bccf"/>
+    <!-- Ombre portée du col sur la blouse. -->
+    <path d="M144 270 L 152 298 C 166 293 179 281 185 266 C 192 281 206 293 223 299 L 238 270 L 240 284 L 226 304 C 208 299 193 289 185 278 C 178 290 166 299 150 304 L 140 284 Z" fill="#c9bccf"/>
+    <circle cx="200" cy="300" r="3.5" fill="#ff8a2a"/>
+    <circle cx="140" cy="304" r="2.5" fill="#9a5ce0"/>
+  </g>
+  <use href="#gribouille-blouse" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- ============ BRAS DU FOND (manche gauche) ============ -->
+  <use href="#gribouille-manche-g" fill="#f6efdc"/>
+  <g clip-path="url(#gribouille-manche-g-clip)">
+    <path d="M150 276 C 136 296 132 326 136 356 L 160 356 L 160 270 Z" fill="#c9bccf"/>
+    <path d="M110 290 C 114 280 124 272 136 270 C 126 278 118 288 116 300 Z" fill="#fffaf0"/>
+    <circle cx="118" cy="314" r="7" fill="#3d9be9"/>
+    <circle cx="124" cy="322" r="3" fill="#3d9be9"/>
+    <path d="M128 286 C 134 284 140 288 138 294 C 136 300 128 298 128 292 Z" fill="#5cc85a"/>
+  </g>
+  <use href="#gribouille-manche-g" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- ============ SALOPETTE ============ -->
+  <use href="#gribouille-salopette" fill="#3e78d0"/>
+  <g clip-path="url(#gribouille-salopette-clip)">
+    <path d="M218 290 C 226 330 248 350 264 352 C 270 380 262 410 252 432 L 280 440 L 280 290 Z" fill="#2b51a0"/>
+    <path d="M194 404 L 204 398 L 210 432 L 190 432 Z" fill="#1f3678"/>
+    <path d="M128 352 C 134 344 142 340 150 340 C 142 352 138 372 138 392 L 130 392 Z" fill="#79aaf0"/>
+    <path d="M151 312 C 163 308 177 308 187 309 C 177 312 165 314 157 318 Z" fill="#79aaf0"/>
+    <path d="M142 336 C 170 342 204 342 224 336 L 226 344 C 204 350 170 350 142 344 Z" fill="#2b51a0"/>
+    <!-- Main jaune posée sur la cuisse : il tache tout ce qu'il touche. -->
+    <g fill="none" stroke="#ffcb2b" stroke-width="5.5" stroke-linecap="round">
+      <path d="M234 368 L 231 357"/><path d="M240 366 L 239 354"/><path d="M246 367 L 247 355"/><path d="M251 371 L 255 362"/><path d="M231 379 L 223 375"/>
+    </g>
+    <path d="M230 378 C 230 370 238 366 246 368 C 253 370 255 378 251 384 C 247 390 235 390 231 385 C 230 383 230 380 230 378 Z" fill="#ffcb2b"/>
+    <path d="M152 386 C 150 380 156 376 161 379 C 166 376 170 382 166 386 C 168 391 162 394 158 391 C 154 394 150 390 152 386 Z" fill="#ff6fae"/>
+    <circle cx="171" cy="377" r="2.5" fill="#ff6fae"/>
+    <circle cx="146" cy="397" r="2" fill="#ff6fae"/>
+    <circle cx="214" cy="410" r="3" fill="#fffaf0"/>
+  </g>
+  <use href="#gribouille-salopette" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- Coutures surpiquées. -->
+  <g fill="none" stroke="#f4b13a" stroke-width="2" stroke-dasharray="5 4" stroke-linecap="round">
+    <path d="M153 313 C 172 309 196 309 213 311"/>
+    <path d="M196 348 C 197 366 199 384 200 398"/>
+    <path d="M258 358 C 260 378 259 396 257 412"/>
+  </g>
+  <!-- Bretelles, boutons de laiton. -->
+  <g stroke="#1d1a16" stroke-width="3" stroke-linejoin="round">
+    <path d="M150 311 L 162 310 L 158 282 L 146 283 Z" fill="#3e78d0"/>
+    <path d="M205 309 L 217 308 L 238 283 L 226 281 Z" fill="#2b51a0"/>
+  </g>
+  <g stroke="#1d1a16" stroke-width="2.5">
+    <circle cx="156" cy="314" r="5" fill="#f2bd3b"/>
+    <circle cx="211" cy="312" r="5" fill="#b97a2b"/>
+  </g>
+  <circle cx="154.5" cy="312.5" r="1.8" fill="#fff3b0"/>
+  <circle cx="209.5" cy="310.5" r="1.6" fill="#f2bd3b"/>
+  <!-- Poche du plastron, un petit pinceau de rechange dedans. -->
+  <path d="M180 318 L 176 300" fill="none" stroke="#1d1a16" stroke-width="7.5" stroke-linecap="round"/>
+  <path d="M180 318 L 176 300" fill="none" stroke="#5cc85a" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M172 301 C 171 295 173 289 176 287 C 179 289 181 295 180 301 Z" fill="#9a5ce0" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M166 318 L 203 316 L 204 331 C 196 337 174 338 167 333 Z" fill="#3568bd" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M170 322 L 200 320.5 L 200.5 329" fill="none" stroke="#f4b13a" stroke-width="2" stroke-dasharray="4 3" stroke-linecap="round"/>
+  <!-- Revers retroussés. -->
+  <use href="#gribouille-revers-g" fill="#84aee6"/>
+  <g clip-path="url(#gribouille-revers-g-clip)"><path d="M180 410 L 204 410 L 204 440 L 184 440 Z" fill="#5a82c4"/></g>
+  <use href="#gribouille-revers-g" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <use href="#gribouille-revers-d" fill="#84aee6"/>
+  <g clip-path="url(#gribouille-revers-d-clip)"><path d="M246 410 L 270 410 L 270 440 L 250 440 Z" fill="#5a82c4"/></g>
+  <use href="#gribouille-revers-d" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- ============ PALETTE ============ -->
+  <g transform="translate(76 332) rotate(-12)">
+    <use href="#gribouille-palette" transform="translate(0 6)" fill="#81492e"/>
+    <use href="#gribouille-palette" transform="translate(0 6)" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <use href="#gribouille-palette" fill="#e2aa6a"/>
+    <g clip-path="url(#gribouille-palette-clip)">
+      <path d="M-70 10 C -50 30 0 36 30 24 C 50 16 62 4 66 -10 L 70 50 L -70 50 Z" fill="#b3713f"/>
+      <path d="M-56 -10 C -52 -26 -32 -34 -10 -35 C -30 -30 -46 -22 -52 -6 Z" fill="#f7d6a0"/>
+      <!-- Grain du bois. -->
+      <path d="M-40 -2 C -24 -8 -6 -6 10 -12" fill="none" stroke="#c08550" stroke-width="2" stroke-linecap="round"/>
+      <path d="M-20 14 C -6 10 8 12 20 8" fill="none" stroke="#c08550" stroke-width="2" stroke-linecap="round"/>
+    </g>
+    <use href="#gribouille-palette" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <!-- Trou du pouce. -->
+    <ellipse cx="38" cy="4" rx="9" ry="7" fill="#81492e" stroke="#1d1a16" stroke-width="3"/>
+    <!-- Noisettes de peinture. -->
+    <g stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M-50 -12 C -52 -20 -42 -24 -36 -20 C -30 -16 -32 -8 -40 -6 C -46 -5 -49 -8 -50 -12 Z" fill="#e53935"/>
+      <path d="M-28 -26 C -28 -34 -16 -36 -12 -30 C -8 -24 -14 -18 -20 -19 C -25 -20 -28 -22 -28 -26 Z" fill="#ffcb2b"/>
+      <path d="M-2 -30 C -2 -38 10 -38 13 -32 C 16 -26 10 -21 4 -22 C 0 -23 -2 -26 -2 -30 Z" fill="#3d9be9"/>
+      <path d="M22 -24 C 22 -31 33 -31 35 -25 C 37 -19 32 -15 27 -16 C 24 -17 22 -20 22 -24 Z" fill="#5cc85a"/>
+      <path d="M-46 10 C -46 3 -36 2 -33 7 C -30 12 -34 17 -39 17 C -43 17 -46 14 -46 10 Z" fill="#fffaf0"/>
+      <path d="M-22 20 C -22 14 -12 13 -10 18 C -8 23 -12 27 -16 27 C -20 27 -22 24 -22 20 Z" fill="#ff6fae"/>
+    </g>
+    <g fill="#ffffff">
+      <circle cx="-44" cy="-16" r="2.2"/><circle cx="-21" cy="-30" r="2.2"/><circle cx="4" cy="-33" r="2.2"/>
+      <circle cx="27" cy="-27" r="2"/><circle cx="-40" cy="7" r="1.8"/><circle cx="-16" cy="18" r="1.8"/>
+    </g>
+    <!-- Pouce passé dans le trou. -->
+    <use href="#gribouille-pouce" fill="#fdd5bd"/>
+    <g clip-path="url(#gribouille-pouce-clip)"><path d="M42 -12 C 50 -4 48 6 44 12 L 54 12 L 54 -12 Z" fill="#eda593"/></g>
+    <use href="#gribouille-pouce" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  </g>
+
+  <!-- ============ COU, COL ============ -->
+  <use href="#gribouille-cou" fill="#cf7f7a"/>
+  <use href="#gribouille-col-g" fill="#f6efdc"/>
+  <g clip-path="url(#gribouille-col-g-clip)"><path d="M150 286 C 164 286 176 276 180 262 L 190 262 L 190 296 L 150 296 Z" fill="#c9bccf"/></g>
+  <use href="#gribouille-col-g" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <use href="#gribouille-col-d" fill="#f6efdc"/>
+  <g clip-path="url(#gribouille-col-d-clip)"><path d="M214 290 C 232 288 244 280 246 266 L 252 266 L 252 296 L 214 296 Z" fill="#c9bccf"/></g>
+  <use href="#gribouille-col-d" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- ============ TÊTE ============ -->
+  <g transform="rotate(-4 190 250)">
+    <use href="#gribouille-cheveux" fill="#8b4a2b"/>
+    <g clip-path="url(#gribouille-cheveux-clip)">
+      <path d="M250 112 C 262 130 280 140 300 140 L 300 200 L 240 200 Z" fill="#5a2a24"/>
+    </g>
+    <use href="#gribouille-cheveux" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+    <use href="#gribouille-tete" fill="#fdd5bd"/>
+    <g clip-path="url(#gribouille-tete-clip)">
+      <!-- Ombre propre : arrière de la joue et dessous de la mâchoire. -->
+      <path d="M252 92 C 266 128 266 180 248 212 C 232 238 204 252 172 256 L 300 300 L 300 92 Z" fill="#eda593"/>
+      <!-- Ombre portée du béret sur le front et l'œil du fond. -->
+      <path d="M90 110 L 300 104 L 300 134 C 262 130 222 132 196 138 C 176 144 166 156 160 170 C 152 184 130 198 96 192 Z" fill="#eda593"/>
+      <path d="M90 110 L 300 104 L 300 126 C 262 122 222 124 190 130 C 168 136 156 150 150 166 C 144 180 126 192 96 188 Z" fill="#cf7f7a"/>
+      <!-- Reflets. -->
+      <ellipse cx="226" cy="200" rx="10" ry="6" fill="#fff1e4" transform="rotate(-20 226 200)"/>
+      <path d="M108 200 C 108 214 114 228 124 238" fill="none" stroke="#fff1e4" stroke-width="4" stroke-linecap="round"/>
+      <!-- Joues. -->
+      <ellipse cx="234" cy="208" rx="17" ry="10" fill="#ff8a8a" opacity="0.5"/>
+      <ellipse cx="120" cy="212" rx="9" ry="7" fill="#ff8a8a" opacity="0.5"/>
+    </g>
+    <use href="#gribouille-tete" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+    <!-- Oreille. -->
+    <use href="#gribouille-oreille" fill="#fdd5bd"/>
+    <g clip-path="url(#gribouille-oreille-clip)">
+      <path d="M262 190 C 270 182 282 186 281 198 C 280 208 272 212 266 208 C 270 202 268 194 262 190 Z" fill="#cf7f7a"/>
+      <path d="M276 172 C 286 176 292 186 290 200 L 300 200 L 300 168 Z" fill="#eda593"/>
+    </g>
+    <use href="#gribouille-oreille" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+    <!-- Taches de rousseur. -->
+    <g fill="#d07a5c">
+      <circle cx="226" cy="198" r="1.8"/><circle cx="234" cy="194" r="1.6"/><circle cx="242" cy="199" r="1.8"/>
+      <circle cx="232" cy="204" r="1.5"/><circle cx="246" cy="206" r="1.4"/>
+      <circle cx="166" cy="190" r="1.5"/><circle cx="174" cy="194" r="1.5"/><circle cx="120" cy="204" r="1.5"/>
+    </g>
+
+    <!-- Œil de devant. -->
+    <use href="#gribouille-oeil-d" fill="#fffaf0"/>
+    <g clip-path="url(#gribouille-oeil-d-clip)">
+      <path d="M176 140 L 226 140 L 226 158 C 212 150 192 150 176 160 Z" fill="#d9cfe0"/>
+      <ellipse cx="205" cy="177" rx="14" ry="17" fill="#3f9a4e"/>
+      <path d="M190 172 C 194 160 216 158 220 172 Z" fill="#24603a"/>
+      <ellipse cx="206" cy="185" rx="9" ry="5" fill="#7fcf6a"/>
+      <ellipse cx="206" cy="178" rx="8" ry="10" fill="#1d1a16"/>
+      <circle cx="199" cy="169" r="6" fill="#ffffff"/>
+      <circle cx="212" cy="186" r="2.8" fill="#ffffff"/>
+    </g>
+    <use href="#gribouille-oeil-d" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M178 170 C 180 152 192 144 201 144 C 213 144 222 152 224 166 C 226 162 229 158 233 156" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Œil du fond (à moitié sous le béret). -->
+    <use href="#gribouille-oeil-g" fill="#fffaf0"/>
+    <g clip-path="url(#gribouille-oeil-g-clip)">
+      <ellipse cx="139" cy="180" rx="10" ry="13" fill="#3f9a4e"/>
+      <ellipse cx="139" cy="187" rx="6" ry="4" fill="#7fcf6a"/>
+      <ellipse cx="140" cy="181" rx="5.5" ry="7.5" fill="#1d1a16"/>
+      <circle cx="135" cy="176" r="4" fill="#ffffff"/>
+      <circle cx="144" cy="188" r="2" fill="#ffffff"/>
+    </g>
+    <use href="#gribouille-oeil-g" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+    <!-- Sourcil relevé, fier. -->
+    <path d="M180 138 C 190 122 214 116 230 126 C 232 130 230 133 226 132 C 212 126 196 130 186 140 C 183 143 179 142 180 138 Z" fill="#5a2a24" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+
+    <!-- Nez et peinture sur le bout. -->
+    <path d="M166 190 C 156 191 149 200 154 208 C 158 214 168 213 172 207" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M150 204 C 150 198 156 196 159 199 C 162 202 160 208 156 209 C 152 210 150 207 150 204 Z" fill="#3d9be9" stroke="#1d1a16" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="163" cy="196" r="2.5" fill="#fff1e4"/>
+
+    <!-- Bouche : sourire de garnement, dent manquante. -->
+    <use href="#gribouille-bouche" fill="#6e2430"/>
+    <g clip-path="url(#gribouille-bouche-clip)">
+      <path d="M134 220 C 156 228 188 226 212 210 L 212 222 C 188 236 156 236 134 230 Z" fill="#fffaf0"/>
+      <path d="M170 228 L 178 228 L 178 240 L 170 240 Z" fill="#6e2430"/>
+      <path d="M152 246 C 160 236 186 234 198 242 C 192 254 162 256 152 246 Z" fill="#ff8d9e"/>
+    </g>
+    <use href="#gribouille-bouche" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M206 214 C 212 212 216 214 218 220" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Peinture verte sur la joue (traces de doigts). -->
+    <g fill="#5cc85a" stroke="#1d1a16" stroke-width="2" stroke-linejoin="round">
+      <path d="M238 220 C 244 214 254 212 258 216 C 254 220 246 224 240 226 C 236 226 236 222 238 220 Z"/>
+      <path d="M236 232 C 242 226 252 224 256 228 C 252 232 244 236 238 238 C 234 238 234 234 236 232 Z"/>
+    </g>
+
+    <!-- Mèches qui dépassent sur le front. -->
+    <use href="#gribouille-meche" fill="#8b4a2b" stroke="#1d1a16" stroke-width="3" stroke-linejoin="round"/>
+
+    <!-- Béret : trop grand, il tombe sur l'œil. -->
+    <use href="#gribouille-beret" fill="url(#gribouille-beret-volume)"/>
+    <g clip-path="url(#gribouille-beret-clip)">
+      <path d="M90 186 C 104 170 120 150 130 130 C 160 110 220 104 300 104 L 330 60 L 330 140 L 90 200 Z" fill="#ab1f3b"/>
+      <path d="M150 170 C 154 150 166 134 190 128 C 230 120 268 120 300 110 L 320 130 L 140 190 Z" fill="#761636"/>
+      <path d="M262 54 C 290 62 310 76 312 96 L 330 96 L 330 50 Z" fill="#ab1f3b"/>
+      <path d="M100 130 C 108 104 138 80 184 66 C 150 84 124 106 112 140 Z" fill="#ff7b5a"/>
+      <circle cx="196" cy="62" r="4" fill="#ff7b5a"/>
+    </g>
+    <use href="#gribouille-beret" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M132 124 C 122 140 112 156 108 172" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+    <use href="#gribouille-queue-beret" fill="#e53935" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  </g>
+
+  <!-- ============ BRAS LEVÉ ============ -->
+  <use href="#gribouille-manche-d" fill="#f6efdc"/>
+  <g clip-path="url(#gribouille-manche-d-clip)">
+    <path d="M322 222 C 332 248 322 276 268 300 L 350 310 L 350 220 Z" fill="#c9bccf"/>
+    <path d="M296 256 C 304 262 314 262 322 258 C 316 268 304 270 296 266 Z" fill="#c9bccf"/>
+    <path d="M250 286 C 258 290 266 294 274 296 L 262 302 L 246 292 Z" fill="#9d8aa6"/>
+    <path d="M256 268 C 266 259 280 255 292 256 C 280 261 270 266 262 276 Z" fill="#fffaf0"/>
+    <circle cx="316" cy="248" r="7.5" fill="#e53935"/>
+    <circle cx="305" cy="238" r="3" fill="#e53935"/>
+    <path d="M276 278 C 282 274 290 276 290 282 C 290 288 282 290 278 286 Z" fill="#ffcb2b"/>
+    <circle cx="322" cy="272" r="3.5" fill="#3d9be9"/>
+  </g>
+  <use href="#gribouille-manche-d" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- Plis du coude : c'est du tissu, pas un biceps. -->
+  <g fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round">
+    <path d="M294 256 C 302 260 312 260 320 256"/>
+    <path d="M300 270 C 308 268 316 268 324 272"/>
+    <path d="M272 286 C 280 284 290 286 296 290"/>
+    <path d="M320 234 C 327 242 331 250 331 259"/>
+  </g>
+  <!-- Poignet froncé. -->
+  <path d="M286 232 C 294 222 306 214 316 211 C 321 215 323 220 321 225 C 311 229 300 236 293 242 C 289 240 286 236 286 232 Z" fill="#f6efdc" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M295 236 C 298 232 300 228 302 226 M 304 230 C 307 226 309 222 310 220" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- ============ PINCEAU GÉANT ============ -->
+  <g transform="translate(318 202) rotate(17)">
+    <use href="#gribouille-manche" fill="#d0393a"/>
+    <g clip-path="url(#gribouille-manche-clip)">
+      <path d="M2 -60 L 14 -60 L 14 60 L 2 60 Z" fill="#921e36"/>
+      <path d="M-6 -50 L -3 -50 L -2 40 L -5 40 Z" fill="#ff8a6a"/>
+      <path d="M-10 30 L 10 30 L 10 60 L -10 60 Z" fill="#f0cd96"/>
+    </g>
+    <use href="#gribouille-manche" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <use href="#gribouille-poils" fill="#c88d57"/>
+    <g clip-path="url(#gribouille-poils-clip)">
+      <path d="M6 -80 C 14 -100 16 -130 4 -170 L 40 -170 L 40 -80 Z" fill="#8d5737"/>
+      <path d="M-40 -116 C -30 -112 -20 -120 -12 -114 C -8 -110 -9 -100 -5 -98 C -1 -96 0 -108 2 -114 C 8 -120 18 -112 40 -118 L 40 -200 L -40 -200 Z" fill="#ffcb2b"/>
+      <path d="M8 -112 C 16 -130 12 -150 2 -170 L 40 -170 L 40 -112 Z" fill="#ec8f22"/>
+      <path d="M-20 -122 C -20 -136 -12 -150 -2 -160 C -6 -146 -10 -134 -12 -120 Z" fill="#fff3a6"/>
+    </g>
+    <use href="#gribouille-poils" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <use href="#gribouille-virole" fill="#cfd4dc"/>
+    <g clip-path="url(#gribouille-virole-clip)">
+      <path d="M4 -90 L 20 -90 L 20 -44 L 4 -44 Z" fill="#858da0"/>
+      <path d="M-8 -84 L -4 -84 L -4 -52 L -7 -52 Z" fill="#ffffff"/>
+    </g>
+    <use href="#gribouille-virole" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M-11.5 -56 L 11.5 -56 M -12.2 -63 L 12.2 -63" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Poing qui serre le manche. -->
+    <use href="#gribouille-poing" fill="#fdd5bd"/>
+    <g clip-path="url(#gribouille-poing-clip)">
+      <path d="M8 -26 C 16 -12 16 8 6 24 L 30 24 L 30 -26 Z" fill="#eda593"/>
+      <circle cx="-12" cy="-4" r="3" fill="#3d9be9"/>
+    </g>
+    <use href="#gribouille-poing" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M-19 -4 L -6 -4 M -19 6 L -6 6 M -16 15 L -6 15" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M-15 -14 C -8 -18 2 -17 8 -12" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- ============ GICLÉE ============ -->
+  <use href="#gribouille-giclee" fill="#ffcb2b"/>
+  <g clip-path="url(#gribouille-giclee-clip)">
+    <path d="M298 26 C 304 34 316 36 326 29 C 336 21 350 21 360 29 L 372 52 L 290 52 Z" fill="#ec8f22"/>
+    <path d="M318 15 C 332 12 350 14 362 24 C 350 19 334 17 322 19 Z" fill="#fff3a6"/>
+  </g>
+  <use href="#gribouille-giclee" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- Gouttes projetées devant la giclée (en larmes : la tête ronde vers l'avant). -->
+  <g stroke="#1d1a16" stroke-width="3" stroke-linejoin="round">
+    <path d="M277 20 C 277 14 283 12 288 15 L 298 20 L 288 25 C 283 28 277 26 277 20 Z" fill="#ffcb2b"/>
+    <circle cx="289" cy="36" r="3.5" fill="#ffcb2b"/>
+    <circle cx="380" cy="27" r="3" fill="#ffcb2b"/>
+    <circle cx="265" cy="34" r="4.5" fill="#3d9be9"/>
+  </g>
+  <circle cx="308" cy="19" r="3" fill="#ffffff"/>
+  <circle cx="282" cy="18" r="1.6" fill="#ffffff"/>
+  <circle cx="263" cy="32" r="1.5" fill="#ffffff"/>
+</svg>

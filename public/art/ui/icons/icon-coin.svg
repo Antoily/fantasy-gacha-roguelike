@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Pièce d'or de trois quarts : tranche crénelée visible en bas à droite, liseré en relief,
+       champ creusé, étoile en relief au centre. Jeu d'icônes : contour encre 5 (≈ 2 px à 28 px),
+       ombre portée encre 20 % décalée (1,5 ; 3), lumière en haut à gauche, reflets blancs. -->
+  <defs>
+    <!-- Silhouette : face et dos reliés par la tranche (cylindre en perspective cavalière). -->
+    <path id="icon-coin-corps" d="M44.4 14.2 A21.5 21.5 0 0 0 10.6 40.8 L16.1 47.8 A21.5 21.5 0 0 0 49.9 21.2 Z"/>
+    <clipPath id="icon-coin-corps-clip"><use href="#icon-coin-corps"/></clipPath>
+    <circle id="icon-coin-face" cx="27.5" cy="27.5" r="21.5"/>
+    <clipPath id="icon-coin-face-clip"><use href="#icon-coin-face"/></clipPath>
+    <circle id="icon-coin-champ" cx="27.5" cy="27.5" r="15.5"/>
+    <clipPath id="icon-coin-champ-clip"><use href="#icon-coin-champ"/></clipPath>
+    <path id="icon-coin-etoile" d="M26.8 18.3 Q27.5 16.9 28.2 18.3 L30.6 23.3 L36 24 Q37.6 24.2 36.4 25.3 L32.4 29.1 L33.4 34.5 Q33.7 36.1 32.3 35.3 L27.5 32.7 L22.7 35.3 Q21.3 36.1 21.6 34.5 L22.6 29.1 L18.6 25.3 Q17.4 24.2 19 24 L24.4 23.3 Z"/>
+    <clipPath id="icon-coin-etoile-clip"><use href="#icon-coin-etoile"/></clipPath>
+  </defs>
+
+  <!-- Ombre portée. -->
+  <use href="#icon-coin-corps" transform="translate(1.5 3)" fill="#1d1a16" opacity="0.2"/>
+
+  <!-- Tranche : or orangé, moitié extérieure plus sombre, crénelage, liseré de contre-jour. -->
+  <use href="#icon-coin-corps" fill="#f2a52f"/>
+  <g clip-path="url(#icon-coin-corps-clip)">
+    <circle cx="30.3" cy="31" r="30" fill="none" stroke="#d9801f" stroke-width="17"/>
+    <path d="M48.1 21.2 L53.6 28.2 M48.9 26 L54.4 33 M48.7 30.9 L54.2 37.9 M47.4 35.6 L52.9 42.6 M45.1 39.8 L50.6 46.8 M41.9 43.5 L47.4 50.5 M37.9 46.3 L43.4 53.3 M33.4 48.2 L38.9 55.2 M28.6 49 L34.1 56 M23.8 48.7 L29.3 55.7 M19.1 47.3 L24.6 54.3" fill="none" stroke="#b25e1a" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M50.1 28.3 A18.2 18.2 0 0 1 26.8 51.6" fill="none" stroke="#ffd25e" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Face : liseré clair en haut à gauche, sombre en bas à droite. -->
+  <use href="#icon-coin-face" fill="#ffe27a"/>
+  <g clip-path="url(#icon-coin-face-clip)">
+    <path d="M4 52 C 20 44 44 20 52 4 L 64 0 L 64 64 L 0 64 Z" fill="#f6ae34"/>
+    <!-- Champ creusé : ombre du rebord en haut à gauche, paroi éclairée en bas à droite. -->
+    <use href="#icon-coin-champ" fill="#ffc93c"/>
+    <g clip-path="url(#icon-coin-champ-clip)">
+      <circle cx="29" cy="29.4" r="20.5" fill="none" stroke="#eb9d2c" stroke-width="10"/>
+      <circle cx="26.6" cy="26.4" r="20.5" fill="none" stroke="#ffdf6e" stroke-width="10"/>
+    </g>
+    <!-- Étoile en relief : ombre portée sur le champ, pans clairs vers la lumière. -->
+    <use href="#icon-coin-etoile" transform="translate(1.1 1.5)" fill="#df8b21"/>
+    <use href="#icon-coin-etoile" fill="#ffd447"/>
+    <g clip-path="url(#icon-coin-etoile-clip)">
+      <polygon points="27.5,27.5 24.4,23.3 27.5,16.9" fill="#fff6cf"/>
+      <polygon points="27.5,27.5 27.5,16.9 30.6,23.3" fill="#fbb935"/>
+      <polygon points="27.5,27.5 30.6,23.3 37.6,24.2" fill="#fff6cf"/>
+      <polygon points="27.5,27.5 37.6,24.2 32.4,29.1" fill="#f09b28"/>
+      <polygon points="27.5,27.5 32.4,29.1 33.7,36.1" fill="#ffd447"/>
+      <polygon points="27.5,27.5 33.7,36.1 27.5,32.7" fill="#ffe27a"/>
+      <polygon points="27.5,27.5 27.5,32.7 21.3,36.1" fill="#f09b28"/>
+      <polygon points="27.5,27.5 21.3,36.1 22.6,29.1" fill="#fff6cf"/>
+      <polygon points="27.5,27.5 22.6,29.1 17.4,24.2" fill="#fbb935"/>
+      <polygon points="27.5,27.5 17.4,24.2 24.4,23.3" fill="#ffe98f"/>
+    </g>
+    <use href="#icon-coin-etoile" fill="none" stroke="#b25e1a" stroke-width="1.3" stroke-linejoin="round"/>
+    <!-- Reflets : trait sur le liseré, point, étincelle sur la partie sombre. -->
+    <path d="M10.5 23.9 A17.4 17.4 0 0 1 21 11.4" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"/>
+    <circle cx="25.1" cy="10.3" r="1.4" fill="#ffffff"/>
+    <path d="M41 35.3 Q41.4 38.4 44.5 38.8 Q41.4 39.2 41 42.3 Q40.6 39.2 37.5 38.8 Q40.6 38.4 41 35.3 Z" fill="#ffffff"/>
+  </g>
+
+  <!-- Arête face / tranche, puis contour de silhouette par-dessus. -->
+  <use href="#icon-coin-face" fill="none" stroke="#1d1a16" stroke-width="3.5"/>
+  <use href="#icon-coin-corps" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+</svg>

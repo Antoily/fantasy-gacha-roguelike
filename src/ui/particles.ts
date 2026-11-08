@@ -1,13 +1,14 @@
 import Phaser from 'phaser';
 import { mulberry32, type Rng } from '../logic/rng';
-import { COLORS, STROKE } from './theme';
+import { ART_FX, COLORS, STROKE } from './theme';
 
 // Particules de la révélation, dessinées à la main dans un seul Graphics redessiné à
 // chaque image. Pas d'émetteur Phaser : ses plages aléatoires lisent Math.random et
 // décaleraient le hasard scripté de l'e2e (leçon 004). Le hasard d'ici vient d'un
 // générateur à graine propre : purement décoratif, il ne touche jamais au tirage.
 
-export type Shape = 'dot' | 'spark' | 'confetti' | 'star';
+// shard : éclat de verre (orbe brisée) ; glow : lueur douce, en mélange additif (007).
+export type Shape = 'dot' | 'spark' | 'confetti' | 'star' | 'shard' | 'glow';
 
 type Range = readonly [number, number];
 
@@ -74,18 +75,24 @@ const V = Phaser.Math.Vector2;
 
 export class Particles {
   private readonly g: Phaser.GameObjects.Graphics;
+  // Lueurs : un second Graphics en mélange additif, sous les autres formes.
+  private readonly glow: Phaser.GameObjects.Graphics;
   private readonly rng: Rng;
   private readonly parts: Particle[] = [];
   private readonly streams: Stream[] = [];
 
   constructor(scene: Phaser.Scene, parent: Phaser.GameObjects.Container, seed = 1) {
     this.rng = mulberry32(seed);
+    this.glow = scene.add.graphics().setBlendMode(Phaser.BlendModes.ADD);
     this.g = scene.add.graphics();
-    parent.add(this.g);
+    parent.add([this.glow, this.g]);
     const tick = (_time: number, delta: number) => this.step(delta);
     scene.events.on(Phaser.Scenes.Events.UPDATE, tick);
     // La fenêtre détruite emporte le Graphics : on se désabonne avec lui.
-    this.g.once(Phaser.GameObjects.Events.DESTROY, () => scene.events.off(Phaser.Scenes.Events.UPDATE, tick));
+    this.g.once(Phaser.GameObjects.Events.DESTROY, () => {
+      scene.events.off(Phaser.Scenes.Events.UPDATE, tick);
+      this.glow.destroy();
+    });
   }
 
   get graphics(): Phaser.GameObjects.Graphics {
@@ -156,6 +163,7 @@ export class Particles {
     this.streams.length = 0;
     this.parts.length = 0;
     this.g.clear();
+    this.glow.clear();
   }
 
   // Valeur décorative, pour varier un effet sans toucher Math.random.
@@ -204,6 +212,7 @@ export class Particles {
 
   private draw() {
     const g = this.g.clear();
+    const glow = this.glow.clear();
     for (const p of this.parts) {
       const t = p.age / p.life;
       // Convergence : apparaît puis reste pleine ; le reste s'efface sur le dernier tiers.
@@ -231,6 +240,23 @@ export class Particles {
             .map(([dx, dy]) => new V(p.x + dx! * c - dy! * sn, p.y + dx! * sn + dy! * c));
           g.fillStyle(p.color, alpha).fillPoints(pts, true);
           g.lineStyle(1, COLORS.ink, alpha).strokePoints(pts, true);
+          break;
+        }
+        case 'glow':
+          // Trois disques de plus en plus petits et opaques : une lumière sans bord net.
+          for (const [k, a] of [[2.6, 0.18], [1.6, 0.3], [0.8, 0.55]] as const) {
+            glow.fillStyle(p.color, alpha * a * ART_FX.glowAlpha * 2).fillCircle(p.x, p.y, s * k);
+          }
+          break;
+        case 'shard': {
+          // Triangle de verre qui tourne, cerné d'un trait fin, reflet clair sur une arête.
+          const pts = [0, 2.3, 4.1].map((t, i) => {
+            const rr = s * (i === 0 ? 1.4 : 0.9);
+            return new V(p.x + rr * Math.cos(p.rot + t), p.y + rr * Math.sin(p.rot + t));
+          });
+          g.fillStyle(p.color, alpha).fillPoints(pts, true);
+          g.lineStyle(1, COLORS.ink, alpha).strokePoints(pts, true);
+          g.lineStyle(1, ART_FX.crackLight, alpha).lineBetween(pts[0]!.x, pts[0]!.y, pts[1]!.x, pts[1]!.y);
           break;
         }
         case 'star': {

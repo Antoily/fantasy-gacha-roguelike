@@ -1,0 +1,593 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <!-- Roi Barbichon (Légendaire) : monarque minuscule qui brandit son sceptre, couronne trop
+       grande posée sur ses sourcils. Sa barbe tressée (rubans, anneaux d'or) fait le tour de sa
+       taille puis s'enroule au sol en volute. Lumière unique en haut à gauche.
+       Charte docs/art/charte.md. -->
+  <defs>
+    <radialGradient id="roi-barbichon-aura" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff7cf" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#ffd966" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#ffb43c" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Étincelle dorée à quatre branches, centrée sur l'origine. -->
+    <path id="roi-barbichon-etincelle" d="M0 -12 C 1.6 -4.5 4.5 -1.6 12 0 C 4.5 1.6 1.6 4.5 0 12 C -1.6 4.5 -4.5 1.6 -12 0 C -4.5 -1.6 -1.6 -4.5 0 -12 Z"/>
+    <!-- Moucheture d'hermine : queue noire et trois points. -->
+    <g id="roi-barbichon-moucheture" fill="#1d1a16">
+      <path d="M0 -1.5 C 2.2 0.8 2.5 3.8 0 7 C -2.5 3.8 -2.2 0.8 0 -1.5 Z"/>
+      <circle cx="-2.8" cy="-3.6" r="1.3"/>
+      <circle cx="2.8" cy="-3.6" r="1.3"/>
+      <circle cx="0" cy="-5.6" r="1.3"/>
+    </g>
+    <!-- Petite fleur de lys brodée sur la cape. -->
+    <path id="roi-barbichon-fleurette" d="M0 -7 C 2.4 -4.6 3 -1.6 1.5 1.6 L -1.5 1.6 C -3 -1.6 -2.4 -4.6 0 -7 Z M1.2 1.4 C 2.4 -1.8 5.6 -2.6 6.6 -0.2 C 7.2 1.6 5.8 2.8 4.6 2 C 4.6 1 3.6 0.6 2.6 2.4 Z M-1.2 1.4 C -2.4 -1.8 -5.6 -2.6 -6.6 -0.2 C -7.2 1.6 -5.8 2.8 -4.6 2 C -4.6 1 -3.6 0.6 -2.6 2.4 Z M-4.2 2 L 4.2 2 L 4.2 3.8 L -4.2 3.8 Z M-1.6 3.8 L 1.6 3.8 L 0.9 6.8 L -0.9 6.8 Z"/>
+
+    <!-- Nœud de ruban rouge (origine = nœud, boucles en travers, pans vers +y). -->
+    <path id="roi-barbichon-noeud-boucles" d="M-3 -3 C -10 -15 -27 -16 -29 -5 C -30 4 -18 8 -3 3 Z M3 -3 C 10 -15 27 -16 29 -5 C 30 4 18 8 3 3 Z"/>
+    <clipPath id="roi-barbichon-noeud-boucles-clip"><use href="#roi-barbichon-noeud-boucles"/></clipPath>
+    <path id="roi-barbichon-noeud-pans" d="M-4 2 C -9 10 -13 18 -16 27 L -10 25 L -6 31 C -3 22 -1 12 1 4 Z M4 2 C 8 10 11 17 13 25 L 7 24 L 3 29 C 2 20 1 12 -1 4 Z"/>
+    <clipPath id="roi-barbichon-noeud-pans-clip"><use href="#roi-barbichon-noeud-pans"/></clipPath>
+    <g id="roi-barbichon-noeud">
+      <use href="#roi-barbichon-noeud-pans" fill="#e23d4b"/>
+      <g clip-path="url(#roi-barbichon-noeud-pans-clip)">
+        <path d="M-1 0 L 16 0 L 16 32 L 3 32 C 4 20 2 10 -1 0 Z" fill="#a61f45"/>
+        <path d="M-12 22 C -10 14 -7 8 -4 4" fill="none" stroke="#ff8a80" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+      <use href="#roi-barbichon-noeud-pans" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linejoin="round"/>
+      <use href="#roi-barbichon-noeud-boucles" fill="#e23d4b"/>
+      <g clip-path="url(#roi-barbichon-noeud-boucles-clip)">
+        <path d="M-30 0 C -20 9 -8 7 0 2 L 0 12 L -30 12 Z M30 -6 C 22 6 10 7 0 3 L 0 12 L 30 12 Z" fill="#a61f45"/>
+        <path d="M-6 -1 C -12 -7 -19 -8 -22 -3 C -17 1 -10 1 -6 1 Z M6 -1 C 12 -7 19 -8 22 -3 C 17 1 10 1 6 1 Z" fill="#761733"/>
+        <path d="M-26 -6 C -23 -12 -15 -13 -9 -9" fill="none" stroke="#ff8a80" stroke-width="3" stroke-linecap="round"/>
+        <path d="M10 -10 C 15 -13 21 -12 24 -9" fill="none" stroke="#ff8a80" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+      <use href="#roi-barbichon-noeud-boucles" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linejoin="round"/>
+      <ellipse cx="0" cy="0" rx="6" ry="6.5" fill="#e23d4b" stroke="#1d1a16" stroke-width="3"/>
+      <path d="M-3 -2.5 C -1.5 -4 1 -4 2.5 -2.5" fill="none" stroke="#ff8a80" stroke-width="2" stroke-linecap="round"/>
+    </g>
+
+    <!-- Cape de velours pourpre : derrière le corps, ouverte vers la droite. -->
+    <path id="roi-barbichon-cape" d="M250 268 C 286 270 322 284 344 312 C 360 330 368 348 368 362 C 368 372 372 380 378 392 C 388 414 392 440 396 462 C 380 472 358 478 332 479 C 290 480 248 478 214 476 C 184 475 160 473 140 471 L 146 300 C 180 282 216 270 250 268 Z"/>
+    <clipPath id="roi-barbichon-cape-clip"><use href="#roi-barbichon-cape"/></clipPath>
+    <path id="roi-barbichon-cape-doublure" d="M396 462 C 388 446 376 436 362 436 C 356 448 354 464 352 478 C 370 478 386 472 396 462 Z"/>
+    <clipPath id="roi-barbichon-cape-doublure-clip"><use href="#roi-barbichon-cape-doublure"/></clipPath>
+    <path id="roi-barbichon-cape-hermine" d="M140 471 C 140 464 150 460 160 462 C 168 457 180 458 186 462 C 196 457 208 458 214 463 C 224 458 236 459 242 464 C 252 459 264 460 270 465 C 280 460 292 461 298 466 C 308 461 320 462 326 467 C 336 462 348 462 356 466 L 352 478 C 330 480 290 480 250 478 C 210 476 170 474 140 471 Z"/>
+    <clipPath id="roi-barbichon-cape-hermine-clip"><use href="#roi-barbichon-cape-hermine"/></clipPath>
+
+    <!-- Robe rouge, cloche jusqu'aux chevilles. -->
+    <path id="roi-barbichon-robe" d="M148 266 C 136 300 128 344 122 384 C 118 410 114 430 112 447 C 150 459 246 460 292 447 C 290 414 284 366 274 326 C 268 302 260 282 252 266 Z"/>
+    <clipPath id="roi-barbichon-robe-clip"><use href="#roi-barbichon-robe"/></clipPath>
+    <path id="roi-barbichon-robe-galon" d="M113 435 C 150 447 246 448 291 435 L 292 447 C 246 460 150 459 112 447 Z"/>
+
+    <!-- Souliers pointus de velours, pompon d'or. -->
+    <path id="roi-barbichon-soulier-g" d="M196 450 C 184 448 168 450 158 455 C 148 459 138 458 134 452 C 130 446 134 440 140 442 C 140 448 148 448 156 445 C 168 441 182 440 196 442 Z"/>
+    <path id="roi-barbichon-soulier-d" d="M270 452 C 258 454 240 458 228 464 C 220 468 210 468 206 462 C 203 456 207 450 213 452 C 213 458 220 458 226 455 C 240 448 256 444 270 444 Z"/>
+
+    <!-- Bras du fond : poing sur la hanche, il tient la tresse. -->
+    <path id="roi-barbichon-bras-g" d="M136 276 C 116 284 98 300 90 318 C 85 331 91 342 104 347 C 110 349 115 351 118 353 L 128 337 C 122 334 114 330 114 323 C 116 313 126 304 144 297 Z"/>
+    <clipPath id="roi-barbichon-bras-g-clip"><use href="#roi-barbichon-bras-g"/></clipPath>
+    <path id="roi-barbichon-main-g" d="M114 344 C 116 335 127 332 138 335 C 147 338 151 348 149 358 C 147 367 137 371 126 368 C 117 365 112 354 114 344 Z"/>
+    <clipPath id="roi-barbichon-main-g-clip"><use href="#roi-barbichon-main-g"/></clipPath>
+
+    <!-- Bras de devant, levé : manche, poing, sceptre. -->
+    <path id="roi-barbichon-bras-d" d="M256 264 C 276 252 298 242 312 238 C 314 226 316 216 318 206 L 348 208 C 348 226 346 244 342 256 C 336 270 320 278 306 284 C 294 290 282 296 270 298 Z"/>
+    <clipPath id="roi-barbichon-bras-d-clip"><use href="#roi-barbichon-bras-d"/></clipPath>
+    <path id="roi-barbichon-manchette-d" d="M315 216 C 314 210 316 204 318 199 C 328 197 340 198 350 201 C 351 207 350 213 348 218 C 338 216 326 215 315 216 Z"/>
+    <path id="roi-barbichon-poing-d" d="M318 186 C 316 174 324 165 335 165 C 347 165 355 174 355 186 C 355 197 350 205 339 206 C 328 207 320 201 318 193 Z"/>
+    <clipPath id="roi-barbichon-poing-d-clip"><use href="#roi-barbichon-poing-d"/></clipPath>
+    <path id="roi-barbichon-sceptre-tige" d="M329 236 L 345 80 L 355 81 L 339 237 Z"/>
+    <clipPath id="roi-barbichon-sceptre-tige-clip"><use href="#roi-barbichon-sceptre-tige"/></clipPath>
+    <!-- Fleur de lys du sceptre, origine à la base des pétales. -->
+    <path id="roi-barbichon-lys-petales" d="M0 -30 C 7 -22 11 -12 9 0 C 8 6 5 10 4 12 L -4 12 C -5 10 -8 6 -9 0 C -11 -12 -7 -22 0 -30 Z M5 10 C 8 0 14 -10 24 -12 C 31 -13 35 -6 32 0 C 30 5 24 6 22 1 C 23 -3 19 -4 16 0 C 12 5 10 10 9 14 Z M-5 10 C -8 0 -14 -10 -24 -12 C -31 -13 -35 -6 -32 0 C -30 5 -24 6 -22 1 C -23 -3 -19 -4 -16 0 C -12 5 -10 10 -9 14 Z"/>
+    <clipPath id="roi-barbichon-lys-petales-clip"><use href="#roi-barbichon-lys-petales"/></clipPath>
+    <path id="roi-barbichon-lys-bande" d="M-14 9 L 14 9 C 16 12 16 16 14 19 L -14 19 C -16 16 -16 12 -14 9 Z M-8 19 C -10 25 -6 30 -2 27 L 0 32 L 2 27 C 6 30 10 25 8 19 Z"/>
+    <clipPath id="roi-barbichon-lys-bande-clip"><use href="#roi-barbichon-lys-bande"/></clipPath>
+
+    <!-- Col d'hermine. -->
+    <path id="roi-barbichon-col" d="M106 256 C 140 242 252 240 300 254 C 314 260 324 270 322 284 C 318 293 309 294 303 291 C 298 299 287 301 280 296 C 266 304 252 302 246 298 L 158 300 C 148 305 136 303 130 297 C 122 303 108 302 104 294 C 92 294 84 285 87 276 C 90 266 98 260 106 256 Z"/>
+    <clipPath id="roi-barbichon-col-clip"><use href="#roi-barbichon-col"/></clipPath>
+
+    <!-- Tête, oreille, mèches blanches. -->
+    <path id="roi-barbichon-tete" d="M196 86 C 248 86 282 118 282 164 C 282 210 250 250 198 250 C 146 250 112 212 112 168 C 112 120 146 86 196 86 Z"/>
+    <clipPath id="roi-barbichon-tete-clip"><use href="#roi-barbichon-tete"/></clipPath>
+    <path id="roi-barbichon-cheveux-d" d="M266 130 C 284 124 302 132 306 148 C 316 154 317 170 308 177 C 315 188 309 202 296 202 C 290 211 276 210 270 200 Z"/>
+    <clipPath id="roi-barbichon-cheveux-d-clip"><use href="#roi-barbichon-cheveux-d"/></clipPath>
+    <path id="roi-barbichon-cheveux-g" d="M124 116 C 108 118 98 130 102 144 C 93 151 95 166 106 170 C 112 162 116 150 120 138 Z"/>
+    <path id="roi-barbichon-oreille" d="M272 160 C 288 152 303 162 301 178 C 299 194 287 201 274 195 Z"/>
+    <clipPath id="roi-barbichon-oreille-clip"><use href="#roi-barbichon-oreille"/></clipPath>
+
+    <!-- Couronne (dessinée droite, penchée par le groupe) : calotte de velours, fleurons, bandeau. -->
+    <path id="roi-barbichon-calotte" d="M106 94 C 110 58 150 40 196 40 C 242 40 282 58 286 94 Z"/>
+    <clipPath id="roi-barbichon-calotte-clip"><use href="#roi-barbichon-calotte"/></clipPath>
+    <path id="roi-barbichon-couronne" d="M92 90 Q 97 74 98 56 Q 108 76 118 92 Q 127 66 136 42 Q 150 70 166 96 Q 182 62 196 30 Q 210 62 226 96 Q 242 70 256 42 Q 265 66 274 92 Q 284 76 294 56 Q 295 74 300 90 C 303 102 303 114 300 124 C 262 140 130 140 92 124 C 89 114 89 102 92 90 Z"/>
+    <clipPath id="roi-barbichon-couronne-clip"><use href="#roi-barbichon-couronne"/></clipPath>
+
+    <!-- Yeux. -->
+    <ellipse id="roi-barbichon-oeil-d" cx="218" cy="168" rx="22" ry="27"/>
+    <clipPath id="roi-barbichon-oeil-d-clip"><use href="#roi-barbichon-oeil-d"/></clipPath>
+    <ellipse id="roi-barbichon-oeil-g" cx="156" cy="170" rx="18" ry="25"/>
+    <clipPath id="roi-barbichon-oeil-g-clip"><use href="#roi-barbichon-oeil-g"/></clipPath>
+    <!-- Sourcils broussailleux qui retiennent la couronne. -->
+    <path id="roi-barbichon-sourcil-d" d="M193 140 C 196 126 210 116 227 116 C 242 116 254 121 264 116 C 272 112 275 104 271 97 C 282 101 285 114 279 124 C 272 134 258 137 245 135 C 231 133 216 135 204 143 C 198 147 192 146 193 140 Z"/>
+    <clipPath id="roi-barbichon-sourcil-d-clip"><use href="#roi-barbichon-sourcil-d"/></clipPath>
+    <path id="roi-barbichon-sourcil-g" d="M177 141 C 173 129 161 122 147 122 C 135 122 127 124 119 120 C 113 116 112 108 116 103 C 105 106 103 118 109 126 C 115 134 127 138 139 137 C 151 137 162 139 170 145 C 175 148 178 146 177 141 Z"/>
+    <clipPath id="roi-barbichon-sourcil-g-clip"><use href="#roi-barbichon-sourcil-g"/></clipPath>
+
+    <!-- Barbe (plastron), bouche, moustache, nez. -->
+    <path id="roi-barbichon-barbe" d="M266 162 C 276 178 284 194 292 206 C 304 220 306 242 296 254 C 306 268 302 290 288 298 C 292 314 280 328 262 328 C 254 338 238 342 224 338 L 174 338 C 160 342 144 338 138 328 C 120 330 108 314 112 298 C 98 290 96 268 106 256 C 98 244 100 226 112 218 C 110 210 114 204 120 200 C 140 212 162 218 186 220 C 214 220 236 212 248 200 C 256 190 262 176 266 162 Z"/>
+    <clipPath id="roi-barbichon-barbe-clip"><use href="#roi-barbichon-barbe"/></clipPath>
+    <path id="roi-barbichon-bouche" d="M168 222 C 180 226 200 226 212 220 C 212 236 202 251 190 251 C 178 251 168 238 168 222 Z"/>
+    <clipPath id="roi-barbichon-bouche-clip"><use href="#roi-barbichon-bouche"/></clipPath>
+    <path id="roi-barbichon-moustache" d="M186 208 C 200 200 222 198 240 200 C 252 201 260 196 264 188 C 268 180 276 180 278 188 C 280 200 270 212 254 218 C 236 226 210 228 194 222 C 190 220 188 218 186 216 C 182 220 176 224 168 226 C 150 230 128 224 118 212 C 108 202 110 188 118 186 C 124 184 128 190 126 196 C 132 204 146 206 160 204 C 170 203 178 204 186 208 Z"/>
+    <clipPath id="roi-barbichon-moustache-clip"><use href="#roi-barbichon-moustache"/></clipPath>
+    <ellipse id="roi-barbichon-nez" cx="186" cy="198" rx="21" ry="19"/>
+    <clipPath id="roi-barbichon-nez-clip"><use href="#roi-barbichon-nez"/></clipPath>
+    <!-- Grand anneau d'or qui rassemble la barbe en tresse. -->
+    <path id="roi-barbichon-anneau" d="M171 333 C 188 328 210 328 227 333 L 229 354 C 210 361 188 361 169 354 Z"/>
+    <clipPath id="roi-barbichon-anneau-clip"><use href="#roi-barbichon-anneau"/></clipPath>
+    <path id="roi-barbichon-tresse-avant" d="M199.8 352Q179.4 352.5 179.1 354.3Q178.8 356.1 178.7 358.1Q178.6 360.2 178.8 362.3Q179 364.4 179.5 366.4Q179.9 368.5 180.7 370.5Q181.4 372.5 182.4 374.3Q183.4 376.2 184.6 377.9Q185.9 379.6 187.2 381.1Q188.6 382.6 190.2 383.9Q191.8 385.2 193.3 386.5Q194.7 387.7 195.7 389.4Q196.7 391.1 197.8 392.7Q198.9 394.3 200.1 395.8Q201.4 397.2 202.7 398.6Q204.1 399.9 205.5 401Q207 402.1 208.6 403.1Q210.2 404 211.8 404.7Q213.5 405.4 215.2 405.9Q216.9 406.3 218.6 406.7Q220.3 407 222 407.2Q223.8 407.4 225.5 407.4Q227.2 407.5 228.7 408.1Q230.2 408.8 231.7 409.7Q233.2 410.6 234.9 411.3Q236.6 412 238.2 412.5Q239.8 413 241.4 413.4Q243 413.8 244.6 414Q246.3 414.2 247.9 414.1Q249.6 414.1 251.3 413.9Q252.9 413.8 254.6 413.4Q256.2 413.1 257.8 412.6Q259.5 412.1 261 411.4Q262.6 410.7 264.2 410.6Q265.8 410.6 267.5 410.7Q269.1 410.9 270.8 411Q272.5 411.1 274.2 411.1Q275.8 411 277.4 410.8Q279.1 410.6 280.6 410.1Q282.2 409.7 283.7 409.2Q285.2 408.6 286.7 407.9Q288.1 407.1 289.5 406.2Q290.8 405.3 292.1 404.3Q293.3 403.3 294.6 402.3Q295.8 401.2 297.1 400.5Q298.5 399.8 300 399.6Q301.5 399.4 303 397.5Q304.5 395.6 305.9 393.9Q307.3 392.2 308.3 390.2Q309.2 388.1 309.6 386Q310 383.8 309.8 381.6Q309.6 379.4 308.8 377.3Q308.1 375.2 306.8 373.4Q305.6 371.5 303.9 370.1Q302.2 368.7 300.2 367.7Q298.1 366.8 296 366.4Q293.8 366 291.6 366.2Q289.4 366.4 286.6 365.8Q283.8 365.2 282.7 365.6Q281.6 365.9 280.6 366.4Q279.7 366.8 278.8 367.4Q277.9 367.9 277 368.5Q276.1 369.1 275.3 369.9Q274.5 370.7 273.7 371.4Q272.8 372.1 272 372.9Q271.1 373.6 270 373.5Q268.9 373.4 267.8 373.2Q266.7 373 265.7 372.8Q264.6 372.6 263.6 372.5Q262.6 372.4 261.6 372.4Q260.7 372.4 259.7 372.5Q258.8 372.6 257.8 372.8Q256.9 373 256 373.3Q255 373.5 254.1 373.9Q253.1 374.2 252.1 374.6Q251.1 375 250.1 375.4Q249.1 375.8 248.1 375.3Q247.2 374.9 246.2 374.3Q245.3 373.8 244.4 373.3Q243.5 372.7 242.7 372.3Q242 371.8 241.2 371.4Q240.4 371 239.5 370.7Q238.6 370.4 237.7 370.2Q236.8 370 235.9 369.9Q235 369.7 234 369.7Q233.1 369.6 232.1 369.7Q231.1 369.7 230.1 369.7Q229.1 369.7 228.4 369.2Q227.7 368.7 227.3 367.8Q226.9 367 226.5 366.2Q226.2 365.3 225.9 364.6Q225.5 363.9 225.2 363.3Q224.8 362.7 224.5 362.2Q224.1 361.7 223.7 361.2Q223.3 360.8 222.8 360.5Q222.3 360.1 221.8 359.8Q221.3 359.4 220.7 359.1Q220.1 358.8 219.5 358.4Q218.9 358 218.4 357.5Q217.8 357.1 218.1 356.4Q218.4 355.7 218.8 355Q219.1 354.3 219.4 353.7Q219.7 353.1 219.9 352.3Q220.2 351.4 199.8 352Z"/>
+    <clipPath id="roi-barbichon-tresse-avant-clip"><use href="#roi-barbichon-tresse-avant"/></clipPath>
+    <path id="roi-barbichon-tresse-volute" d="M128.7 336Q110.5 336 110.2 337.4Q109.8 338.7 109.6 340Q109.4 341.4 109.2 342.7Q109.1 344.1 109.1 345.4Q109.1 346.8 109.3 348.1Q109.5 349.4 109.8 350.8Q110.1 352.1 110.6 353.4Q111 354.7 111.5 356Q112 357.3 112.3 358.7Q112.7 360 112.2 361.3Q111.7 362.6 111.4 364Q111.1 365.3 110.9 366.6Q110.6 367.9 110.5 369.3Q110.4 370.6 110.5 371.9Q110.5 373.2 110.7 374.5Q110.9 375.8 111.2 377.1Q111.6 378.4 112 379.7Q112.4 381 112.9 382.2Q113.4 383.5 113.6 384.8Q113.9 386.1 113.5 387.4Q113.1 388.7 112.8 390Q112.5 391.3 112.3 392.6Q112 393.9 112 395.2Q111.9 396.5 111.9 397.8Q112 399 112.2 400.3Q112.4 401.6 112.8 402.8Q113.1 404.1 113.5 405.4Q114 406.6 114.6 407.9Q115.1 409.2 114.9 410.4Q114.6 411.7 114.2 412.4Q113.8 413.1 113.4 413.6Q113 414.2 112.6 415Q112.3 415.9 112 416.8Q111.8 417.6 111.7 418.5Q111.5 419.4 111.5 420.4Q111.5 421.3 111.5 422.4Q111.5 423.4 111.6 424.4Q111.7 425.5 111.3 426.4Q110.9 427.2 110.1 427.9Q109.2 428.5 108.5 429.1Q107.7 429.7 107 430.3Q106.3 431 105.7 431.6Q105.1 432.3 104.6 433.1Q104.1 433.8 103.6 434.6Q103.2 435.5 102.8 436.4Q102.4 437.3 102 438.3Q101.6 439.2 100.9 439.9Q100.3 440.6 99.3 440.8Q98.3 441 97.3 441.2Q96.4 441.5 95.5 441.7Q94.6 442 93.8 442.3Q92.9 442.7 92.2 443.2Q91.4 443.7 90.7 444.2Q89.9 444.8 89.2 445.5Q88.5 446.1 87.7 446.8Q86.9 447.5 86 447.6Q85 447.7 84 447.5Q83.1 447.2 82.1 447Q81.2 446.8 80.3 446.7Q79.4 446.6 78.5 446.6Q77.7 446.7 76.8 446.8Q75.9 446.9 75 447.2Q74 447.4 73.1 447.7Q72.1 448 71.1 448.2Q70.1 448.4 69.4 447.6Q68.6 446.9 67.9 446.3Q67.1 445.7 66.4 445.1Q65.6 444.6 64.9 444.2Q64.1 443.8 63.3 443.4Q62.5 443.1 61.6 443Q60.7 442.8 59.7 442.6Q58.7 442.4 57.7 442.2Q56.7 442 56.2 441.2Q55.8 440.3 55.5 439.4Q55.2 438.4 54.8 437.6Q54.4 436.8 53.9 436.1Q53.4 435.4 52.9 434.7Q52.3 434.1 51.7 433.5Q51 432.9 50.2 432.3Q49.3 431.8 48.5 431.1Q47.7 430.5 47.8 429.5Q47.9 428.6 48 427.6Q48.1 426.7 48.2 425.8Q48.3 424.9 48.2 424.1Q48.1 423.3 47.9 422.4Q47.7 421.6 47.4 420.8Q47.1 420 46.7 419.1Q46.3 418.2 46.1 417.3Q45.9 416.4 46.4 415.6Q47 414.9 47.5 414.1Q48.1 413.4 48.5 412.7Q48.9 412 49.2 411.2Q49.6 410.5 49.7 409.7Q49.9 408.9 50 408Q50.1 407.1 50.2 406.2Q50.3 405.2 50.9 404.6Q51.5 404 52.4 403.7Q53.3 403.5 54.1 403.1Q54.9 402.8 55.5 402.4Q56.2 402 56.7 401.5Q57.3 401 57.9 400.4Q58.4 399.8 58.9 399Q59.5 398.2 60.2 397.8Q60.9 397.5 61.8 397.7Q62.7 397.9 63.4 398.1Q64.2 398.3 65 398.4Q65.7 398.5 66.4 398.4Q67.1 398.3 67.8 398.2Q68.6 398 69.4 397.7Q70.2 397.5 71 397.4Q71.8 397.4 72.3 398.2Q72.7 398.9 73.2 399.5Q73.6 400.1 74.1 400.5Q74.5 401 75.1 401.4Q75.6 401.7 76.2 402Q76.8 402.3 77.6 402.5Q78.4 402.7 78.8 403.3Q79.2 403.8 79 404.5Q78.9 405.3 78.8 405.9Q78.6 406.5 78.6 407Q78.6 407.5 78.8 407.9Q78.9 408.4 79.2 408.9Q79.5 409.4 79.8 410Q80.1 410.6 79.7 411Q79.4 411.4 78.8 411.4Q78.3 411.5 78 411.5Q77.7 411.6 77.2 411.9Q76.7 412.3 76.2 414Q75.8 415.6 75.1 416.7Q74.4 417.8 73.9 419.1Q73.5 420.3 73.4 421.6Q73.3 422.9 73.6 424.2Q73.9 425.5 74.4 426.6Q75 427.8 75.9 428.8Q76.7 429.8 77.8 430.5Q78.9 431.2 80.2 431.6Q81.4 432 82.7 432.1Q84 432.2 85.3 432Q86.6 431.7 87.9 431.3Q89.2 430.9 90.7 429.8Q92.3 428.7 94.2 427.4Q96.1 426.1 97.7 424.4Q99.2 422.7 100.2 420.7Q101.3 418.7 101.8 416.6Q102.3 414.4 102.3 412.2Q102.2 410.1 101.8 408.1Q101.4 406 101.6 404Q101.8 401.9 101.6 399.8Q101.4 397.8 100.9 395.8Q100.3 393.8 99.4 392Q98.4 390.2 97 388.7Q95.7 387.2 94.1 386Q92.5 384.8 90.9 383.7Q89.4 382.6 88.1 381.1Q86.8 379.6 85.4 378.4Q83.9 377.1 82.2 376.1Q80.5 375.1 78.7 374.5Q76.8 373.9 74.9 373.7Q73 373.5 71.1 373.6Q69.2 373.7 67.4 374Q65.5 374.2 63.7 373.7Q61.8 373.3 59.9 373.2Q58.1 373.1 56.2 373.3Q54.3 373.5 52.5 374.1Q50.7 374.7 49.1 375.6Q47.5 376.6 46.1 377.7Q44.6 378.9 43.3 380.2Q42 381.5 40.3 382.1Q38.6 382.8 37 383.7Q35.4 384.6 33.9 385.7Q32.4 386.8 31.2 388.2Q30 389.5 29.1 391.1Q28.1 392.7 27.4 394.3Q26.8 396 26.4 397.8Q26.1 399.6 25.2 401.1Q24.3 402.7 23.4 404.2Q22.4 405.7 21.6 407.4Q20.9 409 20.4 410.7Q19.9 412.5 19.7 414.3Q19.5 416.1 19.7 417.8Q19.8 419.6 20.2 421.4Q20.6 423.1 21.2 424.8Q21.8 426.5 21.6 428.2Q21.5 430 21.4 431.8Q21.3 433.6 21.5 435.4Q21.7 437.1 22.3 438.8Q22.8 440.5 23.5 442.1Q24.3 443.7 25.4 445.1Q26.4 446.6 27.6 447.8Q28.9 449.1 30.1 450.3Q31.3 451.6 32 453.2Q32.7 454.8 33.5 456.4Q34.3 458 35.3 459.4Q36.3 460.9 37.6 462.1Q38.8 463.4 40.2 464.4Q41.7 465.4 43.2 466.2Q44.8 467 46.5 467.5Q48.1 468 49.8 468.5Q51.5 468.9 52.8 470.1Q54.1 471.2 55.6 472.3Q57 473.3 58.5 474.1Q60.1 475 61.7 475.6Q63.3 476.2 65 476.5Q66.7 476.8 68.5 476.9Q70.2 477 71.9 476.8Q73.7 476.7 75.4 476.4Q77.1 476 78.7 476.1Q80.4 476.2 82.1 476.6Q83.8 476.9 85.6 477.1Q87.3 477.3 89 477.2Q90.8 477.1 92.5 476.8Q94.2 476.5 95.8 475.9Q97.4 475.3 99 474.6Q100.5 473.8 101.9 472.8Q103.3 471.8 104.7 470.8Q106 469.7 107.7 469.3Q109.4 469 111.1 468.5Q112.8 468 114.4 467.4Q116 466.7 117.4 465.9Q118.9 465 120.3 463.9Q121.6 462.9 122.8 461.6Q124 460.4 125 459Q126 457.6 126.8 456.1Q127.7 454.6 128.4 453.1Q129.2 451.5 130.6 450.6Q132.1 449.6 133.4 448.5Q134.7 447.3 135.8 446Q137 444.8 138 443.4Q139 442 139.7 440.5Q140.5 438.9 141.1 437.3Q141.6 435.7 141.9 434Q142.3 432.3 142.5 430.6Q142.6 428.9 142.7 427.2Q142.7 425.5 143.5 424Q144.3 422.5 145 421Q145.7 419.4 146.3 417.4Q146.9 415.4 147.2 413.5Q147.4 411.5 147.5 410.2Q147.6 408.8 147.5 407.5Q147.3 406.1 147.1 404.8Q146.8 403.5 146.5 402.1Q146.1 400.8 145.6 399.5Q145.2 398.2 145.2 396.9Q145.2 395.5 145.6 394.2Q146 392.9 146.4 391.5Q146.7 390.2 147 388.9Q147.2 387.5 147.3 386.2Q147.4 384.9 147.4 383.6Q147.4 382.3 147.2 381Q147 379.7 146.6 378.4Q146.3 377.1 145.9 375.8Q145.5 374.5 145 373.2Q144.6 371.9 144.7 370.6Q144.9 369.3 145.3 368Q145.7 366.7 146.1 365.4Q146.4 364.1 146.6 362.8Q146.9 361.5 147 360.2Q147.1 358.9 147 357.6Q147 356.3 146.8 355Q146.6 353.8 146.3 352.5Q146 351.2 145.6 350Q145.2 348.7 144.7 347.4Q144.1 346.2 144.4 344.9Q144.6 343.6 145 342.3Q145.5 341.1 145.9 339.8Q146.3 338.5 146.6 337.2Q146.9 336 128.7 336Z"/>
+    <clipPath id="roi-barbichon-tresse-volute-clip"><use href="#roi-barbichon-tresse-volute"/></clipPath>
+  </defs>
+
+  <!-- Aura dorée derrière la couronne. -->
+  <circle cx="200" cy="100" r="96" fill="url(#roi-barbichon-aura)"/>
+
+  <!-- Ombre portée. -->
+  <ellipse cx="212" cy="472" rx="182" ry="12" fill="#1d1a16" opacity="0.18"/>
+
+  <!-- ===== Cape ===== -->
+  <use href="#roi-barbichon-cape" fill="#8e3fb8"/>
+  <g clip-path="url(#roi-barbichon-cape-clip)">
+    <!-- Plis : chaque pente tournée vers la droite passe à l'ombre. -->
+    <path d="M300 290 C 312 350 318 410 320 480 L 344 480 C 340 410 330 350 314 296 Z" fill="#5f2a92"/>
+    <path d="M336 312 C 352 360 360 420 362 480 L 400 480 L 400 300 Z" fill="#5f2a92"/>
+    <path d="M362 330 C 376 380 386 430 392 480 L 400 480 L 400 320 Z" fill="#3f1d6c"/>
+    <!-- Occlusion sous le bras levé et contre le corps. -->
+    <path d="M250 290 C 280 300 316 296 344 282 L 350 312 C 318 322 280 320 256 314 Z" fill="#3f1d6c"/>
+    <path d="M270 300 C 284 360 292 420 296 480 L 286 480 C 282 420 276 360 262 304 Z" fill="#5f2a92"/>
+    <!-- Reflets de velours sur les crêtes, côté lumière. -->
+    <path d="M296 300 C 306 350 312 410 314 470" fill="none" stroke="#b968dc" stroke-width="5" stroke-linecap="round"/>
+    <path d="M332 318 C 346 360 352 410 354 470" fill="none" stroke="#b968dc" stroke-width="4" stroke-linecap="round"/>
+    <path d="M318 292 C 330 300 340 310 346 320" fill="none" stroke="#d39cf0" stroke-width="3" stroke-linecap="round"/>
+    <!-- Lys brodés. -->
+    <use href="#roi-barbichon-fleurette" transform="translate(310 344) scale(1.3)" fill="#ffc73a"/>
+    <use href="#roi-barbichon-fleurette" transform="translate(326 410) scale(1.3)" fill="#ffc73a"/>
+    <use href="#roi-barbichon-fleurette" transform="translate(352 378) scale(1.3)" fill="#c0883a"/>
+    <use href="#roi-barbichon-fleurette" transform="translate(376 440) scale(1.3)" fill="#c0883a"/>
+    <use href="#roi-barbichon-fleurette" transform="translate(304 452) scale(1.3)" fill="#ffc73a"/>
+    <!-- Liseré de contre-jour sur le bord ombré. -->
+    <path d="M372 384 C 382 408 388 434 391 456" fill="none" stroke="#b968dc" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <!-- Galon d'or du bord avant. -->
+  <path d="M278 296 C 288 340 294 400 300 464" fill="none" stroke="#1d1a16" stroke-width="13" stroke-linecap="round"/>
+  <path d="M278 296 C 288 340 294 400 300 464" fill="none" stroke="#ffc73a" stroke-width="6.5" stroke-linecap="round"/>
+  <path d="M280 304 C 288 344 292 392 297 440" fill="none" stroke="#fff0a6" stroke-width="2" stroke-linecap="round"/>
+  <!-- Doublure de satin d'or, révélée par le bas qui se retourne. -->
+  <use href="#roi-barbichon-cape-doublure" fill="#ffc73a"/>
+  <g clip-path="url(#roi-barbichon-cape-doublure-clip)">
+    <path d="M362 436 C 372 450 380 466 384 480 L 400 480 L 400 430 Z" fill="#d98a1c"/>
+    <path d="M362 444 C 360 454 358 464 357 474" fill="none" stroke="#fff0a6" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <use href="#roi-barbichon-cape-doublure" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- Bordure d'hermine au sol. -->
+  <use href="#roi-barbichon-cape-hermine" fill="#fffaf0"/>
+  <g clip-path="url(#roi-barbichon-cape-hermine-clip)">
+    <path d="M140 474 C 220 478 300 480 360 472 L 360 482 L 140 482 Z" fill="#cdc5e8"/>
+    <use href="#roi-barbichon-moucheture" x="232" y="469"/>
+    <use href="#roi-barbichon-moucheture" x="296" y="471"/>
+    <use href="#roi-barbichon-moucheture" x="334" y="472"/>
+  </g>
+  <use href="#roi-barbichon-cape-hermine" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- Plis à l'encre, puis contour de la cape. -->
+  <path d="M300 292 C 312 350 318 410 320 466" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M336 314 C 350 360 358 410 360 464" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M368 372 C 378 398 384 422 386 444" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+  <use href="#roi-barbichon-cape" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+  <!-- ===== Robe ===== -->
+  <use href="#roi-barbichon-robe" fill="#e0393e"/>
+  <g clip-path="url(#roi-barbichon-robe-clip)">
+    <path d="M244 266 C 262 320 272 384 270 460 L 300 460 L 300 266 Z" fill="#a51f3f"/>
+    <path d="M150 330 C 190 350 240 352 286 334 L 286 366 C 240 382 190 380 150 360 Z" fill="#7a1736"/>
+    <path d="M176 398 C 212 418 256 416 292 398 L 292 418 C 256 432 210 432 172 414 Z" fill="#a51f3f"/>
+    <path d="M140 300 C 132 340 126 390 122 430" fill="none" stroke="#ff7f6e" stroke-width="5" stroke-linecap="round"/>
+    <path d="M200 420 C 204 428 206 436 206 444" fill="none" stroke="#ff7f6e" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#roi-barbichon-robe-galon" fill="#ffc73a"/>
+  <path d="M244 447 C 262 446 278 443 291 438 L 292 447 C 276 452 260 455 244 456 Z" fill="#d98a1c"/>
+  <path d="M116 438 C 150 449 240 450 289 438" fill="none" stroke="#fff0a6" stroke-width="2" stroke-linecap="round"/>
+  <path d="M136 446 l 4 -4 l 4 4 l -4 4 Z M168 450 l 4 -4 l 4 4 l -4 4 Z M200 451 l 4 -4 l 4 4 l -4 4 Z M232 451 l 4 -4 l 4 4 l -4 4 Z M264 448 l 4 -4 l 4 4 l -4 4 Z" fill="#e0393e" stroke="#1d1a16" stroke-width="1.5" stroke-linejoin="round"/>
+  <use href="#roi-barbichon-robe-galon" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M170 410 C 166 424 162 436 160 446" fill="none" stroke="#1d1a16" stroke-width="4" stroke-linecap="round"/>
+  <path d="M224 418 C 228 428 230 436 230 444" fill="none" stroke="#1d1a16" stroke-width="4" stroke-linecap="round"/>
+  <path d="M258 412 C 264 422 268 432 270 442" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+  <use href="#roi-barbichon-robe" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+
+  <!-- Souliers. -->
+  <use href="#roi-barbichon-soulier-g" fill="#6f2f9a" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M188 445 C 176 445 164 447 156 450" fill="none" stroke="#a86ad0" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="137" cy="443" r="5" fill="#ffc73a" stroke="#1d1a16" stroke-width="3"/>
+  <use href="#roi-barbichon-soulier-d" fill="#6f2f9a" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M262 448 C 250 450 238 454 230 458" fill="none" stroke="#a86ad0" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="209" cy="453" r="5" fill="#ffc73a" stroke="#1d1a16" stroke-width="3"/>
+
+  <!-- ===== Bras du fond (poing sur la hanche) ===== -->
+  <use href="#roi-barbichon-bras-g" fill="#e0393e"/>
+  <g clip-path="url(#roi-barbichon-bras-g-clip)">
+    <path d="M86 330 C 98 346 110 352 124 356 L 124 370 L 80 370 Z" fill="#a51f3f"/>
+    <path d="M112 326 C 116 312 128 304 146 298 L 150 312 C 134 316 122 324 118 334 Z" fill="#7a1736"/>
+    <path d="M96 314 C 102 300 114 290 128 284" fill="none" stroke="#ff7f6e" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#roi-barbichon-bras-g" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M100 322 C 104 328 108 332 114 334" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- ===== Bras levé ===== -->
+  <use href="#roi-barbichon-bras-d" fill="#e0393e"/>
+  <g clip-path="url(#roi-barbichon-bras-d-clip)">
+    <path d="M330 206 C 336 230 334 252 320 270 C 304 284 286 294 268 300 L 360 300 L 360 200 Z" fill="#a51f3f"/>
+    <path d="M300 280 C 312 274 324 266 332 256 L 340 262 C 330 276 316 284 302 290 Z" fill="#7a1736"/>
+    <path d="M262 266 C 278 256 296 248 310 244" fill="none" stroke="#ff7f6e" stroke-width="4" stroke-linecap="round"/>
+    <path d="M321 236 C 322 226 323 218 324 212" fill="none" stroke="#ff7f6e" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <use href="#roi-barbichon-bras-d" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M312 238 C 318 244 326 250 334 252" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- ===== Col d'hermine ===== -->
+  <use href="#roi-barbichon-col" fill="#fffaf0"/>
+  <g clip-path="url(#roi-barbichon-col-clip)">
+    <path d="M250 250 C 290 254 316 266 330 292 L 330 310 L 240 310 Z" fill="#cdc5e8"/>
+    <path d="M84 284 C 100 296 124 300 150 300 L 150 310 L 84 310 Z" fill="#cdc5e8"/>
+    <path d="M94 270 C 98 262 106 258 116 256" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+    <use href="#roi-barbichon-moucheture" x="98" y="280"/>
+    <use href="#roi-barbichon-moucheture" x="120" y="292"/>
+    <use href="#roi-barbichon-moucheture" x="308" y="276"/>
+    <use href="#roi-barbichon-moucheture" x="292" y="289"/>
+  </g>
+  <use href="#roi-barbichon-col" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+
+  <!-- ===== Tête ===== -->
+  <use href="#roi-barbichon-cheveux-g" fill="#fffaf0"/>
+  <path d="M104 146 C 108 152 108 160 106 166" fill="none" stroke="#cdc5e8" stroke-width="4" stroke-linecap="round"/>
+  <use href="#roi-barbichon-cheveux-g" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+  <use href="#roi-barbichon-tete" fill="#ffd3b6"/>
+  <g clip-path="url(#roi-barbichon-tete-clip)">
+    <!-- Ombre du côté opposé à la lumière, occlusion sous la couronne. -->
+    <path d="M246 86 C 264 120 270 170 252 250 L 300 250 L 300 86 Z" fill="#eda08e"/>
+    <path d="M100 116 C 150 140 240 152 300 146 L 300 162 C 240 168 150 158 100 132 Z" fill="#e39187"/>
+    <!-- Joue et front éclairés. -->
+    <path d="M122 170 C 120 156 124 146 132 140" fill="none" stroke="#fff0e2" stroke-width="5" stroke-linecap="round"/>
+    <!-- Joues roses. -->
+    <ellipse cx="246" cy="198" rx="17" ry="10" fill="#ff7f96" opacity="0.5"/>
+    <ellipse cx="128" cy="198" rx="12" ry="8" fill="#ff7f96" opacity="0.5"/>
+    <!-- Pattes d'oie, bon vieux roi. -->
+    <path d="M246 172 C 252 170 256 168 259 164 M247 180 C 253 180 257 182 260 185" fill="none" stroke="#d9837f" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <use href="#roi-barbichon-tete" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <use href="#roi-barbichon-cheveux-d" fill="#fffaf0"/>
+  <g clip-path="url(#roi-barbichon-cheveux-d-clip)">
+    <path d="M290 130 C 300 150 304 180 296 210 L 320 210 L 320 130 Z" fill="#cdc5e8"/>
+    <path d="M276 140 C 284 136 292 138 298 144" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <use href="#roi-barbichon-cheveux-d" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M300 158 C 304 164 304 170 300 174 M296 186 C 300 190 300 196 296 200" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <use href="#roi-barbichon-oreille" fill="#ffd3b6"/>
+  <g clip-path="url(#roi-barbichon-oreille-clip)">
+    <path d="M292 156 C 300 170 298 190 286 200 L 310 200 L 310 156 Z" fill="#eda08e"/>
+  </g>
+  <use href="#roi-barbichon-oreille" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M280 170 C 288 166 294 172 292 180 C 290 186 284 186 282 182" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- ===== Couronne trop grande, penchée ===== -->
+  <g transform="rotate(6 196 102)">
+    <use href="#roi-barbichon-calotte" fill="#8e3fb8"/>
+    <g clip-path="url(#roi-barbichon-calotte-clip)">
+      <path d="M236 40 C 262 52 278 70 284 96 L 300 96 L 300 36 Z" fill="#5f2a92"/>
+      <path d="M128 78 C 136 60 154 50 176 46" fill="none" stroke="#d39cf0" stroke-width="5" stroke-linecap="round"/>
+    </g>
+    <use href="#roi-barbichon-calotte" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+    <use href="#roi-barbichon-couronne" fill="#ffc73a"/>
+    <g clip-path="url(#roi-barbichon-couronne-clip)">
+      <!-- Ombre côté droit et bas du bandeau, lumière sur les fleurons de gauche. -->
+      <path d="M246 20 C 252 60 264 92 304 96 L 310 96 L 310 20 Z" fill="#d98a1c"/>
+      <path d="M86 116 C 140 128 250 130 306 112 L 306 150 L 86 150 Z" fill="#d98a1c"/>
+      <path d="M232 112 C 260 116 286 112 306 104 L 306 150 L 232 150 Z" fill="#a85a17"/>
+      <path d="M86 92 C 140 106 250 108 306 92 L 306 98 C 250 114 140 112 86 98 Z" fill="#a85a17"/>
+      <path d="M101 62 L 104 84 M139 50 C 136 62 132 74 128 84 M193 40 C 190 56 184 72 176 88" fill="none" stroke="#fff0a6" stroke-width="4" stroke-linecap="round"/>
+      <path d="M98 106 C 120 112 150 114 170 114" fill="none" stroke="#fff0a6" stroke-width="4" stroke-linecap="round"/>
+      <!-- Ciselures entre les pierres. -->
+      <path d="M124 116 C 128 110 134 112 132 118 M164 120 C 168 114 174 116 172 122 M220 122 C 224 116 230 118 228 124 M262 120 C 266 114 272 116 270 122" fill="none" stroke="#a85a17" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+    <use href="#roi-barbichon-couronne" fill="none" stroke="#1d1a16" stroke-width="6.5" stroke-linejoin="round"/>
+    <!-- Bord haut du bandeau (les fleurons partent de là). -->
+    <path d="M93 92 C 140 106 250 108 299 92" fill="none" stroke="#1d1a16" stroke-width="4" stroke-linecap="round"/>
+    <!-- Perles au bout des fleurons. -->
+    <g stroke="#1d1a16" stroke-width="3">
+      <circle cx="98" cy="52" r="6" fill="#fffaf0"/>
+      <circle cx="136" cy="37" r="7.5" fill="#fffaf0"/>
+      <circle cx="196" cy="24" r="8.5" fill="#fffaf0"/>
+      <circle cx="256" cy="37" r="7.5" fill="#fffaf0"/>
+      <circle cx="294" cy="52" r="6" fill="#d8cfe8"/>
+    </g>
+    <circle cx="193.5" cy="21.5" r="3" fill="#ffffff"/>
+    <circle cx="134" cy="35" r="2.6" fill="#ffffff"/>
+    <circle cx="96.5" cy="50.5" r="2" fill="#ffffff"/>
+    <circle cx="254" cy="35" r="2.4" fill="#ffffff"/>
+    <!-- Pierres : rubis au centre, saphirs, émeraudes. -->
+    <ellipse cx="196" cy="118" rx="14" ry="11" fill="#e8384f"/>
+    <path d="M196 118 L 210 118 C 210 125 204 129 196 129 Z M182 118 L 196 118 L 196 129 C 188 129 182 125 182 118 Z" fill="#a01d40"/>
+    <path d="M184 116 C 186 110 192 108 198 108" fill="none" stroke="#ff9aa5" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="196" cy="118" rx="14" ry="11" fill="none" stroke="#1d1a16" stroke-width="3"/>
+    <circle cx="190" cy="113" r="2.4" fill="#ffffff"/>
+    <circle cx="146" cy="114" r="9" fill="#3b6fe0"/>
+    <path d="M146 114 L 155 114 C 155 119 151 123 146 123 Z" fill="#233f99"/>
+    <circle cx="146" cy="114" r="9" fill="none" stroke="#1d1a16" stroke-width="3"/>
+    <circle cx="142.5" cy="110.5" r="2.4" fill="#ffffff"/>
+    <circle cx="246" cy="114" r="9" fill="#3b6fe0"/>
+    <path d="M246 114 L 255 114 C 255 119 251 123 246 123 Z M237 114 L 246 114 L 246 123 C 241 123 237 119 237 114 Z" fill="#233f99"/>
+    <circle cx="246" cy="114" r="9" fill="none" stroke="#1d1a16" stroke-width="3"/>
+    <circle cx="242.5" cy="110.5" r="2" fill="#ffffff"/>
+    <path d="M111 102 L 117 109 L 111 116 L 105 109 Z" fill="#2fbf71" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M282 102 L 288 109 L 282 116 L 276 109 Z" fill="#1c7f55" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  </g>
+
+  <!-- ===== Visage ===== -->
+  <!-- Œil de devant : paupière lourde (l'air important), regard qui toise. -->
+  <use href="#roi-barbichon-oeil-d" fill="#fffaf0"/>
+  <g clip-path="url(#roi-barbichon-oeil-d-clip)">
+    <ellipse cx="213" cy="174" rx="14" ry="17" fill="#3b7be0"/>
+    <ellipse cx="213" cy="180" rx="14" ry="11" fill="#2a4fa8"/>
+    <ellipse cx="213" cy="175" rx="7.5" ry="9.5" fill="#1d1a16"/>
+    <circle cx="207" cy="165" r="5.5" fill="#ffffff"/>
+    <circle cx="220" cy="183" r="2.6" fill="#ffffff"/>
+    <path d="M190 156 C 202 150 226 148 244 156 L 244 136 L 190 136 Z" fill="#ffd3b6"/>
+    <path d="M190 156 C 202 150 226 148 244 156 L 244 150 C 226 144 202 146 190 150 Z" fill="#eda08e"/>
+  </g>
+  <use href="#roi-barbichon-oeil-d" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+  <path d="M195 155 C 206 150 226 148 242 155" fill="none" stroke="#1d1a16" stroke-width="5.5" stroke-linecap="round"/>
+  <use href="#roi-barbichon-oeil-g" fill="#fffaf0"/>
+  <g clip-path="url(#roi-barbichon-oeil-g-clip)">
+    <ellipse cx="154" cy="176" rx="12" ry="15" fill="#3b7be0"/>
+    <ellipse cx="154" cy="181" rx="12" ry="10" fill="#2a4fa8"/>
+    <ellipse cx="154" cy="177" rx="6.5" ry="8.5" fill="#1d1a16"/>
+    <circle cx="149" cy="169" r="4.5" fill="#ffffff"/>
+    <circle cx="159.5" cy="184" r="2.2" fill="#ffffff"/>
+    <path d="M136 160 C 146 154 164 154 176 160 L 176 140 L 136 140 Z" fill="#ffd3b6"/>
+    <path d="M136 160 C 146 154 164 154 176 160 L 176 154 C 164 148 146 148 136 154 Z" fill="#eda08e"/>
+  </g>
+  <use href="#roi-barbichon-oeil-g" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+  <path d="M140 159 C 148 154 164 154 174 159" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linecap="round"/>
+  <!-- Sourcils broussailleux. -->
+  <use href="#roi-barbichon-sourcil-d" fill="#fffaf0"/>
+  <g clip-path="url(#roi-barbichon-sourcil-d-clip)">
+    <path d="M190 146 C 214 130 250 136 286 120 L 290 150 L 190 150 Z" fill="#cdc5e8"/>
+    <path d="M206 128 C 214 122 226 120 238 121" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#roi-barbichon-sourcil-d" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M222 127 C 230 124 238 124 246 126 M262 118 C 266 114 268 110 268 106" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <use href="#roi-barbichon-sourcil-g" fill="#fffaf0"/>
+  <g clip-path="url(#roi-barbichon-sourcil-g-clip)">
+    <path d="M100 124 C 130 140 160 140 182 146 L 182 152 L 100 152 Z" fill="#cdc5e8"/>
+    <path d="M124 124 C 132 125 142 125 152 125" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#roi-barbichon-sourcil-g" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M140 131 C 148 129 156 130 162 133" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- ===== Barbe ===== -->
+  <use href="#roi-barbichon-barbe" fill="#fffaf0"/>
+  <g clip-path="url(#roi-barbichon-barbe-clip)">
+    <path d="M232 212 C 262 236 278 280 262 334 L 320 344 L 320 150 L 262 150 Z" fill="#cdc5e8"/>
+    <path d="M132 318 C 170 334 232 334 276 316 L 276 352 L 132 352 Z" fill="#cdc5e8"/>
+    <path d="M114 204 C 148 228 232 232 290 196 L 290 214 C 236 250 148 248 114 222 Z" fill="#a39ad0"/>
+    <!-- Mèches : ombre propre de chaque boucle. -->
+    <path d="M134 236 C 128 260 134 286 152 304" fill="none" stroke="#cdc5e8" stroke-width="7" stroke-linecap="round"/>
+    <path d="M162 244 C 158 272 166 302 184 324" fill="none" stroke="#cdc5e8" stroke-width="7" stroke-linecap="round"/>
+    <path d="M198 256 C 196 284 200 308 206 330" fill="none" stroke="#cdc5e8" stroke-width="7" stroke-linecap="round"/>
+    <path d="M230 246 C 238 274 234 304 222 328" fill="none" stroke="#a39ad0" stroke-width="7" stroke-linecap="round"/>
+    <!-- Lumières sur les boucles côté gauche. -->
+    <path d="M104 266 C 108 258 114 254 122 252" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M108 226 C 112 220 118 218 124 218" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M118 304 C 122 298 128 296 134 296" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M140 242 C 136 256 136 270 140 282" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    <!-- Liseré de contre-jour sur le bord ombré. -->
+    <path d="M298 228 C 300 240 298 248 292 254 M298 272 C 298 284 294 292 286 298" fill="none" stroke="#efeaff" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#roi-barbichon-barbe" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linejoin="round"/>
+  <!-- Mèches et petites boucles en spirale. -->
+  <g fill="none" stroke="#1d1a16" stroke-linecap="round">
+    <path d="M128 232 C 122 256 128 284 146 302" stroke-width="4"/>
+    <path d="M156 240 C 152 268 160 300 178 324" stroke-width="4"/>
+    <path d="M192 252 C 190 280 194 306 200 330" stroke-width="4"/>
+    <path d="M224 242 C 232 270 228 300 216 326" stroke-width="4"/>
+    <path d="M252 222 C 268 250 268 284 250 312" stroke-width="4"/>
+    <path d="M118 298 C 124 296 128 300 126 305 C 124 309 119 308 119 304" stroke-width="2.5"/>
+    <path d="M110 258 C 116 255 121 259 119 264 C 117 268 112 267 112 263" stroke-width="2.5"/>
+    <path d="M286 296 C 280 294 276 298 278 303 C 280 307 285 306 285 302" stroke-width="2.5"/>
+    <path d="M294 254 C 288 252 284 256 286 261 C 288 265 293 264 293 260" stroke-width="2.5"/>
+    <path d="M262 326 C 256 324 252 328 254 333" stroke-width="2.5"/>
+    <path d="M142 326 C 148 324 152 328 150 333" stroke-width="2.5"/>
+  </g>
+  <!-- Bouche ouverte qui proclame. -->
+  <use href="#roi-barbichon-bouche" fill="#6e2430"/>
+  <g clip-path="url(#roi-barbichon-bouche-clip)">
+    <path d="M168 220 L 212 218 L 212 230 C 200 233 180 233 168 230 Z" fill="#fffaf0"/>
+    <path d="M176 243 C 182 235 198 235 204 242 C 200 251 180 252 176 243 Z" fill="#ff8d9e"/>
+    <path d="M186 240 C 190 239 194 239 197 240" fill="none" stroke="#e0647a" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <use href="#roi-barbichon-bouche" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- Moustache en volutes. -->
+  <use href="#roi-barbichon-moustache" fill="#fffaf0"/>
+  <g clip-path="url(#roi-barbichon-moustache-clip)">
+    <path d="M110 206 C 150 224 220 228 284 196 L 284 236 L 110 236 Z" fill="#cdc5e8"/>
+    <path d="M196 220 C 220 224 246 220 262 210 L 284 236 L 196 236 Z" fill="#a39ad0"/>
+    <path d="M122 196 C 130 202 144 204 156 203" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M206 204 C 220 201 234 201 246 202" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <use href="#roi-barbichon-moustache" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M270 196 C 276 192 276 186 272 186 C 268 186 268 190 270 192 M118 198 C 114 194 115 189 119 190 C 122 191 121 195 119 196" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M206 216 C 220 218 236 216 248 210 M170 218 C 156 220 142 218 132 212" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Nez rond et rose. -->
+  <use href="#roi-barbichon-nez" fill="#ff9f8c"/>
+  <g clip-path="url(#roi-barbichon-nez-clip)">
+    <path d="M206 186 C 206 204 196 216 178 218 L 210 222 L 214 186 Z" fill="#e2687a"/>
+    <ellipse cx="179" cy="190" rx="8" ry="6" fill="#ffd9c8"/>
+    <circle cx="176" cy="188" r="3" fill="#ffffff"/>
+    <path d="M178 212 C 184 214 190 214 196 212" fill="none" stroke="#ffbca8" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <use href="#roi-barbichon-nez" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+
+  <!-- ===== Tresse : anneau, tour de taille, volute au sol ===== -->
+  <use href="#roi-barbichon-anneau" fill="#ffc73a"/>
+  <g clip-path="url(#roi-barbichon-anneau-clip)">
+    <path d="M212 326 C 218 336 220 350 216 364 L 236 364 L 236 326 Z" fill="#d98a1c"/>
+    <path d="M166 348 C 188 356 210 356 232 348 L 232 364 L 166 364 Z" fill="#a85a17"/>
+    <path d="M176 340 C 178 346 178 350 176 354" fill="none" stroke="#fff0a6" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#roi-barbichon-anneau" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+  <ellipse cx="199" cy="344" rx="7.5" ry="6.5" fill="#e8384f" stroke="#1d1a16" stroke-width="2.5"/>
+  <circle cx="196.5" cy="341.5" r="2" fill="#ffffff"/>
+  <use href="#roi-barbichon-tresse-avant" fill="#fffaf0"/>
+  <g clip-path="url(#roi-barbichon-tresse-avant-clip)">
+    <path d="M176 352.6Q181 352.5 181.2 355.3Q181.4 358 181.9 361Q182.5 364 183.4 366.9Q184.4 369.8 185.8 372.5Q187.3 375.2 189 377.6Q190.8 380 192.9 382.1Q194.9 384.2 197.1 386Q199.3 387.8 201.6 389.3Q203.9 390.8 206.2 392Q208.5 393.3 210.8 394.4Q213.1 395.4 215.4 396.3Q217.7 397.2 220 398Q222.3 398.7 224.6 399.4Q226.9 400 229.2 400.5Q231.4 401 233.8 401.4Q236.1 401.8 238.4 402Q240.8 402.3 243 402.4Q245.3 402.6 247.6 402.6Q249.8 402.6 252.1 402.5Q254.4 402.5 256.6 402.3Q258.9 402.1 261.1 401.8Q263.4 401.5 265.6 401.1Q267.8 400.7 270 400.2Q272.2 399.6 274.3 399Q276.5 398.4 278.6 397.7Q280.7 397 282.7 396.2Q284.8 395.5 286.8 394.6Q288.8 393.7 290.8 392.8Q292.8 391.9 294.7 390.9Q296.6 389.9 301 398.4Q305.4 407 303.3 408.1Q301.1 409.2 298.8 410.3Q296.5 411.3 294.1 412.3Q291.7 413.4 289.2 414.3Q286.7 415.2 284.2 416Q281.6 416.8 279 417.5Q276.4 418.1 273.7 418.7Q271.1 419.3 268.3 419.7Q265.6 420.1 262.9 420.4Q260.1 420.6 257.4 420.8Q254.6 420.9 251.8 420.9Q249.1 420.8 246.3 420.7Q243.6 420.5 240.9 420.2Q238.2 419.9 235.3 419.4Q232.5 418.9 229.6 418.2Q226.8 417.5 224.1 416.7Q221.5 415.9 218.8 414.9Q216.1 413.9 213.4 412.7Q210.7 411.6 208.1 410.1Q205.4 408.7 202.7 407.1Q200.1 405.4 197.5 403.4Q194.9 401.5 192.4 399.3Q190 397 187.7 394.5Q185.4 391.9 183.3 389.1Q181.2 386.2 179.4 383.1Q177.6 380 176.2 376.6Q174.8 373.3 173.7 369.8Q172.7 366.3 172.1 362.7Q171.4 359.1 171.2 356Q171 352.8 176 352.6Z" fill="#cdc5e8"/>
+    <path d="M218.5 351.5Q210 351.7 210.4 353.2Q210.8 354.8 211.4 356Q212.1 357.2 212.9 358.3Q213.7 359.4 214.7 360.3Q215.6 361.3 216.6 362Q217.6 362.8 218.6 363.5Q219.6 364.2 220.7 364.9Q221.7 365.6 222.7 366.3Q223.8 366.9 224.8 367.6Q225.9 368.3 227.1 368.9Q228.2 369.6 229.4 370.3Q230.6 370.9 232 371.5Q233.3 372.1 234.7 372.7Q236.1 373.2 237.5 373.7Q239 374.2 240.4 374.6Q241.8 374.9 243.2 375.2Q244.7 375.5 246.3 375.7Q247.8 375.9 249.4 376Q251 376.1 252.5 376.2Q254.1 376.2 255.6 376.2Q257.2 376.1 258.7 376Q260.3 375.9 261.9 375.6Q263.4 375.4 265 375.1Q266.5 374.8 268.1 374.5Q269.6 374.1 271.2 373.6Q272.7 373.2 274.3 372.6Q275.8 372.1 277.4 371.5Q278.9 370.9 280.4 370.2Q282 369.5 283.6 368.7Q285.2 367.9 282.9 363.5Q280.6 359 279.1 359.8Q277.6 360.5 276.3 361.1Q274.9 361.7 273.6 362.2Q272.2 362.8 270.9 363.2Q269.6 363.7 268.2 364.1Q266.9 364.5 265.6 364.8Q264.3 365.1 263 365.3Q261.7 365.6 260.4 365.8Q259.1 365.9 257.8 366Q256.5 366.1 255.2 366.2Q254 366.2 252.7 366.2Q251.4 366.1 250.1 366Q248.8 365.9 247.5 365.7Q246.1 365.6 245 365.4Q243.9 365.1 242.8 364.9Q241.7 364.6 240.5 364.2Q239.3 363.8 238.2 363.3Q237.1 362.9 236.1 362.4Q235 362 234.2 361.5Q233.3 361 232.5 360.4Q231.7 359.9 231.1 359.4Q230.4 358.9 229.9 358.4Q229.4 357.9 229 357.5Q228.6 357 228.3 356.6Q228 356.1 227.8 355.7Q227.6 355.3 227.5 354.9Q227.3 354.6 227.2 354.2Q227.1 353.8 227.1 353.4Q227 352.9 227 352.1Q227 351.2 218.5 351.5Z" fill="#cdc5e8"/>
+    <path d="M176 352.6Q181 352.5 181.2 355.3Q181.4 358 181.9 361Q182.4 364 183.3 367Q184.2 369.9 185.4 372.7Q186.6 375.6 188.1 378.2Q189.6 380.8 191.5 383.2Q193.3 385.5 195.4 387.5Q197.5 389.6 199.7 391.3Q202 393 204.3 394.5Q206.6 396 209 397.2Q211.4 398.4 213.8 399.4Q216.2 400.4 218.6 401.3Q221 402.1 223.3 402.8Q225.7 403.5 228.1 404Q230.4 404.6 232.9 405Q235.3 405.4 237.8 405.7Q240.2 405.9 242.6 406.1Q245 406.2 247.3 406.3Q249.7 406.3 252.1 406.2Q254.4 406.1 256.8 405.9Q259.1 405.7 261.5 405.4Q263.8 405.1 266.1 404.6Q268.4 404.2 270.7 403.7Q273 403.1 275.2 402.5Q277.4 401.8 279.6 401.1Q281.8 400.4 283.9 399.5Q286.1 398.7 288.1 397.8Q290.2 396.9 292.3 396Q294.3 395 296.2 394Q298.2 393 301.8 400Q305.4 407 303.3 408.1Q301.1 409.2 298.8 410.3Q296.5 411.3 294.1 412.3Q291.7 413.4 289.2 414.3Q286.7 415.2 284.2 416Q281.6 416.8 279 417.5Q276.4 418.1 273.7 418.7Q271.1 419.3 268.3 419.7Q265.6 420.1 262.9 420.4Q260.1 420.6 257.4 420.8Q254.6 420.9 251.8 420.9Q249.1 420.8 246.3 420.7Q243.6 420.5 240.9 420.2Q238.2 419.9 235.3 419.4Q232.5 418.9 229.6 418.2Q226.8 417.5 224.1 416.7Q221.5 415.9 218.8 414.9Q216.1 413.9 213.4 412.7Q210.7 411.6 208.1 410.1Q205.4 408.7 202.7 407.1Q200.1 405.4 197.5 403.4Q194.9 401.5 192.4 399.3Q190 397 187.7 394.5Q185.4 391.9 183.3 389.1Q181.2 386.2 179.4 383.1Q177.6 380 176.2 376.6Q174.8 373.3 173.7 369.8Q172.7 366.3 172.1 362.7Q171.4 359.1 171.2 356Q171 352.8 176 352.6Z" fill="#a39ad0"/>
+    <path d="M220.4 351.4Q213.8 351.6 214.1 353Q214.4 354.4 214.9 355.4Q215.4 356.5 216.1 357.4Q216.7 358.4 217.3 359.2Q218 360.1 218.7 360.9Q219.4 361.7 220.1 362.5Q220.8 363.3 221.5 364.1Q222.3 365 223.2 365.8Q224 366.6 225 367.4Q226 368.1 227.1 368.9Q228.2 369.6 229.4 370.3Q230.6 370.9 232 371.5Q233.3 372.1 234.7 372.7Q236.1 373.2 237.5 373.7Q239 374.2 240.4 374.6Q241.8 374.9 243.2 375.2Q244.7 375.5 246.3 375.7Q247.8 375.9 249.4 376Q251 376.1 252.5 376.2Q254.1 376.2 255.6 376.2Q257.2 376.1 258.7 376Q260.3 375.9 261.9 375.6Q263.4 375.4 265 375.1Q266.5 374.8 268.1 374.5Q269.6 374.1 271.2 373.6Q272.7 373.2 274.3 372.6Q275.8 372.1 277.4 371.5Q278.9 370.9 280.4 370.2Q282 369.5 283.6 368.7Q285.2 367.9 282.9 363.5Q280.6 359 279.1 359.8Q277.6 360.5 276.3 361.1Q274.9 361.7 273.6 362.2Q272.2 362.8 270.9 363.2Q269.6 363.7 268.2 364.1Q266.9 364.5 265.6 364.8Q264.3 365.1 263 365.3Q261.7 365.6 260.4 365.8Q259.1 365.9 257.8 366Q256.5 366.1 255.2 366.2Q254 366.2 252.7 366.2Q251.4 366.1 250.1 366Q248.8 365.9 247.5 365.7Q246.1 365.6 245 365.4Q243.9 365.1 242.8 364.9Q241.7 364.6 240.5 364.2Q239.3 363.8 238.2 363.3Q237.1 362.9 236.1 362.4Q235 362 234.2 361.5Q233.3 361 232.5 360.4Q231.7 359.9 231.1 359.4Q230.4 358.9 229.9 358.4Q229.4 357.9 229 357.5Q228.6 357 228.3 356.6Q228 356.1 227.8 355.7Q227.6 355.3 227.5 354.9Q227.3 354.6 227.2 354.2Q227.1 353.8 227.1 353.4Q227 352.9 227 352.1Q227 351.2 220.4 351.4Z" fill="#a39ad0"/>
+    <path d="M190.4 352.2Q193.5 352.1 194.1 354.3Q194.7 356.5 195.8 358.6Q196.9 360.7 198.4 362.5Q199.8 364.4 201.5 365.9Q203.1 367.4 204.9 368.6Q206.7 369.8 208.5 370.8Q210.4 371.7 212.1 372.5Q213.9 373.3 215.7 373.9Q217.4 374.5 219.1 375.1Q220.8 375.6 222.5 376.1Q224.1 376.6 225.8 377Q227.4 377.5 229.1 377.9Q230.7 378.3 232.4 378.6Q234.1 379 235.8 379.3Q237.5 379.6 239.1 379.8Q240.7 380 242.4 380.1Q244 380.2 245.7 380.3Q247.4 380.4 249.1 380.4Q250.8 380.4 252.4 380.3Q254.1 380.3 255.8 380.1Q257.4 380 259.1 379.7Q260.7 379.5 262.4 379.2Q264 378.9 265.6 378.5Q267.3 378.2 268.9 377.7Q270.5 377.2 272.1 376.7Q273.7 376.2 275.3 375.6Q276.9 375 278.5 374.3Q280.1 373.7 281.7 372.9Q283.3 372.2 284.9 371.4Q286.6 370.6 287.7 372.7Q288.8 374.9 287.1 375.7Q285.4 376.6 283.7 377.4Q282.1 378.2 280.4 378.9Q278.7 379.6 277 380.3Q275.3 380.9 273.6 381.5Q271.9 382.1 270.1 382.6Q268.4 383.1 266.6 383.5Q264.9 384 263.1 384.3Q261.4 384.7 259.6 385Q257.8 385.3 256 385.5Q254.2 385.7 252.4 385.8Q250.5 385.9 248.7 385.9Q246.9 386 245 385.9Q243.2 385.9 241.3 385.8Q239.5 385.7 237.7 385.5Q235.8 385.4 234 385.1Q232.1 384.8 230.2 384.4Q228.4 384 226.5 383.6Q224.6 383.2 222.7 382.7Q220.8 382.2 218.9 381.7Q217 381.1 215 380.4Q213 379.8 211 379Q209 378.2 206.9 377.2Q204.9 376.2 202.8 374.9Q200.8 373.7 198.8 372.1Q196.8 370.5 195.1 368.6Q193.3 366.7 191.9 364.4Q190.5 362.2 189.4 359.7Q188.4 357.3 187.8 354.8Q187.3 352.3 190.4 352.2Z" fill="#ffffff"/>
+    <path d="M220.4 359.3Q207.6 368.9 202.4 380.5M195 390.8Q211.3 385.1 222.9 380.4M231.5 369.2Q228.6 385 231 397.3M230 410.1Q240.4 397 248.5 387.6M251.4 374.2Q255.7 389.6 262.8 399.7M266.5 411.9Q270.9 396 274.8 384.4M272.9 371Q282.4 383.7 292.4 390.6M300 400.8Q297.2 385.5 295.3 381.9" fill="none" stroke="#a39ad0" stroke-width="6" stroke-linecap="round"/>
+    <path d="M215.7 363.3Q209.5 371.8 207.6 379.4M205.8 392Q215.9 386.9 223 383.6M231.7 376Q231.9 386.6 234.3 394M238.8 405.7Q245 396.6 249.9 390.7M255 380.3Q259.4 389.8 264.5 395.5M272.5 404.6Q274.8 394.1 277.2 386.8M278.5 375.4Q286 382.6 292.5 386.3M293 383Q293 383 293 383" fill="none" stroke="#cdc5e8" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M230.1 378.4Q236.4 376.9 241 380.7M254.4 383.1Q259.7 379.3 265.5 380.9M279 378.2Q282.8 372.8 287.7 373" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    <path d="M219.6 356.8Q206.8 366.4 201.6 378M193.2 388.8Q209.6 383.2 221.2 378.5M229.2 367.9Q226.3 383.7 228.8 396M227.5 409.4Q237.9 396.3 246 386.8M248.8 374Q253.2 389.4 260.2 399.5M263.9 412.2Q268.3 396.3 272.2 384.7M270.4 371.8Q279.9 384.4 290 391.4M297.7 401.9Q294.9 386.6 293 383" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#roi-barbichon-tresse-avant" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  <use href="#roi-barbichon-noeud" transform="translate(235.5 391.4) rotate(-75.2) scale(0.7)"/>
+  <path d="M288.5 408.8L300.4 403.7Q294.5 382.7 283.1 364.1L271.2 369.3Q277.1 390.3 288.5 408.8Z" fill="#ffc73a"/>
+  <path d="M283.8 398.2L295.7 393 300.4 403.7 288.5 408.8ZM271.2 369.3L283.1 364.1 283.1 364.1 271.2 369.3Z" fill="#d98a1c"/>
+  <path d="M285.6 402.2L297.5 397 300.4 403.7 288.5 408.8ZM271.2 369.3L283.1 364.1 283.1 364.1 271.2 369.3Z" fill="#a85a17"/>
+  <path d="M272.7 372.6L284.6 367.4 287.3 373.7 275.4 378.9Z" fill="#fff0a6"/>
+  <path d="M288.5 408.8L300.4 403.7Q294.5 382.7 283.1 364.1L271.2 369.3Q277.1 390.3 288.5 408.8Z" fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M292.1 407.2L274.9 367.7M296.7 405.3L279.5 365.7" fill="none" stroke="#a85a17" stroke-width="1.8"/>
+  <use href="#roi-barbichon-tresse-volute" fill="#fffaf0"/>
+  <g clip-path="url(#roi-barbichon-tresse-volute-clip)">
+    <path d="M107 336Q112 336 112 338.1Q112.1 340.2 112.1 342.2Q112.2 344.3 112.3 346.4Q112.4 348.4 112.4 350.5Q112.5 352.5 112.6 354.6Q112.7 356.6 112.8 358.7Q112.9 360.7 113 362.8Q113.1 364.8 113.2 366.8Q113.3 368.9 113.4 370.9Q113.5 372.9 113.7 374.9Q113.8 377 113.9 379Q114 381 114.1 383Q114.2 385 114.3 387Q114.4 389 114.5 391Q114.6 393 114.7 395Q114.8 397 114.9 399Q115 401 115.1 402.9Q115.2 404.9 115.2 406.9Q115.3 408.9 115.3 410.7Q115.4 412.5 115.3 413.5Q115.3 414.5 115 416Q114.8 417.4 114.4 418.9Q114.1 420.4 113.6 421.8Q113.1 423.2 112.6 424.6Q112 426 111.3 427.4Q110.7 428.7 109.9 430Q109.2 431.3 108.3 432.5Q107.5 433.8 106.5 434.9Q105.6 436.1 104.6 437.2Q103.6 438.3 102.5 439.3Q101.4 440.3 100.2 441.2Q99 442.1 97.8 443Q96.5 443.8 95.2 444.5Q93.9 445.2 92.6 445.9Q91.2 446.5 89.9 447Q88.5 447.5 87 447.9Q85.6 448.3 84.2 448.6Q82.7 448.8 81.3 449Q79.8 449.2 78.3 449.2Q76.8 449.2 75.4 449.2Q73.9 449.1 72.5 448.9Q71 448.6 69.6 448.3Q68.2 448 66.8 447.5Q65.4 447.1 64.1 446.5Q62.7 445.9 61.4 445.3Q60.1 444.6 58.9 443.9Q57.6 443.1 56.4 442.3Q55.2 441.5 54 440.6Q52.8 439.7 51.7 438.7Q50.5 437.8 49.4 436.7Q48.4 435.6 47.3 434.4Q46.3 433.2 45.4 431.9Q44.5 430.6 43.8 429.2Q43 427.8 42.4 426.3Q41.8 424.8 41.3 423.2Q40.9 421.6 40.7 420Q40.5 418.3 40.5 416.6Q40.4 415 40.6 413.3Q40.8 411.6 41.2 410Q41.6 408.3 42.3 406.8Q42.9 405.2 43.7 403.7Q44.5 402.2 45.5 400.8Q46.6 399.4 47.7 398.2Q48.9 397 50.3 395.9Q51.6 394.9 53.1 394Q54.5 393.2 56.1 392.5Q57.7 391.9 59.3 391.5Q60.9 391.2 62.5 391Q64.2 390.9 65.8 391.1Q67.4 391.2 69 391.6Q70.5 392.1 71.9 392.8Q73.3 393.5 74.5 394.4Q75.6 395.3 76.6 396.4Q77.5 397.5 78.1 398.7Q78.8 399.9 79.2 401.1Q79.6 402.3 79.8 403.4Q80.1 404.4 80.3 405.4Q80.5 406.4 80.6 407.4Q80.7 408.3 80.6 409.2Q80.5 410.1 80.3 410.8Q80 411.6 79.6 412.2Q79.2 412.8 78.5 413.3Q77.8 413.9 75 409.8Q72.2 405.6 72.1 405.7Q72 405.8 71.6 406.3Q71.2 406.8 71.1 407.1Q70.9 407.4 70.8 407.7Q70.7 407.9 70.7 408Q70.7 408 70.6 408Q70.6 408 70.5 407.9Q70.4 407.8 70.2 407.6Q70.1 407.5 69.8 407.3Q69.6 407.2 69.3 407Q69 406.8 68.6 406.7Q68.2 406.5 67.8 406.4Q67.3 406.4 66.8 406.3Q66.3 406.3 65.8 406.3Q65.2 406.4 64.7 406.5Q64.1 406.6 63.5 406.8Q62.9 407 62.3 407.3Q61.8 407.6 61.2 407.9Q60.6 408.3 60.1 408.8Q59.6 409.2 59.1 409.8Q58.6 410.3 58.1 410.9Q57.7 411.5 57.3 412.2Q56.9 412.9 56.6 413.6Q56.3 414.3 56.1 415.1Q55.8 415.9 55.7 416.7Q55.5 417.6 55.5 418.4Q55.4 419.3 55.4 420.1Q55.5 421 55.6 421.9Q55.7 422.7 55.9 423.6Q56.1 424.5 56.4 425.4Q56.7 426.2 57.1 427.1Q57.5 427.9 58 428.7Q58.5 429.5 59 430.3Q59.6 431 60.2 431.8Q60.9 432.5 61.6 433.2Q62.3 433.8 63.1 434.4Q63.8 435 64.7 435.6Q65.5 436.1 66.4 436.6Q67.3 437 68.2 437.4Q69.2 437.8 70.1 438.1Q71.1 438.4 72.1 438.6Q73.1 438.9 74.1 439Q75.2 439.1 76.2 439.2Q77.3 439.2 78.3 439.2Q79.4 439.2 80.4 439Q81.5 438.9 82.5 438.7Q83.6 438.5 84.6 438.2Q85.6 437.9 86.6 437.5Q87.7 437.1 88.6 436.7Q89.6 436.2 90.6 435.7Q91.5 435.1 92.4 434.5Q93.3 433.9 94.2 433.2Q95.1 432.5 95.9 431.8Q96.7 431 97.5 430.2Q98.2 429.4 98.9 428.5Q99.6 427.6 100.2 426.7Q100.9 425.7 101.4 424.8Q102 423.8 102.5 422.7Q103 421.7 103.4 420.7Q103.8 419.6 104.2 418.5Q104.5 417.4 104.8 416.3Q105 415.2 105.2 414Q105.4 412.9 105.4 412.6Q105.4 412.3 105.3 410.6Q105.3 409 105.2 407Q105.2 405.1 105.1 403.1Q105 401.2 104.9 399.2Q104.8 397.3 104.7 395.3Q104.6 393.3 104.5 391.3Q104.4 389.4 104.3 387.4Q104.2 385.4 104.1 383.4Q104 381.4 103.9 379.4Q103.8 377.3 103.7 375.3Q103.5 373.3 103.4 371.3Q103.3 369.2 103.2 367.2Q103.1 365.1 103 363.1Q102.9 361 102.8 359Q102.7 356.9 102.6 354.9Q102.5 352.8 102.4 350.7Q102.4 348.6 102.3 346.5Q102.2 344.4 102.1 342.3Q102.1 340.2 102 338.1Q102 336.1 107 336Z" fill="#cdc5e8"/>
+    <path d="M145.8 336Q137.7 336 137.7 338Q137.7 340 137.7 342Q137.7 343.9 137.7 345.9Q137.8 347.9 137.8 349.9Q137.8 351.9 137.9 353.9Q137.9 355.9 138 357.9Q138 359.9 138.1 361.9Q138.1 363.9 138.2 366Q138.2 368 138.3 370Q138.3 372 138.4 374Q138.4 376 138.5 378.1Q138.5 380.1 138.6 382.1Q138.6 384.1 138.7 386.2Q138.7 388.2 138.8 390.2Q138.8 392.2 138.8 394.3Q138.9 396.3 138.9 398.4Q138.9 400.4 138.9 402.4Q138.9 404.5 138.9 406.5Q138.9 408.6 138.8 410.7Q138.7 412.9 138.1 415.5Q137.6 418 137 420.2Q136.4 422.5 135.7 424.6Q134.9 426.8 134.1 428.9Q133.2 431 132.2 433.1Q131.2 435.1 130.1 437.1Q128.9 439.1 127.7 441Q126.4 442.9 125 444.6Q123.6 446.4 122.1 448.1Q120.6 449.8 119 451.4Q117.4 453 115.7 454.4Q114 455.9 112.1 457.2Q110.3 458.6 108.4 459.8Q106.5 461 104.5 462.1Q102.5 463.1 100.4 464Q98.3 464.9 96.2 465.7Q94.1 466.5 91.9 467.1Q89.7 467.7 87.4 468.1Q85.2 468.5 82.9 468.8Q80.6 469.1 78.3 469.2Q76 469.3 73.7 469.2Q71.4 469.1 69.1 468.9Q66.7 468.6 64.4 468.2Q62.1 467.8 59.8 467.2Q57.5 466.5 55.3 465.7Q53 464.9 50.8 463.9Q48.6 463 46.4 461.8Q44.3 460.6 42.2 459.2Q40.2 457.8 38.2 456.2Q36.3 454.6 34.5 452.8Q32.7 451 31.1 449Q29.5 447 28.1 444.8Q26.8 442.6 25.7 440.2Q24.6 437.9 23.8 435.4Q23 432.9 22.5 430.3Q22 427.7 21.8 425.1Q21.6 422.4 21.6 419.8Q21.7 417.1 22 414.5Q22.4 411.9 23 409.3Q23.6 406.7 24.5 404.2Q25.4 401.7 26.6 399.3Q27.8 396.9 29.3 394.6Q30.7 392.4 32.4 390.3Q34.1 388.2 36.1 386.4Q38.1 384.5 40.2 382.9Q42.4 381.2 44.8 379.9Q47.2 378.5 49.7 377.5Q52.2 376.5 54.9 375.8Q57.6 375.1 60.3 374.7Q63.1 374.4 65.9 374.4Q68.7 374.5 71.4 374.9Q74.2 375.3 76.9 376.2Q79.6 377 82.2 378.3Q84.7 379.6 87 381.3Q89.3 383.1 91.1 385.3Q93 387.5 94.3 390.1Q95.6 392.6 96.4 395.3Q97.1 398.1 97.4 400.9Q97.6 403.6 97.3 406.3Q97 409 96.3 411.6Q95.6 414.2 94.4 416.5Q93.2 418.9 91.5 420.9Q89.8 422.9 87.8 424.5Q85.9 426 90.2 432.4Q94.5 438.8 97.7 436.3Q101 433.7 103.7 430Q106.5 426.2 108.2 422.2Q109.9 418.1 110.6 413.9Q111.3 409.7 111.1 405.6Q110.9 401.5 109.9 397.6Q108.9 393.7 107.2 390.2Q105.5 386.6 103.3 383.5Q101.1 380.4 98.4 377.8Q95.8 375.2 92.7 373Q89.7 370.9 86.5 369.3Q83.2 367.7 79.8 366.7Q76.4 365.6 72.9 365Q69.4 364.5 65.9 364.4Q62.4 364.4 59 364.8Q55.5 365.3 52.2 366.1Q48.9 367 45.8 368.3Q42.7 369.6 39.7 371.3Q36.8 372.9 34.2 374.9Q31.5 376.9 29.1 379.2Q26.7 381.5 24.6 384.1Q22.6 386.6 20.8 389.3Q19 392.1 17.6 395Q16.2 397.9 15.1 400.9Q14 404 13.2 407.1Q12.5 410.2 12.1 413.4Q11.7 416.5 11.6 419.7Q11.6 422.9 11.8 426Q12.1 429.2 12.7 432.2Q13.2 435.3 14.1 438.3Q15 441.3 16.2 444.2Q17.3 447.1 18.8 449.8Q20.2 452.6 21.9 455.2Q23.6 457.8 25.5 460.2Q27.4 462.6 29.6 464.8Q31.7 467 34 469Q36.3 471 38.8 472.7Q41.3 474.5 43.9 476Q46.5 477.6 49.3 478.9Q52 480.2 54.8 481.2Q57.7 482.3 60.6 483.1Q63.5 483.8 66.4 484.4Q69.4 484.9 72.4 485.2Q75.3 485.5 78.3 485.5Q81.3 485.6 84.3 485.4Q87.2 485.2 90.2 484.7Q93.1 484.2 96 483.6Q98.9 482.9 101.7 482Q104.5 481 107.2 479.9Q110 478.8 112.6 477.4Q115.2 476.1 117.7 474.6Q120.2 473 122.6 471.3Q125 469.6 127.2 467.7Q129.4 465.8 131.5 463.7Q133.6 461.7 135.5 459.4Q137.4 457.2 139.2 454.9Q140.9 452.6 142.5 450.1Q144 447.7 145.4 445.1Q146.8 442.5 147.9 439.9Q149.1 437.3 150.1 434.5Q151.1 431.8 151.9 429Q152.7 426.2 153.3 423.4Q153.9 420.6 154.2 416.9Q154.6 413.2 154.6 410.8Q154.7 408.4 154.7 406.3Q154.7 404.2 154.7 402.1Q154.6 400 154.6 398Q154.6 395.9 154.6 393.8Q154.6 391.7 154.5 389.7Q154.5 387.6 154.5 385.6Q154.4 383.6 154.4 381.5Q154.4 379.5 154.3 377.5Q154.3 375.4 154.2 373.4Q154.2 371.4 154.2 369.4Q154.1 367.4 154.1 365.4Q154.1 363.4 154 361.4Q154 359.4 154 357.4Q153.9 355.5 153.9 353.5Q153.9 351.5 153.9 349.6Q153.9 347.6 153.9 345.7Q153.9 343.7 153.9 341.8Q153.9 339.8 154 337.9Q154 335.9 145.8 336Z" fill="#cdc5e8"/>
+    <path d="M107 336Q112 336 112 338.1Q112.1 340.2 112.1 342.2Q112.2 344.3 112.3 346.4Q112.4 348.4 112.4 350.5Q112.5 352.5 112.6 354.6Q112.7 356.6 112.8 358.7Q112.9 360.7 113 362.8Q113.1 364.8 113.2 366.8Q113.3 368.9 113.4 370.9Q113.5 372.9 113.7 374.9Q113.8 377 113.9 379Q114 381 114.1 383Q114.2 385 114.3 387Q114.4 389 114.5 391Q114.6 393 114.7 395Q114.8 397 114.9 399Q115 401 115.1 402.9Q115.2 404.9 115.2 406.9Q115.3 408.9 115.3 410.7Q115.4 412.5 115.3 413.5Q115.3 414.5 115 416Q114.8 417.4 114.4 418.9Q114.1 420.4 113.6 421.8Q113.1 423.2 112.6 424.6Q112 426 111.3 427.4Q110.7 428.7 109.9 430Q109.2 431.3 108.3 432.5Q107.5 433.8 106.5 434.9Q105.6 436.1 104.6 437.2Q103.6 438.3 102.5 439.3Q101.4 440.3 100.2 441.2Q99 442.1 97.8 443Q96.5 443.8 95.2 444.5Q93.9 445.2 92.6 445.9Q91.2 446.5 89.9 447Q88.5 447.5 87 447.9Q85.6 448.3 84.2 448.6Q82.7 448.8 81.3 449Q79.8 449.2 78.3 449.2Q76.8 449.2 75.4 449.2Q73.9 449.1 72.5 448.9Q71 448.6 69.6 448.3Q68.2 448 66.8 447.5Q65.4 447.1 64.1 446.5Q62.7 445.9 61.5 445.2Q60.2 444.6 59 443.8Q57.8 443 56.6 442.1Q55.5 441.2 54.5 440.2Q53.4 439.2 52.5 438.1Q51.5 437 50.6 435.9Q49.7 434.8 48.9 433.6Q48 432.4 47.3 431.2Q46.5 429.9 45.9 428.6Q45.2 427.2 44.7 425.8Q44.2 424.4 43.8 423Q43.4 421.5 43.2 420Q43 418.5 42.9 416.9Q42.9 415.4 43.1 413.9Q43.2 412.3 43.6 410.8Q43.9 409.3 44.5 407.8Q45 406.3 45.7 404.9Q46.5 403.6 47.4 402.3Q48.3 401 49.4 399.9Q50.4 398.7 51.7 397.8Q52.9 396.8 54.2 396Q55.6 395.2 57 394.7Q58.4 394.1 59.9 393.7Q61.4 393.4 62.9 393.3Q64.3 393.2 65.8 393.4Q67.3 393.5 68.6 393.9Q70 394.3 71.2 394.9Q72.5 395.5 73.5 396.3Q74.6 397.1 75.5 398Q76.3 398.9 77.1 399.9Q77.8 400.8 78.4 401.7Q79 402.6 79.4 403.6Q79.9 404.5 80.2 405.5Q80.5 406.4 80.6 407.4Q80.7 408.3 80.6 409.2Q80.5 410.1 80.3 410.8Q80 411.6 79.6 412.2Q79.2 412.8 78.5 413.3Q77.8 413.9 75 409.8Q72.2 405.6 72.1 405.7Q72 405.8 71.6 406.3Q71.2 406.8 71.1 407.1Q70.9 407.4 70.8 407.7Q70.7 407.9 70.7 408Q70.7 408 70.6 408Q70.6 408 70.5 407.9Q70.4 407.8 70.2 407.6Q70.1 407.5 69.8 407.3Q69.6 407.2 69.3 407Q69 406.8 68.6 406.7Q68.2 406.5 67.8 406.4Q67.3 406.4 66.8 406.3Q66.3 406.3 65.8 406.3Q65.2 406.4 64.7 406.5Q64.1 406.6 63.5 406.8Q62.9 407 62.3 407.3Q61.8 407.6 61.2 407.9Q60.6 408.3 60.1 408.8Q59.6 409.2 59.1 409.8Q58.6 410.3 58.1 410.9Q57.7 411.5 57.3 412.2Q56.9 412.9 56.6 413.6Q56.3 414.3 56.1 415.1Q55.8 415.9 55.7 416.7Q55.5 417.6 55.5 418.4Q55.4 419.3 55.4 420.1Q55.5 421 55.6 421.9Q55.7 422.7 55.9 423.6Q56.1 424.5 56.4 425.4Q56.7 426.2 57.1 427.1Q57.5 427.9 58 428.7Q58.5 429.5 59 430.3Q59.6 431 60.2 431.8Q60.9 432.5 61.6 433.2Q62.3 433.8 63.1 434.4Q63.8 435 64.7 435.6Q65.5 436.1 66.4 436.6Q67.3 437 68.2 437.4Q69.2 437.8 70.1 438.1Q71.1 438.4 72.1 438.6Q73.1 438.9 74.1 439Q75.2 439.1 76.2 439.2Q77.3 439.2 78.3 439.2Q79.4 439.2 80.4 439Q81.5 438.9 82.5 438.7Q83.6 438.5 84.6 438.2Q85.6 437.9 86.6 437.5Q87.7 437.1 88.6 436.7Q89.6 436.2 90.6 435.7Q91.5 435.1 92.4 434.5Q93.3 433.9 94.2 433.2Q95.1 432.5 95.9 431.8Q96.7 431 97.5 430.2Q98.2 429.4 98.9 428.5Q99.6 427.6 100.2 426.7Q100.9 425.7 101.4 424.8Q102 423.8 102.5 422.7Q103 421.7 103.4 420.7Q103.8 419.6 104.2 418.5Q104.5 417.4 104.8 416.3Q105 415.2 105.2 414Q105.4 412.9 105.4 412.6Q105.4 412.3 105.3 410.6Q105.3 409 105.2 407Q105.2 405.1 105.1 403.1Q105 401.2 104.9 399.2Q104.8 397.3 104.7 395.3Q104.6 393.3 104.5 391.3Q104.4 389.4 104.3 387.4Q104.2 385.4 104.1 383.4Q104 381.4 103.9 379.4Q103.8 377.3 103.7 375.3Q103.5 373.3 103.4 371.3Q103.3 369.2 103.2 367.2Q103.1 365.1 103 363.1Q102.9 361 102.8 359Q102.7 356.9 102.6 354.9Q102.5 352.8 102.4 350.7Q102.4 348.6 102.3 346.5Q102.2 344.4 102.1 342.3Q102.1 340.2 102 338.1Q102 336.1 107 336Z" fill="#a39ad0"/>
+    <path d="M147.5 336Q141 336 141 338Q141 339.9 141 341.9Q141 343.9 141 345.9Q141.1 347.9 141.1 349.9Q141.1 351.8 141.1 353.8Q141.2 355.8 141.2 357.8Q141.3 359.8 141.3 361.8Q141.3 363.8 141.4 365.8Q141.4 367.9 141.5 369.9Q141.5 371.9 141.6 373.9Q141.6 375.9 141.7 377.9Q141.7 380 141.7 382Q141.8 384 141.8 386Q141.9 388.1 141.9 390.1Q141.9 392.1 141.9 394.2Q142 396.2 142 398.3Q142 400.3 142 402.4Q142 404.4 142 406.5Q142 408.6 141.9 410.8Q141.8 412.9 141.2 415.7Q140.6 418.5 140 420.8Q139.4 423.2 138.6 425.4Q137.8 427.7 136.9 429.9Q136 432.1 134.9 434.3Q133.9 436.4 132.7 438.5Q131.5 440.5 130.1 442.5Q128.8 444.5 127.4 446.3Q125.9 448.2 124.3 450Q122.7 451.7 121 453.4Q119.3 455 117.5 456.6Q115.7 458.1 113.8 459.5Q111.9 460.9 109.9 462.1Q107.9 463.4 105.8 464.5Q103.7 465.6 101.5 466.6Q99.3 467.5 97.1 468.3Q94.8 469.1 92.5 469.7Q90.2 470.4 87.9 470.8Q85.5 471.3 83.1 471.6Q80.7 471.9 78.3 472Q75.9 472.1 73.5 472Q71 471.9 68.6 471.6Q66.2 471.3 63.7 470.8Q61.3 470.4 58.9 469.7Q56.5 469 54.2 468.1Q51.8 467.2 49.6 466.1Q47.3 465 45.1 463.7Q42.9 462.3 40.9 460.8Q38.8 459.2 37 457.5Q35.1 455.7 33.4 453.7Q31.7 451.7 30.2 449.6Q28.8 447.4 27.6 445.1Q26.4 442.8 25.4 440.4Q24.4 437.9 23.7 435.4Q22.9 432.9 22.5 430.3Q22 427.7 21.8 425.1Q21.6 422.4 21.6 419.8Q21.7 417.1 22 414.5Q22.4 411.9 23 409.3Q23.6 406.7 24.5 404.2Q25.4 401.7 26.6 399.3Q27.8 396.9 29.3 394.6Q30.7 392.4 32.4 390.3Q34.1 388.2 36.1 386.4Q38.1 384.5 40.2 382.9Q42.4 381.2 44.8 379.9Q47.2 378.5 49.7 377.5Q52.2 376.5 54.9 375.8Q57.6 375.1 60.3 374.7Q63.1 374.4 65.9 374.4Q68.7 374.5 71.4 374.9Q74.2 375.3 76.9 376.2Q79.6 377 82.2 378.3Q84.7 379.6 87.1 381.2Q89.4 382.9 91.5 385Q93.6 387 95.2 389.5Q96.8 391.9 97.8 394.7Q98.8 397.5 99.2 400.4Q99.6 403.3 99.4 406.2Q99.2 409.1 98.4 411.9Q97.6 414.7 96.3 417.3Q95 419.9 93.1 422.1Q91.3 424.4 89.1 426Q87 427.7 90.7 433.3Q94.5 438.8 97.7 436.3Q101 433.7 103.7 430Q106.5 426.2 108.2 422.2Q109.9 418.1 110.6 413.9Q111.3 409.7 111.1 405.6Q110.9 401.5 109.9 397.6Q108.9 393.7 107.2 390.2Q105.5 386.6 103.3 383.5Q101.1 380.4 98.4 377.8Q95.8 375.2 92.7 373Q89.7 370.9 86.5 369.3Q83.2 367.7 79.8 366.7Q76.4 365.6 72.9 365Q69.4 364.5 65.9 364.4Q62.4 364.4 59 364.8Q55.5 365.3 52.2 366.1Q48.9 367 45.8 368.3Q42.7 369.6 39.7 371.3Q36.8 372.9 34.2 374.9Q31.5 376.9 29.1 379.2Q26.7 381.5 24.6 384.1Q22.6 386.6 20.8 389.3Q19 392.1 17.6 395Q16.2 397.9 15.1 400.9Q14 404 13.2 407.1Q12.5 410.2 12.1 413.4Q11.7 416.5 11.6 419.7Q11.6 422.9 11.8 426Q12.1 429.2 12.7 432.2Q13.2 435.3 14.1 438.3Q15 441.3 16.2 444.2Q17.3 447.1 18.8 449.8Q20.2 452.6 21.9 455.2Q23.6 457.8 25.5 460.2Q27.4 462.6 29.6 464.8Q31.7 467 34 469Q36.3 471 38.8 472.7Q41.3 474.5 43.9 476Q46.5 477.6 49.3 478.9Q52 480.2 54.8 481.2Q57.7 482.3 60.6 483.1Q63.5 483.8 66.4 484.4Q69.4 484.9 72.4 485.2Q75.3 485.5 78.3 485.5Q81.3 485.6 84.3 485.4Q87.2 485.2 90.2 484.7Q93.1 484.2 96 483.6Q98.9 482.9 101.7 482Q104.5 481 107.2 479.9Q110 478.8 112.6 477.4Q115.2 476.1 117.7 474.6Q120.2 473 122.6 471.3Q125 469.6 127.2 467.7Q129.4 465.8 131.5 463.7Q133.6 461.7 135.5 459.4Q137.4 457.2 139.2 454.9Q140.9 452.6 142.5 450.1Q144 447.7 145.4 445.1Q146.8 442.5 147.9 439.9Q149.1 437.3 150.1 434.5Q151.1 431.8 151.9 429Q152.7 426.2 153.3 423.4Q153.9 420.6 154.2 416.9Q154.6 413.2 154.6 410.8Q154.7 408.4 154.7 406.3Q154.7 404.2 154.7 402.1Q154.6 400 154.6 398Q154.6 395.9 154.6 393.8Q154.6 391.7 154.5 389.7Q154.5 387.6 154.5 385.6Q154.4 383.6 154.4 381.5Q154.4 379.5 154.3 377.5Q154.3 375.4 154.2 373.4Q154.2 371.4 154.2 369.4Q154.1 367.4 154.1 365.4Q154.1 363.4 154 361.4Q154 359.4 154 357.4Q153.9 355.5 153.9 353.5Q153.9 351.5 153.9 349.6Q153.9 347.6 153.9 345.7Q153.9 343.7 153.9 341.8Q153.9 339.8 154 337.9Q154 335.9 147.5 336Z" fill="#a39ad0"/>
+    <path d="M120.2 336Q122.9 336 123 338Q123 340.1 123.1 342.1Q123.1 344.1 123.2 346.2Q123.3 348.2 123.3 350.2Q123.4 352.3 123.5 354.3Q123.6 356.3 123.7 358.4Q123.8 360.4 123.9 362.4Q123.9 364.4 124 366.5Q124.1 368.5 124.2 370.5Q124.3 372.5 124.4 374.5Q124.5 376.6 124.6 378.6Q124.7 380.6 124.7 382.6Q124.8 384.6 124.9 386.6Q125 388.7 125 390.7Q125.1 392.7 125.2 394.7Q125.2 396.7 125.3 398.7Q125.3 400.7 125.3 402.7Q125.4 404.7 125.4 406.7Q125.4 408.7 125.3 410.7Q125.2 412.6 124.6 414.2Q123.9 415.8 123.4 417.6Q122.9 419.3 122.2 421Q121.6 422.7 120.9 424.3Q120.2 426 119.4 427.6Q118.6 429.1 117.7 430.7Q116.8 432.2 115.8 433.6Q114.8 435.1 113.8 436.5Q112.7 437.9 111.5 439.2Q110.4 440.5 109.2 441.7Q107.9 442.9 106.6 444.1Q105.3 445.2 103.9 446.3Q102.6 447.3 101.1 448.3Q99.7 449.2 98.2 450.1Q96.7 450.9 95.1 451.7Q93.5 452.4 91.9 453.1Q90.3 453.7 88.6 454.2Q87 454.8 85.3 455.2Q83.6 455.6 81.8 455.9Q80.1 456.2 78.3 456.4Q76.5 456.6 74.7 456.7Q72.9 456.8 71.1 456.7Q69.3 456.7 67.5 456.5Q65.6 456.3 63.7 456Q61.9 455.8 60 455.3Q58.1 454.9 56.3 454.3Q54.4 453.8 52.5 453Q50.6 452.3 48.7 451.4Q46.9 450.5 45 449.5Q43.2 448.4 41.4 447.1Q39.7 445.8 38 444.3Q36.3 442.9 34.8 441.2Q33.3 439.5 32 437.6Q30.7 435.6 29.6 433.6Q28.5 431.5 27.7 429.2Q26.9 427 26.3 424.6Q25.8 422.3 25.6 419.8Q25.4 417.4 25.5 414.9Q25.6 412.4 26 410Q26.4 407.5 27.1 405.1Q27.8 402.7 28.8 400.3Q29.8 398 31.2 395.8Q32.5 393.6 34.1 391.6Q35.7 389.6 37.5 387.8Q39.3 386 41.4 384.4Q43.5 382.9 45.8 381.6Q48.1 380.3 50.5 379.4Q52.9 378.4 55.5 377.8Q58 377.2 60.6 377Q63.2 376.8 65.8 377Q68.5 377.2 71 377.9Q73.5 378.6 75.8 379.6Q78.2 380.7 80.2 382.3Q82.3 383.8 83.9 385.7Q85.6 387.6 86.7 389.8Q87.8 392 88.4 394.3Q89 396.6 89 398.8Q89.1 401.1 88.8 403.1Q88.5 405.1 88 406.9Q87.5 408.6 86.8 410.1Q86.1 411.6 85.2 412.8Q84.4 414 83.5 415Q82.6 416 81.4 416.9Q80.3 417.7 79.5 416.5Q78.7 415.4 79.6 414.7Q80.5 414 81.2 413.3Q81.8 412.6 82.4 411.7Q83 410.7 83.5 409.6Q84 408.5 84.4 407.1Q84.8 405.7 85.1 404.1Q85.4 402.5 85.4 400.6Q85.4 398.8 85 396.8Q84.7 394.8 83.8 392.8Q83 390.8 81.6 389Q80.3 387.2 78.6 385.8Q76.8 384.3 74.8 383.2Q72.7 382.1 70.5 381.4Q68.2 380.7 65.8 380.5Q63.5 380.2 61.1 380.3Q58.7 380.5 56.3 381Q54 381.5 51.7 382.3Q49.5 383.2 47.4 384.4Q45.3 385.5 43.4 387Q41.5 388.4 39.8 390.1Q38.1 391.8 36.7 393.7Q35.2 395.6 34 397.6Q32.9 399.7 32 401.8Q31.1 404 30.5 406.3Q29.9 408.5 29.6 410.8Q29.3 413.1 29.4 415.4Q29.4 417.6 29.7 419.9Q30 422.1 30.6 424.2Q31.2 426.3 32 428.4Q32.9 430.4 34 432.2Q35.1 434.1 36.4 435.7Q37.6 437.4 39.1 438.9Q40.5 440.3 42.1 441.6Q43.6 442.9 45.2 444Q46.9 445.1 48.5 446Q50.2 446.9 51.9 447.7Q53.5 448.5 55.2 449.1Q56.9 449.7 58.6 450.3Q60.3 450.8 61.9 451.2Q63.6 451.5 65.3 451.8Q66.9 452.1 68.6 452.3Q70.2 452.4 71.8 452.5Q73.5 452.6 75.1 452.5Q76.7 452.5 78.3 452.3Q79.9 452.2 81.5 451.9Q83.1 451.6 84.6 451.3Q86.2 450.9 87.7 450.4Q89.2 449.9 90.7 449.4Q92.1 448.8 93.6 448.1Q95 447.4 96.4 446.6Q97.7 445.8 99 445Q100.3 444.1 101.6 443.1Q102.9 442.2 104 441.1Q105.2 440 106.3 438.9Q107.4 437.8 108.5 436.6Q109.5 435.4 110.4 434.1Q111.4 432.8 112.3 431.5Q113.1 430.1 113.9 428.7Q114.7 427.3 115.4 425.8Q116.1 424.4 116.7 422.9Q117.3 421.4 117.9 419.8Q118.4 418.3 118.8 416.7Q119.3 415.1 119.7 413.8Q120.2 412.6 120.3 410.7Q120.3 408.8 120.3 406.8Q120.2 404.8 120.2 402.8Q120.2 400.8 120.1 398.8Q120 396.8 120 394.8Q119.9 392.8 119.8 390.8Q119.7 388.8 119.6 386.8Q119.6 384.8 119.5 382.8Q119.4 380.8 119.3 378.8Q119.2 376.8 119.1 374.7Q119 372.7 118.9 370.7Q118.8 368.7 118.7 366.6Q118.6 364.6 118.5 362.6Q118.4 360.6 118.3 358.5Q118.2 356.5 118.1 354.4Q118 352.4 117.9 350.4Q117.8 348.3 117.7 346.3Q117.6 344.2 117.6 342.2Q117.5 340.1 117.5 338.1Q117.4 336 120.2 336Z" fill="#ffffff"/>
+    <path d="M145.9 347.8Q132 353.3 122.7 359.6M110.9 362.1Q124.9 367 134.5 372.5M146.3 373.9Q132.8 379.6 123.8 385.7M112.3 387.7Q126 392.3 135.2 397.7M146.7 399.1Q133.5 404.5 124.7 410.3M113.3 412.2Q126.5 416.7 134.2 423.6M143.9 428.4Q129.8 430.1 119.8 431.9M108.7 428.2Q118 437.8 122 447.1M128.7 455.2Q115.6 451 106.1 448.4M97.9 440.5Q102.2 452.8 101.8 462.6M104.6 472.5Q94.7 463.3 87.4 457.1M83.3 446.8Q81.9 459.4 77.4 467.8M75.8 477.6Q71.1 465.4 67.3 456.9M68.3 446Q61.7 456.4 54.2 461.8M48.2 469.5Q49.4 456.7 50 447.7M55.8 438.8Q45.5 445 36.6 446.3M28.1 450.3Q34.9 439.9 39.4 432.4M48.5 427.2Q36.8 427.7 28.7 424.7M19.5 424.3Q30.3 418.6 37.7 414.4M47.9 414.4Q37.7 409.3 32.3 402.9M25 397.8Q36.8 398.3 45 398.5M53.5 403.8Q47.5 394.5 46.3 386.4M43.4 378.2Q52.9 384.9 59.4 389.4M63.5 398.4Q63.8 387.6 67.4 380.6M68.8 372.4Q72.7 383 75.3 390.3M73.1 399.8Q79.5 391.4 86.5 388.1M92.8 383.1Q89.2 393.6 86.5 400.6M78.7 406.3Q88.7 404.4 95.8 406.9M103.5 408.4Q93.5 413 86.7 415.3M77.4 412.6Q85 418.9 86.7 426" fill="none" stroke="#a39ad0" stroke-width="6" stroke-linecap="round"/>
+    <path d="M140.3 352.5Q131.5 356.7 125.9 360.9M116.8 366.6Q125.7 370.2 131.4 373.9M140.8 378.6Q132.3 382.8 127 386.9M118.1 391.8Q126.7 395.4 132.2 399M141.2 403.6Q132.9 407.6 127.6 411.4M118.7 414.6Q126.2 419.2 130.4 424.1M136.8 432.1Q127.8 432.8 121.5 433.7M112.1 432.8Q116.8 440 118.5 446M121 455.6Q112.8 452.4 106.9 450.7M99.1 446Q100.3 454.2 99.3 460.1M97.6 469.5Q91.7 463.4 87.3 459.4M82.2 452.1Q79.7 459.7 76.4 464.5M71 472Q68.5 464.1 66.3 458.7M65.2 450.2Q59.8 455.8 54.8 458.5M46.6 462.5Q47.9 454.5 48.4 448.9M51.3 441.2Q44.2 443.6 38.7 443.7M29.9 443.5Q34.6 437.3 37.6 432.7M43.6 427.3Q36.4 426 31.7 423.5M24.3 419.4Q31.3 416.3 36 413.9M43.6 412.3Q38.1 407.8 35.4 403.4M31.5 396.1Q38.8 396.9 43.9 397.3M50.9 400Q48.6 393.5 48.6 388.5M49.6 380.3Q55.1 384.9 59 388M63.3 393.9Q65.1 387.5 68 383.6M72.7 377.6Q74.4 384.4 75.7 389M75.3 396Q80.4 392.2 85 390.9M92.5 389.6Q89.6 395.7 87.5 400M82.6 404.7Q88.7 405.4 92.7 407.8M98.4 412.9Q92 414.6 87.5 415.5M81.3 414Q84.1 419.2 84.2 423.6" fill="none" stroke="#cdc5e8" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M119.3 365.9Q116.4 371.9 118.8 377.7M120.5 391.1Q117.6 396.9 119.9 402.5M121.1 414.5Q117.4 418.3 118.1 423.2M114.3 433.6Q109.4 435.6 108.1 440.1M100.7 447.6Q95.6 447.3 92.5 450.7M82.8 454.1Q78.6 451.7 74.5 453.4M64.9 452.3Q62.3 448.4 58 448.1M50.1 442.9Q49.6 438.3 46.1 436.2M26.3 420Q24.2 414.4 26.9 409.1M32.7 397.6Q33.9 391.8 38.8 388.8M49.9 382.2Q54 378.1 59.7 378.3M71.8 379.2Q77.5 378.4 81.9 382M90.8 390.2Q95.6 393.4 96.5 399M84.1 404Q82.6 406.8 84 409.2M82.7 414.9Q79.8 414.8 83.3 422.2" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    <path d="M145.9 345.2Q132 350.7 122.6 357M110.8 359.5Q124.8 364.4 134.4 369.9M146.2 371.3Q132.7 377 123.7 383.1M112.2 385.1Q125.9 389.7 135.1 395.1M146.6 396.5Q133.4 401.9 124.6 407.7M113.3 409.6Q126.4 414.1 134.2 421M144.5 425.9Q130.5 427.6 120.4 429.4M109.9 425.8Q119.2 435.5 123.2 444.8M130.4 453.2Q117.2 449 107.7 446.4M99.9 438.9Q104.2 451.2 103.9 461M106.9 471.4Q97.1 462.2 89.8 456M85.8 446.2Q84.4 458.8 80 467.2M78.4 477.6Q73.7 465.4 69.9 456.8M70.9 446.6Q64.3 457 56.8 462.4M50.5 470.6Q51.8 457.9 52.3 448.9M57.8 440.5Q47.5 446.7 38.6 448M29.6 452.4Q36.4 442 41 434.5M49.5 429.6Q37.8 430.1 29.6 427.1M19.9 426.9Q30.6 421.2 38 417M47.6 417Q37.3 411.9 31.9 405.4M23.9 400.1Q35.8 400.6 44 400.9M51.9 405.9Q45.9 396.5 44.7 388.4M41.2 379.6Q50.7 386.3 57.2 390.9M61 399.2Q61.3 388.4 64.9 381.3M66.2 372.3Q70.1 383 72.7 390.3M70.7 398.9Q77.1 390.6 84 387.3M90.8 381.4Q87.2 392 84.5 398.9M77.5 404Q87.5 402.1 94.6 404.6M103.3 405.8Q93.4 410.4 86.5 412.7M78.4 410.2Q86 416.5 87.8 423.6" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#roi-barbichon-tresse-volute" fill="none" stroke="#1d1a16" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M108.5 360.2L108.9 373.2Q129 375.5 148.8 371.8L148.4 358.8Q128.3 356.5 108.5 360.2Z" fill="#ffc73a"/>
+  <path d="M108.5 360.2L108.9 373.2 108.9 373.2 108.5 360.2ZM148.4 358.8L148.8 371.8 141.2 372.1 140.7 359.1Z" fill="#d98a1c"/>
+  <path d="M108.5 360.2L108.9 373.2 108.9 373.2 108.5 360.2ZM148.4 358.8L148.8 371.8 145.3 371.9 144.9 358.9Z" fill="#a85a17"/>
+  <path d="M122.8 359.7L123.3 372.7 115.7 373 115.2 360Z" fill="#fff0a6"/>
+  <path d="M108.5 360.2L108.9 373.2Q129 375.5 148.8 371.8L148.4 358.8Q128.3 356.5 108.5 360.2Z" fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M108.6 364.2L148.5 362.8M108.8 369.2L148.7 367.8" fill="none" stroke="#a85a17" stroke-width="1.8"/>
+  <path d="M100.5 436.1L89.4 442.8Q96.4 459.9 108.4 473.9L119.5 467.1Q112.6 450 100.5 436.1Z" fill="#ffc73a"/>
+  <path d="M100.5 436.1L89.4 442.8 89.4 442.8 100.5 436.1ZM119.5 467.1L108.4 473.9 103.2 465.4 114.3 458.6Z" fill="#d98a1c"/>
+  <path d="M100.5 436.1L89.4 442.8 89.4 442.8 100.5 436.1ZM119.5 467.1L108.4 473.9 105.2 468.5 116.3 461.8Z" fill="#a85a17"/>
+  <path d="M105 443.4L93.9 450.2 91 445.4 102.1 438.6Z" fill="#fff0a6"/>
+  <path d="M100.5 436.1L89.4 442.8Q96.4 459.9 108.4 473.9L119.5 467.1Q112.6 450 100.5 436.1Z" fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M97.1 438.1L116.1 469.2M92.8 440.8L111.8 471.8" fill="none" stroke="#a85a17" stroke-width="1.8"/>
+  <circle cx="102.5" cy="451.7" r="3.6" fill="#3b6fe0" stroke="#1d1a16" stroke-width="2"/>
+  <use href="#roi-barbichon-noeud" transform="translate(104.5 455) rotate(58.5) scale(0.8)"/>
+  <path d="M53.1 433.2L49.3 420.8Q32.5 422.9 17.4 430.7L21.3 443.1Q38.1 441 53.1 433.2Z" fill="#ffc73a"/>
+  <path d="M48.8 434.6L45 422.1 49.3 420.8 53.1 433.2ZM21.3 443.1L17.4 430.7 17.6 430.6 21.4 443Z" fill="#d98a1c"/>
+  <path d="M51.7 433.7L47.9 421.2 49.3 420.8 53.1 433.2ZM21.3 443.1L17.4 430.7 17.4 430.7 21.3 443.1Z" fill="#a85a17"/>
+  <path d="M29.1 440.7L25.3 428.2 31.9 426.2 35.8 438.6Z" fill="#fff0a6"/>
+  <path d="M53.1 433.2L49.3 420.8Q32.5 422.9 17.4 430.7L21.3 443.1Q38.1 441 53.1 433.2Z" fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M51.9 429.4L20.1 439.3M50.4 424.6L18.6 434.5" fill="none" stroke="#a85a17" stroke-width="1.8"/>
+  <path d="M79.8 406.1L73.8 414.2Q83 424.7 95.7 430.4L101.7 422.3Q92.5 411.8 79.8 406.1Z" fill="#ffc73a"/>
+  <path d="M79.8 406.1L73.8 414.2 73.8 414.2 79.8 406.1ZM101.7 422.3L95.7 430.4 89.9 426 95.8 418Z" fill="#d98a1c"/>
+  <path d="M79.8 406.1L73.8 414.2 73.8 414.2 79.8 406.1ZM101.7 422.3L95.7 430.4 92.1 427.7 98.1 419.7Z" fill="#a85a17"/>
+  <path d="M85.2 410.1L79.2 418.2 75.7 415.6 81.7 407.6Z" fill="#fff0a6"/>
+  <path d="M79.8 406.1L73.8 414.2Q83 424.7 95.7 430.4L101.7 422.3Q92.5 411.8 79.8 406.1Z" fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M77.4 409.4L99.3 425.5M76.2 411L98.1 427.1" fill="none" stroke="#a85a17" stroke-width="1.8"/>
+  <use href="#roi-barbichon-noeud" transform="translate(87.8 418.3) rotate(36.5) scale(0.5)"/>
+
+  <!-- ===== Main du fond qui tient la tresse ===== -->
+  <path d="M106 349 L 121 333 L 130 340 L 115 356 Z" fill="#ffc73a" stroke="#1d1a16" stroke-width="4" stroke-linejoin="round"/>
+  <use href="#roi-barbichon-main-g" fill="#ffd3b6"/>
+  <g clip-path="url(#roi-barbichon-main-g-clip)">
+    <path d="M150 340 C 146 356 138 366 122 370 L 152 372 Z" fill="#eda08e"/>
+    <path d="M120 346 C 122 341 127 338 133 338" fill="none" stroke="#fff0e2" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <use href="#roi-barbichon-main-g" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M134 345 C 140 344 145 346 148 349 M132 354 C 138 353 144 355 148 358 M128 362 C 134 362 139 364 142 367" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- ===== Sceptre brandi ===== -->
+  <use href="#roi-barbichon-sceptre-tige" fill="#ffc73a"/>
+  <g clip-path="url(#roi-barbichon-sceptre-tige-clip)">
+    <path d="M335 237 L 351 81 L 360 81 L 344 237 Z" fill="#d98a1c"/>
+    <path d="M333 226 L 347 92" fill="none" stroke="#fff0a6" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <use href="#roi-barbichon-sceptre-tige" fill="none" stroke="#1d1a16" stroke-width="4" stroke-linejoin="round"/>
+  <!-- Nœuds d'orfèvrerie le long de la tige. -->
+  <g stroke="#1d1a16" stroke-width="3">
+    <circle cx="333.5" cy="241" r="7.5" fill="#ffc73a"/>
+    <ellipse cx="342" cy="152" rx="10" ry="5.5" fill="#ffc73a" transform="rotate(6 342 152)"/>
+    <ellipse cx="346" cy="114" rx="8" ry="4.5" fill="#ffc73a" transform="rotate(6 346 114)"/>
+    <circle cx="350" cy="86" r="11" fill="#ffc73a"/>
+  </g>
+  <path d="M336 238 C 338 242 338 245 336 247 M347 154 C 345 156 342 157 338 157 M354 89 C 354 94 351 97 346 97" fill="none" stroke="#d98a1c" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="330.5" cy="238" r="2" fill="#fff0a6"/>
+  <circle cx="345.5" cy="81.5" r="3" fill="#fff0a6"/>
+  <circle cx="350" cy="86" r="11" fill="none" stroke="#1d1a16" stroke-width="3"/>
+  <!-- Fleur de lys au sommet. -->
+  <g transform="translate(351 43) rotate(6)">
+    <use href="#roi-barbichon-lys-petales" fill="#ffc73a"/>
+    <g clip-path="url(#roi-barbichon-lys-petales-clip)">
+      <path d="M2 -30 C 10 -18 12 -4 6 14 L 40 14 L 40 -30 Z" fill="#d98a1c"/>
+      <path d="M-3 -22 C -6 -14 -7 -6 -6 2" fill="none" stroke="#fff0a6" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M-28 -6 C -26 -10 -22 -11 -18 -9" fill="none" stroke="#fff0a6" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <use href="#roi-barbichon-lys-petales" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <use href="#roi-barbichon-lys-bande" fill="#ffc73a"/>
+    <g clip-path="url(#roi-barbichon-lys-bande-clip)">
+      <path d="M-16 15 L 16 15 L 16 34 L -16 34 Z" fill="#d98a1c"/>
+      <path d="M2 19 L 12 19 L 12 34 L 2 34 Z" fill="#a85a17"/>
+    </g>
+    <use href="#roi-barbichon-lys-bande" fill="none" stroke="#1d1a16" stroke-width="4" stroke-linejoin="round"/>
+    <ellipse cx="0" cy="14" rx="5" ry="4" fill="#e8384f" stroke="#1d1a16" stroke-width="2.5"/>
+    <circle cx="-1.5" cy="12.8" r="1.4" fill="#ffffff"/>
+  </g>
+  <!-- Poing qui serre la tige, chevalière au doigt. -->
+  <use href="#roi-barbichon-manchette-d" fill="#ffc73a"/>
+  <path d="M332 216 C 338 215 344 216 348 218 L 350 201 C 346 200 341 199 336 199 Z" fill="#d98a1c"/>
+  <use href="#roi-barbichon-manchette-d" fill="none" stroke="#1d1a16" stroke-width="4" stroke-linejoin="round"/>
+  <use href="#roi-barbichon-poing-d" fill="#ffd3b6"/>
+  <g clip-path="url(#roi-barbichon-poing-d-clip)">
+    <path d="M356 172 C 354 190 346 202 330 208 L 360 210 Z" fill="#eda08e"/>
+    <path d="M323 180 C 324 173 329 169 336 168" fill="none" stroke="#fff0e2" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <use href="#roi-barbichon-poing-d" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M320 182 C 328 180 338 181 346 184 M321 192 C 329 190 338 191 346 194" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M325 174 C 330 170 338 170 343 174" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+  <path d="M327 194 L 341 196" fill="none" stroke="#1d1a16" stroke-width="7" stroke-linecap="round"/>
+  <path d="M327 194 L 341 196" fill="none" stroke="#ffc73a" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="334" cy="195" r="3.5" fill="#e8384f" stroke="#1d1a16" stroke-width="2"/>
+
+  <!-- ===== Étincelles dorées ===== -->
+  <g stroke="#1d1a16" stroke-linejoin="round">
+    <g transform="translate(76 66)"><use href="#roi-barbichon-etincelle" fill="#ffd34d" stroke-width="2.5"/></g>
+    <g transform="translate(296 24) scale(0.7)"><use href="#roi-barbichon-etincelle" fill="#ffd34d" stroke-width="3.6"/></g>
+    <g transform="translate(44 128) scale(0.6)"><use href="#roi-barbichon-etincelle" fill="#ffd34d" stroke-width="4.2"/></g>
+    <g transform="translate(132 18) scale(0.55)"><use href="#roi-barbichon-etincelle" fill="#ffd34d" stroke-width="4.5"/></g>
+    <g transform="translate(386 128) scale(0.6)"><use href="#roi-barbichon-etincelle" fill="#ffd34d" stroke-width="4.2"/></g>
+    <g transform="translate(26 350) scale(0.55)"><use href="#roi-barbichon-etincelle" fill="#ffd34d" stroke-width="4.5"/></g>
+  </g>
+  <g fill="#ffffff">
+    <use href="#roi-barbichon-etincelle" transform="translate(76 66) scale(0.4)"/>
+    <use href="#roi-barbichon-etincelle" transform="translate(296 24) scale(0.28)"/>
+  </g>
+  <g fill="#ffd34d" stroke="#1d1a16" stroke-width="1.5">
+    <circle cx="106" cy="30" r="3.2"/>
+    <circle cx="56" cy="96" r="2.6"/>
+    <circle cx="318" cy="60" r="2.6"/>
+    <circle cx="384" cy="92" r="2.4"/>
+    <circle cx="266" cy="14" r="2.4"/>
+    <circle cx="40" cy="380" r="2.4"/>
+  </g>
+</svg>

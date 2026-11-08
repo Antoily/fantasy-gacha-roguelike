@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Emblème Rare : saphir bleu taillé en brillant, vu de profil.
+       Troisième échelon : taille plus riche (couronne et pavillon à facettes alternées),
+       liseré de contre-jour et une première étincelle. Lumière en haut à gauche. -->
+  <defs>
+    <path id="rarity-rare-saphir" d="M20 15 L44 15 L57 28 L32 58 L7 28 Z"/>
+    <clipPath id="rarity-rare-saphir-clip"><use href="#rarity-rare-saphir"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#rarity-rare-saphir-clip)">
+    <!-- Couronne -->
+    <polygon points="7,28 20,15 22,28" fill="#93d2f4"/>
+    <polygon points="20,15 32,15 22,28" fill="#bfe8fb"/>
+    <polygon points="32,15 22,28 42,28" fill="#7cc0ef"/>
+    <polygon points="32,15 44,15 42,28" fill="#4d9de0"/>
+    <polygon points="44,15 57,28 42,28" fill="#2f6fca"/>
+    <!-- Pavillon : facettes alternées qui convergent vers la pointe -->
+    <polygon points="7,28 14.5,28 32,58" fill="#3f8ad8"/>
+    <polygon points="14.5,28 22,28 32,58" fill="#67b0ea"/>
+    <polygon points="22,28 32,28 32,58" fill="#3478d0"/>
+    <polygon points="32,28 42,28 32,58" fill="#2a5bbd"/>
+    <polygon points="42,28 49.5,28 32,58" fill="#23419f"/>
+    <polygon points="49.5,28 57,28 32,58" fill="#182072"/>
+    <!-- Arêtes -->
+    <path d="M20 15 L22 28 L32 15 L42 28 L44 15 M7 28 L57 28 M14.5 28 L32 58 L22 28 M32 28 L32 58 L42 28 M49.5 28 L32 58" fill="none" stroke="#182072" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round" stroke-opacity="0.55"/>
+    <!-- Reflets -->
+    <polygon points="22.2,18.2 28.6,18.2 23.6,24.4" fill="#ffffff"/>
+    <path d="M13.2 26.4 L19.2 20.4" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+    <circle cx="18.5" cy="33" r="1.1" fill="#ffffff"/>
+    <!-- Liseré de contre-jour sur le bord ombré -->
+    <path d="M50.6 30.4 L38.5 45" stroke="#86d0ff" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+  <!-- Contour de silhouette -->
+  <use href="#rarity-rare-saphir" fill="none" stroke="#1d1a16" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- Étincelle -->
+  <path d="M10.5 4.5 Q11.7 9.8 17 11 Q11.7 12.2 10.5 17.5 Q9.3 12.2 4 11 Q9.3 9.8 10.5 4.5 Z" fill="#ffffff" stroke="#1d1a16" stroke-width="1.6" stroke-linejoin="round"/>
+</svg>

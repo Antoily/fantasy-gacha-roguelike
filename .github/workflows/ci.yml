@@ -30,6 +30,9 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npx playwright install --with-deps chromium
+      # Visuels (007) : format et cadrages, puis contraste des textes posés sur le fond.
+      - run: npm run art:check
+      - run: npm run art:contrast
       - run: npm run e2e
         env:
           CI: 'true'

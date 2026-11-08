@@ -1,0 +1,384 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <!-- Croquinet (Commun, créature) : « Hamster aux joues toujours pleines. » Charte : docs/art/charte.md.
+       Lumière en haut à gauche. Trois quarts tourné vers la gauche, tête penchée (rotate 5°) : air béat.
+       Silhouette (7) : masses tracées dessous en 9,5, puis contour 4,5 par-dessus chaque masse ;
+       les frontières entre masses restent donc à 4,5. -->
+  <defs>
+    <!-- ===== Corps ===== -->
+    <path id="croquinet-corps" d="M196 477 C 136 477 84 466 78 424 C 75 406 75 392 77 380 C 73 383 69 384 65 384 C 70 377 73 368 79 362 C 84 340 96 306 118 280 C 140 256 250 250 280 274 C 296 288 308 306 316 328 C 321 333 326 339 329 345 C 326 346 323 347 321 347 C 327 372 330 398 326 420 C 322 466 258 477 196 477 Z"/>
+    <clipPath id="croquinet-corps-clip"><use href="#croquinet-corps"/></clipPath>
+    <!-- Ombre propre du corps (flanc droit + assise), servie au pelage puis au ventre -->
+    <path id="croquinet-corps-ombre" d="M268 266 C 296 290 308 318 308 344 C 303 349 298 352 293 354 C 299 357 304 360 307 364 C 307 384 304 404 298 420 C 293 424 288 426 283 427 C 288 431 291 434 293 438 C 280 456 252 466 220 470 C 184 474 136 470 100 458 L 80 500 L 380 500 L 380 250 Z"/>
+    <path id="croquinet-ventre" d="M104 460 C 96 440 93 420 96 402 C 93 400 90 397 88 393 C 92 394 95 394 98 393 C 101 376 108 360 120 348 C 118 344 117 340 117 336 C 120 339 124 341 128 341 C 146 324 170 314 196 314 C 222 314 242 322 258 335 C 261 331 265 328 269 327 C 268 332 268 337 267 341 C 282 360 290 386 291 410 C 294 413 297 416 300 420 C 296 421 293 422 290 422 C 290 438 289 450 287 461 C 258 475 136 475 104 460 Z"/>
+    <clipPath id="croquinet-ventre-clip"><use href="#croquinet-ventre"/></clipPath>
+    <!-- Pattes arrière (doigts vers nous) -->
+    <path id="croquinet-pied-g" d="M106 469 C 104 452 120 444 138 444 C 158 444 172 454 172 467 C 172 477 163 483 155 481 C 151 486 141 487 137 482 C 131 486 121 485 119 479 C 111 479 107 475 106 469 Z"/>
+    <clipPath id="croquinet-pied-g-clip"><use href="#croquinet-pied-g"/></clipPath>
+    <path id="croquinet-pied-d" d="M226 470 C 224 454 240 446 260 446 C 280 446 294 456 293 470 C 292 478 286 483 280 481 C 276 486 266 487 262 482 C 256 486 246 485 244 480 C 236 481 228 477 226 470 Z"/>
+    <clipPath id="croquinet-pied-d-clip"><use href="#croquinet-pied-d"/></clipPath>
+    <!-- Avant-bras crème qui sortent de sous les joues -->
+    <path id="croquinet-bras-g" d="M134 272 C 142 264 158 264 166 274 L 176 298 C 170 305 156 307 150 301 Z"/>
+    <clipPath id="croquinet-bras-g-clip"><use href="#croquinet-bras-g"/></clipPath>
+    <path id="croquinet-bras-d" d="M262 274 C 254 266 238 266 230 276 L 218 300 C 224 307 238 309 244 303 Z"/>
+    <clipPath id="croquinet-bras-d-clip"><use href="#croquinet-bras-d"/></clipPath>
+    <!-- Menottes roses serrées sur la noisette -->
+    <path id="croquinet-main-g" d="M156 290 C 146 300 144 320 152 332 C 158 340 170 340 177 334 C 182 330 182 323 177 321 C 183 317 183 310 177 308 C 182 303 180 296 174 295 C 168 291 162 288 156 290 Z"/>
+    <clipPath id="croquinet-main-g-clip"><use href="#croquinet-main-g"/></clipPath>
+    <path id="croquinet-main-d" d="M238 292 C 248 302 250 322 242 334 C 236 342 224 342 217 336 C 212 332 212 325 217 323 C 211 319 211 312 217 310 C 212 305 214 298 220 297 C 226 293 232 290 238 292 Z"/>
+    <clipPath id="croquinet-main-d-clip"><use href="#croquinet-main-d"/></clipPath>
+    <!-- Noisette (repère local centré, pointe en haut) -->
+    <path id="croquinet-noisette" d="M0 -38 C 7 -34 34 -24 34 2 C 34 22 19 33 0 33 C -19 33 -34 22 -34 2 C -34 -24 -7 -34 0 -38 Z"/>
+    <clipPath id="croquinet-noisette-clip"><use href="#croquinet-noisette"/></clipPath>
+    <!-- Graine de tournesol (pointe en 0,0, vers +x) -->
+    <path id="croquinet-graine-forme" d="M0 0 C 6 -7 18 -8.5 26 -6.5 C 34 -4.5 34 4.5 26 6.5 C 18 8.5 6 7 0 0 Z"/>
+    <clipPath id="croquinet-graine-clip"><use href="#croquinet-graine-forme"/></clipPath>
+    <g id="croquinet-graine">
+      <use href="#croquinet-graine-forme" fill="#3a363e"/>
+      <g clip-path="url(#croquinet-graine-clip)" fill="none" stroke-linecap="round">
+        <path d="M2 -1.8 C 10 -4.8 20 -5.2 31 -2.6" stroke="#ddd6ca" stroke-width="2.4"/>
+        <path d="M2 1.8 C 10 4.8 20 5.2 31 2.6" stroke="#ddd6ca" stroke-width="2.4"/>
+        <path d="M4 5 C 12 8 22 8.5 32 5" stroke="#26232a" stroke-width="3"/>
+      </g>
+      <use href="#croquinet-graine-forme" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+    </g>
+
+    <!-- ===== Tête (repère local, inclinée par rotate(5 200 262)) ===== -->
+    <ellipse id="croquinet-oreille-g" cx="120" cy="74" rx="31" ry="35" transform="rotate(-22 120 74)"/>
+    <clipPath id="croquinet-oreille-g-clip"><use href="#croquinet-oreille-g"/></clipPath>
+    <ellipse id="croquinet-oreille-g-int" cx="117" cy="77" rx="19" ry="23" transform="rotate(-22 117 77)"/>
+    <clipPath id="croquinet-oreille-g-int-clip"><use href="#croquinet-oreille-g-int"/></clipPath>
+    <ellipse id="croquinet-oreille-d" cx="278" cy="66" rx="33" ry="37" transform="rotate(18 278 66)"/>
+    <clipPath id="croquinet-oreille-d-clip"><use href="#croquinet-oreille-d"/></clipPath>
+    <ellipse id="croquinet-oreille-d-int" cx="272" cy="70" rx="21" ry="25" transform="rotate(18 272 70)"/>
+    <clipPath id="croquinet-oreille-d-int-clip"><use href="#croquinet-oreille-d-int"/></clipPath>
+    <!-- Crâne avec épi de trois mèches -->
+    <path id="croquinet-crane" d="M118 236 C 102 210 98 160 108 132 C 114 112 124 100 134 92 C 146 80 160 72 174 68 C 174 60 178 48 188 42 C 186 50 190 56 198 60 C 196 48 202 40 214 36 C 208 44 210 52 216 58 C 220 50 228 46 238 46 C 232 52 232 58 236 66 C 266 76 290 96 300 130 C 310 164 306 206 292 234 C 274 262 240 272 204 272 C 166 272 134 262 118 236 Z"/>
+    <clipPath id="croquinet-crane-clip"><use href="#croquinet-crane"/></clipPath>
+    <!-- Joue du fond (gauche), petite bosse de provisions en bas -->
+    <path id="croquinet-joue-g" d="M134 168 C 164 174 184 200 182 234 C 180 270 150 294 110 294 C 90 294 72 290 60 280 C 50 282 40 274 40 262 C 34 252 36 240 38 232 C 40 194 80 162 134 168 Z"/>
+    <clipPath id="croquinet-joue-g-clip"><use href="#croquinet-joue-g"/></clipPath>
+    <path id="croquinet-joue-g-creme" d="M20 232 C 28 236 36 239 44 240 C 47 244 50 247 52 251 C 54 247 57 244 60 243 C 68 246 76 248 84 249 C 88 252 91 255 94 259 C 96 255 99 252 102 250 C 110 251 118 251 126 250 C 130 253 134 256 138 259 C 139 255 141 252 144 249 C 152 247 160 245 166 243 C 169 246 172 248 174 251 C 175 247 177 244 180 241 C 186 239 191 237 196 234 L 196 320 L 20 320 Z"/>
+    <clipPath id="croquinet-joue-g-creme-clip"><use href="#croquinet-joue-g-creme"/></clipPath>
+    <path id="croquinet-joue-g-ombre" d="M34 266 C 60 286 106 290 140 276 C 162 266 176 242 178 214 C 178 198 174 186 168 178 L 220 160 L 220 320 L 20 320 Z"/>
+    <!-- Joue de devant (droite), plus grosse, bosse d'une noisette cachée -->
+    <path id="croquinet-joue-d" d="M270 156 C 324 148 366 186 366 226 C 366 252 354 270 336 280 C 338 292 326 300 312 298 C 302 298 296 293 290 293 C 248 293 214 266 214 232 C 212 196 238 162 270 156 Z"/>
+    <clipPath id="croquinet-joue-d-clip"><use href="#croquinet-joue-d"/></clipPath>
+    <path id="croquinet-joue-d-creme" d="M204 236 C 212 240 220 243 228 244 C 231 248 234 251 236 255 C 238 251 241 248 244 247 C 254 249 264 251 274 251 C 278 254 281 257 284 261 C 286 257 289 254 292 252 C 302 252 312 252 322 250 C 326 253 329 256 332 260 C 333 256 335 253 338 250 C 346 248 354 245 360 242 C 363 245 366 248 368 251 L 380 240 L 380 320 L 204 320 Z"/>
+    <clipPath id="croquinet-joue-d-creme-clip"><use href="#croquinet-joue-d-creme"/></clipPath>
+    <path id="croquinet-joue-d-ombre" d="M302 152 C 334 172 348 204 346 240 C 344 266 326 284 300 290 C 270 296 236 286 214 266 L 200 320 L 400 320 L 400 140 Z"/>
+    <path id="croquinet-joue-d-occ" d="M226 198 C 238 206 242 226 234 244 C 228 254 218 260 206 260 L 200 260 L 200 196 Z"/>
+    <!-- Museau crème : deux coussinets à moustaches -->
+    <path id="croquinet-museau" d="M188 190 C 178 184 160 190 158 206 C 156 222 165 234 176 236 C 178 248 186 254 194 254 C 204 254 210 248 211 238 C 224 236 232 224 230 208 C 228 192 208 184 196 190 C 193 188 191 188 188 190 Z"/>
+    <clipPath id="croquinet-museau-clip"><use href="#croquinet-museau"/></clipPath>
+    <ellipse id="croquinet-oeil-g" cx="150" cy="134" rx="18" ry="23"/>
+    <clipPath id="croquinet-oeil-g-clip"><use href="#croquinet-oeil-g"/></clipPath>
+    <ellipse id="croquinet-oeil-d" cx="237" cy="130" rx="23" ry="27"/>
+    <clipPath id="croquinet-oeil-d-clip"><use href="#croquinet-oeil-d"/></clipPath>
+    <path id="croquinet-nez" d="M178 189 C 180 182 198 182 200 189 C 201 196 193 202 189 203 C 185 202 177 196 178 189 Z"/>
+    <clipPath id="croquinet-nez-clip"><use href="#croquinet-nez"/></clipPath>
+    <path id="croquinet-bouche" d="M173 214 C 180 219 186 218 189 213 C 192 218 198 219 205 214 C 205 230 198 240 189 240 C 180 240 173 230 173 214 Z"/>
+    <clipPath id="croquinet-bouche-clip"><use href="#croquinet-bouche"/></clipPath>
+    <!-- Étincelle de contentement -->
+    <path id="croquinet-etincelle" d="M0 -11 C 1.5 -3.5 3.5 -1.5 11 0 C 3.5 1.5 1.5 3.5 0 11 C -1.5 3.5 -3.5 1.5 -11 0 C -3.5 -1.5 -1.5 -3.5 0 -11 Z"/>
+  </defs>
+
+  <!-- Ombre au sol -->
+  <ellipse cx="202" cy="478" rx="152" ry="13" fill="#1d1a16" opacity="0.18"/>
+
+  <!-- Silhouette : masses tracées dessous (la moitié intérieure du trait est recouverte par les aplats) -->
+  <g fill="#1d1a16" stroke="#1d1a16" stroke-width="9.5" stroke-linejoin="round">
+    <use href="#croquinet-corps"/>
+    <use href="#croquinet-pied-g"/>
+    <use href="#croquinet-pied-d"/>
+    <g transform="rotate(5 200 262)">
+      <use href="#croquinet-oreille-g"/>
+      <use href="#croquinet-oreille-d"/>
+      <use href="#croquinet-crane"/>
+      <use href="#croquinet-joue-g"/>
+      <use href="#croquinet-joue-d"/>
+    </g>
+  </g>
+
+  <!-- ===== Corps ===== -->
+  <use href="#croquinet-corps" fill="#f4a646"/>
+  <g clip-path="url(#croquinet-corps-clip)">
+    <path d="M90 424 C 84 392 88 352 106 318 C 98 352 96 390 102 422 Z" fill="#ffd27c"/>
+    <use href="#croquinet-corps-ombre" fill="#d0703c"/>
+    <path d="M86 466 C 140 480 260 480 318 460 L 330 500 L 80 500 Z" fill="#a44a37"/>
+    <!-- Ombre portée de la tête sur le poitrail -->
+    <g transform="rotate(5 200 262) translate(8 12)" fill="#a44a37">
+      <use href="#croquinet-crane"/>
+      <use href="#croquinet-joue-g"/>
+      <use href="#croquinet-joue-d"/>
+    </g>
+    <!-- Poils du flanc -->
+    <g fill="none" stroke-width="2.5" stroke-linecap="round">
+      <path d="M86 398 C 88 403 88 408 86 413" stroke="#d0703c"/>
+      <path d="M84 432 C 86 437 86 442 84 447" stroke="#d0703c"/>
+      <path d="M314 380 C 316 386 316 392 314 398" stroke="#a44a37"/>
+      <path d="M306 440 C 306 446 304 450 300 454" stroke="#a44a37"/>
+    </g>
+    <!-- Ventre crème -->
+    <use href="#croquinet-ventre" fill="#fdecc9"/>
+    <g clip-path="url(#croquinet-ventre-clip)">
+      <path d="M112 448 C 104 418 108 380 128 354 C 120 384 118 416 124 446 Z" fill="#fff8e6"/>
+      <use href="#croquinet-corps-ombre" fill="#e8b694"/>
+      <path d="M86 466 C 140 480 260 480 318 460 L 330 500 L 80 500 Z" fill="#c98a76"/>
+      <g transform="rotate(5 200 262) translate(8 12)" fill="#c98a76">
+        <use href="#croquinet-joue-d"/>
+      </g>
+      <!-- Ombres portées de la noisette et des menottes -->
+      <use href="#croquinet-noisette" transform="translate(206 324) rotate(-14)" fill="#c98a76"/>
+      <use href="#croquinet-main-g" transform="translate(7 9)" fill="#c98a76"/>
+      <use href="#croquinet-main-d" transform="translate(7 9)" fill="#c98a76"/>
+      <g fill="none" stroke-width="2.5" stroke-linecap="round">
+        <path d="M138 438 C 141 432 145 432 148 438 C 151 432 155 432 158 438" stroke="#e8b694"/>
+        <path d="M112 410 C 114 416 114 420 112 425" stroke="#e8b694"/>
+        <path d="M246 446 C 249 440 253 440 256 446" stroke="#c98a76"/>
+      </g>
+    </g>
+  </g>
+  <use href="#croquinet-corps" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- ===== Pattes arrière ===== -->
+  <use href="#croquinet-pied-g" fill="#ffa5b4"/>
+  <g clip-path="url(#croquinet-pied-g-clip)">
+    <path d="M98 442 C 120 452 150 452 178 442 L 178 430 L 98 430 Z" fill="#c4566f"/>
+    <path d="M100 473 C 120 479 150 479 176 461 L 180 500 L 96 500 Z" fill="#e7738f"/>
+    <path d="M115 462 C 118 455 127 451 138 451" fill="none" stroke="#ffd5dc" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#croquinet-pied-g" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M155 481 C 154 476 154 472 156 468 M137 482 C 137 477 137 473 138 469" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <use href="#croquinet-pied-d" fill="#ffa5b4"/>
+  <g clip-path="url(#croquinet-pied-d-clip)">
+    <path d="M218 444 C 240 454 272 454 300 444 L 300 432 L 218 432 Z" fill="#c4566f"/>
+    <path d="M220 474 C 244 480 276 480 298 463 L 300 500 L 216 500 Z" fill="#e7738f"/>
+    <path d="M236 463 C 239 456 248 453 258 453" fill="none" stroke="#ffd5dc" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <use href="#croquinet-pied-d" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M280 481 C 279 476 279 472 281 468 M262 482 C 262 477 262 473 263 469" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- ===== Avant-bras ===== -->
+  <use href="#croquinet-bras-g" fill="#fdecc9"/>
+  <g clip-path="url(#croquinet-bras-g-clip)">
+    <path d="M160 266 C 166 280 170 292 172 306 L 190 306 L 190 260 Z" fill="#e8b694"/>
+    <g transform="rotate(5 200 262) translate(8 12)" fill="#c98a76"><use href="#croquinet-joue-g"/></g>
+  </g>
+  <use href="#croquinet-bras-g" fill="none" stroke="#1d1a16" stroke-width="4" stroke-linejoin="round"/>
+  <use href="#croquinet-bras-d" fill="#fdecc9"/>
+  <g clip-path="url(#croquinet-bras-d-clip)">
+    <path d="M248 268 C 248 284 246 296 242 308 L 270 308 L 270 266 Z" fill="#e8b694"/>
+    <g transform="rotate(5 200 262) translate(8 12)" fill="#c98a76"><use href="#croquinet-joue-d"/></g>
+  </g>
+  <use href="#croquinet-bras-d" fill="none" stroke="#1d1a16" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- ===== Tête ===== -->
+  <g transform="rotate(5 200 262)">
+    <!-- Oreille du fond -->
+    <use href="#croquinet-oreille-g" fill="#f4a646"/>
+    <g clip-path="url(#croquinet-oreille-g-clip)">
+      <path d="M94 78 C 92 60 104 44 122 41 C 108 50 100 62 100 80 Z" fill="#ffd27c"/>
+      <path d="M144 48 C 156 66 154 94 138 110 L 170 120 L 170 40 Z" fill="#d0703c"/>
+      <use href="#croquinet-oreille-g-int" fill="#ffa5b4"/>
+      <g clip-path="url(#croquinet-oreille-g-int-clip)">
+        <path d="M98 84 C 96 66 106 55 121 54 C 109 61 103 71 104 86 Z" fill="#e7738f"/>
+        <path d="M94 98 C 108 104 128 104 142 94 L 142 112 L 94 112 Z" fill="#c4566f"/>
+        <path d="M127 92 C 132 86 134 79 133 71" fill="none" stroke="#ffd5dc" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <use href="#croquinet-oreille-g-int" fill="none" stroke="#1d1a16" stroke-width="2.5"/>
+    </g>
+    <use href="#croquinet-oreille-g" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+    <!-- Oreille de devant -->
+    <use href="#croquinet-oreille-d" fill="#f4a646"/>
+    <g clip-path="url(#croquinet-oreille-d-clip)">
+      <path d="M248 74 C 246 54 258 36 278 32 C 263 42 255 56 255 76 Z" fill="#ffd27c"/>
+      <path d="M302 42 C 316 62 314 92 296 106 L 330 112 L 330 30 Z" fill="#d0703c"/>
+      <use href="#croquinet-oreille-d-int" fill="#ffa5b4"/>
+      <g clip-path="url(#croquinet-oreille-d-int-clip)">
+        <path d="M251 76 C 249 57 259 46 274 45 C 262 52 256 63 257 78 Z" fill="#e7738f"/>
+        <path d="M248 90 C 262 98 284 98 298 88 L 298 108 L 248 108 Z" fill="#c4566f"/>
+        <path d="M282 85 C 288 79 290 71 289 62" fill="none" stroke="#ffd5dc" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <use href="#croquinet-oreille-d-int" fill="none" stroke="#1d1a16" stroke-width="2.5"/>
+    </g>
+    <use href="#croquinet-oreille-d" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+
+    <!-- Crâne -->
+    <use href="#croquinet-crane" fill="#f4a646"/>
+    <g clip-path="url(#croquinet-crane-clip)">
+      <path d="M110 172 C 106 134 124 102 158 82 C 138 104 126 134 126 170 Z" fill="#ffd27c"/>
+      <path d="M240 60 C 276 80 298 118 296 166 C 294 198 284 224 266 246 L 330 280 L 330 30 Z" fill="#d0703c"/>
+      <ellipse cx="146" cy="97" rx="10" ry="5" transform="rotate(-38 146 97)" fill="#ffe6a8"/>
+      <path d="M181 60 C 182 54 185 49 188 45 M204 53 C 205 47 208 42 212 39" fill="none" stroke="#ffd27c" stroke-width="3" stroke-linecap="round"/>
+      <!-- Gorge crème sous le museau -->
+      <path d="M150 244 C 172 256 230 256 262 242 L 262 290 L 150 290 Z" fill="#fdecc9"/>
+      <path d="M216 252 C 234 252 250 248 262 242 L 262 290 L 216 290 Z" fill="#e8b694"/>
+      <use href="#croquinet-museau" transform="translate(3 9)" fill="#c98a76"/>
+      <g fill="none" stroke="#a44a37" stroke-width="2.5" stroke-linecap="round">
+        <path d="M290 112 C 292 118 292 124 290 130"/>
+        <path d="M296 152 C 298 158 298 164 296 170"/>
+      </g>
+    </g>
+    <use href="#croquinet-crane" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+    <!-- Yeux mi-clos : paupière lourde, iris brun, deux reflets -->
+    <use href="#croquinet-oeil-g" fill="#fffaf0"/>
+    <g clip-path="url(#croquinet-oeil-g-clip)">
+      <ellipse cx="147" cy="140" rx="12.5" ry="15" fill="#6b3a22"/>
+      <ellipse cx="147" cy="149" rx="8.5" ry="5.5" fill="#b8743a"/>
+      <ellipse cx="147" cy="141" rx="6.5" ry="8.5" fill="#1d1a16"/>
+      <circle cx="141.5" cy="142.5" r="4.2" fill="#ffffff"/>
+      <circle cx="153" cy="150" r="2" fill="#ffffff"/>
+      <path d="M128 104 L 172 104 L 172 131 C 162 137 138 137 128 131 Z" fill="#f4a646"/>
+      <path d="M128 124 C 140 129 160 129 172 124 L 172 131 C 162 137 138 137 128 131 Z" fill="#d0703c"/>
+    </g>
+    <use href="#croquinet-oeil-g" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+    <path d="M132.5 131 C 140 136.5 160 136.5 167.5 131" fill="none" stroke="#1d1a16" stroke-width="5.5" stroke-linecap="round"/>
+    <use href="#croquinet-oeil-d" fill="#fffaf0"/>
+    <g clip-path="url(#croquinet-oeil-d-clip)">
+      <ellipse cx="233" cy="137" rx="15" ry="18" fill="#6b3a22"/>
+      <ellipse cx="233" cy="147" rx="10.5" ry="6.5" fill="#b8743a"/>
+      <ellipse cx="233" cy="138" rx="8" ry="10" fill="#1d1a16"/>
+      <circle cx="226" cy="140" r="5" fill="#ffffff"/>
+      <circle cx="240.5" cy="148.5" r="2.4" fill="#ffffff"/>
+      <path d="M210 98 L 264 98 L 264 126 C 252 134 222 134 210 126 Z" fill="#f4a646"/>
+      <path d="M210 118 C 224 124 250 124 264 118 L 264 126 C 252 134 222 134 210 126 Z" fill="#d0703c"/>
+    </g>
+    <use href="#croquinet-oeil-d" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+    <path d="M214.5 126.5 C 224 133.5 250 133.5 259.5 126.5" fill="none" stroke="#1d1a16" stroke-width="5.5" stroke-linecap="round"/>
+    <!-- Sourcils hauts et détendus -->
+    <path d="M128 106 C 136 94 154 89 168 94 C 156 97 140 101 130 109 Z" fill="#1d1a16"/>
+    <path d="M214 94 C 224 82 246 79 262 96 C 247 88 227 90 216 98 Z" fill="#1d1a16"/>
+
+    <!-- Joue du fond -->
+    <use href="#croquinet-joue-g" fill="#f4a646"/>
+    <g clip-path="url(#croquinet-joue-g-clip)">
+      <use href="#croquinet-joue-g-ombre" fill="#d0703c"/>
+      <path d="M50 228 C 52 202 74 184 102 180 C 82 192 68 208 64 230 Z" fill="#ffd27c"/>
+      <ellipse cx="80" cy="194" rx="8" ry="4.5" transform="rotate(-32 80 194)" fill="#ffe6a8"/>
+      <use href="#croquinet-joue-g-creme" fill="#fdecc9"/>
+      <g clip-path="url(#croquinet-joue-g-creme-clip)">
+        <use href="#croquinet-joue-g-ombre" fill="#e8b694"/>
+      </g>
+      <ellipse cx="98" cy="250" rx="23" ry="12" fill="#ff7f96" opacity="0.5"/>
+      <path d="M88 254 L 93 245 M97 256 L 102 247 M106 256 L 111 247" fill="none" stroke="#e05f7d" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+    <use href="#croquinet-joue-g" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+
+    <!-- Joue de devant -->
+    <use href="#croquinet-joue-d" fill="#f4a646"/>
+    <g clip-path="url(#croquinet-joue-d-clip)">
+      <use href="#croquinet-joue-d-ombre" fill="#d0703c"/>
+      <use href="#croquinet-joue-d-occ" fill="#a44a37"/>
+      <path d="M230 208 C 236 184 254 168 280 164 C 262 176 250 190 246 212 Z" fill="#ffd27c"/>
+      <ellipse cx="270" cy="175" rx="9" ry="5" transform="rotate(-25 270 175)" fill="#ffe6a8"/>
+      <use href="#croquinet-joue-d-creme" fill="#fdecc9"/>
+      <g clip-path="url(#croquinet-joue-d-creme-clip)">
+        <use href="#croquinet-joue-d-ombre" fill="#e8b694"/>
+        <use href="#croquinet-joue-d-occ" fill="#c98a76"/>
+        <path d="M312 298 C 314 288 324 281 336 280 L 360 300 Z" fill="#c98a76"/>
+      </g>
+      <ellipse cx="300" cy="246" rx="26" ry="13" fill="#ff7f96" opacity="0.5"/>
+      <path d="M289 251 L 294 242 M299 253 L 304 244 M309 253 L 314 244" fill="none" stroke="#e05f7d" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+    <use href="#croquinet-joue-d" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M336 280 C 328 282 320 287 315 294" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Moustaches (racines cachées sous le museau) -->
+    <g fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round">
+      <path d="M162 208 C 142 200 124 196 104 198"/>
+      <path d="M160 216 C 140 214 122 216 102 222"/>
+      <path d="M162 224 C 146 230 130 238 114 248"/>
+      <path d="M226 206 C 246 196 264 192 284 194"/>
+      <path d="M228 214 C 248 212 268 214 288 220"/>
+      <path d="M226 222 C 244 228 260 236 276 246"/>
+    </g>
+
+    <!-- Museau -->
+    <use href="#croquinet-museau" fill="#fdecc9"/>
+    <g clip-path="url(#croquinet-museau-clip)">
+      <path d="M162 216 C 162 202 170 194 180 192 C 172 198 168 206 168 218 Z" fill="#fff8e6"/>
+      <path d="M220 196 C 230 210 228 232 212 244 C 204 252 192 258 178 254 L 196 270 L 250 270 L 250 190 Z" fill="#e8b694"/>
+      <g fill="#c98a76">
+        <circle cx="168" cy="213" r="1.8"/><circle cx="174" cy="221" r="1.8"/><circle cx="166" cy="224" r="1.8"/>
+        <circle cx="214" cy="211" r="1.8"/><circle cx="220" cy="219" r="1.8"/><circle cx="212" cy="224" r="1.8"/>
+      </g>
+    </g>
+    <use href="#croquinet-museau" fill="none" stroke="#1d1a16" stroke-width="4" stroke-linejoin="round"/>
+
+    <!-- Nez -->
+    <use href="#croquinet-nez" fill="#ee7d97"/>
+    <g clip-path="url(#croquinet-nez-clip)">
+      <path d="M189 203 C 196 200 201 194 201 187 L 206 187 L 206 206 Z" fill="#c95470"/>
+      <ellipse cx="184.5" cy="188" rx="4.5" ry="2.6" fill="#ffffff"/>
+    </g>
+    <use href="#croquinet-nez" fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M189 203 L 189 212" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Bouche pleine : dents, langue, graines qui dépassent -->
+    <use href="#croquinet-bouche" fill="#6e2430"/>
+    <g clip-path="url(#croquinet-bouche-clip)">
+      <path d="M179 234 C 183 228 195 228 199 233 C 196 240 182 241 179 234 Z" fill="#ff8d9e"/>
+      <rect x="183.5" y="211" width="5.5" height="10" rx="1.5" fill="#fffaf0" stroke="#1d1a16" stroke-width="2"/>
+      <rect x="189" y="211" width="5.5" height="10" rx="1.5" fill="#fffaf0" stroke="#1d1a16" stroke-width="2"/>
+    </g>
+    <use href="#croquinet-bouche" fill="none" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+    <use href="#croquinet-graine" transform="translate(181 225) rotate(150)"/>
+    <use href="#croquinet-graine" transform="translate(198 224) rotate(24)"/>
+  </g>
+
+  <!-- ===== Noisette serrée ===== -->
+  <g transform="translate(198 314) rotate(-14)">
+    <use href="#croquinet-noisette" fill="#a9622f"/>
+    <g clip-path="url(#croquinet-noisette-clip)">
+      <path d="M-9 -30 C -19 -14 -21 2 -19 14 M9 -30 C 18 -14 20 2 18 14 M0 -34 C 1 -16 1 0 0 12" fill="none" stroke="#8c4c27" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M24 -24 C 32 -8 31 14 18 26 C 8 33 -10 35 -24 30 L -40 44 L 44 44 L 44 -30 Z" fill="#78402a"/>
+      <path d="M-27 -6 C -27 -20 -16 -31 -5 -34 C -15 -26 -21 -16 -21 -4 Z" fill="#d8914f"/>
+      <ellipse cx="-15" cy="-21" rx="6.5" ry="3.2" transform="rotate(-52 -15 -21)" fill="#ffffff"/>
+      <circle cx="-23" cy="-5" r="1.8" fill="#ffffff"/>
+      <path d="M-36 12 C -26 7 -14 10 -6 8 C 2 11 12 7 20 9 C 26 8 32 10 36 13 L 36 40 L -36 40 Z" fill="#ecd5a6"/>
+      <path d="M32 12 C 30 24 16 32 0 33 C -10 34 -20 31 -26 26 L -40 44 L 44 44 L 44 10 Z" fill="#c8a47c"/>
+      <g fill="#a7835d">
+        <circle cx="-20" cy="18" r="1.6"/><circle cx="-10" cy="23" r="1.6"/><circle cx="2" cy="19" r="1.6"/>
+        <circle cx="12" cy="25" r="1.5"/><circle cx="-2" cy="28" r="1.4"/><circle cx="20" cy="17" r="1.4"/>
+      </g>
+      <ellipse cx="0" cy="-35" rx="4" ry="3.5" fill="#57291f"/>
+    </g>
+    <use href="#croquinet-noisette" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M-33 12 C -26 7 -14 10 -6 8 C 2 11 12 7 20 9 C 26 8 30 10 33 13" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- ===== Menottes ===== -->
+  <use href="#croquinet-main-g" fill="#ffa5b4"/>
+  <g clip-path="url(#croquinet-main-g-clip)">
+    <path d="M140 326 C 152 336 168 338 184 330 L 190 350 L 140 350 Z" fill="#e7738f"/>
+    <path d="M151 306 C 152 300 156 295 162 293" fill="none" stroke="#ffd5dc" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#croquinet-main-g" fill="none" stroke="#1d1a16" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M177 321 C 173 321 169 320 166 318 M177 308 C 173 308 169 307 166 305" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+  <use href="#croquinet-main-d" fill="#ffa5b4"/>
+  <g clip-path="url(#croquinet-main-d-clip)">
+    <path d="M206 330 C 220 341 238 339 254 322 L 256 350 L 204 350 Z" fill="#e7738f"/>
+    <path d="M240 300 C 244 304 246 310 246 316" fill="none" stroke="#e7738f" stroke-width="4" stroke-linecap="round"/>
+    <path d="M221 300 C 223 297 226 296 229 296" fill="none" stroke="#ffd5dc" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <use href="#croquinet-main-d" fill="none" stroke="#1d1a16" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M217 323 C 221 323 225 322 228 320 M217 310 C 221 310 225 309 228 307" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- ===== Graines tombées, graine qui s'échappe, effets ===== -->
+  <use href="#croquinet-graine" transform="translate(34 478) rotate(-12)"/>
+  <use href="#croquinet-graine" transform="translate(184 487) rotate(-6)"/>
+  <use href="#croquinet-graine" transform="translate(368 484) rotate(192)"/>
+  <use href="#croquinet-graine" transform="translate(352 340) rotate(66)"/>
+  <g fill="none" stroke="#1d1a16" stroke-linecap="round">
+    <path d="M338 330 C 340 322 344 318 350 316" stroke-width="3"/>
+    <path d="M362 326 C 364 320 368 318 372 318" stroke-width="3"/>
+    <!-- Mâchonnements de part et d'autre des joues -->
+    <path d="M30 194 C 23 203 22 214 25 223" stroke-width="3.5"/>
+    <path d="M18 206 C 14 212 14 219 16 225" stroke-width="3.5"/>
+    <path d="M378 206 C 385 214 386 225 383 234" stroke-width="3.5"/>
+    <path d="M389 220 C 392 226 392 232 390 238" stroke-width="3.5"/>
+  </g>
+  <use href="#croquinet-etincelle" transform="translate(58 104)" fill="#ffe6a8" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+  <use href="#croquinet-etincelle" transform="translate(346 116) scale(0.7)" fill="#ffe6a8" stroke="#1d1a16" stroke-width="3.5" stroke-linejoin="round"/>
+</svg>

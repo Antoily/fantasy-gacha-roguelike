@@ -3,10 +3,11 @@ import { RARITIES, type Rarity } from '../data/gachaConfig';
 import { REVEAL_TIMING } from '../data/revealConfig';
 import type { PullResult } from '../logic/gacha';
 import type { FlipSchedule, RevealKind, RevealPlan } from '../logic/reveal';
-import { flipCues, revealCues, type Cue } from '../logic/soundCues';
+import { crackTimes, flipCues, revealCues, type Cue } from '../logic/soundCues';
+import { orbSize, uiImage } from './art';
 import { GACHA, HEIGHT, REVEAL, WIDTH, resultCardRect, type Rect } from './layout';
 import { Particles, type Shape } from './particles';
-import { COLORS, CSS, FONT_SIZE, RADIUS, REVEAL_FX, STROKE } from './theme';
+import { ART_FX, COLORS, CSS, FONT_SIZE, RADIUS, REVEAL_FX, STROKE } from './theme';
 import { makeOrb, textStyle } from './widgets';
 
 // Minuteries et tweens d'une mise en scène, gardés pour tout arrêter d'un coup quand
@@ -49,7 +50,7 @@ const SHAPES: readonly (readonly Shape[])[] = [
 ];
 
 // Couleurs d'un éclat : la rareté et son or ; l'Ultra rare prend tout l'arc-en-ciel.
-const colorsOf = (rarity: Rarity): number[] =>
+export const colorsOf = (rarity: Rarity): number[] =>
   rarity === 'ultra' ? Object.values(COLORS.rarity) : [COLORS.rarity[rarity], COLORS.rarity[rarity], REVEAL_FX.sparkle];
 
 // Pluie d'étoiles et de confettis sur tout l'écran (Légendaire et Ultra rare).
@@ -136,18 +137,34 @@ export function playReveal(
   const { x, y } = REVEAL.center;
   const t = REVEAL_TIMING;
 
+  // Nuit (révision 2, FR-016) : l'écran plonge dans le noir pendant que l'orbe arrive.
+  const night = uiImage(scene, 'bg-reveal', WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT)
+    ?? scene.add.rectangle(0, 0, WIDTH, HEIGHT, ART_FX.night, ART_FX.nightAlpha).setOrigin(0);
+  night.setAlpha(0);
+  seq.tween({ targets: night, alpha: 1, duration: 300, ease: 'Quad.easeOut' });
+  // Cercle magique sous l'orbe : il s'allume, tourne de plus en plus vite, puis prend la
+  // couleur du palier. Lumière neutre jusque-là : le suspense ne trahit rien (FR-002).
+  const circle = uiImage(scene, 'magic-circle', x, y, REVEAL.circle, REVEAL.circle);
+  const circleScale = circle?.scaleX ?? 1;
+  circle?.setAlpha(0).setTint(ART_FX.crackLight);
+
   const fx = scene.add.container(x, y);
   const orb = makeOrb(scene, GACHA.orb.r).setPosition(GACHA.orb.x, GACHA.orb.y);
-  // Cœur coloré posé sur l'orbe à la révélation : la couleur du palier en aplat.
+  // Ce qui dessine l'orbe intacte, masqué quand elle éclate.
+  const sphere = [...orb.list] as unknown as Phaser.GameObjects.Components.Visible[];
+  // Fissures : trois calques de plus en plus fendus, dans la lumière neutre.
+  const size = orbSize(GACHA.orb.r);
+  const cracks = (['orb-cracks-1', 'orb-cracks-2', 'orb-cracks-3'] as const)
+    .map(name => uiImage(scene, name, 0, 0, size, size)?.setVisible(false).setTint(ART_FX.crackLight) ?? null);
+  // Cœur lumineux qui remplace l'orbe brisée : la couleur du palier.
   const core = scene.add.graphics();
-  const mark = scene.add.text(0, 0, '!', textStyle(FONT_SIZE.title * 1.6)).setOrigin(0.5).setVisible(false);
-  orb.add([core, mark]);
+  orb.add([...cracks.filter(c => c !== null), core]);
   const flash = scene.add.rectangle(0, 0, WIDTH, HEIGHT, COLORS.panel, 1).setOrigin(0).setAlpha(0);
   const label = scene.add.text(x, REVEAL.labelY, '', { ...textStyle(FONT_SIZE.title), stroke: CSS.outline, strokeThickness: 6 })
     .setOrigin(0.5).setAlpha(0);
   const hint = scene.add.text(x, REVEAL.hintY, 'Touche pour passer', textStyle(FONT_SIZE.small, CSS.textFaint))
     .setOrigin(0.5);
-  modal.add([fx, orb, flash]);
+  modal.add([night, ...(circle ? [circle] : []), fx, orb, flash]);
   const particles = new Particles(scene, modal, 1);
   modal.add([label, hint]);
   // Halo qui bat autour de l'orbe, de plus en plus vite : le cœur du joueur.
@@ -155,41 +172,85 @@ export function playReveal(
   halo.lineStyle(STROKE.thick, REVEAL_FX.heartbeat, 1).strokeCircle(0, 0, GACHA.orb.r * REVEAL.orbScale + 6);
   modal.addAt(halo, modal.getIndex(orb));
 
-  // Suspense, identique pour tous les paliers (FR-002) : l'orbe gagne le centre, grossit,
-  // aspire de l'énergie et tremble de plus en plus ; un halo bat de plus en plus vite.
+  // Suspense en trois temps, identique pour tous les paliers (FR-002, FR-016) : l'orbe gagne
+  // le centre au-dessus du cercle et aspire l'énergie ; elle se fissure trois fois en
+  // tremblant de plus en plus ; tout se fige ; puis elle éclate.
   seq.tween({ targets: orb, x, y, scale: REVEAL.orbScale, duration: 400, ease: 'Cubic.easeOut' });
+  let spin: Phaser.Tweens.Tween | null = null;
+  if (circle) {
+    seq.tween({ targets: circle, alpha: 0.85, duration: 500, delay: 200 });
+    spin = seq.tween({ targets: circle, angle: REVEAL.circleTurn, duration: t.suspense - t.freeze, ease: 'Cubic.easeIn' });
+  }
   let shake = seq.tween({
-    targets: orb, angle: { from: -3, to: 3 }, duration: 70, yoyo: true, repeat: -1, delay: 400,
+    targets: orb, angle: { from: -2, to: 2 }, duration: 80, yoyo: true, repeat: -1, delay: 400,
   });
-  seq.at(Math.round(t.suspense * 0.7), () => {
+  crackTimes().forEach((at, i) => seq.at(at, () => {
+    // Fissure : le calque suivant, un à-coup, des éclats de verre ; le tremblement s'emballe.
+    cracks.forEach((c, j) => c?.setVisible(j === i));
     shake.stop();
-    shake = seq.tween({ targets: orb, angle: { from: -7, to: 7 }, duration: 45, yoyo: true, repeat: -1 });
-  });
+    const amp = 3 + 2 * i;
+    orb.setAngle(amp * 1.6);
+    shake = seq.tween({ targets: orb, angle: { from: -amp, to: amp }, duration: 60 - 8 * i, yoyo: true, repeat: -1 });
+    particles.burst({
+      x, y, count: 8 + 6 * i, colors: [ART_FX.glass, ART_FX.crackLight], shapes: ['shard', 'spark'],
+      speed: [90, 220], size: [2.5, 4.5], life: [300, 520],
+      spawnRadius: [GACHA.orb.r * 0.6, GACHA.orb.r * REVEAL.orbScale], gravity: 300, drag: 1,
+    });
+  }));
   const charge = {
-    x, y, colors: REVEAL_FX.charge, shapes: ['spark', 'dot'] as Shape[],
-    radius: [110, 200] as const, size: [2, 4] as const, life: [280, 420] as const,
+    x, y, colors: REVEAL_FX.charge, shapes: ['spark', 'dot', 'glow'] as Shape[],
+    radius: [110, 210] as const, size: [2, 4] as const, life: [280, 420] as const,
   };
-  seq.at(150, () => particles.stream(() => particles.converge(charge, 1), 20, 110, t.suspense - 350));
-  for (const beat of [0.4, 0.62, 0.78, 0.9]) {
+  seq.at(150, () => particles.stream(() => particles.converge(charge, 1), 30, 180, t.suspense - t.freeze - 150));
+  // Temps figé : plus de tremblement ni d'aspiration, silence ; l'orbe se gonfle à peine.
+  seq.at(t.suspense - t.freeze, () => {
+    shake.stop();
+    orb.setAngle(0);
+    particles.stopStreams();
+    spin?.pause();
+    halo.setAlpha(0);
+    seq.tween({ targets: orb, scale: REVEAL.orbScale * 1.06, duration: t.freeze, ease: 'Quad.easeIn' });
+  });
+  for (const beat of [0.3, 0.46, 0.6, 0.71, 0.8, 0.87]) {
     seq.at(Math.round(t.suspense * beat), () => {
       halo.setScale(1).setAlpha(REVEAL_FX.heartbeatAlpha);
       seq.tween({ targets: halo, scale: 1.3, alpha: 0, duration: 220, ease: 'Quad.easeOut' });
     });
   }
 
+  let shattered = false;
   const burst = (rarity: Rarity, last: boolean) => {
     const k = rankOf(rarity);
     const color = COLORS.rarity[rarity];
+    // Premier éclat : l'orbe vole en éclats de verre (FR-017).
+    if (!shattered) {
+      shattered = true;
+      sphere.forEach(o => o.setVisible(false));
+      cracks.forEach(c => c?.setVisible(false));
+      particles.burst({
+        x, y, count: REVEAL.shards[k]!, colors: [ART_FX.glass, ART_FX.crackLight, color], shapes: ['shard'],
+        speed: [180, 440], size: [4, 8], life: [600, 1000],
+        spawnRadius: [10, GACHA.orb.r * REVEAL.orbScale * 0.8], gravity: 380, drag: 0.6,
+      });
+    }
+    if (circle) {
+      scene.tweens.killTweensOf(circle);
+      circle.setTint(color).setAlpha(1).setScale(circleScale * 1.15);
+      seq.tween({ targets: circle, scale: circleScale, duration: 400, ease: 'Cubic.easeOut' });
+      seq.tween({ targets: circle, angle: circle.angle + 40, duration: 3000 });
+    }
     // Une transition encore en cours (leurre qui se dégonfle) écraserait ce palier.
     scene.tweens.killTweensOf([fx, orb, ...fx.list]);
     fx.removeAll(true);
     fx.setScale(1).setAlpha(1).setAngle(0).setPosition(x, y);
     orb.setScale(REVEAL.orbScale).setAngle(0).setPosition(x, y);
 
+    const or = GACHA.orb.r;
     core.clear();
-    core.fillStyle(color, 1).fillCircle(0, 0, GACHA.orb.r);
-    core.lineStyle(STROKE.thick, COLORS.ink, 1).strokeCircle(0, 0, GACHA.orb.r);
-    mark.setVisible(true);
+    core.fillStyle(color, 1).fillCircle(0, 0, or);
+    core.fillStyle(COLORS.panel, 0.35).fillCircle(-or * 0.22, -or * 0.22, or * 0.6);
+    core.fillStyle(COLORS.panel, 0.7).fillCircle(-or * 0.32, -or * 0.32, or * 0.22);
+    core.lineStyle(STROKE.thick, COLORS.ink, 1).strokeCircle(0, 0, or);
     seq.tween({
       targets: orb, scale: REVEAL.orbScale * REVEAL.pulse[k]!, duration: 180, yoyo: true, ease: 'Quad.easeOut',
     });
@@ -232,13 +293,18 @@ export function playReveal(
       speed: [speed * 0.3, speed], size: [3, 5 + 1.5 * k], life: [500, 900 + 180 * k],
       spawnRadius: [GACHA.orb.r * 0.6, GACHA.orb.r * REVEAL.orbScale], gravity: k >= 2 ? 260 : 60, drag: 1.1,
     });
+    // Lueurs additives : la lumière du palier qui inonde la nuit.
+    particles.burst({
+      x, y, count: REVEAL.glows[k]!, colors: colorsOf(rarity), shapes: ['glow'],
+      speed: [30, 150], size: [8, 14 + 2 * k], life: [500, 950], spawnRadius: [0, GACHA.orb.r],
+    });
 
     // Éclair plein écran, secousse et pluie d'étoiles pour les deux plus hauts paliers.
     if (k >= 3) {
       flash.setFillStyle(color, 1);
       seq.tween({ targets: flash, alpha: { from: 0, to: REVEAL_FX.flashAlpha }, duration: 140, yoyo: true });
       seq.tween({ targets: [fx, orb], x: x + 2 * k, duration: 40, yoyo: true, repeat: 3, ease: 'Sine.easeInOut' });
-      rain(particles, rarity, t.final[rarity], k === 4 ? 45 : 25);
+      rain(particles, rarity, t.final[rarity], k === 4 ? 90 : 50);
     }
 
     // Le nom de la rareté n'apparaît qu'au vrai palier : une fausse piste reste muette.
@@ -267,6 +333,7 @@ export function playReveal(
         angle: [0, Math.PI], spawnRadius: [10, GACHA.orb.r], size: [2, 4], life: [500, 800], gravity: 420,
       });
       seq.tween({ targets: fx, scale: 0.2, alpha: 0, duration: t.transition, ease: 'Cubic.easeIn' });
+      if (circle) seq.tween({ targets: circle, alpha: 0.3, duration: t.transition });
       seq.tween({ targets: orb, scale: REVEAL.orbScale * 0.8, duration: t.transition, ease: 'Cubic.easeIn' });
     }
   };
@@ -297,7 +364,7 @@ interface FlipCard {
   readonly rarity: Rarity;
   readonly pivot: Phaser.GameObjects.Container;
   readonly face: Phaser.GameObjects.Container;
-  readonly back: readonly (Phaser.GameObjects.Graphics | Phaser.GameObjects.Text)[];
+  readonly back: readonly (Phaser.GameObjects.Graphics | Phaser.GameObjects.Text | Phaser.GameObjects.Image)[];
   // Lueur de la rareté autour du dos, pendant l'anticipation.
   readonly glow: Phaser.GameObjects.Graphics;
 }
@@ -313,13 +380,19 @@ function makeFlipCard(
   const pad = REVEAL_FX.glowStroke / 2;
   glow.lineStyle(REVEAL_FX.glowStroke, COLORS.rarity[rarity], 1)
     .strokeRoundedRect(-r.w / 2 - pad, -r.h / 2 - pad, r.w + 2 * pad, r.h + 2 * pad, RADIUS + pad);
-  const g = scene.add.graphics();
-  g.fillStyle(REVEAL_FX.cardBack, 1).fillRoundedRect(-r.w / 2, -r.h / 2, r.w, r.h, RADIUS);
-  g.lineStyle(STROKE.base, COLORS.ink, 1).strokeRoundedRect(-r.w / 2, -r.h / 2, r.w, r.h, RADIUS);
-  const mark = scene.add.text(0, 0, '?', textStyle(FONT_SIZE.title)).setOrigin(0.5);
-  pivot.add([glow, face, g, mark]);
+  // Dos illustré (007) ; en repli, l'aplat et le « ? » d'avant.
+  const art = uiImage(scene, 'card-back', 0, 0, r.w, r.h);
+  let back: FlipCard['back'];
+  if (art) back = [art];
+  else {
+    const g = scene.add.graphics();
+    g.fillStyle(REVEAL_FX.cardBack, 1).fillRoundedRect(-r.w / 2, -r.h / 2, r.w, r.h, RADIUS);
+    g.lineStyle(STROKE.base, COLORS.ink, 1).strokeRoundedRect(-r.w / 2, -r.h / 2, r.w, r.h, RADIUS);
+    back = [g, scene.add.text(0, 0, '?', textStyle(FONT_SIZE.title)).setOrigin(0.5)];
+  }
+  pivot.add([glow, face, ...back]);
   modal.add(pivot);
-  return { r, rarity, pivot, face, back: [g, mark], glow };
+  return { r, rarity, pivot, face, back, glow };
 }
 
 // Retournement du ×10, une carte à la fois, au calendrier de la logique

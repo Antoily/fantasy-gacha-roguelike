@@ -10,19 +10,24 @@ import {
   type Progression, type PullCount,
 } from '../logic/progression';
 import { featuredRatePercent, formatPercent, ratePercent, rarityTable } from '../logic/rates';
+import { presentations } from '../logic/presentation';
 import { flipSchedule, planReveal } from '../logic/reveal';
 import { SETTINGS_KEY, serializeSettings, type Settings } from '../logic/settings';
 import { SAVE_KEY, serializeSave, type SaveStatus } from '../logic/save';
+import { ART_READY, uiImage } from '../ui/art';
+import { R } from '../ui/display';
 import {
-  COLLECTION, CONFIRM_DIALOG_H, DIALOG, GACHA, RESULTS, REVEAL, WARNING_DIALOG_H,
+  COLLECTION, CONFIRM_DIALOG_H, DIALOG, GACHA, HEIGHT, RESULTS, REVEAL, WARNING_DIALOG_H, WIDTH,
   center, ratesDialogH, collectionCellRect, dialogButtons, dialogRect, resultCardRect, type Rect,
 } from '../ui/layout';
 import { Particles } from '../ui/particles';
 import { celebrateSingle, playFlip, playReveal, sparkleBest, type Sequence } from '../ui/reveal';
+import { playSplash } from '../ui/splash';
 import { Sfx } from '../ui/sfx';
-import { COLORS, CSS, FONT_SIZE, STROKE } from '../ui/theme';
+import { ART_FX, COLORS, CSS, FONT_SIZE, STROKE } from '../ui/theme';
 import {
-  makeButton, makeModal, makeOrb, makePanel, makeResultCard, makeShardAmount, makeShardIcon, textStyle, type Button,
+  makeButton, makeEmblem, makeModal, makeOrb, makePanel, makePortrait, makeResultCard, makeShardAmount, makeShardIcon,
+  textStyle, type Button,
 } from '../ui/widgets';
 
 // Délai avant qu'un appui passe l'animation : un double appui sur « Tirer » ne doit
@@ -45,6 +50,11 @@ export class GachaScene extends Phaser.Scene {
   private orb!: Phaser.GameObjects.Container;
   private sfx!: Sfx;
   private muteIcon!: Phaser.GameObjects.Graphics;
+  // Icônes illustrées du son (007), à la place du dessin quand elles existent.
+  private muteImages: { on: Phaser.GameObjects.Image; off: Phaser.GameObjects.Image } | null = null;
+  private bannerPortrait: Phaser.GameObjects.Container | null = null;
+  // Bandeaux clairs sous les textes posés sur le fond (FR-008), redessinés à chaque refresh.
+  private textPlates!: Phaser.GameObjects.Graphics;
   private currencyText!: Phaser.GameObjects.Text;
   private counterText!: Phaser.GameObjects.Text;
   private shardsText!: Phaser.GameObjects.Text;
@@ -61,6 +71,9 @@ export class GachaScene extends Phaser.Scene {
   }
 
   create(data: GachaData) {
+    // Rendu à la densité de l'écran (ADR 0007) : la scène reste en coordonnées 360 × 640.
+    this.cameras.main.setZoom(R).centerOn(WIDTH / 2, HEIGHT / 2);
+    uiImage(this, 'bg-main', WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT);
     this.progression = data.progression;
     this.modalOpen = false;
     this.sfx = new Sfx(this, data.settings.muted);
@@ -78,6 +91,7 @@ export class GachaScene extends Phaser.Scene {
       { ...textStyle(FONT_SIZE.body, CSS.textDim), align: 'center', wordWrap: { width: GACHA.pullSingle.w } })
       .setOrigin(0.5, 0);
 
+    this.textPlates = this.add.graphics();
     this.pityText = this.add.text(GACHA.orb.x, GACHA.pityLineY, '', textStyle(FONT_SIZE.body, CSS.textDim)).setOrigin(0.5);
     this.featuredText = this.add.text(GACHA.orb.x, GACHA.featuredLineY, '', textStyle(FONT_SIZE.body)).setOrigin(0.5);
     makeButton(this, GACHA.collection, 'Collection', COLORS.btn.secondary, () => this.showCollection());
@@ -85,6 +99,10 @@ export class GachaScene extends Phaser.Scene {
     makeButton(this, GACHA.reset, 'Recommencer', COLORS.btn.neutral, () => this.showResetConfirm());
 
     this.refresh();
+    // Les illustrations arrivent juste après l'écran (SC-004) : le portrait de la vedette suit.
+    const onArt = () => this.refresh();
+    this.game.events.on(ART_READY, onArt);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.game.events.off(ART_READY, onArt));
     // Signal pour le test de bout en bout : l'écran est prêt à recevoir des appuis.
     document.body.dataset.ready = 'gacha';
     if (data.status === 'corrupted') {
@@ -98,9 +116,11 @@ export class GachaScene extends Phaser.Scene {
     makePanel(this, h);
     const coinX = h.x + 26;
     const cy = h.y + h.h / 2;
-    const coin = this.add.graphics();
-    coin.fillStyle(COLORS.coin, 1).fillCircle(coinX, cy, 12);
-    coin.lineStyle(STROKE.thin, COLORS.ink, 1).strokeCircle(coinX, cy, 12);
+    if (!uiImage(this, 'icon-coin', coinX, cy, 30, 30)) {
+      const coin = this.add.graphics();
+      coin.fillStyle(COLORS.coin, 1).fillCircle(coinX, cy, 12);
+      coin.lineStyle(STROKE.thin, COLORS.ink, 1).strokeCircle(coinX, cy, 12);
+    }
     this.currencyText = this.add.text(coinX + 20, cy, '', textStyle(FONT_SIZE.big)).setOrigin(0, 0.5);
     this.counterText = this.add.text(h.x + h.w - 16, cy, '', textStyle(FONT_SIZE.big)).setOrigin(1, 0.5);
     const shardX = h.x + h.w / 2 - 6;
@@ -123,12 +143,21 @@ export class GachaScene extends Phaser.Scene {
       this.drawMuteIcon();
     });
     this.muteIcon = this.add.graphics();
+    const { x, y } = center(r);
+    const on = uiImage(this, 'icon-sound-on', x, y, 30, 30);
+    const off = uiImage(this, 'icon-sound-off', x, y, 30, 30);
+    this.muteImages = on && off ? { on, off } : null;
     this.drawMuteIcon();
   }
 
   private drawMuteIcon() {
     const { x, y } = center(GACHA.mute);
     const g = this.muteIcon.clear();
+    if (this.muteImages) {
+      this.muteImages.on.setVisible(!this.sfx.isMuted);
+      this.muteImages.off.setVisible(this.sfx.isMuted);
+      return;
+    }
     const V = Phaser.Math.Vector2;
     g.fillStyle(COLORS.ink, 1);
     g.fillRect(x - 11, y - 4, 6, 8);
@@ -156,6 +185,7 @@ export class GachaScene extends Phaser.Scene {
     for (const [r, step] of [[GACHA.bannerPrev, -1], [GACHA.bannerNext, 1]] as const) {
       makeButton(this, r, '', COLORS.btn.neutral, () => this.onCycleBanner(step));
       const c = center(r);
+      if (uiImage(this, 'icon-arrow', c.x, c.y, 28, 28)?.setFlipX(step < 0)) continue;
       const tip = step * 6;
       this.add.graphics().fillStyle(COLORS.ink, 1)
         .fillPoints([new V(c.x + tip, c.y), new V(c.x - tip, c.y - 8), new V(c.x - tip, c.y + 8)], true);
@@ -191,8 +221,16 @@ export class GachaScene extends Phaser.Scene {
     // Signal pour l'e2e : la bannière active, sans lire le canvas.
     document.body.dataset.banner = banner.id;
     const vedette = banner.featured;
+    // Portrait de la vedette dans le bandeau (007, FR-005) ; le texte se centre à côté.
+    this.bannerPortrait?.destroy();
+    this.bannerPortrait = null;
+    const b = GACHA.banner;
+    const textX = vedette ? b.x + 34 + (b.w - 34) / 2 : b.x + b.w / 2;
+    this.bannerName.setX(textX);
+    this.bannerDetail.setX(textX);
     if (vedette) {
       const count = p.owned[vedette.id] ?? 0;
+      this.bannerPortrait = makePortrait(this, b.x + 20, b.y + b.h / 2, 30, vedette, true);
       this.bannerName.setText(vedette.name);
       this.bannerDetail.setText(
         `${rarityLabel(vedette.rarity)} · ${count > 0 ? `possédé ×${count}` : 'pas encore obtenu'}`);
@@ -205,6 +243,7 @@ export class GachaScene extends Phaser.Scene {
       ? `Prochain ${rarityLabel(vedette.rarity)} garanti\u00a0: ${vedette.name}`
       : '');
     document.body.dataset.featuredLine = this.featuredText.text;
+    this.drawTextPlates();
     const single = canAfford(p, 1);
     const ten = canAfford(p, 10);
     this.singleButton.setEnabled(single);
@@ -217,6 +256,20 @@ export class GachaScene extends Phaser.Scene {
           ? `Pas assez de pièces pour un ×10 (il en faut ${formatAmount(GACHA_CONFIG.costTen)}).`
           : '',
     );
+  }
+
+  // Un bandeau par bloc de texte non vide, à la largeur du texte.
+  private drawTextPlates() {
+    const g = this.textPlates.clear().fillStyle(ART_FX.textPlate, ART_FX.textPlateAlpha);
+    const lines = [this.pityText, this.featuredText].filter(t => t.text !== '');
+    if (lines.length > 0) {
+      const w = Math.max(...lines.map(t => t.width)) + 24;
+      const top = Math.min(...lines.map(t => t.y - t.height / 2)) - 4;
+      const bottom = Math.max(...lines.map(t => t.y + t.height / 2)) + 4;
+      g.fillRoundedRect(GACHA.orb.x - w / 2, top, w, bottom - top, (bottom - top) / 2 > 12 ? 12 : (bottom - top) / 2);
+    }
+    const s = this.shortageText;
+    if (s.text !== '') g.fillRoundedRect(s.x - s.width / 2 - 12, s.y - 4, s.width + 24, s.height + 8, 12);
   }
 
   private onPull(count: PullCount) {
@@ -254,11 +307,53 @@ export class GachaScene extends Phaser.Scene {
       delete document.body.dataset.reveal;
       this.orb.setVisible(true);
       this.closeModal(modal);
+      // Présentations plein écran (007, FR-003), même quand la révélation est passée : au ×1
+      // avant la carte, au ×10 par-dessus les résultats, dans l'ordre de retournement.
+      const queue = presentations(results, plan.flipOrder);
+      const counts = runningCounts(results, ownedBefore);
+      if (results.length === 1) {
+        this.showSplashes(queue, results, counts, () => this.showResults(results, ownedBefore));
+        return;
+      }
       // Passer montre tout de suite toutes les cartes, déjà retournées (FR-006).
-      this.showResults(results, ownedBefore, skipped ? undefined : plan.flipOrder);
+      this.showResults(results, ownedBefore, skipped ? undefined : plan.flipOrder,
+        () => this.showSplashes(queue, results, counts, () => {}));
     };
     const seq = playReveal(this, modal, plan, cue => this.sfx.play(cue), () => finish(false));
     this.addSkipZone(modal, seq, SKIP_ARM_MS, () => finish(true));
+  }
+
+  // Présentations à la suite (007) ; `done` quand la dernière est fermée. Au ×1, aucune
+  // fenêtre n'est ouverte dessous : le verrou reste tenu jusqu'à la carte.
+  private showSplashes(queue: readonly number[], results: PullResult[], counts: readonly number[], done: () => void) {
+    const under = document.body.dataset.modal;
+    const next = (i: number) => {
+      if (i >= queue.length) {
+        if (under) document.body.dataset.modal = under;
+        else {
+          delete document.body.dataset.modal;
+          this.modalOpen = false;
+        }
+        done();
+        return;
+      }
+      const index = queue[i]!;
+      this.modalOpen = true;
+      document.body.dataset.modal = 'splash';
+      delete document.body.dataset.skip;
+      document.body.dataset.splash = results[index]!.item.id;
+      const modal = this.add.container(0, 0).setDepth(200);
+      // Voile transparent : rien de ce qui est dessous ne réagit pendant la présentation.
+      modal.add(this.add.rectangle(0, 0, WIDTH, HEIGHT, COLORS.ink, 0).setOrigin(0).setInteractive());
+      const seq = playSplash(this, modal, results[index]!, counts[index]!, () => {
+        seq.stop();
+        modal.destroy();
+        delete document.body.dataset.splash;
+        delete document.body.dataset.skip;
+        next(i + 1);
+      });
+    };
+    next(0);
   }
 
   // Zone plein écran au-dessus de tout le contenu de la fenêtre.
@@ -267,8 +362,13 @@ export class GachaScene extends Phaser.Scene {
     const zone = this.add.zone(r.x, r.y, r.w, r.h).setOrigin(0);
     zone.on('pointerup', onTap);
     modal.add(zone);
-    if (armMs === 0) zone.setInteractive();
-    else seq.at(armMs, () => zone.setInteractive());
+    // Signal pour l'e2e : sur un runner lent, l'armement tombe plus tard qu'un délai fixe.
+    const arm = () => {
+      zone.setInteractive();
+      document.body.dataset.skip = 'armed';
+    };
+    if (armMs === 0) arm();
+    else seq.at(armMs, arm);
     return zone;
   }
 
@@ -285,6 +385,7 @@ export class GachaScene extends Phaser.Scene {
   private openModal(name: string): Phaser.GameObjects.Container {
     this.modalOpen = true;
     document.body.dataset.modal = name;
+    delete document.body.dataset.skip;
     return makeModal(this);
   }
 
@@ -292,24 +393,24 @@ export class GachaScene extends Phaser.Scene {
     modal.destroy();
     this.modalOpen = false;
     delete document.body.dataset.modal;
+    delete document.body.dataset.skip;
   }
 
   // `flipOrder` donné (×10 regardé jusqu'au bout) : les cartes arrivent face cachée et
   // se retournent dans cet ordre (FR-008). Sinon elles sont toutes visibles d'emblée.
   private showResults(
     results: PullResult[], ownedBefore: Readonly<Record<string, number>>, flipOrder?: readonly number[],
+    onShown: () => void = () => {},
   ) {
     const flip = flipOrder !== undefined && results.length > 1;
     const modal = this.openModal(flip ? 'flip' : 'results');
-    // Chaque carte affiche le nombre d'exemplaires atteint À CE résultat : deux doublons
-    // d'une même salve montrent ×2 puis ×3, pas deux fois le total final.
-    const running: Record<string, number> = { ...ownedBefore };
-    const counts = results.map(r => (running[r.item.id] = (running[r.item.id] ?? 0) + 1));
+    const counts = runningCounts(results, ownedBefore);
     const addOk = () =>
       modal.add(makeButton(this, RESULTS.ok, 'OK', COLORS.btn.primary, () => this.closeModal(modal)).container);
     if (results.length === 1) {
       const r = RESULTS.single;
-      modal.add(this.add.text(r.x + r.w / 2, r.y - 40, 'Tu as obtenu…', textStyle(FONT_SIZE.big)).setOrigin(0.5));
+      // Titre entre l'en-tête et la carte agrandie (007), sans chevaucher l'en-tête.
+      modal.add(this.add.text(r.x + r.w / 2, r.y - 22, 'Tu as obtenu…', textStyle(FONT_SIZE.big)).setOrigin(0.5));
       const card = makeResultCard(this, r, results[0]!, counts[0]!, true);
       modal.add(card);
       celebrateSingle(this, modal, card, r, results[0]!.item.rarity);
@@ -324,9 +425,13 @@ export class GachaScene extends Phaser.Scene {
       modal.add(faces);
       sparkleBest(new Particles(this, modal, 2), results.map((res, i) => ({ r: resultCardRect(i), rarity: res.item.rarity })));
       addOk();
+      onShown();
       return;
     }
-    this.playFlip(modal, faces, results, flipOrder, addOk);
+    this.playFlip(modal, faces, results, flipOrder, () => {
+      addOk();
+      onShown();
+    });
   }
 
   private playFlip(
@@ -343,6 +448,7 @@ export class GachaScene extends Phaser.Scene {
       if (tapped) this.sfx.stopAll();
       zone.destroy();
       hint.destroy();
+      delete document.body.dataset.skip;
       document.body.dataset.modal = 'results';
       addOk();
     });
@@ -369,10 +475,7 @@ export class GachaScene extends Phaser.Scene {
     const right = rect.x + rect.w - DIALOG.padding;
     let y = bodyY;
     for (const r of rarityTable()) {
-      const g = this.add.graphics();
-      g.fillStyle(COLORS.rarity[r.id], 1).fillCircle(left + 10, y + 11, 10);
-      g.lineStyle(STROKE.thin, COLORS.ink, 1).strokeCircle(left + 10, y + 11, 10);
-      modal.add(g);
+      modal.add(makeEmblem(this, left + 10, y + 11, 24, r.id));
       modal.add(this.add.text(left + 30, y + 11, r.label, textStyle(FONT_SIZE.body)).setOrigin(0, 0.5));
       modal.add(this.add.text(right, y + 11, formatPercent(ratePercent(r.id)), textStyle(FONT_SIZE.body)).setOrigin(1, 0.5));
       y += 34;
@@ -416,10 +519,7 @@ export class GachaScene extends Phaser.Scene {
     const slot = panel.w / summary.length;
     summary.forEach((s, i) => {
       const x = panel.x + slot * i + slot / 2;
-      const g = this.add.graphics();
-      g.fillStyle(COLORS.rarity[s.rarity], 1).fillCircle(x - 16, COLLECTION.summaryY, 7);
-      g.lineStyle(STROKE.thin, COLORS.ink, 1).strokeCircle(x - 16, COLLECTION.summaryY, 7);
-      modal.add(g);
+      modal.add(makeEmblem(this, x - 16, COLLECTION.summaryY, 18, s.rarity));
       modal.add(this.add.text(x - 5, COLLECTION.summaryY, `${s.owned}/${s.total}`, textStyle(FONT_SIZE.small))
         .setOrigin(0, 0.5));
     });
@@ -434,18 +534,17 @@ export class GachaScene extends Phaser.Scene {
     const c = this.add.container(0, 0);
     // Manquant : grisé, nom visible (clarification de la spec).
     c.add(makePanel(this, r, owned ? COLORS.panel : COLORS.btn.disabled));
-    const disc = this.add.graphics();
-    disc.fillStyle(COLORS.rarity[item.rarity], owned ? 1 : 0.45).fillCircle(r.x + 18, r.y + r.h / 2, 10);
-    disc.lineStyle(STROKE.thin, COLORS.ink, owned ? 1 : 0.45).strokeCircle(r.x + 18, r.y + r.h / 2, 10);
-    c.add(disc);
-    c.add(this.add.text(r.x + 34, r.y + 5, item.name, textStyle(FONT_SIZE.small, owned ? CSS.text : CSS.textDim)));
+    // Portrait (possédé) ou silhouette (manquant), 007 FR-004.
+    c.add(makePortrait(this, r.x + 22, r.y + r.h / 2, 32, item, owned));
+    const textX = r.x + 44;
+    c.add(this.add.text(textX, r.y + 5, item.name, textStyle(FONT_SIZE.small, owned ? CSS.text : CSS.textDim)));
     if (owned) {
       const kind = item.kind === 'character' ? 'Personnage' : 'Créature';
-      c.add(this.add.text(r.x + 34, r.y + 24, `${kind} · ×${count}`, textStyle(FONT_SIZE.micro, CSS.textDim)));
+      c.add(this.add.text(textX, r.y + 24, `${kind} · ×${count}`, textStyle(FONT_SIZE.micro, CSS.textDim)));
       return c;
     }
     // Coût mis en évidence s'il est abordable, estompé sinon (FR-004).
-    c.add(makeShardAmount(this, r.x + 34, r.y + 30, formatAmount(cost), 0).setAlpha(affordable ? 1 : 0.4));
+    c.add(makeShardAmount(this, textX, r.y + 30, formatAmount(cost), 0).setAlpha(affordable ? 1 : 0.4));
     if (affordable) {
       const zone = this.add.zone(r.x, r.y, r.w, r.h).setOrigin(0).setInteractive({ useHandCursor: true });
       zone.on('pointerup', () => {
@@ -500,4 +599,11 @@ export class GachaScene extends Phaser.Scene {
     const [ok] = dialogButtons(rect, 1);
     modal.add(makeButton(this, ok!, 'OK', COLORS.btn.primary, () => this.closeModal(modal)).container);
   }
+}
+
+// Exemplaires atteints À CHAQUE résultat : deux doublons d'une même salve montrent ×2 puis
+// ×3, pas deux fois le total final (cartes et présentations).
+function runningCounts(results: readonly PullResult[], ownedBefore: Readonly<Record<string, number>>): number[] {
+  const running: Record<string, number> = { ...ownedBefore };
+  return results.map(r => (running[r.item.id] = (running[r.item.id] ?? 0) + 1));
 }

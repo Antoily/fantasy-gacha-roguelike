@@ -1,4 +1,5 @@
 import type { Rarity } from './gachaConfig';
+import { REVEAL_TIMING } from './revealConfig';
 
 // Bruitages synthétisés (005, ADR 0006) : des « recettes » jouées par src/ui/sfx.ts.
 // Provisoires comme la DA : changer un son = changer ces données.
@@ -16,7 +17,7 @@ export interface Tone {
   readonly gain: number;
 }
 
-export type SynthCue = 'suspense' | `tier:${Rarity}` | 'rise' | 'card' | 'star';
+export type SynthCue = 'suspense' | 'crack' | `tier:${Rarity}` | 'rise' | 'card' | 'star';
 
 // Notes de do majeur (Hz).
 const C5 = 523.25, E5 = 659.25, G5 = 783.99, C6 = 1046.5, E6 = 1318.51, G6 = 1567.98, C7 = 2093;
@@ -25,8 +26,14 @@ const arpeggio = (notes: readonly number[], step: number, dur: number, wave: Wav
   notes.map((freq, i) => ({ freq, at: i * step, dur, wave, gain }));
 
 export const SOUND_RECIPES: Readonly<Record<SynthCue, readonly Tone[]>> = {
-  // Suspense : une sirène qui monte pendant que l'orbe tremble (900 ms, 004).
-  suspense: [{ freq: 220, to: 660, at: 0, dur: 900, wave: 'triangle', gain: 0.5 }],
+  // Suspense : une sirène qui monte pendant que l'orbe tremble, et se tait au temps figé
+  // (004, révision 2 : FR-016).
+  suspense: [{ freq: 220, to: 660, at: 0, dur: REVEAL_TIMING.suspense - REVEAL_TIMING.freeze, wave: 'triangle', gain: 0.5 }],
+  // Fissure de l'orbe : un craquement de verre bref, qui tombe vers le grave.
+  crack: [
+    { freq: 2600, to: 500, at: 0, dur: 70, wave: 'sawtooth', gain: 0.22 },
+    { freq: 1900, to: 900, at: 25, dur: 45, wave: 'square', gain: 0.12 },
+  ],
   // Paliers : plus haut le rang, plus long et plus aigu l'arpège (FR-001).
   'tier:common': arpeggio([C5], 0, 180, 'square', 0.25),
   'tier:uncommon': arpeggio([C5, E5], 90, 200, 'square', 0.3),

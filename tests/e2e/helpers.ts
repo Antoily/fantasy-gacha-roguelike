@@ -28,15 +28,25 @@ export async function save(page: Page): Promise<Save | null> {
   return raw === null ? null : (JSON.parse(raw) as Save);
 }
 
-export async function load(page: Page) {
-  await page.evaluate(() => delete document.body.dataset.ready);
-  await page.reload();
+// Écran prêt ET illustrations prêtes (elles arrivent juste après l'écran, 007 SC-004) :
+// les captures et les tests d'illustrations voient toujours le rendu final.
+async function ready(page: Page) {
   await page.waitForSelector('body[data-ready="gacha"]');
+  await page.waitForSelector('body[data-art="ready"]');
+}
+
+export async function load(page: Page) {
+  await page.evaluate(() => {
+    delete document.body.dataset.ready;
+    delete document.body.dataset.art;
+  });
+  await page.reload();
+  await ready(page);
 }
 
 export async function start(page: Page) {
   await page.goto('/');
-  await page.waitForSelector('body[data-ready="gacha"]');
+  await ready(page);
 }
 
 // Écrit une sauvegarde puis recharge : l'écran repart de cet état.
@@ -80,18 +90,47 @@ export function rarityRoll(rarity: string): number {
   throw new Error(`rareté inconnue : ${rarity}`);
 }
 
+// Attend la fenêtre `name`. Une présentation plein écran (007) rencontrée en chemin est
+// passée d'un appui, comme le ferait le joueur : les parcours d'avant restent valables.
 export async function waitModal(page: Page, name: string, timeout = 10_000) {
-  await page.waitForSelector(`body[data-modal="${name}"]`, { timeout });
+  const deadline = Date.now() + timeout;
+  for (;;) {
+    const seen = await page.waitForFunction(n => {
+      const m = document.body.dataset.modal;
+      return m === n || m === 'splash' ? m : null;
+    }, name, { timeout: Math.max(1, deadline - Date.now()) });
+    if ((await seen.jsonValue()) === name) {
+      // Deux images : Phaser n'inscrit ses nouvelles zones d'appui qu'à l'image suivante,
+      // un appui dans la même image que l'ouverture de la fenêtre serait perdu.
+      await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
+      return;
+    }
+    await passSplash(page);
+  }
+}
+
+// Passe une présentation : attend que l'appui soit armé, puis touche.
+export async function passSplash(page: Page) {
+  await armedSkip(page);
+  await page.mouse.click(180, 600);
+  await page.waitForTimeout(100);
 }
 
 export async function revealSteps(page: Page): Promise<string | null> {
   return page.evaluate(() => document.body.dataset.reveal ?? null);
 }
 
+// Attend que l'appui qui passe l'animation soit armé (dataset.skip), plus deux images pour
+// que Phaser inscrive la zone : un délai fixe ne suffit pas sur le rendu logiciel lent de la CI.
+export async function armedSkip(page: Page) {
+  await page.waitForSelector('body[data-skip="armed"]');
+  await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
+}
+
 // Passe l'animation d'un tirage : attend que l'appui soit armé, touche, cartes affichées.
 export async function skipReveal(page: Page) {
   await waitModal(page, 'reveal');
-  await page.waitForTimeout(250);
+  await armedSkip(page);
   await page.mouse.click(180, 320);
   await waitModal(page, 'results');
   await page.waitForTimeout(150);

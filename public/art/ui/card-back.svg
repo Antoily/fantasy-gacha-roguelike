@@ -1,0 +1,165 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 312 184" width="312" height="184">
+  <!-- Dos des cartes du tirage ×10 (affiché 156×92) : carte précieuse nuit et or.
+       Lumière unique en haut à gauche ; composition symétrique sur les deux axes, pour
+       que dix cartes alignées forment un ensemble calme d'où ressort l'orbe centrale. -->
+  <defs>
+    <!-- Silhouette : axe du contour encre (6) à 3 du bord, soit un rayon extérieur de 24. -->
+    <rect id="card-back-carte" x="3" y="3" width="306" height="178" rx="21"/>
+    <clipPath id="card-back-carte-clip"><use href="#card-back-carte"/></clipPath>
+    <!-- Champ de nuit, dans la tranche d'or (rayon concentrique à celui de la carte). -->
+    <rect id="card-back-champ" x="14" y="14" width="284" height="156" rx="10"/>
+    <!-- Filet d'or intérieur, coins creusés en quart de cercle autour des clous d'angle. -->
+    <path id="card-back-filet" d="M32 23H280A9 9 0 0 0 289 32V152A9 9 0 0 0 280 161H32A9 9 0 0 0 23 152V32A9 9 0 0 0 32 23Z"/>
+    <clipPath id="card-back-filet-clip"><use href="#card-back-filet"/></clipPath>
+    <radialGradient id="card-back-nuit" cx="0.5" cy="0.5" r="0.62">
+      <stop offset="0" stop-color="#3d3897"/>
+      <stop offset="0.55" stop-color="#27236e"/>
+      <stop offset="1" stop-color="#15123a"/>
+    </radialGradient>
+    <!-- Le motif s'efface vers le centre : l'emblème respire, rien ne grouille autour. -->
+    <radialGradient id="card-back-fondu-degrade" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0.4" stop-color="#000000"/>
+      <stop offset="0.85" stop-color="#ffffff"/>
+    </radialGradient>
+    <mask id="card-back-fondu" maskUnits="userSpaceOnUse" x="0" y="0" width="312" height="184">
+      <rect x="14" y="14" width="284" height="156" fill="url(#card-back-fondu-degrade)"/>
+    </mask>
+    <radialGradient id="card-back-halo">
+      <stop offset="0" stop-color="#b9a8ff" stop-opacity="0.6"/>
+      <stop offset="0.45" stop-color="#7d6de0" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#5a4fc0" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Étoile de l'emblème : quatre branches, la verticale plus longue. -->
+    <path id="card-back-etoile" d="M0 -21Q3 -4 15 0Q3 4 0 21Q-3 4 -15 0Q-3 -4 0 -21Z"/>
+    <clipPath id="card-back-etoile-clip"><use href="#card-back-etoile"/></clipPath>
+    <!-- Biseau : quart haut gauche éclairé, quart bas droit dans l'ombre. -->
+    <g id="card-back-etoile-ornee">
+      <use href="#card-back-etoile" fill="#ffc93c"/>
+      <g clip-path="url(#card-back-etoile-clip)">
+        <rect x="-16" y="-22" width="16" height="22" fill="#fff0b0"/>
+        <rect x="0" y="0" width="16" height="22" fill="#e0921f"/>
+      </g>
+      <use href="#card-back-etoile" fill="none" stroke="#1d1a16" stroke-width="3" stroke-linejoin="round"/>
+    </g>
+    <!-- Scintillement fin (rayon 10), sans contour : c'est de la lumière. -->
+    <path id="card-back-scintille" d="M0 -10Q1.6 -1.6 10 0Q1.6 1.6 0 10Q-1.6 1.6 -10 0Q-1.6 -1.6 0 -10Z"/>
+    <!-- Clou du cadre : losange d'or à quatre facettes. -->
+    <g id="card-back-clou">
+      <path d="M-6 0 0 -6 6 0 0 6Z" fill="#ffc93c"/>
+      <path d="M-6 0 0 -6 0 0Z" fill="#fff0b0"/>
+      <path d="M6 0 0 6 0 0Z" fill="#e0921f"/>
+      <path d="M-6 0 0 -6 6 0 0 6Z" fill="none" stroke="#1d1a16" stroke-width="1.6" stroke-linejoin="round"/>
+    </g>
+    <!-- Emblème : sertissure d'or et orbe. -->
+    <circle id="card-back-sertie" cx="156" cy="92" r="33"/>
+    <clipPath id="card-back-sertie-clip"><use href="#card-back-sertie"/></clipPath>
+    <circle id="card-back-orbe" cx="156" cy="92" r="24.5"/>
+    <clipPath id="card-back-orbe-clip"><use href="#card-back-orbe"/></clipPath>
+    <radialGradient id="card-back-orbe-degrade" cx="0.4" cy="0.36" r="0.7">
+      <stop offset="0" stop-color="#9a86ff"/>
+      <stop offset="0.55" stop-color="#5a45cc"/>
+      <stop offset="1" stop-color="#2b2283"/>
+    </radialGradient>
+    <radialGradient id="card-back-coeur">
+      <stop offset="0" stop-color="#fff6d6" stop-opacity="0.95"/>
+      <stop offset="0.4" stop-color="#ffd27a" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#ff9fe0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 1. Tranche d'or : aplat, ombre propre en bas à droite (onglets à 45° aux coins),
+       reflet en haut à gauche. Le champ recouvre ensuite tout l'intérieur. -->
+  <use href="#card-back-carte" fill="#ffc93c"/>
+  <g clip-path="url(#card-back-carte-clip)">
+    <path d="M312 0V184H0L44 140L268 44Z" fill="#e0921f"/>
+    <path d="M8.2 128V24A15.8 15.8 0 0 1 24 8.2H196" fill="none" stroke="#fff4c4" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+
+  <!-- 2. Champ de nuit, plus clair au centre. -->
+  <use href="#card-back-champ" fill="url(#card-back-nuit)"/>
+
+  <!-- 3. Motif : arlequin de losanges clairs (32×40) aligné sur le centre, petites étoiles
+       dans les losanges sombres ; s'efface vers l'emblème. -->
+  <g clip-path="url(#card-back-filet-clip)">
+    <g mask="url(#card-back-fondu)">
+      <path fill="#6d68dc" opacity="0.24" d="M-4 32l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20z
+        M-4 72l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20z
+        M-4 112l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20z
+        M-4 152l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20zm32 0l16-20 16 20-16 20z"/>
+      <g fill="#ffe7a6" opacity="0.85">
+        <use href="#card-back-scintille" transform="translate(60 52) scale(0.45)"/>
+        <use href="#card-back-scintille" transform="translate(252 52) scale(0.45)"/>
+        <use href="#card-back-scintille" transform="translate(60 132) scale(0.45)"/>
+        <use href="#card-back-scintille" transform="translate(252 132) scale(0.45)"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- 4. Halo autour de l'emblème. -->
+  <circle cx="156" cy="92" r="74" fill="url(#card-back-halo)"/>
+
+  <!-- 5. Filet d'or, puis bord encre du champ (trait intérieur). -->
+  <use href="#card-back-filet" fill="none" stroke="#ffc93c" stroke-width="2.2" stroke-linejoin="round"/>
+  <use href="#card-back-champ" fill="none" stroke="#1d1a16" stroke-width="3"/>
+
+  <!-- 6. Axe d'or qui relie l'emblème aux clous des côtés, et anneau magique. -->
+  <path d="M29 92H283" fill="none" stroke="#ffc93c" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="156" cy="92" r="46" fill="none" stroke="#ffc93c" stroke-width="1.8" opacity="0.85"/>
+  <circle cx="156" cy="46" r="2.6" fill="#ffc93c" stroke="#1d1a16" stroke-width="1.2"/>
+  <circle cx="156" cy="138" r="2.6" fill="#ffc93c" stroke="#1d1a16" stroke-width="1.2"/>
+
+  <!-- 7. Les deux étoiles, accrochées à l'anneau. -->
+  <use href="#card-back-etoile-ornee" transform="translate(100 92)"/>
+  <use href="#card-back-etoile-ornee" transform="translate(212 92)"/>
+
+  <!-- 8. Sertissure d'or : ombre en bas à droite, reflet en haut à gauche. -->
+  <use href="#card-back-sertie" fill="#ffc93c"/>
+  <g clip-path="url(#card-back-sertie-clip)">
+    <path d="M116 132L196 52V132Z" fill="#e0921f"/>
+  </g>
+  <path d="M129.2 82.3A28.5 28.5 0 0 1 146.3 65.2" fill="none" stroke="#fff4c4" stroke-width="2" stroke-linecap="round"/>
+  <use href="#card-back-sertie" fill="none" stroke="#1d1a16" stroke-width="4"/>
+
+  <!-- 9. L'orbe : nébuleuse rose et bleue en spirale autour d'un éclat d'or. -->
+  <use href="#card-back-orbe" fill="url(#card-back-orbe-degrade)"/>
+  <g clip-path="url(#card-back-orbe-clip)">
+    <path d="M156 89C162 78 174 78 178 92C171 84 163 86 158 94Z" fill="#f27fd2"/>
+    <path d="M156 95C150 106 138 106 134 92C141 100 149 98 154 90Z" fill="#62b8f2"/>
+    <!-- Ombre propre en croissant, puis liseré de contre-jour sur son bord. -->
+    <path d="M180.1 87.7A24.5 24.5 0 0 1 151.7 116.1A40 40 0 0 0 180.1 87.7Z" fill="#241c6e"/>
+    <path d="M176.2 99.4A21.5 21.5 0 0 1 163.4 112.2" fill="none" stroke="#9fe0ff" stroke-width="2" stroke-linecap="round"/>
+    <!-- Cœur : éclat et sa lueur. -->
+    <circle cx="156" cy="92" r="12" fill="url(#card-back-coeur)"/>
+    <use href="#card-back-scintille" transform="translate(156 92) scale(0.85)" fill="#fff6d6"/>
+    <!-- Poussière d'étoiles. -->
+    <circle cx="168" cy="82" r="1.2" fill="#ffffff"/>
+    <circle cx="146" cy="103" r="1" fill="#ffffff"/>
+    <circle cx="165" cy="104" r="0.9" fill="#ffffff"/>
+    <!-- Fenêtre de verre en haut à gauche et petit reflet. -->
+    <ellipse cx="145" cy="81" rx="8" ry="4.2" transform="rotate(-45 145 81)" fill="#ffffff" opacity="0.92"/>
+    <circle cx="138.5" cy="91" r="1.8" fill="#ffffff" opacity="0.92"/>
+  </g>
+  <use href="#card-back-orbe" fill="none" stroke="#1d1a16" stroke-width="3"/>
+
+  <!-- 10. Scintillements autour de l'emblème (symétrie centrale). -->
+  <g fill="#fff4cc">
+    <use href="#card-back-scintille" transform="translate(113.6 49.6) scale(0.7)"/>
+    <use href="#card-back-scintille" transform="translate(198.4 134.4) scale(0.7)"/>
+    <use href="#card-back-scintille" transform="translate(198.4 49.6) scale(0.45)"/>
+    <use href="#card-back-scintille" transform="translate(113.6 134.4) scale(0.45)"/>
+  </g>
+
+  <!-- 11. Clous du cadre : quatre angles, quatre milieux. -->
+  <use href="#card-back-clou" transform="translate(23 23) scale(0.85)"/>
+  <use href="#card-back-clou" transform="translate(289 23) scale(0.85)"/>
+  <use href="#card-back-clou" transform="translate(23 161) scale(0.85)"/>
+  <use href="#card-back-clou" transform="translate(289 161) scale(0.85)"/>
+  <use href="#card-back-clou" transform="translate(156 23)"/>
+  <use href="#card-back-clou" transform="translate(156 161)"/>
+  <use href="#card-back-clou" transform="translate(23 92)"/>
+  <use href="#card-back-clou" transform="translate(289 92)"/>
+
+  <!-- 12. Contour de la carte par-dessus, puis éclat sur la tranche en haut à gauche. -->
+  <use href="#card-back-carte" fill="none" stroke="#1d1a16" stroke-width="6"/>
+  <use href="#card-back-scintille" transform="translate(13.6 13.6) scale(0.5)" fill="#ffffff"/>
+</svg>
