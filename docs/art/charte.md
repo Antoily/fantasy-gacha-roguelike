@@ -16,6 +16,10 @@ de près. Ni réalisme, ni croquis, ni « clipart » plat.
 Univers : un monde de conte loufoque et tendre (peintres maladroits, pirates de cuisine,
 chats-nuages, baleines-bulles). L'humour passe par la pose, l'expression et l'accessoire.
 
+Textes de l'interface : **Fredoka SemiBold**, embarquée ([ADR 0008](../adr/0008-police-embarquee.md)),
+ronde et épaisse comme le trait ; plus de Comic Sans MS. Les SVG, eux, ne contiennent
+jamais de texte (§ 2) : la police d'un SVG rastérisé n'est pas celle du jeu.
+
 ## 2. Format technique (vérifié par `npm run art:check`)
 
 - **SVG** avec `xmlns="http://www.w3.org/2000/svg"`, un `viewBox`, `width`/`height` égaux au viewBox.

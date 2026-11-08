@@ -233,14 +233,14 @@ export class GachaScene extends Phaser.Scene {
       const count = p.owned[vedette.id] ?? 0;
       this.bannerPortrait = makePortrait(this, b.x + BANNER.portraitX, b.y + b.h / 2, BANNER.portraitD, vedette, true);
       this.bannerName.setText(vedette.name);
-      // « non obtenu » plutôt que « pas encore obtenu » : la ligne tient à sa taille avec
-      // Comic Sans MS, où elle dépassait du bandeau des deux côtés.
+      // « non obtenu » plutôt que « pas encore obtenu » (qui débordait avec Comic Sans MS) :
+      // la ligne garde sa taille, même avec une police de repli plus large.
       this.bannerDetail.setText(`${rarityLabel(vedette.rarity)} · ${count > 0 ? `possédé ×${count}` : 'non obtenu'}`);
     } else {
       this.bannerName.setText('Bannière standard');
       this.bannerDetail.setText('Tous les éléments, taux de base');
     }
-    // Filet de sécurité pour les polices plus larges (repli des appareils sans Comic).
+    // Filet de sécurité si la police embarquée manque : le repli est plus large (ADR 0008).
     fitWidth(this.bannerName, FONT_SIZE.body, area.w);
     fitWidth(this.bannerDetail, FONT_SIZE.micro, area.w);
     // Tournure sans accord : la vedette peut être féminine (Marquise Cerise).

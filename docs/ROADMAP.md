@@ -38,6 +38,8 @@ résultat du tirage ; le joueur devine ce qu'il a eu avant de voir les cartes.
 
 ## Fait
 
+- 2026-11-08 — **Police embarquée** (ADR 0008) : Fredoka SemiBold remplace Comic Sans MS,
+  jugée « trop cheap » par l'utilisateur ; même rendu sur tout appareil, CI comprise.
 - 2026-11-08 — **Révision de 003** (retours de l'utilisateur en jeu) : un appui sur un
   élément possédé ouvre sa fiche (illustration en grand, exemplaires, phrase) ; le total
   « N / 20 » n'est plus que dans la collection ; le texte du bandeau de bannière tient
