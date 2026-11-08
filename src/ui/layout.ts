@@ -49,6 +49,17 @@ export const GACHA = {
   reset: { x: MARGIN * 2 + half, y: 560, w: half, h: 48 },
 } as const satisfies Record<string, unknown>;
 
+// Bandeau de bannière : portrait de la vedette à gauche (007, FR-005), centre et diamètre.
+export const BANNER = { portraitX: 20, portraitD: 30, pad: 6 } as const;
+
+// Place des textes du bandeau : à côté du portrait d'une vedette, sans toucher ni lui ni le
+// cadre. Un texte plus large y est réduit (révision du 2026-11-08 : il passait dessous).
+export function bannerTextArea(featured: boolean): { x: number; w: number } {
+  const b = GACHA.banner;
+  const left = b.x + BANNER.pad + (featured ? BANNER.portraitX + BANNER.portraitD / 2 : 0);
+  return { x: left, w: b.x + b.w - BANNER.pad - left };
+}
+
 // Fenêtre de résultats : ×10 en grille 2 × 5, dans l'ordre du tirage.
 export const RESULTS = {
   panel: { x: MARGIN / 2, y: MARGIN, w: WIDTH - MARGIN, h: HEIGHT - 2 * MARGIN },
@@ -114,6 +125,17 @@ export const COLLECTION = {
   gap: 4,
   completeY: 86,
   close: { x: MARGIN * 2, y: 568, w: CONTENT_W - 2 * MARGIN, h: 44 },
+} as const;
+
+// Fiche d'un possédé, ouverte depuis la collection (révision du 2026-11-08 de 003) :
+// illustration en grand, nom, type et rareté, exemplaires, phrase ; « Retour » en bas.
+export const SHEET = {
+  art: { x: (WIDTH - 280) / 2, y: 36, w: 280, h: 340 },
+  nameY: 386,
+  rarityY: 428,
+  countY: 444,
+  blurb: { x: MARGIN * 2, y: 476, w: CONTENT_W - 2 * MARGIN, h: 56 },
+  back: COLLECTION.close,
 } as const;
 
 export function collectionCellRect(index: number): Rect {

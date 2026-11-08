@@ -116,6 +116,7 @@ elle est inchangée.
 - **Échange d'éclats** : ne dépend pas de la bannière et ne touche à aucune garantie vedette.
 - **Recommencer** : remet la bannière standard, efface les garanties vedettes (et, comme avant, le compteur des 40, la monnaie, les possessions, les éclats).
 - **Sauvegarde d'avant cette feature** : reprise sans perte, bannière standard active, aucune garantie vedette.
+- **Texte du bandeau plus large que sa place** (police de l'appareil, nom long, exemplaires à plusieurs chiffres) : il reste entier dans le bandeau, sans passer sous le portrait de la vedette ni sous le cadre *(révision du 2026-11-08 : « Ultra rare · pas encore obtenu » débordait des deux côtés)*.
 
 ## Requirements *(mandatory)*
 

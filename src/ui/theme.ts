@@ -121,3 +121,6 @@ export const RADIUS = 12;
 export const FONT_FAMILY = '"Comic Neue", "Comic Sans MS", "Chalkboard SE", "Trebuchet MS", sans-serif';
 
 export const FONT_SIZE = { title: 28, big: 22, button: 18, body: 14, small: 12, tiny: 11, micro: 10 } as const;
+// Plancher d'un texte réduit pour tenir dans sa place : sa largeur dépend de la police de
+// l'appareil (Comic Neue, Comic Sans MS ou la police de repli, bien plus large).
+export const FONT_SIZE_MIN = 8;

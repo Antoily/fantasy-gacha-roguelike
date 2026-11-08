@@ -79,8 +79,9 @@ tirages ×1, les fréquences observées correspondent aux taux affichés.
 ### User Story 4 - Retrouver sa progression (Priority: P2)
 
 Le joueur ferme le jeu et le rouvre plus tard : son solde, les éléments obtenus et
-leur nombre d'exemplaires sont intacts. L'écran de tirage indique combien
-d'éléments différents il possède sur le total.
+leur nombre d'exemplaires sont intacts. La collection (003) indique combien
+d'éléments différents il possède sur le total *(révision du 2026-11-08 : d'abord
+affiché sur l'écran de tirage)*.
 
 **Why this priority**: sans sauvegarde, la monnaie de départ se recharge à chaque
 ouverture et le tirage perd tout enjeu.
@@ -92,7 +93,7 @@ ouverture et le tirage perd tout enjeu.
 
 1. **Given** un joueur qui a effectué des tirages, **When** il ferme puis rouvre le jeu, **Then** son solde et ses possessions sont identiques.
 2. **Given** un premier lancement, **When** le jeu s'ouvre, **Then** le joueur dispose du stock de départ et ne possède aucun élément.
-3. **Given** un joueur qui possède 7 éléments différents sur 20, **When** il regarde l'écran de tirage, **Then** il lit « 7 / 20 ».
+3. **Given** un joueur qui possède 7 éléments différents sur 20, **When** il ouvre la collection (003), **Then** il lit « 7 / 20 ».
 
 ---
 
@@ -159,7 +160,7 @@ possédé ; une annulation ne change rien.
 
 **Progression**
 
-- **FR-017**: L'écran de tirage MUST afficher en permanence le solde et le nombre d'éléments différents possédés sur le total du catalogue.
+- **FR-017**: L'écran de tirage MUST afficher en permanence le solde. *(Révision du 2026-11-08 : le nombre d'éléments différents possédés sur le total du catalogue ne s'affiche plus que dans la collection, 003 FR-013.)*
 - **FR-018**: Le solde, les éléments possédés et leur nombre d'exemplaires MUST être conservés entre deux sessions, sur le même appareil.
 - **FR-019**: Le joueur MUST pouvoir effacer sa progression après une confirmation explicite ; il retrouve alors le stock de départ et une collection vide.
 

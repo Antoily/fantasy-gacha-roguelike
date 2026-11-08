@@ -139,6 +139,15 @@ test('Recommencer remet la standard et efface les garanties (FR-020)', async ({ 
   expect((await save(page))!.guarantees).toEqual([]);
 });
 
+// Révision du 2026-11-08 : « Ultra rare · pas encore obtenu » débordait du bandeau. Contrôle
+// visuel seulement (le canvas ne se lit pas) : relire ces captures.
+test('bandeau : nom et détail restent dans le cadre, vedette possédée ou non', async ({ page }) => {
+  await loadWith(page, { ...FRESH, banner: 'marquise-cerise', owned: { 'marquise-cerise': 12 } });
+  await capture(page, 'bandeau-possede');
+  await loadWith(page, { ...FRESH, banner: 'tonnerrouf' });
+  await capture(page, 'bandeau-non-obtenu');
+});
+
 test('les flèches ne réagissent pas sous une fenêtre (US1-5)', async ({ page }) => {
   await tap(page, GACHA.rates);
   await tap(page, GACHA.bannerNext);

@@ -1,7 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
 import { CATALOGUE } from '../../src/data/catalogue';
 import type { Rarity } from '../../src/data/gachaConfig';
-import { GACHA, RESULTS, SPLASH, dialogButtons, dialogRect, ratesDialogH } from '../../src/ui/layout';
+import { collectionEntries } from '../../src/logic/collection';
+import { GACHA, RESULTS, SPLASH, collectionCellRect, dialogButtons, dialogRect, ratesDialogH } from '../../src/ui/layout';
 import {
   FRESH, armedSkip, capture, installRng, load, loadWith, modal, passSplash, rarityRoll, scriptRng, start, tap, waitModal,
 } from './helpers';
@@ -122,6 +123,12 @@ test('illustration manquante : pastille en repli, sans erreur (FR-010)', async (
   await waitModal(page, 'results');
   await page.waitForTimeout(300);
   await capture(page, 'repli-pastille');
+  // Sa fiche, dans la collection, se replie de même (003, révision du 2026-11-08).
+  await tap(page, RESULTS.ok);
+  await tap(page, GACHA.collection);
+  await tap(page, collectionCellRect(collectionEntries(FRESH).findIndex(e => e.item.id === 'gloups')));
+  await waitModal(page, 'fiche');
+  await capture(page, 'repli-fiche');
   expect(errors).toEqual([]);
 });
 

@@ -38,6 +38,10 @@ résultat du tirage ; le joueur devine ce qu'il a eu avant de voir les cartes.
 
 ## Fait
 
+- 2026-11-08 — **Révision de 003** (retours de l'utilisateur en jeu) : un appui sur un
+  élément possédé ouvre sa fiche (illustration en grand, exemplaires, phrase) ; le total
+  « N / 20 » n'est plus que dans la collection ; le texte du bandeau de bannière tient
+  dans son cadre quelle que soit la police de l'appareil (« non obtenu »).
 - 2026-11-08 — **007 Illustrations** et **révision 2 de 004** : une illustration cartoon
   détaillée par élément (SVG faits main sous une charte, ADR 0007), cartes illustrées,
   collection en portraits et silhouettes, portrait de la vedette, présentation plein écran

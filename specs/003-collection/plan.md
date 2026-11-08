@@ -76,3 +76,21 @@ tests/e2e/collection.spec.ts    nouveaux scénarios du quickstart
 ## Complexity Tracking
 
 Aucune violation de la constitution à justifier.
+
+## Révision du 2026-11-08 (retours de l'utilisateur en jeu)
+
+Spec : FR-013, FR-014, User Story 5, SC-006 ; 001 FR-017 et 006 (cas limite du bandeau).
+
+- **Fiche** : `makeSheet()` (`src/ui/widgets.ts`) réutilise le fond, le cadre et la ligne de
+  rareté des cartes ; géométrie `SHEET` dans `layout.ts` ; `GachaScene.showSheet()` ouvre
+  la fenêtre `fiche` et pose `dataset.fiche` pour l'e2e ; « Retour » rouvre la collection
+  (même enchaînement qu'« Annuler » sur un échange). Rien de sauvegardé.
+- **En-tête** : compteur retiré, éclats calés à droite (l'icône suit la largeur du montant).
+- **Bandeau** : le débordement venait de la police de l'appareil (Comic Sans MS sous
+  Windows : 156 px pour 141 de place ; DejaVu, police de la CI : 178). `bannerTextArea()`
+  donne la place, `fitWidth()` réduit le texte au besoin (plancher `FONT_SIZE_MIN`), et
+  « non obtenu » remplace « pas encore obtenu » pour garder la taille d'origine.
+
+Constitution : I (pas de nouveau mécanisme : la fiche ne fait que montrer, sans action),
+II (spec révisée d'abord), V (géométrie du bandeau testée et mutée ; fiche couverte par
+l'e2e et mutée), VI (aucune couleur ni taille en dur ; plancher dans le thème). ✅
