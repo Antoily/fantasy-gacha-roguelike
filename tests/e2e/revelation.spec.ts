@@ -5,8 +5,7 @@ import { REVEAL_TIMING } from '../../src/data/revealConfig';
 import { flipOrder, flipSchedule } from '../../src/logic/reveal';
 import { GACHA, RESULTS, center } from '../../src/ui/layout';
 import {
-  FRESH, capture, installRng, load, loadWith, modal, rarityRoll, revealSteps, save, scriptRng, start, tap,
-  waitModal,
+  FRESH, armedSkip, capture, installRng, load, loadWith, modal, rarityRoll, revealSteps, save, scriptRng, start, tap, waitModal,
 } from './helpers';
 
 // Scénarios de specs/004-revelation/quickstart.md, joués sur le build. Le hasard est
@@ -107,10 +106,11 @@ test('×10 : palier du meilleur, puis cartes une à une, OK à la fin (US5, FR-0
   await at(star.at + star.anticipation + star.turn * 0.8);
   await capture(page, 'x10-vedette');
   await waitModal(page, 'results');
-  // Marge large : les 4 captures prises pendant le retournement ralentissent le runner
-  // de la CI (4,5 s mesurées pour 3,9 s prévues). La borne exacte de FR-010 est vérifiée
-  // par les tests unitaires de flipSchedule ; ici, on vérifie que la fin suit le calendrier.
-  expect(Date.now() - t0).toBeLessThan(duration + 1500);
+  // Marge large : les 4 captures prises pendant le retournement et le rendu logiciel des
+  // visuels de 007 ralentissent le runner de la CI (5,7 s mesurées pour 3,9 s prévues). La
+  // borne exacte de FR-010 est vérifiée par les tests unitaires de flipSchedule ; ici, on
+  // vérifie que la fin suit le calendrier.
+  expect(Date.now() - t0).toBeLessThan(duration + 3000);
   await page.waitForTimeout(400);
   await capture(page, 'x10-fin');
   await tap(page, RESULTS.ok);
@@ -126,7 +126,7 @@ test('passer l’animation : cartes en moins de 0,5 s, rien de changé (US2, FR-
   await tap(page, GACHA.pullTen);
   await waitModal(page, 'reveal');
   const before = await save(page);
-  await page.waitForTimeout(250);
+  await armedSkip(page);
   const t0 = Date.now();
   await page.mouse.click(180, 320);
   await waitModal(page, 'results', 500);
@@ -160,10 +160,10 @@ test('verrou : un seul tirage, l’écran de tirage ne répond pas pendant l’a
   // Avant l'armement du passage (200 ms), un appui sur un bouton ne fait rien du tout.
   await page.mouse.click(center(GACHA.collection).x, center(GACHA.collection).y);
   expect(await modal(page)).toBe('reveal');
-  await page.waitForTimeout(250);
+  await armedSkip(page);
   // Ensuite, il passe l'animation : jamais de tirage ni d'autre fenêtre.
   await tap(page, GACHA.pullSingle);
-  expect(await modal(page)).toBe('results');
+  await waitModal(page, 'results', 2_000);
   expect((await save(page))!.currency).toBe(8900);
 });
 

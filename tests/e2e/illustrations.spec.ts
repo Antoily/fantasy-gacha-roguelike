@@ -1,9 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
 import { CATALOGUE } from '../../src/data/catalogue';
 import type { Rarity } from '../../src/data/gachaConfig';
-import { GACHA, RESULTS, SPLASH } from '../../src/ui/layout';
+import { GACHA, RESULTS, SPLASH, dialogButtons, dialogRect, ratesDialogH } from '../../src/ui/layout';
 import {
-  FRESH, capture, installRng, load, loadWith, modal, passSplash, rarityRoll, scriptRng, start, tap, waitModal,
+  FRESH, armedSkip, capture, installRng, load, loadWith, modal, passSplash, rarityRoll, scriptRng, start, tap, waitModal,
 } from './helpers';
 
 // Scénarios de specs/007-illustrations/quickstart.md, joués sur le build. Hasard scripté
@@ -49,7 +49,7 @@ test('passer la révélation d’un Ultra rare : présenté quand même (FR-003)
   await scriptRng(page, [rarityRoll('ultra'), 0, DIRECT]);
   await tap(page, GACHA.pullSingle);
   await waitModal(page, 'reveal');
-  await page.waitForTimeout(250);
+  await armedSkip(page);
   await page.mouse.click(180, 320);
   await page.waitForSelector('body[data-modal="splash"]', { timeout: 2_000 });
   expect(await splashId(page)).toBe(of('ultra')[0]!.id);
@@ -134,12 +134,12 @@ test('densité 2 : canvas ×2, appuis aux mêmes endroits (FR-009, SC-006)', asy
   await start(page);
   await loadWith(page, FRESH);
   expect(await page.evaluate(() => document.querySelector('canvas')!.width)).toBe(720);
-  await scriptRng(page, [rarityRoll('common'), 0, DIRECT]);
-  await tap(page, GACHA.pullSingle);
-  await waitModal(page, 'results');
-  await page.waitForTimeout(300);
-  await capture(page, 'densite-2-carte');
-  await tap(page, RESULTS.ok);
-  expect(await modal(page)).toBeNull();
+  await capture(page, 'densite-2-ecran');
+  // Une fenêtre légère plutôt qu'un tirage : le rendu logiciel ×4 de la CI est lent.
+  await tap(page, GACHA.rates);
+  await waitModal(page, 'rates', 5_000);
+  await capture(page, 'densite-2-taux');
+  await tap(page, dialogButtons(dialogRect(ratesDialogH(false)), 1)[0]!);
+  await page.waitForFunction(() => !document.body.dataset.modal, undefined, { timeout: 5_000 });
   await context.close();
 });

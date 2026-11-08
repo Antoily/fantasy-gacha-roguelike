@@ -69,7 +69,9 @@ public/art/   SVG faits main (ADR 0007) : characters/<id>.svg + <id>.json (cadra
   `warning`), et `dataset.reveal` = paliers montrés (`rare>legendary`) pendant
   `reveal` ; `dataset.sounds` (sons émis depuis le dernier tirage), `dataset.soundsLive`
   (notes en train de sonner), `dataset.muted`, `dataset.banner` (bannière active) et
-  `dataset.featuredLine` (ligne de garantie vedette). L'e2e s'en sert pour vérifier l'enchaînement des écrans : sans lui, deux
+  `dataset.featuredLine` (ligne de garantie vedette), `dataset.skip = 'armed'` (l'appui qui passe
+  l'animation est armé), `dataset.splash` (présentation affichée), `dataset.art = 'ready'` et
+  `dataset.artMissing` (illustrations prêtes, ou en repli). L'e2e s'en sert pour vérifier l'enchaînement des écrans : sans lui, deux
   mutations de la 002 survivaient (une confirmation ouverte à tort que la logique
   refusait ensuite).
 - Playwright tourne avec **un seul worker** : les captures sont numérotées dans
@@ -245,6 +247,9 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
 - **Présentations dans l'e2e** : `waitModal` passe d'elles-mêmes les fenêtres `splash` ; un
   test chronométré tire au hasard scripté, sinon un Légendaire aléatoire décale la mesure.
 - Le journal des sons compte trois `crack` après `suspense` (révision 2 de 004).
+- **Runner de la CI** : rendu logiciel bien plus lent qu'en local avec les visuels de 007.
+  Attendre un signal (`armedSkip`, `waitModal`), jamais un délai fixe ; tester la densité 2
+  sur une fenêtre légère.
 - `pkill -f "<motif>"` tue aussi le shell dont la ligne de commande contient le motif :
   écrire `pkill -f "vite preview --port 418[3]"`.
 

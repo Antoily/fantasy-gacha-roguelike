@@ -360,8 +360,13 @@ export class GachaScene extends Phaser.Scene {
     const zone = this.add.zone(r.x, r.y, r.w, r.h).setOrigin(0);
     zone.on('pointerup', onTap);
     modal.add(zone);
-    if (armMs === 0) zone.setInteractive();
-    else seq.at(armMs, () => zone.setInteractive());
+    // Signal pour l'e2e : sur un runner lent, l'armement tombe plus tard qu'un délai fixe.
+    const arm = () => {
+      zone.setInteractive();
+      document.body.dataset.skip = 'armed';
+    };
+    if (armMs === 0) arm();
+    else seq.at(armMs, arm);
     return zone;
   }
 
@@ -378,6 +383,7 @@ export class GachaScene extends Phaser.Scene {
   private openModal(name: string): Phaser.GameObjects.Container {
     this.modalOpen = true;
     document.body.dataset.modal = name;
+    delete document.body.dataset.skip;
     return makeModal(this);
   }
 
@@ -385,6 +391,7 @@ export class GachaScene extends Phaser.Scene {
     modal.destroy();
     this.modalOpen = false;
     delete document.body.dataset.modal;
+    delete document.body.dataset.skip;
   }
 
   // `flipOrder` donné (×10 regardé jusqu'au bout) : les cartes arrivent face cachée et
@@ -439,6 +446,7 @@ export class GachaScene extends Phaser.Scene {
       if (tapped) this.sfx.stopAll();
       zone.destroy();
       hint.destroy();
+      delete document.body.dataset.skip;
       document.body.dataset.modal = 'results';
       addOk();
     });

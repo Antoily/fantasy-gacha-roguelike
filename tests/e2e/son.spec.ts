@@ -3,7 +3,9 @@ import type { Rarity } from '../../src/data/gachaConfig';
 import { REVEAL_TIMING } from '../../src/data/revealConfig';
 import { SETTINGS_KEY } from '../../src/logic/settings';
 import { CONFIRM_DIALOG_H, GACHA, RESULTS, dialogButtons, dialogRect } from '../../src/ui/layout';
-import { FRESH, capture, installRng, load, loadWith, rarityRoll, scriptRng, start, tap, waitModal } from './helpers';
+import {
+  FRESH, armedSkip, capture, installRng, load, loadWith, rarityRoll, scriptRng, start, tap, waitModal,
+} from './helpers';
 
 // Scénarios de specs/005-son/quickstart.md. La CI n'entend rien : on lit le journal des
 // sons émis (dataset.sounds) et l'état du bouton (dataset.muted).
@@ -65,7 +67,7 @@ test('passer : plus aucun son après l’appui (FR-005, SC-003)', async ({ page 
   await scriptRng(page, [rarityRoll('ultra'), 0, DIRECT]);
   await tap(page, GACHA.pullSingle);
   await waitModal(page, 'reveal');
-  await page.waitForTimeout(250);
+  await armedSkip(page);
   await page.mouse.click(180, 320);
   await waitModal(page, 'results');
   expect(await sounds(page)).toBe('suspense');

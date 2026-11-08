@@ -120,10 +120,17 @@ export async function revealSteps(page: Page): Promise<string | null> {
   return page.evaluate(() => document.body.dataset.reveal ?? null);
 }
 
+// Attend que l'appui qui passe l'animation soit armé (dataset.skip), plus deux images pour
+// que Phaser inscrive la zone : un délai fixe ne suffit pas sur le rendu logiciel lent de la CI.
+export async function armedSkip(page: Page) {
+  await page.waitForSelector('body[data-skip="armed"]');
+  await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
+}
+
 // Passe l'animation d'un tirage : attend que l'appui soit armé, touche, cartes affichées.
 export async function skipReveal(page: Page) {
   await waitModal(page, 'reveal');
-  await page.waitForTimeout(250);
+  await armedSkip(page);
   await page.mouse.click(180, 320);
   await waitModal(page, 'results');
   await page.waitForTimeout(150);
