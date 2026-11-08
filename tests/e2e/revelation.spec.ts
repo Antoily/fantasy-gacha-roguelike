@@ -42,8 +42,11 @@ test('un palier par rareté, puis la carte obtenue (US1, FR-003)', async ({ page
     await capture(page, `palier-${id}`);
     // SC-003 mesure l'animation : elle s'arrête à la carte, ou à la présentation plein écran
     // d'un Légendaire / Ultra rare (007), qui attend ensuite l'appui du joueur.
+    // Marge large : les deux captures prises pendant l'animation figent le rendu logiciel. La
+    // borne exacte (FR-010) est vérifiée par les tests unitaires de revealDuration, et sans
+    // capture par le test « regardé jusqu'au bout avec le vrai hasard ».
     await page.waitForFunction(() => ['results', 'splash'].includes(document.body.dataset.modal ?? ''));
-    expect(Date.now() - t0).toBeLessThan(5_500); // SC-003
+    expect(Date.now() - t0).toBeLessThan(8_000); // SC-003, avec captures
     await waitModal(page, 'results');
     if (id === 'legendary') {
       await page.waitForTimeout(150);

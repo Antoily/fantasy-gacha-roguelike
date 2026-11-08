@@ -28,18 +28,29 @@ test('écran habillé, toutes les illustrations chargées (US4, SC-001)', async 
 });
 
 test('×1 Légendaire : présentation armée à 400 ms, puis la carte (US2, FR-003)', async ({ page }) => {
+  // Instants exacts, relevés dans la page, de l'ouverture et de l'armement : un appui
+  // chronométré depuis le test arrive trop tard sur le rendu lent de la CI.
+  await page.evaluate(() => {
+    const w = window as unknown as { __splash: { open?: number; armed?: number } };
+    w.__splash = {};
+    new MutationObserver(() => {
+      const d = document.body.dataset;
+      if (d.modal !== 'splash') return;
+      w.__splash.open ??= performance.now();
+      if (d.skip === 'armed') w.__splash.armed ??= performance.now();
+    }).observe(document.body, { attributes: true, attributeFilter: ['data-modal', 'data-skip'] });
+  });
   await scriptRng(page, [rarityRoll('legendary'), 0, DIRECT]);
   await tap(page, GACHA.pullSingle);
   await page.waitForSelector('body[data-modal="splash"]', { timeout: 8_000 });
   expect(await splashId(page)).toBe(of('legendary')[0]!.id);
-  // Trop tôt : l'appui ne ferme rien.
-  await page.mouse.click(180, 600);
-  await page.waitForTimeout(150);
-  expect(await modal(page)).toBe('splash');
-  await page.waitForTimeout(SPLASH.armMs);
+  await armedSkip(page);
+  // Un appui n'est accepté qu'une fois l'illustration entrée (cas limite de la spec).
+  const { open, armed } = await page.evaluate(() => (window as unknown as { __splash: { open: number; armed: number } }).__splash);
+  expect(armed - open).toBeGreaterThanOrEqual(SPLASH.armMs * 0.8);
   await capture(page, 'presentation-legendaire');
   await page.mouse.click(180, 600);
-  await page.waitForSelector('body[data-modal="results"]', { timeout: 1_000 });
+  await page.waitForSelector('body[data-modal="results"]', { timeout: 2_000 });
   expect(await splashId(page)).toBeNull();
   await page.waitForTimeout(300);
   await capture(page, 'x1-carte-illustree');

@@ -93,6 +93,8 @@ export function playSplash(
   modal.add([hint, zone]);
   seq.at(SPLASH.armMs, () => {
     zone.setInteractive();
+    // Signal pour l'e2e, comme l'appui qui passe la révélation.
+    document.body.dataset.skip = 'armed';
     seq.tween({ targets: hint, alpha: { from: 0.35, to: 1 }, duration: 700, yoyo: true, repeat: -1 });
   });
   return seq;

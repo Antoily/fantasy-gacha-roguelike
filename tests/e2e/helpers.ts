@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
 import { CATALOGUE } from '../../src/data/catalogue';
 import { RARITIES } from '../../src/data/gachaConfig';
-import { SPLASH, center, type Rect } from '../../src/ui/layout';
+import { center, type Rect } from '../../src/ui/layout';
 
 export interface Save {
   version: number; currency: number; owned: Record<string, number>; pity?: number; shards?: number;
@@ -111,7 +111,7 @@ export async function waitModal(page: Page, name: string, timeout = 10_000) {
 
 // Passe une présentation : attend que l'appui soit armé, puis touche.
 export async function passSplash(page: Page) {
-  await page.waitForTimeout(SPLASH.armMs + 100);
+  await armedSkip(page);
   await page.mouse.click(180, 600);
   await page.waitForTimeout(100);
 }

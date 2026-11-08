@@ -340,6 +340,7 @@ export class GachaScene extends Phaser.Scene {
       const index = queue[i]!;
       this.modalOpen = true;
       document.body.dataset.modal = 'splash';
+      delete document.body.dataset.skip;
       document.body.dataset.splash = results[index]!.item.id;
       const modal = this.add.container(0, 0).setDepth(200);
       // Voile transparent : rien de ce qui est dessous ne réagit pendant la présentation.
@@ -348,6 +349,7 @@ export class GachaScene extends Phaser.Scene {
         seq.stop();
         modal.destroy();
         delete document.body.dataset.splash;
+        delete document.body.dataset.skip;
         next(i + 1);
       });
     };
