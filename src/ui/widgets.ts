@@ -4,8 +4,10 @@ import { RARITIES, type Rarity } from '../data/gachaConfig';
 import type { PullResult } from '../logic/gacha';
 import { artKey, bustKey, hasArt, headKey, orbSize, shadowKey, uiImage } from './art';
 import { R } from './display';
-import { ART, HEIGHT, RESULTS, WIDTH, type Rect } from './layout';
-import { ART_FX, COLORS, CSS, FONT_FAMILY, FONT_SIZE, RADIUS, SCRIM_ALPHA, SHADOW_OFFSET, STROKE } from './theme';
+import { ART, HEIGHT, RESULTS, SHEET, WIDTH, type Rect } from './layout';
+import {
+  ART_FX, COLORS, CSS, FONT_FAMILY, FONT_SIZE, FONT_SIZE_MIN, RADIUS, SCRIM_ALPHA, SHADOW_OFFSET, STROKE,
+} from './theme';
 
 // `resolution` : le texte est rastérisé à l'échelle de rendu, net sous la caméra ×R.
 export function textStyle(size: number, color: string = CSS.text): Phaser.Types.GameObjects.Text.TextStyle {
@@ -167,6 +169,13 @@ function fitText(scene: Phaser.Scene, x: number, y: number, s: string, size: num
   return t;
 }
 
+// Texte d'une ligne ramené à `maxW` : la police rétrécit, au plus jusqu'à FONT_SIZE_MIN.
+export function fitWidth(t: Phaser.GameObjects.Text, size: number, maxW: number) {
+  t.setFontSize(size);
+  for (let fs = size; t.width > maxW && fs > FONT_SIZE_MIN; fs--) t.setFontSize(fs - 1);
+  return t;
+}
+
 // Portrait rond (collection, bannière) : la tête, ou la silhouette d'un manquant (FR-004).
 export function makePortrait(scene: Phaser.Scene, x: number, y: number, d: number, item: Item, owned: boolean) {
   const c = scene.add.container(0, 0);
@@ -237,6 +246,32 @@ export function makeResultCard(
   // Pastille façon autocollant, à cheval sur le bord : la ligne du bas est déjà pleine
   // quand un résultat forcé est aussi un doublon.
   if (result.pity || result.featuredGuarantee) c.add(makeSticker(scene, r.x + r.w - 6, r.y - 7, 'Garanti !'));
+  return c;
+}
+
+// Fiche d'un possédé (003, révision du 2026-11-08) : l'illustration entière en grand, nom,
+// type et rareté, exemplaires, et la phrase de présentation, qu'aucun autre écran ne montre
+// pour les raretés sans présentation plein écran.
+export function makeSheet(scene: Phaser.Scene, item: Item, ownedCount: number): Phaser.GameObjects.Container {
+  const c = scene.add.container(0, 0);
+  const win = SHEET.art;
+  const cx = win.x + win.w / 2;
+  c.add(artBackdrop(scene, win, item.rarity, RADIUS));
+  if (hasArt(scene, item)) {
+    const h = win.h - 8;
+    c.add(scene.add.image(cx, win.y + win.h / 2 + 2, artKey(item.id)).setDisplaySize(h * 0.8, h));
+  } else {
+    c.add(initialDisc(scene, cx, win.y + win.h / 2, 48, item, FONT_SIZE.title));
+  }
+  c.add(frame(scene, win, RADIUS));
+  const b = SHEET.blurb;
+  c.add(fitWidth(scene.add.text(cx, SHEET.nameY, item.name, textStyle(FONT_SIZE.big)).setOrigin(0.5, 0), FONT_SIZE.big, b.w));
+  c.add(makeRarityLine(scene, cx, SHEET.rarityY, `${kindLabel(item)} · ${rarityInfo(item.rarity).label}`, item.rarity,
+    FONT_SIZE.body, 0.5));
+  c.add(makeBadge(scene, cx, SHEET.countY, `Possédé ×${ownedCount}`, false, 0.5));
+  c.add(makePanel(scene, b));
+  c.add(scene.add.text(cx, b.y + b.h / 2, item.blurb,
+    { ...textStyle(FONT_SIZE.body, CSS.textDim), align: 'center', wordWrap: { width: b.w - 24 } }).setOrigin(0.5));
   return c;
 }
 

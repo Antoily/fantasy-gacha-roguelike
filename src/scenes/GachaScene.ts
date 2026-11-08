@@ -17,8 +17,8 @@ import { SAVE_KEY, serializeSave, type SaveStatus } from '../logic/save';
 import { ART_READY, uiImage } from '../ui/art';
 import { R } from '../ui/display';
 import {
-  COLLECTION, CONFIRM_DIALOG_H, DIALOG, GACHA, HEIGHT, RESULTS, REVEAL, WARNING_DIALOG_H, WIDTH,
-  center, ratesDialogH, collectionCellRect, dialogButtons, dialogRect, resultCardRect, type Rect,
+  BANNER, COLLECTION, CONFIRM_DIALOG_H, DIALOG, GACHA, HEIGHT, RESULTS, REVEAL, SHEET, WARNING_DIALOG_H, WIDTH,
+  bannerTextArea, center, ratesDialogH, collectionCellRect, dialogButtons, dialogRect, resultCardRect, type Rect,
 } from '../ui/layout';
 import { Particles } from '../ui/particles';
 import { celebrateSingle, playFlip, playReveal, sparkleBest, type Sequence } from '../ui/reveal';
@@ -26,8 +26,8 @@ import { playSplash } from '../ui/splash';
 import { Sfx } from '../ui/sfx';
 import { ART_FX, COLORS, CSS, FONT_SIZE, STROKE } from '../ui/theme';
 import {
-  makeButton, makeEmblem, makeModal, makeOrb, makePanel, makePortrait, makeResultCard, makeShardAmount, makeShardIcon,
-  textStyle, type Button,
+  fitWidth, makeButton, makeEmblem, makeModal, makeOrb, makePanel, makePortrait, makeResultCard, makeShardAmount,
+  makeShardIcon, makeSheet, textStyle, type Button,
 } from '../ui/widgets';
 
 // Délai avant qu'un appui passe l'animation : un double appui sur « Tirer » ne doit
@@ -56,7 +56,7 @@ export class GachaScene extends Phaser.Scene {
   // Bandeaux clairs sous les textes posés sur le fond (FR-008), redessinés à chaque refresh.
   private textPlates!: Phaser.GameObjects.Graphics;
   private currencyText!: Phaser.GameObjects.Text;
-  private counterText!: Phaser.GameObjects.Text;
+  private shardIcon!: Phaser.GameObjects.Image | Phaser.GameObjects.Graphics;
   private shardsText!: Phaser.GameObjects.Text;
   private pityText!: Phaser.GameObjects.Text;
   private bannerName!: Phaser.GameObjects.Text;
@@ -122,10 +122,10 @@ export class GachaScene extends Phaser.Scene {
       coin.lineStyle(STROKE.thin, COLORS.ink, 1).strokeCircle(coinX, cy, 12);
     }
     this.currencyText = this.add.text(coinX + 20, cy, '', textStyle(FONT_SIZE.big)).setOrigin(0, 0.5);
-    this.counterText = this.add.text(h.x + h.w - 16, cy, '', textStyle(FONT_SIZE.big)).setOrigin(1, 0.5);
-    const shardX = h.x + h.w / 2 - 6;
-    makeShardIcon(this, shardX, cy, 12);
-    this.shardsText = this.add.text(shardX + 16, cy, '', textStyle(FONT_SIZE.big)).setOrigin(0, 0.5);
+    // Éclats calés à droite : le nombre d'éléments possédés, qui était là, n'est plus que
+    // dans la collection (003, FR-013). refresh() place l'icône devant le montant.
+    this.shardsText = this.add.text(h.x + h.w - 16, cy, '', textStyle(FONT_SIZE.big)).setOrigin(1, 0.5);
+    this.shardIcon = makeShardIcon(this, 0, cy, 12);
   }
 
   private drawOrb() {
@@ -178,9 +178,9 @@ export class GachaScene extends Phaser.Scene {
   // Bannières (006) : flèches en boucle. Pendant une fenêtre, le voile les recouvre.
   private drawBannerSelector() {
     makePanel(this, GACHA.banner);
-    const { x, y } = center(GACHA.banner);
-    this.bannerName = this.add.text(x, y - 8, '', textStyle(FONT_SIZE.body)).setOrigin(0.5);
-    this.bannerDetail = this.add.text(x, y + 10, '', textStyle(FONT_SIZE.micro, CSS.textDim)).setOrigin(0.5);
+    const { y } = center(GACHA.banner);
+    this.bannerName = this.add.text(0, y - 8, '', textStyle(FONT_SIZE.body)).setOrigin(0.5);
+    this.bannerDetail = this.add.text(0, y + 10, '', textStyle(FONT_SIZE.micro, CSS.textDim)).setOrigin(0.5);
     const V = Phaser.Math.Vector2;
     for (const [r, step] of [[GACHA.bannerPrev, -1], [GACHA.bannerNext, 1]] as const) {
       makeButton(this, r, '', COLORS.btn.neutral, () => this.onCycleBanner(step));
@@ -211,8 +211,8 @@ export class GachaScene extends Phaser.Scene {
   private refresh() {
     const p = this.progression;
     this.currencyText.setText(formatAmount(p.currency));
-    this.counterText.setText(`${distinctOwned(p)} / ${CATALOGUE.length}`);
     this.shardsText.setText(formatAmount(p.shards));
+    this.shardIcon.setX(this.shardsText.x - this.shardsText.width - 16);
     const left = pullsUntilPity(p);
     this.pityText.setText(left === 1
       ? 'Légendaire garanti au prochain tirage'
@@ -225,19 +225,24 @@ export class GachaScene extends Phaser.Scene {
     this.bannerPortrait?.destroy();
     this.bannerPortrait = null;
     const b = GACHA.banner;
-    const textX = vedette ? b.x + 34 + (b.w - 34) / 2 : b.x + b.w / 2;
+    const area = bannerTextArea(vedette !== null);
+    const textX = area.x + area.w / 2;
     this.bannerName.setX(textX);
     this.bannerDetail.setX(textX);
     if (vedette) {
       const count = p.owned[vedette.id] ?? 0;
-      this.bannerPortrait = makePortrait(this, b.x + 20, b.y + b.h / 2, 30, vedette, true);
+      this.bannerPortrait = makePortrait(this, b.x + BANNER.portraitX, b.y + b.h / 2, BANNER.portraitD, vedette, true);
       this.bannerName.setText(vedette.name);
-      this.bannerDetail.setText(
-        `${rarityLabel(vedette.rarity)} · ${count > 0 ? `possédé ×${count}` : 'pas encore obtenu'}`);
+      // « non obtenu » plutôt que « pas encore obtenu » : la ligne tient à sa taille avec
+      // Comic Sans MS, où elle dépassait du bandeau des deux côtés.
+      this.bannerDetail.setText(`${rarityLabel(vedette.rarity)} · ${count > 0 ? `possédé ×${count}` : 'non obtenu'}`);
     } else {
       this.bannerName.setText('Bannière standard');
       this.bannerDetail.setText('Tous les éléments, taux de base');
     }
+    // Filet de sécurité pour les polices plus larges (repli des appareils sans Comic).
+    fitWidth(this.bannerName, FONT_SIZE.body, area.w);
+    fitWidth(this.bannerDetail, FONT_SIZE.micro, area.w);
     // Tournure sans accord : la vedette peut être féminine (Marquise Cerise).
     this.featuredText.setText(vedette && hasFeaturedGuarantee(p)
       ? `Prochain ${rarityLabel(vedette.rarity)} garanti\u00a0: ${vedette.name}`
@@ -541,19 +546,43 @@ export class GachaScene extends Phaser.Scene {
     if (owned) {
       const kind = item.kind === 'character' ? 'Personnage' : 'Créature';
       c.add(this.add.text(textX, r.y + 24, `${kind} · ×${count}`, textStyle(FONT_SIZE.micro, CSS.textDim)));
+      // Un possédé se montre en grand (FR-014).
+      c.add(this.cellZone(r, () => {
+        this.closeModal(modal);
+        this.showSheet(item, count);
+      }));
       return c;
     }
     // Coût mis en évidence s'il est abordable, estompé sinon (FR-004).
     c.add(makeShardAmount(this, textX, r.y + 30, formatAmount(cost), 0).setAlpha(affordable ? 1 : 0.4));
     if (affordable) {
-      const zone = this.add.zone(r.x, r.y, r.w, r.h).setOrigin(0).setInteractive({ useHandCursor: true });
-      zone.on('pointerup', () => {
+      c.add(this.cellZone(r, () => {
         this.closeModal(modal);
         this.showExchangeConfirm(item);
-      });
-      c.add(zone);
+      }));
     }
     return c;
+  }
+
+  private cellZone(r: Rect, onTap: () => void) {
+    const zone = this.add.zone(r.x, r.y, r.w, r.h).setOrigin(0).setInteractive({ useHandCursor: true });
+    zone.on('pointerup', onTap);
+    return zone;
+  }
+
+  // Fiche d'un possédé (003, révision du 2026-11-08) : elle ne fait que montrer ; « Retour »
+  // rouvre la collection, comme « Annuler » sur un échange.
+  private showSheet(item: Item, count: number) {
+    const modal = this.openModal('fiche');
+    // Signal pour l'e2e : l'élément montré, sans lire le canvas.
+    document.body.dataset.fiche = item.id;
+    modal.add(makePanel(this, RESULTS.panel, COLORS.background));
+    modal.add(makeSheet(this, item, count));
+    modal.add(makeButton(this, SHEET.back, 'Retour', COLORS.btn.neutral, () => {
+      delete document.body.dataset.fiche;
+      this.closeModal(modal);
+      this.showCollection();
+    }).container);
   }
 
   private showExchangeConfirm(item: Item) {

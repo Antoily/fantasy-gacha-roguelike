@@ -12,6 +12,8 @@ Mêmes commandes que [001](../001-tirage/quickstart.md) :
 3. **Échange depuis la collection** (scénarios 002 réécrits) : Légendaire manquant +
    150 éclats → Collection → case → Échanger → possédé, 0 éclat, 3 appuis ;
    trop cher → rien ; Annuler → retour à `collection`.
-4. **Appui sur un possédé** : aucune fenêtre ne s'ouvre, rien ne change.
-5. **Collection complète** : message de félicitation (capture).
+4. **Appui sur un possédé** *(révision du 2026-11-08)* : sa fiche s'ouvre (`fiche`,
+   `dataset.fiche` = son id ; capture) ; Retour → `collection` ; sauvegarde inchangée.
+   Un manquant n'ouvre jamais de fiche.
+5. **Collection complète** : message de félicitation (capture) ; la première case ouvre sa fiche.
 6. Fermer → retour à l'écran de tirage, sauvegarde inchangée.

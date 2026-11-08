@@ -44,6 +44,14 @@ Aucune.
 - [x] T011 Relire les captures : 20 cases lisibles, noms longs, ×N, résumé, collection complète
 - [x] T012 [P] `CLAUDE.md`, `docs/ROADMAP.md` (003 → Fait), cocher ce fichier
 
+## Phase 8: Révision du 2026-11-08 (retours de l'utilisateur)
+
+- [x] T013 Spec : FR-013 (total seulement dans la collection), FR-014 et User Story 5 (fiche), SC-006 ; 001 FR-017 ; cas limite du bandeau dans 006
+- [x] T014 `src/ui/layout.ts` : `BANNER`, `bannerTextArea()` (testée et mutée), `SHEET` ; `src/ui/theme.ts` : `FONT_SIZE_MIN`
+- [x] T015 `src/ui/widgets.ts` : `fitWidth()`, `makeSheet()` ; `GachaScene` : en-tête sans compteur, bandeau ajusté, case possédée → `showSheet()` → Retour → collection
+- [x] T016 e2e : fiche ouverte puis Retour (id via `dataset.fiche`), manquant sans fiche, collection complète, fiche en repli ; captures du bandeau ; mutations de la scène
+- [x] T017 Relire les captures (Comic Sans MS, Comic Neue, Liberation, DejaVu) ; `CLAUDE.md`, `docs/ROADMAP.md`
+
 ## Dependencies & Execution Order
 
 Phase 2 → US1 → US2 → US3 → US4 (même fenêtre, même fichier) → Polish.
