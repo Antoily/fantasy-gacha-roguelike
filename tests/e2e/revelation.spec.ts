@@ -41,8 +41,11 @@ test('un palier par rareté, puis la carte obtenue (US1, FR-003)', async ({ page
     // Capture en pleine révélation du palier (relue avant merge, SC-005).
     await page.waitForTimeout(T.suspense + 250 - (Date.now() - t0));
     await capture(page, `palier-${id}`);
-    await waitModal(page, 'results');
+    // SC-003 mesure l'animation : elle s'arrête à la carte, ou à la présentation plein écran
+    // d'un Légendaire / Ultra rare (007), qui attend ensuite l'appui du joueur.
+    await page.waitForFunction(() => ['results', 'splash'].includes(document.body.dataset.modal ?? ''));
     expect(Date.now() - t0).toBeLessThan(5_500); // SC-003
+    await waitModal(page, 'results');
     if (id === 'legendary') {
       await page.waitForTimeout(150);
       await capture(page, 'x1-carte-legendaire');

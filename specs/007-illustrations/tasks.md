@@ -17,7 +17,7 @@ Vocabulaire : la « présentation » de la spec est la fenêtre `splash` du code
 ## Phase 1: Setup
 
 - [x] T001 Charte, fiches, exemple de technique (`docs/art/`) ; `scripts/art/check.mjs` (format, éléments interdits, identifiants, cadrages) et `scripts/art/preview.mjs` (aperçu aux tailles du jeu, maquettes, galerie) ; scripts npm `art:check`, `art:preview`
-- [ ] T002 (18/20 : manquent Ronronflette et Coquillard) Produire les 20 illustrations et les visuels d'interface (un agent par visuel, charte + fiche) dans `public/art/` ; `npm run art:check` vert
+- [x] T002 Produire les 20 illustrations et les visuels d'interface (un agent par visuel, charte + fiche) dans `public/art/` ; `npm run art:check` vert
 - [x] T003 `scripts/art/contrast.mjs` (research R6) + script npm `art:contrast` ; CI : `art:check` et `art:contrast` dans le job du jeu
 
 ---
@@ -71,7 +71,7 @@ Vocabulaire : la « présentation » de la spec est la fenêtre `splash` du code
 ## Phase 8: Polish & Cross-Cutting Concerns
 
 - [x] T018 e2e quickstart 10 (densité 2 : appuis justes, capture nette) ; e2e SC-004 : écran prêt (`dataset.ready`) en moins de 3 s après le chargement de la page
-- [ ] T019 Relire toutes les captures (débordements, lisibilité, cohérence) ; vidéo d'une révélation Ultra rare (horloge virtuelle, leçon révision 004)
+- [x] T019 Relire toutes les captures (débordements, lisibilité, cohérence) ; vidéo d'une révélation Ultra rare (horloge virtuelle, leçon révision 004)
 - [x] T020 `CLAUDE.md` (structure, leçons), `docs/ROADMAP.md` ; galerie d'aperçu publiée pour l'utilisateur
 
 ---

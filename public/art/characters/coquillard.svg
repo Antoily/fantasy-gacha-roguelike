@@ -1,0 +1,308 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+<defs>
+<path id="coquillard-spout" d="M118,418 C84,418 62,396 52,366 C46,346 36,324 27,303 C33,296 41,291 49,289 C57,310 65,330 77,344 C88,355 102,360 120,358 Z"/>
+<path id="coquillard-handle" d="M306,312 C342,298 374,318 372,360 C370,400 346,430 310,434 L308,414 C332,410 351,390 352,360 C353,334 336,324 308,332 Z"/>
+<path id="coquillard-foot" d="M146,446 L266,446 L271,461 C246,471 166,471 141,461 Z"/>
+<path id="coquillard-body" d="M124,286 C100,302 86,338 87,374 C88,414 112,444 150,454 L262,454 C300,444 324,412 323,372 C322,334 308,302 286,286 C260,270 150,270 124,286 Z"/>
+<ellipse id="coquillard-collar" cx="205" cy="280" rx="82" ry="19"/>
+<ellipse id="coquillard-hole" cx="205" cy="278" rx="70" ry="13"/>
+<path id="coquillard-lip" d="M123,280 L123,287 A82,19 0 0 0 287,287 L287,280 L275,278 A70,13 0 0 1 135,278 Z"/>
+<path id="coquillard-carapace" d="M140,288 C136,250 160,214 205,212 C250,212 274,248 270,288 A76,16 0 0 1 140,288 Z"/>
+<path id="coquillard-mouth" d="M174,254 C186,276 224,278 242,250 C224,262 194,264 174,254 Z"/>
+<path id="coquillard-claw" d="M-12,6 C-32,2 -36,-34 -22,-52 C-18,-64 -15,-76 -8,-85 C-4,-89 1,-86 -1,-80 C-3,-70 -3,-62 1,-55 C8,-58 18,-56 24,-48 C34,-34 30,-4 12,6 Z"/>
+<path id="coquillard-dactyl" d="M14,-50 C22,-62 20,-78 8,-90 C4,-93 0,-90 2,-85 C9,-75 9,-64 4,-54 Z"/>
+<path id="coquillard-sclaw" d="M-9,5 C-23,1 -26,-24 -16,-37 C-14,-46 -12,-54 -7,-60 C-4,-63 0,-61 -2,-56 C-4,-49 -3,-43 1,-39 C6,-41 13,-39 16,-33 C23,-20 19,-1 8,5 Z"/>
+<path id="coquillard-sdactyl" d="M10,-31 C20,-38 27,-49 27,-59 C27,-64 22,-64 21,-60 C19,-51 13,-43 4,-37 Z"/>
+<path id="coquillard-cup" d="M-21,-13 C-21,4 -12,15 0,15 C12,15 21,4 21,-13 Z"/>
+<path id="coquillard-flange" d="M-46,0 A46,11 0 0 1 46,0 L46,5 A46,11 0 0 1 -46,5 Z"/>
+<path id="coquillard-dome" d="M-34,-1 C-34,-22 -18,-32 0,-32 C18,-32 34,-22 34,-1 A34,8 0 0 1 -34,-1 Z"/>
+<circle id="coquillard-knob" cx="0" cy="-41" r="9"/>
+<circle id="coquillard-eyeL" cx="132" cy="118" r="31"/>
+<circle id="coquillard-eyeR" cx="278" cy="108" r="29"/>
+<path id="coquillard-puff" d="M24,290 A7,7 0 0 1 28,277 A9,9 0 0 1 45,272 A7,7 0 0 1 55,283 A6,6 0 0 1 49,292 C40,296 30,296 24,290 Z"/>
+<path id="coquillard-armR" d="M246,262 C268,270 292,274 312,250"/>
+<path id="coquillard-armL" d="M168,264 C142,272 116,262 98,234"/>
+<path id="coquillard-stalkL" d="M184,230 C178,198 152,172 136,146"/>
+<path id="coquillard-stalkR" d="M228,228 C236,198 260,168 274,138"/>
+<path id="coquillard-leg1" d="M150,286 C140,292 134,300 132,312 L131,322"/>
+<path id="coquillard-leg2" d="M172,292 C166,300 163,308 163,318 L163,328"/>
+<path id="coquillard-leg3" d="M238,292 C244,300 247,308 247,318 L247,328"/>
+<path id="coquillard-leg4" d="M258,286 C268,292 274,300 276,312 L277,322"/>
+<path id="coquillard-w1" d="M34,274 C26,262 40,252 34,240 C28,228 14,230 16,242 C18,250 28,249 27,242"/>
+<path id="coquillard-w2" d="M46,272 C56,262 48,252 54,244 C58,238 56,232 50,232"/>
+<path id="coquillard-w3" d="M345,147 C337,134 352,126 345,113 C339,103 345,95 352,93"/>
+<path id="coquillard-w4" d="M358,146 C366,135 354,126 362,114 C367,106 364,99 360,97"/>
+<path id="coquillard-star" d="M0,-10 Q0,0 10,0 Q0,0 0,10 Q0,0 -10,0 Q0,0 0,-10 Z"/>
+<ellipse id="coquillard-petal" cx="0" cy="-13" rx="6.5" ry="10"/>
+<clipPath id="coquillard-k-spout"><use href="#coquillard-spout"/></clipPath>
+<clipPath id="coquillard-k-handle"><use href="#coquillard-handle"/></clipPath>
+<clipPath id="coquillard-k-foot"><use href="#coquillard-foot"/></clipPath>
+<clipPath id="coquillard-k-body"><use href="#coquillard-body"/></clipPath>
+<clipPath id="coquillard-k-collar"><use href="#coquillard-collar"/></clipPath>
+<clipPath id="coquillard-k-lip"><use href="#coquillard-lip"/></clipPath>
+<clipPath id="coquillard-k-carapace"><use href="#coquillard-carapace"/></clipPath>
+<clipPath id="coquillard-k-mouth"><use href="#coquillard-mouth"/></clipPath>
+<clipPath id="coquillard-k-claw"><use href="#coquillard-claw"/></clipPath>
+<clipPath id="coquillard-k-dactyl"><use href="#coquillard-dactyl"/></clipPath>
+<clipPath id="coquillard-k-sclaw"><use href="#coquillard-sclaw"/></clipPath>
+<clipPath id="coquillard-k-sdactyl"><use href="#coquillard-sdactyl"/></clipPath>
+<clipPath id="coquillard-k-cup"><use href="#coquillard-cup"/></clipPath>
+<clipPath id="coquillard-k-flange"><use href="#coquillard-flange"/></clipPath>
+<clipPath id="coquillard-k-dome"><use href="#coquillard-dome"/></clipPath>
+<clipPath id="coquillard-k-knob"><use href="#coquillard-knob"/></clipPath>
+<clipPath id="coquillard-k-eyeL"><use href="#coquillard-eyeL"/></clipPath>
+<clipPath id="coquillard-k-eyeR"><use href="#coquillard-eyeR"/></clipPath>
+<clipPath id="coquillard-k-puff"><use href="#coquillard-puff"/></clipPath>
+</defs>
+<ellipse cx="206" cy="466" rx="142" ry="12" fill="#1d1a16" opacity=".18"/>
+<g fill="#1d1a16" stroke="#1d1a16" stroke-width="9.5" stroke-linejoin="round" stroke-linecap="round">
+<use href="#coquillard-handle"/><use href="#coquillard-spout"/><use href="#coquillard-foot"/><use href="#coquillard-body"/><use href="#coquillard-collar"/><use href="#coquillard-carapace"/><use href="#coquillard-lip"/><use href="#coquillard-eyeL"/><use href="#coquillard-eyeR"/>
+<g transform="translate(214,203) rotate(14)"><use href="#coquillard-flange"/><use href="#coquillard-dome"/><use href="#coquillard-knob"/></g>
+<g transform="translate(351,163)"><use href="#coquillard-cup"/><ellipse cx="0" cy="-13" rx="21" ry="6"/><ellipse cx="0" cy="15" rx="9" ry="3.5"/><circle cx="-24" cy="-3" r="7.5" fill="none" stroke-width="19"/></g>
+<g transform="translate(312,250) rotate(10)"><use href="#coquillard-dactyl"/><use href="#coquillard-claw"/></g>
+<g transform="translate(97,230) rotate(-22)"><use href="#coquillard-sdactyl"/><use href="#coquillard-sclaw"/></g>
+<g fill="none"><use href="#coquillard-armR" stroke-width="32"/><use href="#coquillard-armL" stroke-width="29"/><use href="#coquillard-stalkL" stroke-width="28"/><use href="#coquillard-stalkR" stroke-width="28"/></g>
+</g>
+<use href="#coquillard-handle" fill="#f7f3ea"/>
+<g clip-path="url(#coquillard-k-handle)">
+<path d="M318,321 C346,312 362,334 362,360 C362,392 344,418 314,424" fill="none" stroke="#e0a82e" stroke-width="3.5"/>
+<g fill="#2050b8"><circle cx="345" cy="322" r="2.6"/><circle cx="361" cy="345" r="2.6"/><circle cx="359" cy="384" r="2.6"/><circle cx="341" cy="410" r="2.6"/></g>
+<path d="M352,316 C368,330 374,346 372,360 C370,400 346,430 310,434 L309,424 C342,418 360,394 361,364 C362,344 360,328 352,316 Z" fill="#3b3f9a" fill-opacity=".22"/>
+<path d="M366,342 C369,372 359,404 330,426" fill="none" stroke="#eef2ff" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M316,318 C334,310 350,314 358,326" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
+</g>
+<use href="#coquillard-handle" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+<use href="#coquillard-spout" fill="#f7f3ea"/>
+<g clip-path="url(#coquillard-k-spout)">
+<g fill="none" stroke="#2050b8" stroke-width="3" stroke-linecap="round"><path d="M106,394 C88,390 72,378 66,360"/><path d="M86,386 C80,376 84,368 92,366"/><path d="M72,370 C63,367 59,359 61,351"/></g>
+<g fill="#2050b8"><circle cx="93" cy="365" r="4"/><circle cx="61" cy="350" r="3"/><path d="M104,394 Q100,382 110,378 Q112,390 104,394 Z"/></g>
+<path d="M20,305 C30,296 42,290 54,287 L57,296 C46,298 36,304 27,313 Z" fill="#e0a82e"/>
+<path d="M27,313 C36,304 46,298 57,296" fill="none" stroke="#1d1a16" stroke-width="2.5"/>
+<path d="M120,402 C86,402 66,386 58,362 C52,344 44,326 36,308 L10,310 L10,440 L130,440 Z" fill="#3b3f9a" fill-opacity=".22"/>
+<path d="M112,412 C86,410 66,394 57,368" fill="none" stroke="#eef2ff" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M86,348 C72,338 62,322 55,306" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
+</g>
+<use href="#coquillard-spout" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+<ellipse cx="38" cy="296" rx="13" ry="5.5" transform="rotate(-32.5 38 296)" fill="#222448" stroke="#1d1a16" stroke-width="4.5"/>
+<use href="#coquillard-foot" fill="#f7f3ea"/>
+<g clip-path="url(#coquillard-k-foot)">
+<path d="M130,458 C166,468 246,468 280,458 L280,480 L130,480 Z" fill="#e0a82e"/>
+<path d="M220,440 L290,440 L290,480 L200,480 C236,470 250,458 220,440 Z" fill="#3b3f9a" fill-opacity=".25"/>
+</g>
+<use href="#coquillard-foot" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+<use href="#coquillard-body" fill="#f7f3ea"/>
+<g clip-path="url(#coquillard-k-body)">
+<ellipse cx="150" cy="335" rx="62" ry="40" fill="#fff" opacity=".7"/>
+<path d="M100,306 Q205,350 310,306" fill="none" stroke="#2050b8" stroke-width="11"/>
+<path d="M100,314 Q205,358 310,314" fill="none" stroke="#2050b8" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 14"/>
+<path d="M100,306 Q205,350 310,306" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-dasharray="0 14"/>
+<path d="M96,326 Q205,372 314,326" fill="none" stroke="#e0a82e" stroke-width="3.5"/>
+<g transform="translate(202,392)">
+<circle r="33" fill="none" stroke="#e0a82e" stroke-width="3.5"/>
+<circle r="28" fill="none" stroke="#2050b8" stroke-width="2"/>
+<g fill="#2050b8"><use href="#coquillard-petal"/><use href="#coquillard-petal" transform="rotate(60)"/><use href="#coquillard-petal" transform="rotate(120)"/><use href="#coquillard-petal" transform="rotate(180)"/><use href="#coquillard-petal" transform="rotate(240)"/><use href="#coquillard-petal" transform="rotate(300)"/></g>
+<g fill="#4f7fe0"><ellipse cx="0" cy="-14" rx="2.2" ry="5"/><ellipse cx="0" cy="-14" rx="2.2" ry="5" transform="rotate(60)"/><ellipse cx="0" cy="-14" rx="2.2" ry="5" transform="rotate(120)"/><ellipse cx="0" cy="-14" rx="2.2" ry="5" transform="rotate(180)"/><ellipse cx="0" cy="-14" rx="2.2" ry="5" transform="rotate(240)"/><ellipse cx="0" cy="-14" rx="2.2" ry="5" transform="rotate(300)"/></g>
+<g fill="#2050b8"><circle cy="-21" r="2.2" transform="rotate(30)"/><circle cy="-21" r="2.2" transform="rotate(90)"/><circle cy="-21" r="2.2" transform="rotate(150)"/><circle cy="-21" r="2.2" transform="rotate(210)"/><circle cy="-21" r="2.2" transform="rotate(270)"/><circle cy="-21" r="2.2" transform="rotate(330)"/></g>
+<circle r="6.5" fill="#e0a82e" stroke="#173f96" stroke-width="2"/>
+</g>
+<g fill="none" stroke="#2050b8" stroke-width="3" stroke-linecap="round"><path d="M166,380 C156,366 134,370 134,384 C134,394 146,396 148,388 C149,382 142,380 140,384"/><path d="M238,380 C248,366 270,370 270,384 C270,394 258,396 256,388 C255,382 262,380 264,384"/><path d="M172,414 C160,426 140,424 136,412"/><path d="M232,414 C244,426 264,424 268,412"/></g>
+<g fill="#2050b8"><path d="M136,412 Q128,402 120,408 Q128,418 136,412 Z"/><path d="M268,412 Q276,402 284,408 Q276,418 268,412 Z"/><circle cx="112" cy="366" r="3.2"/><circle cx="118" cy="371" r="3.2"/><circle cx="115" cy="378" r="3.2"/><circle cx="108" cy="378" r="3.2"/><circle cx="106" cy="371" r="3.2"/><circle cx="296" cy="366" r="3.2"/><circle cx="302" cy="371" r="3.2"/><circle cx="299" cy="378" r="3.2"/><circle cx="292" cy="378" r="3.2"/><circle cx="290" cy="371" r="3.2"/><circle cx="142" cy="350" r="2"/><circle cx="264" cy="350" r="2"/></g>
+<g fill="#e0a82e"><circle cx="112" cy="372.5" r="2.4"/><circle cx="296" cy="372.5" r="2.4"/></g>
+<path d="M112,418 Q205,452 298,418" fill="none" stroke="#2050b8" stroke-width="5" stroke-linecap="round" stroke-dasharray="0 10"/>
+<path d="M106,426 Q205,462 304,426" fill="none" stroke="#e0a82e" stroke-width="3.5"/>
+<path d="M262,282 C300,300 316,340 312,378 C306,420 266,446 196,448 C160,448 128,440 108,428 L100,470 L340,470 L340,282 Z" fill="#3b3f9a" fill-opacity=".2"/>
+<path d="M302,302 C318,332 320,380 304,414 C288,442 248,454 200,458 L200,476 L340,476 L340,296 Z" fill="#3b3f9a" fill-opacity=".18"/>
+<ellipse cx="205" cy="292" rx="90" ry="25" fill="#3b3f9a" fill-opacity=".22"/>
+<path d="M298,306 C312,326 318,352 317,376 C316,408 296,436 260,447" fill="none" stroke="#eef2ff" stroke-width="3" stroke-linecap="round"/>
+<path d="M106,342 C110,320 124,306 144,298 C134,312 126,326 122,344 C120,354 106,354 106,342 Z" fill="#fff"/>
+<circle cx="116" cy="364" r="4" fill="#fff"/>
+<use href="#coquillard-star" transform="translate(136,318) scale(.9)" fill="#fff"/>
+</g>
+<use href="#coquillard-body" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+<use href="#coquillard-collar" fill="#f7f3ea"/>
+<g clip-path="url(#coquillard-k-collar)"><path d="M250,250 C276,262 290,272 290,292 L300,292 L300,250 Z" fill="#3b3f9a" fill-opacity=".22"/></g>
+<ellipse cx="205" cy="279" rx="76" ry="16" fill="none" stroke="#e0a82e" stroke-width="3"/>
+<use href="#coquillard-collar" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+<use href="#coquillard-hole" fill="#222448" stroke="#1d1a16" stroke-width="4.5"/>
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+<use href="#coquillard-armR" stroke="#1d1a16" stroke-width="27"/>
+<use href="#coquillard-armR" stroke="#b03a3c" stroke-width="18"/>
+<use href="#coquillard-armR" stroke="#e85a2c" stroke-width="12" transform="translate(-1.5,-2)"/>
+<use href="#coquillard-armR" stroke="#ff9a5e" stroke-width="3" transform="translate(-3,-5)"/>
+<use href="#coquillard-armL" stroke="#1d1a16" stroke-width="24"/>
+<use href="#coquillard-armL" stroke="#b03a3c" stroke-width="15"/>
+<use href="#coquillard-armL" stroke="#e85a2c" stroke-width="10" transform="translate(-1.5,-2)"/>
+<use href="#coquillard-armL" stroke="#ff9a5e" stroke-width="2.5" transform="translate(-2.5,-4)"/>
+<g stroke="#1d1a16" stroke-width="2.5"><path d="M277,259 Q285,268 279,277"/><path d="M127,269 Q124,262 133,256"/></g>
+</g>
+<use href="#coquillard-carapace" fill="#e85a2c"/>
+<g clip-path="url(#coquillard-k-carapace)">
+<path d="M226,213 C258,220 276,250 272,292 L236,296 C250,270 248,236 226,213 Z" fill="#b03a3c"/>
+<path d="M160,240 C166,224 182,216 200,215 C186,222 174,232 168,248 Z" fill="#ff8f54"/>
+<path d="M168,204 C188,224 232,234 258,226 L256,236 C230,244 186,236 166,214 Z" fill="#b03a3c"/>
+<path d="M254,228 C265,242 270,262 269,284" fill="none" stroke="#ffb59a" stroke-width="2.5" stroke-linecap="round"/>
+<circle cx="168" cy="236" r="3.5" fill="#fff"/>
+<ellipse cx="164" cy="252" rx="10" ry="6" fill="#ff6f86" opacity=".5"/>
+<ellipse cx="249" cy="247" rx="9" ry="5.5" fill="#ff6f86" opacity=".5"/>
+<g fill="#b03a3c"><circle cx="158" cy="249" r="1.6"/><circle cx="164" cy="254" r="1.6"/><circle cx="170" cy="249" r="1.6"/><circle cx="244" cy="245" r="1.5"/><circle cx="250" cy="250" r="1.5"/><circle cx="255" cy="244" r="1.5"/><circle cx="196" cy="236" r="2.6"/><circle cx="214" cy="240" r="2"/><circle cx="186" cy="278" r="2.2"/><circle cx="228" cy="280" r="2.4"/></g>
+</g>
+<use href="#coquillard-carapace" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+<use href="#coquillard-mouth" fill="#6b1d24"/>
+<g clip-path="url(#coquillard-k-mouth)"><ellipse cx="212" cy="268" rx="10" ry="5" fill="#ff7a7f"/><path d="M189,255 L198,256 L193,264 Z" fill="#fff"/></g>
+<use href="#coquillard-mouth" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+<path d="M240,247 C246,245 249,250 246,255" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+<use href="#coquillard-lip" fill="#f7f3ea"/>
+<g clip-path="url(#coquillard-k-lip)">
+<path d="M123,283.5 A82,19 0 0 0 287,283.5" fill="none" stroke="#e0a82e" stroke-width="7"/>
+<path d="M129,279 A76,16 0 0 0 281,279" fill="none" stroke="#e0a82e" stroke-width="2.5"/>
+<path d="M246,270 C268,290 266,300 238,312 L300,312 L300,270 Z" fill="#3b3f9a" fill-opacity=".22"/>
+<path d="M146,296 C162,301 178,303 192,304" fill="none" stroke="#ffe9a8" stroke-width="2.5" stroke-linecap="round"/>
+</g>
+<use href="#coquillard-lip" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+<path d="M123,280 A82,19 0 0 0 287,280" fill="none" stroke="#1d1a16" stroke-width="2.5"/>
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+<g stroke="#1d1a16" stroke-width="20"><use href="#coquillard-leg1"/><use href="#coquillard-leg2"/><use href="#coquillard-leg3"/><use href="#coquillard-leg4"/></g>
+<g stroke="#b03a3c" stroke-width="11"><use href="#coquillard-leg1"/><use href="#coquillard-leg2"/><use href="#coquillard-leg3"/><use href="#coquillard-leg4"/></g>
+<g stroke="#e85a2c" stroke-width="7" transform="translate(-1,-1.5)"><use href="#coquillard-leg1"/><use href="#coquillard-leg2"/><use href="#coquillard-leg3"/><use href="#coquillard-leg4"/></g>
+<g stroke="#6e2622" stroke-width="8"><path d="M132,315 L131,322"/><path d="M163,321 L163,328"/><path d="M247,321 L247,328"/><path d="M276,315 L277,322"/></g>
+<g stroke="#ff9a5e" stroke-width="2.2" transform="translate(-2,-3)"><use href="#coquillard-leg1"/><use href="#coquillard-leg2"/><use href="#coquillard-leg3"/><use href="#coquillard-leg4"/></g>
+<g stroke="#1d1a16" stroke-width="2.5"><path d="M129,302 Q133,308 139,306"/><path d="M158.6,309 Q163.5,314 169.4,311"/><path d="M240.6,310.8 Q246.5,314 251.4,309.2"/><path d="M268.8,305.6 Q275,308 279.2,302.4"/></g>
+</g>
+<g transform="translate(351,163)">
+<ellipse cx="0" cy="15" rx="9" ry="3.5" fill="#e0a82e" stroke="#1d1a16" stroke-width="2.5"/>
+<circle cx="-24" cy="-3" r="7.5" fill="none" stroke="#1d1a16" stroke-width="9.5"/>
+<circle cx="-24" cy="-3" r="7.5" fill="none" stroke="#f7f3ea" stroke-width="5"/>
+<path d="M-30,-7 A7.5,7.5 0 0 1 -22,-10.3" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+<use href="#coquillard-cup" fill="#f7f3ea"/>
+<g clip-path="url(#coquillard-k-cup)">
+<path d="M-20,-6 A20,6 0 0 0 20,-6" fill="none" stroke="#2050b8" stroke-width="5"/>
+<path d="M-19,0 A19,6 0 0 0 19,0" fill="none" stroke="#e0a82e" stroke-width="2"/>
+<g fill="#2050b8"><circle cx="2" cy="3" r="2.8"/><circle cx="7" cy="7.5" r="2.8"/><circle cx="2" cy="12" r="2.8"/><circle cx="-3" cy="7.5" r="2.8"/></g>
+<circle cx="2" cy="7.5" r="2" fill="#e0a82e"/>
+<path d="M6,-12 C18,-8 22,4 14,16 L26,16 L26,-12 Z" fill="#3b3f9a" fill-opacity=".22"/>
+<path d="M-15,-3 C-15,2 -12,7 -8,10" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+</g>
+<use href="#coquillard-cup" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+<ellipse cx="0" cy="-13" rx="21" ry="6" fill="#f7f3ea" stroke="#1d1a16" stroke-width="4.5"/>
+<ellipse cx="0" cy="-12.5" rx="16.5" ry="3.8" fill="#9c5420"/>
+<ellipse cx="-4" cy="-13.5" rx="7" ry="1.6" fill="#d98b3a"/>
+<ellipse cx="0" cy="-13" rx="19" ry="5" fill="none" stroke="#e0a82e" stroke-width="1.5"/>
+</g>
+<g transform="translate(312,250) rotate(10)">
+<use href="#coquillard-dactyl" fill="#e85a2c"/>
+<g clip-path="url(#coquillard-k-dactyl)">
+<path d="M10,-52 C18,-64 16,-78 6,-88 L20,-92 L24,-50 Z" fill="#b03a3c"/>
+<ellipse cx="5" cy="-87" rx="7" ry="7" fill="#7a2a22"/>
+<path d="M7,-58 C9,-66 8,-74 5,-80" fill="none" stroke="#ff9a5e" stroke-width="2.2" stroke-linecap="round"/>
+</g>
+<use href="#coquillard-dactyl" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+<use href="#coquillard-claw" fill="#e85a2c"/>
+<g clip-path="url(#coquillard-k-claw)">
+<path d="M14,-54 C30,-38 28,-10 6,8 L40,10 L40,-60 Z" fill="#b03a3c"/>
+<path d="M-30,-20 C-30,-36 -22,-48 -14,-54 C-18,-42 -22,-32 -22,-18 Z" fill="#ff8f54"/>
+<ellipse cx="-5" cy="-84" rx="6" ry="7" fill="#7a2a22"/>
+<g fill="#b03a3c"><circle cx="-8" cy="-28" r="2.4"/><circle cx="4" cy="-20" r="2.2"/><circle cx="-4" cy="-10" r="2"/><circle cx="-14" cy="-14" r="1.8"/></g>
+<path d="M21,-44 C27,-30 26,-10 13,-1" fill="none" stroke="#ffb59a" stroke-width="2.5" stroke-linecap="round"/>
+<circle cx="-18" cy="-38" r="3.5" fill="#fff"/>
+<path d="M-27,-26 C-27,-20 -25,-14 -21,-10" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+</g>
+<use href="#coquillard-claw" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+<path d="M1,-55 C-6,-50 -12,-48 -18,-50" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"/>
+</g>
+<g transform="translate(97,230) rotate(-22)">
+<use href="#coquillard-sdactyl" fill="#e85a2c"/>
+<g clip-path="url(#coquillard-k-sdactyl)"><path d="M8,-33 C18,-40 24,-50 24,-60 L32,-60 L32,-30 Z" fill="#b03a3c"/><ellipse cx="24" cy="-60" rx="5" ry="5" fill="#7a2a22"/></g>
+<use href="#coquillard-sdactyl" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+<use href="#coquillard-sclaw" fill="#e85a2c"/>
+<g clip-path="url(#coquillard-k-sclaw)">
+<path d="M10,-36 C22,-24 18,-4 4,6 L30,6 L30,-40 Z" fill="#b03a3c"/>
+<path d="M-21,-14 C-21,-26 -16,-34 -10,-38 C-13,-30 -15,-22 -15,-12 Z" fill="#ff8f54"/>
+<ellipse cx="-4" cy="-59" rx="4.5" ry="5.5" fill="#7a2a22"/>
+<circle cx="-12" cy="-26" r="2.6" fill="#fff"/>
+<path d="M14,-30 C18,-20 17,-7 9,0" fill="none" stroke="#ffb59a" stroke-width="2.2" stroke-linecap="round"/>
+</g>
+<use href="#coquillard-sclaw" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+</g>
+<g fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linecap="round"><path d="M56,198 C49,186 49,172 56,162"/><path d="M45,204 C36,188 36,168 45,154"/></g>
+<g transform="translate(214,203) rotate(14)">
+<use href="#coquillard-flange" fill="#f7f3ea"/>
+<g clip-path="url(#coquillard-k-flange)">
+<path d="M-46,0 A46,11 0 0 0 46,0 L46,8 L-46,8 Z" fill="#e0a82e"/>
+<path d="M10,-12 L50,-12 L50,10 L18,10 Z" fill="#3b3f9a" fill-opacity=".22"/>
+<path d="M-38,6 C-24,10 -8,12 6,12" fill="none" stroke="#ffe9a8" stroke-width="2" stroke-linecap="round"/>
+</g>
+<use href="#coquillard-flange" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+<path d="M-46,0 A46,11 0 0 0 46,0" fill="none" stroke="#1d1a16" stroke-width="2.5"/>
+<use href="#coquillard-dome" fill="#f7f3ea"/>
+<g clip-path="url(#coquillard-k-dome)">
+<path d="M-33,-6 C-14,3 14,3 33,-6" fill="none" stroke="#e0a82e" stroke-width="3"/>
+<path d="M-31,-14 C-14,-7 14,-7 31,-14" fill="none" stroke="#2050b8" stroke-width="6"/>
+<path d="M-31,-14 C-14,-7 14,-7 31,-14" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-dasharray="0 7"/>
+<g transform="translate(0,-23) scale(.35)" fill="#2050b8"><use href="#coquillard-petal"/><use href="#coquillard-petal" transform="rotate(60)"/><use href="#coquillard-petal" transform="rotate(120)"/><use href="#coquillard-petal" transform="rotate(180)"/><use href="#coquillard-petal" transform="rotate(240)"/><use href="#coquillard-petal" transform="rotate(300)"/></g>
+<circle cx="0" cy="-23" r="2.4" fill="#e0a82e"/>
+<path d="M8,-31 C24,-28 36,-16 34,-1 L18,4 C24,-8 22,-22 8,-31 Z" fill="#3b3f9a" fill-opacity=".22"/>
+<path d="M27,-22 C31,-16 32,-9 31,-4" fill="none" stroke="#eef2ff" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M-25,-17 C-23,-23 -17,-27 -11,-29" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
+</g>
+<use href="#coquillard-dome" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linejoin="round"/>
+<ellipse cx="0" cy="-32" rx="8" ry="3" fill="#e0a82e" stroke="#1d1a16" stroke-width="2.5"/>
+<use href="#coquillard-knob" fill="#e0a82e"/>
+<g clip-path="url(#coquillard-k-knob)"><circle cx="4" cy="-38" r="9" fill="#a8701e"/><circle cx="1" cy="-42" r="7" fill="#e0a82e"/><circle cx="-3" cy="-45" r="2.6" fill="#fff"/></g>
+<use href="#coquillard-knob" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+</g>
+<g fill="none" stroke-linecap="round">
+<g stroke="#1d1a16" stroke-width="23"><use href="#coquillard-stalkL"/><use href="#coquillard-stalkR"/></g>
+<g stroke="#b03a3c" stroke-width="14"><use href="#coquillard-stalkL"/><use href="#coquillard-stalkR"/></g>
+<g stroke="#e85a2c" stroke-width="9" transform="translate(-1.5,-1.5)"><use href="#coquillard-stalkL"/><use href="#coquillard-stalkR"/></g>
+<g stroke="#ff9a5e" stroke-width="2.5" transform="translate(-3,-3.5)"><use href="#coquillard-stalkL"/><use href="#coquillard-stalkR"/></g>
+<g stroke="#1d1a16" stroke-width="2.5"><path d="M168,206 Q175,207 180,199"/><path d="M153,181 Q160,181 163,174"/><path d="M233,198 Q237,204 245,204"/><path d="M248.5,170.7 Q252.6,176.6 259.7,177.3"/></g>
+</g>
+<use href="#coquillard-eyeL" fill="#fffaf0"/>
+<g clip-path="url(#coquillard-k-eyeL)">
+<path d="M163,118 A31,31 0 0 1 120,147 C140,146 156,136 163,118 Z" fill="#dcd8ec"/>
+<circle cx="127" cy="124" r="17" fill="#b86a12"/>
+<circle cx="127" cy="126.5" r="14.5" fill="#f0a823"/>
+<ellipse cx="128" cy="133" rx="9" ry="4" fill="#ffd36a"/>
+<circle cx="127" cy="124" r="17" fill="none" stroke="#1d1a16" stroke-width="2.5"/>
+<circle cx="126" cy="124" r="8.5" fill="#1d1a16"/>
+<path d="M96,96 C122,96 150,108 170,119 L170,127 C150,117 122,104 96,104 Z" fill="#3b3f9a" fill-opacity=".25"/>
+<circle cx="120" cy="117" r="5.5" fill="#fff"/><circle cx="133" cy="131" r="2.5" fill="#fff"/>
+<path d="M90,80 L176,80 L176,119 L170,119 C150,108 122,96 96,96 L90,96 Z" fill="#e85a2c"/>
+<ellipse cx="124" cy="92" rx="18" ry="6" fill="#ff8f54"/>
+<path d="M96,96 C122,96 150,108 170,119" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+</g>
+<use href="#coquillard-eyeL" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+<use href="#coquillard-eyeR" fill="#fffaf0"/>
+<g clip-path="url(#coquillard-k-eyeR)">
+<path d="M307,108 A29,29 0 0 1 266,134.4 C286,134 302,124 307,108 Z" fill="#dcd8ec"/>
+<circle cx="273" cy="113" r="16" fill="#b86a12"/>
+<circle cx="273" cy="115.5" r="13.5" fill="#f0a823"/>
+<ellipse cx="274" cy="121.5" rx="8.5" ry="3.8" fill="#ffd36a"/>
+<circle cx="273" cy="113" r="16" fill="none" stroke="#1d1a16" stroke-width="2.5"/>
+<circle cx="272" cy="113" r="8" fill="#1d1a16"/>
+<path d="M246,110 C266,100 292,92 312,88 L312,96 C292,100 266,108 246,118 Z" fill="#3b3f9a" fill-opacity=".25"/>
+<circle cx="266" cy="106" r="5" fill="#fff"/><circle cx="279" cy="120" r="2.3" fill="#fff"/>
+<path d="M240,60 L316,60 L316,88 L312,88 C292,92 266,100 246,110 L240,110 Z" fill="#e85a2c"/>
+<ellipse cx="282" cy="86" rx="16" ry="5" fill="#ff8f54"/>
+<path d="M246,110 C266,100 292,92 312,88" fill="none" stroke="#1d1a16" stroke-width="4.5" stroke-linecap="round"/>
+</g>
+<use href="#coquillard-eyeR" fill="none" stroke="#1d1a16" stroke-width="4.5"/>
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+<g stroke="#1d1a16" stroke-width="10"><use href="#coquillard-w1"/><use href="#coquillard-w2"/></g>
+<g stroke="#fff" stroke-width="5"><use href="#coquillard-w1"/><use href="#coquillard-w2"/></g>
+<g stroke="#1d1a16" stroke-width="8.5"><use href="#coquillard-w3"/><use href="#coquillard-w4"/></g>
+<g stroke="#fff" stroke-width="3.5"><use href="#coquillard-w3"/><use href="#coquillard-w4"/></g>
+</g>
+<use href="#coquillard-puff" fill="#fff"/>
+<g clip-path="url(#coquillard-k-puff)"><path d="M28,295 C42,292 52,288 57,279 L62,300 L20,300 Z" fill="#d6e2f7"/></g>
+<use href="#coquillard-puff" fill="none" stroke="#1d1a16" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M40,286 C35,282 39,276 44,279" fill="none" stroke="#1d1a16" stroke-width="2" stroke-linecap="round"/>
+<g fill="#fffbe0" stroke="#1d1a16" stroke-linejoin="round">
+<use href="#coquillard-star" transform="translate(14,262) scale(.75)" stroke-width="3"/>
+<use href="#coquillard-star" transform="translate(70,262) scale(.55)" stroke-width="3.5"/>
+<use href="#coquillard-star" transform="translate(384,118) scale(.8)" stroke-width="3"/>
+<use href="#coquillard-star" transform="translate(330,96) scale(.55)" stroke-width="3.5"/>
+<use href="#coquillard-star" transform="translate(242,150) scale(.6)" stroke-width="3.5"/>
+</g>
+<g fill="#ffd75e"><circle cx="24" cy="222" r="2.2"/><circle cx="374" cy="88" r="2"/><circle cx="60" cy="240" r="1.8"/><circle cx="388" cy="146" r="1.8"/></g>
+</svg>
