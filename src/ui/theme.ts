@@ -118,9 +118,12 @@ export const STROKE = { thin: 2, base: 3, thick: 4 } as const;
 export const SHADOW_OFFSET = 4;
 export const RADIUS = 12;
 
-export const FONT_FAMILY = '"Comic Neue", "Comic Sans MS", "Chalkboard SE", "Trebuchet MS", sans-serif';
+// Police embarquée (ADR 0008) : Fredoka figée en SemiBold, déclarée grasse puisque le jeu
+// écrit tout en gras. Même rendu sur tout appareil ; la pile ne sert qu'en repli.
+export const FONT_FACE = { family: 'Fredoka', url: 'fonts/fredoka-semibold.woff2', weight: 'bold' } as const;
+export const FONT_FAMILY = `"${FONT_FACE.family}", "Trebuchet MS", sans-serif`;
 
 export const FONT_SIZE = { title: 28, big: 22, button: 18, body: 14, small: 12, tiny: 11, micro: 10 } as const;
-// Plancher d'un texte réduit pour tenir dans sa place : sa largeur dépend de la police de
-// l'appareil (Comic Neue, Comic Sans MS ou la police de repli, bien plus large).
+// Plancher d'un texte réduit pour tenir dans sa place : en repli, la police de l'appareil
+// peut être bien plus large que Fredoka.
 export const FONT_SIZE_MIN = 8;

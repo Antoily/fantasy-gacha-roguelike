@@ -18,7 +18,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const load = rel => import(pathToFileURL(join(root, rel)).href);
 const { CATALOGUE } = await load('src/data/catalogue.ts');
 const { RARITIES } = await load('src/data/gachaConfig.ts');
-const { COLORS, FONT_FAMILY } = await load('src/ui/theme.ts');
+const { COLORS, FONT_FACE, FONT_FAMILY } = await load('src/ui/theme.ts');
 const L = await load('src/ui/layout.ts');
 
 const hex = n => `#${n.toString(16).padStart(6, '0')}`;
@@ -27,6 +27,9 @@ const PAPER = hex(COLORS.background);
 const ui = name => join(root, 'public/art/ui', name);
 const uri = path => `data:image/svg+xml;base64,${readFileSync(path).toString('base64')}`;
 const maybe = path => (existsSync(path) ? uri(path) : null);
+// Police embarquée du jeu (ADR 0008), pour que les maquettes aient ses textes.
+const FONT_CSS = `@font-face { font-family: "${FONT_FACE.family}"; font-weight: ${FONT_FACE.weight}; src: url(data:font/woff2;base64,${
+  readFileSync(join(root, 'public', FONT_FACE.url)).toString('base64')}); }`;
 
 // Fenêtre w×h px sur la zone (x, y, cw, ch) d'une illustration de 400×500.
 function crop(src, { x, y, w: cw }, w, h, style = '') {
@@ -42,6 +45,7 @@ const label = text => `<div class="label">${text}</div>`;
 const block = (title, body) => `<div class="block">${label(title)}<div class="row">${body}</div></div>`;
 
 const PAGE = (body, width) => `<!doctype html><html><head><meta charset="utf-8"><style>
+  ${FONT_CSS}
   body { margin: 0; padding: 16px; width: ${width}px; background: #3a3530; font-family: ${FONT_FAMILY}; color: #f0e6d2; }
   .row { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
   .block { margin: 0 16px 16px 0; display: inline-block; vertical-align: top; }
@@ -128,9 +132,9 @@ function mainMock() {
     + box(h, '#fff', '', false)
     + (icon('coin') ? img(icon('coin'), h.x + 12, cy - 14, 28, 28) : `<div style="position:absolute;left:${h.x + 14}px;top:${cy - 12}px;width:24px;height:24px;border-radius:50%;background:#ffc93c;border:2px solid ${INK}"></div>`)
     + `<div style="position:absolute;left:${h.x + 46}px;top:${cy - 14}px">${t('9&nbsp;000', 22)}</div>`
-    + (icon('shard') ? img(icon('shard'), h.x + h.w / 2 - 20, cy - 14, 28, 28) : '')
-    + `<div style="position:absolute;left:${h.x + h.w / 2 + 12}px;top:${cy - 14}px">${t('0', 22)}</div>`
-    + `<div style="position:absolute;right:${360 - (h.x + h.w) + 16}px;top:${cy - 14}px">${t('0 / 20', 22)}</div>`
+    // Éclats calés à droite ; le total « N / 20 » n'est plus que dans la collection (révision de 003).
+    + (icon('shard') ? img(icon('shard'), h.x + h.w - 60, cy - 14, 28, 28) : '')
+    + `<div style="position:absolute;right:${360 - (h.x + h.w) + 16}px;top:${cy - 14}px">${t('0', 22)}</div>`
     + box(GACHA.bannerPrev, '#f0e6d2', icon('arrow') ? `<img src="${icon('arrow')}" style="width:26px;height:26px;transform:scaleX(-1)">` : t('◀', 16))
     + box(GACHA.banner, '#fff', t('Bannière standard', 14) + t('Tous les éléments, taux de base', 10, '#6b6258'), false)
     + box(GACHA.bannerNext, '#f0e6d2', icon('arrow') ? `<img src="${icon('arrow')}" style="width:26px;height:26px">` : t('▶', 16))
@@ -198,7 +202,8 @@ function uiSheet(file, sizes, bgs, mocks, cracks) {
   for (const m of mocks) {
     const html = m === 'main' ? mainMock() : m === 'reveal' ? revealMock(cracks) : m === 'cards' ? cardsMock() : null;
     if (!html) throw new Error(`maquette inconnue : ${m} (main, reveal, cards)`);
-    pages.push({ file: `mock-${m}${m === 'reveal' && cracks ? `-fissures${cracks}` : ''}.png`, html: `<!doctype html><html><body style="margin:0;font-family:${FONT_FAMILY}">${html}</body></html>`, width: 360, scale: 2 });
+    // Apostrophes autour du style : FONT_FAMILY contient des guillemets (sinon Times New Roman).
+    pages.push({ file: `mock-${m}${m === 'reveal' && cracks ? `-fissures${cracks}` : ''}.png`, html: `<!doctype html><html><head><style>${FONT_CSS}</style></head><body style='margin:0;font-family:${FONT_FAMILY}'>${html}</body></html>`, width: 360, scale: 2 });
   }
   return { name, pages };
 }
@@ -246,6 +251,7 @@ try {
     await page.setContent(p.html, { waitUntil: 'load' });
     // Toutes les images décodées avant la capture (data URI : pas de réseau).
     await page.evaluate(() => Promise.all([...document.images].map(i => i.decode().catch(() => {}))));
+    await page.evaluate(() => document.fonts.ready);
     await page.screenshot({ path: join(out, p.file), fullPage: true });
     await page.close();
     console.log(join(out, p.file));

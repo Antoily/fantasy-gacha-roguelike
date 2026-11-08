@@ -58,6 +58,7 @@ src/ui/       theme.ts (SEULES couleurs/polices), layout.ts (géométrie, partag
 src/scenes/   BootScene (lit la sauvegarde) → GachaScene (écran + fenêtres)
 tests/e2e/    parcours Playwright du quickstart, critère de merge
 public/sounds/ enregistrements CC0 seulement, chacun listé dans CREDITS.md (ADR 0006)
+public/fonts/ police embarquée (Fredoka SemiBold, OFL), licence et CREDITS.md (ADR 0008) ; chargée par src/ui/font.ts
 public/art/   SVG faits main (ADR 0007) : characters/<id>.svg + <id>.json (cadrages), ui/ ; charte et fiches dans docs/art/
 ```
 
@@ -71,7 +72,8 @@ public/art/   SVG faits main (ADR 0007) : characters/<id>.svg + <id>.json (cadra
   (notes en train de sonner), `dataset.muted`, `dataset.banner` (bannière active) et
   `dataset.featuredLine` (ligne de garantie vedette), `dataset.skip = 'armed'` (l'appui qui passe
   l'animation est armé), `dataset.splash` (présentation affichée), `dataset.art = 'ready'` et
-  `dataset.artMissing` (illustrations prêtes, ou en repli). L'e2e s'en sert pour vérifier l'enchaînement des écrans : sans lui, deux
+  `dataset.artMissing` (illustrations prêtes, ou en repli), `dataset.font` (`ready` ou
+  `fallback`, police posée avant l'écran). L'e2e s'en sert pour vérifier l'enchaînement des écrans : sans lui, deux
   mutations de la 002 survivaient (une confirmation ouverte à tort que la logique
   refusait ensuite).
 - Playwright tourne avec **un seul worker** : les captures sont numérotées dans
@@ -255,13 +257,19 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
 
 ## Leçons de la révision de 003 (2026-11-08)
 
-- **La police dépend de l'appareil** tant que le jeu n'en embarque pas : Comic Sans MS sous
-  Windows (le poste de l'utilisateur), Comic Neue si installée, sinon la police de repli
-  (DejaVu Sans sur la CI, la plus large). Un texte à place comptée se mesure à l'exécution
-  (`fitWidth`, `bannerTextArea`) ; une capture de la CI ne montre pas ce que voit l'utilisateur.
-- **Voir le rendu de l'utilisateur** : Comic Sans MS se récupère dans `comic32.exe` (corefonts
-  de SourceForge, `cabextract`) ; Chromium prend les polices d'un `fonts.conf` donné par
-  `FONTCONFIG_FILE`. Comparer au moins Comic Sans MS et DejaVu avant de juger une mise en page.
+- **La police dépendait de l'appareil** : Comic Sans MS sous Windows (le poste de
+  l'utilisateur), DejaVu Sans sur la CI, bien plus large. D'où le débordement du bandeau,
+  invisible sur les captures. Corrigé par la police embarquée (ADR 0008) ; un texte à place
+  comptée garde sa mesure à l'exécution (`fitWidth`, `bannerTextArea`) pour le repli.
+- **Juger un rendu avec une autre police** : Chromium prend les polices d'un `fonts.conf`
+  donné par `FONTCONFIG_FILE` (Comic Sans MS : `comic32.exe` des corefonts de SourceForge,
+  `cabextract`).
+- **L'utilisateur n'aime pas Comic Sans MS** (« trop cheap », 2026-11-08) : ne pas la remettre,
+  même en repli. Le choix de la police a été laissé à Claude (Fredoka, ADR 0008).
+- **Police web et Phaser** : un texte prend la police disponible à sa création et n'est pas
+  redessiné quand elle arrive ; d'où le chargement avant l'écran (`loadFont`). Et
+  `document.fonts.check()` répond vrai pour une police qu'aucune face ne déclare : tester
+  `[...document.fonts]` (une mutation l'a montré).
 - **Machine sans les bibliothèques de Chromium ni droits d'installation** (serveur ikka) :
   `apt-get download` des paquets manquants (`ldd` sur `chrome-headless-shell`), `dpkg-deb -x`
   dans un dossier, puis `LD_LIBRARY_PATH` vers son `usr/lib/x86_64-linux-gnu`. Node 24 : archive
