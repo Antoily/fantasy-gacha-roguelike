@@ -80,3 +80,21 @@ tests/e2e/son.spec.ts           nouveaux scénarios du quickstart
 ## Complexity Tracking
 
 Aucune violation de la constitution à justifier.
+
+## Révision du 2026-11-09 (sons d'interface, avec la révision de 007)
+
+Spec : User Story 5, FR-011 à FR-013, SC-006.
+
+- **Recettes** : `tap`, `swish`, `coins`, `shards` dans `SOUND_RECIPES`
+  (`src/data/sounds.ts`), synthétisés comme les autres (FR-013), gain nettement sous
+  celui des paliers ; `coins` / `shards` taillés à la durée du défilement (007 FR-015).
+- **Branchement** : `makeButton` reçoit le son de son appui par une fonction posée une
+  fois par la scène (`setButtonSound`, `src/ui/widgets.ts`) : un seul point d'appel, les
+  widgets ne dépendent pas de `Sfx`. Les flèches de bannière passent `swish`.
+- **Journal** : les nouveaux sons entrent dans `dataset.sounds` ; « Tirer » remet le
+  journal à zéro après son `tap`, donc les attentes des tirages ne changent pas.
+- **e2e** : `tap` à l'ouverture de « Taux », `swish` sur ▶, `coins` après un tirage,
+  rien son coupé ; mutations de la scène.
+
+Constitution : I (pas de mécanisme), II, V (journal vérifié et muté), VI (recettes en
+données). ✅

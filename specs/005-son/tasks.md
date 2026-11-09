@@ -52,3 +52,9 @@ Setup → Phase 2 → US1 → US2 → US3 → US4 → Polish. T010 est le critè
 
 Calendrier et réglages purs d'abord (T003–T004), puis le moteur audio, puis le
 branchement scène par scène, puis l'e2e.
+
+## Phase 8: Révision du 2026-11-09 (sons d'interface)
+
+- [x] T014 Spec : User Story 5, FR-011 à FR-013, SC-006
+- [ ] T015 `src/data/sounds.ts` : recettes `tap`, `swish`, `coins`, `shards` ; `src/ui/widgets.ts` : `setButtonSound` ; `GachaScene` : branchement, tintement au défilement des montants
+- [ ] T016 e2e : journal (`tap`, `swish`, `coins`) son actif, vide son coupé ; mutations de la scène

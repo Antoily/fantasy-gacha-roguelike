@@ -106,3 +106,32 @@ présenté, dans quel ordre) est de la logique pure.
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
 | Rendu à la densité de l'écran (canvas ×R) | Sans lui, le jeu agrandi par le navigateur rend toute illustration floue (FR-009) | Fixer le jeu à 720 × 1280 : toute la géométrie et l'e2e à doubler |
+
+## Révision du 2026-11-09 (écran vivant)
+
+Spec : User Story 5, FR-013 à FR-019, SC-007, SC-008 ; sons d'interface dans la révision
+de 005 (même date).
+
+- **Données** : `src/data/ambienceConfig.ts` (durées, amplitudes, nombre de lueurs),
+  comme `revealConfig.ts` ; couleurs du halo et des lueurs dans `theme.ts`.
+- **Logique pure** : `src/logic/motion.ts`, `rollAmount(from, to, progress)` (valeur
+  entière affichée pendant un défilement, exacte à la fin, bornée) ; testée et mutée.
+- **Ambiance** : `src/ui/ambience.ts` ; lévitation et pulsation de l'orbe (tweens en
+  boucle sur son conteneur), lueurs par `Particles` (`glow`, graine propre : aucun
+  `Math.random`, leçon 004), halo dessiné sous les boutons de tirage payables. Avant la
+  révélation, `killTweensOf` sur l'orbe et retour à sa position de repos (leçon des
+  tweens concurrents) ; reprise à la fermeture de la dernière fenêtre.
+- **Transitions** : défilement des montants (`tweens.addCounter` + `rollAmount`, rebond
+  de l'icône), glissement du bandeau, fondu d'entrée de `openModal` (alpha seul : les
+  zones cliquables ne bougent pas, FR-018).
+- **Réduire les animations** : `matchMedia('(prefers-reduced-motion: reduce)')`, lu au
+  démarrage ; `dataset.motion = 'full' | 'reduced'` et `dataset.glow` (tirages qui
+  portent le halo) pour l'e2e.
+- **e2e** : SC-007 (deux captures de l'orbe à 1 s, avec et sans `reducedMotion` de
+  Playwright), halo selon le solde, orbe au repos au départ de la révélation ; les
+  captures de fenêtres attendent la fin du fondu. Mutations de la scène.
+
+Constitution : I (aucun mécanisme : rien ne change dans les règles), II (spec révisée
+d'abord), IV (hasard du tirage intact : décor à graine propre, SC-005 et suite de
+référence de `gacha.test.ts` inchangés), V (`rollAmount` testé et muté, ambiance
+couverte par l'e2e et mutée), VI (durées en données, couleurs dans le thème). ✅

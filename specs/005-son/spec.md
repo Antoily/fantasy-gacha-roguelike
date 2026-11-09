@@ -22,6 +22,10 @@ donne au joueur le moyen de couper le son.
 - Q: D'où viennent les sons ? → A: Mélange : les bruitages (suspense, paliers, montée, cartes) sont fabriqués par le jeu, style cartoon/rétro, sans fichier ; le rire diabolique est un enregistrement libre de droits (CC0).
 - Q: La musique de fond fait-elle partie de cette feature ? → A: Non, plus tard (feature à part, liée à l'univers du jeu).
 
+### Révision du 2026-11-09 (écran vivant, avec la révision de 007)
+
+- Q: Sonoriser aussi l'interface ? → A (demande de l'utilisateur : du son pour « rendre un peu de vie », sans nouvelle feature, choix laissé à Claude) : oui, de petits bruitages discrets sur les appuis, le changement de bannière et les montants qui défilent (User Story 5, FR-011 à FR-013). La musique de fond reste pour plus tard (roadmap : après l'univers définitif).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Entendre la révélation (Priority: P1)
@@ -96,6 +100,28 @@ celui de la vedette.
 
 ---
 
+### User Story 5 - Entendre l'interface (Priority: P3)
+
+*Révision du 2026-11-09.* Chaque appui sur un bouton fait un petit bruit, le
+changement de bannière un glissement, et un montant qui défile (007, FR-015) fait
+tinter des pièces ou des éclats. Ces sons sont courts et plus discrets que ceux du
+tirage.
+
+**Why this priority**: donne de la vie à l'écran (demande de l'utilisateur) ; le jeu
+reste complet sans eux.
+
+**Independent Test**: son actif, ouvrir « Taux » fait entendre un bruit d'appui, ▶ un
+glissement, un tirage le tintement des pièces ; son coupé, aucun des trois.
+
+**Acceptance Scenarios**:
+
+1. **Given** le son actif, **When** le joueur touche un bouton (écran ou fenêtre), **Then** un bruit d'appui court se fait entendre, une fois.
+2. **Given** le son actif, **When** il touche ◀ ou ▶, **Then** il entend un glissement au lieu du bruit d'appui.
+3. **Given** le son actif, **When** le solde ou les éclats défilent, **Then** des pièces (solde) ou des éclats (éclats) tintent, pas plus longtemps que le défilement.
+4. **Given** le son coupé, **When** le joueur fait l'une de ces actions, **Then** il n'entend rien ; quand il rétablit le son, le bouton son fait entendre le bruit d'appui.
+
+---
+
 ### Edge Cases
 
 - **Passer l'animation** : les sons en cours s'arrêtent aussitôt ; aucun son de la suite (palier, rire, cartes) ne se fait entendre après l'appui.
@@ -117,11 +143,14 @@ celui de la vedette.
 - **FR-008**: Une impossibilité de jouer un son MUST NOT bloquer ni perturber le jeu.
 - **FR-009**: Les bruitages (suspense, paliers, montée, cartes) MUST être **fabriqués par le jeu** (synthèse, style cartoon/rétro), sans fichier sonore.
 - **FR-010**: Le rire diabolique MUST être un **enregistrement libre de droits (CC0)**, court (2 s au plus), dont la provenance (auteur, lien, licence) est tracée dans le dépôt.
+- **FR-011**: *(Révision du 2026-11-09.)* Un appui sur un bouton MUST faire entendre un bruit d'appui court (0,1 s au plus), plus discret que les sons du tirage ; les flèches de bannière MUST faire entendre un glissement à la place.
+- **FR-012**: Le défilement d'un montant (007, FR-015) MUST faire tinter des pièces (solde) ou des éclats (éclats), sans durer plus que le défilement.
+- **FR-013**: Ces sons MUST suivre le réglage du son (FR-006, FR-007) et MUST être fabriqués par le jeu, comme les autres bruitages (FR-009).
 
 ### Key Entities
 
 - **Réglage du son** : actif ou coupé, mémorisé sur l'appareil du joueur, indépendant de la partie.
-- **Bruitage** : un son associé à un moment du jeu (suspense, palier, montée, rire, carte, vedette).
+- **Bruitage** : un son associé à un moment du jeu (suspense, palier, montée, rire, carte, vedette ; depuis la révision du 2026-11-09 : appui, glissement, pièces, éclats).
 
 ## Success Criteria *(mandatory)*
 
@@ -132,12 +161,13 @@ celui de la vedette.
 - **SC-003**: Aucun son ne commence plus de 0,1 s après l'appui qui passe l'animation.
 - **SC-004**: Le rire diabolique se fait entendre dans 100 % des leurres et dans 0 % des autres tirages.
 - **SC-005**: Le jeu se charge et reste jouable quand le son est indisponible.
+- **SC-006**: *(Révision du 2026-11-09.)* Son actif, chaque appui sur un bouton fait entendre exactement un bruit d'appui ou de glissement ; son coupé, aucun.
 
 ## Assumptions
 
 - Pas de musique de fond : feature à part, plus tard (clarification).
 - Pas de vibration : hors périmètre.
 - Pas de réglage de volume fin : un seul bouton coupé / actif.
-- Pas de son sur les boutons, la collection ni les taux : seul le tirage est sonorisé.
+- Sons d'interface : absents au départ, ajoutés par la révision du 2026-11-09 (FR-011 à FR-013) ; toujours ni musique ni son d'ambiance continu.
 - Le réglage du son n'appartient pas à la partie : « Recommencer » ne l'efface pas.
 - Les sons sont provisoires, comme la DA : remplaçables sans toucher aux règles.
