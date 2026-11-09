@@ -30,6 +30,11 @@ de [004](../004-revelation/spec.md) (révision du 2026-10-30).
 - Q: Quelle ambiance pour le fond de l'écran de tirage ? → A: Ciel de rêve pastel : nuages cartoon, îles flottantes, l'orbe sur un socle ornementé baigné de lumière ; clair, l'interface reste lisible.
 - Q: Quel style ? → A (demande de l'utilisateur) : toujours cartoon, avec nettement plus de détails ; la richesse d'une illustration croît avec la rareté.
 
+### Révision du 2026-11-09 (écran vivant)
+
+- Q: L'écran de tirage est statique ; que faut-il animer ? → A (demande de l'utilisateur : « rendre un peu de vie », sans nouvelle feature, choix laissé à Claude) : une ambiance au repos (orbe qui lévite, lueurs dans le ciel), un halo sur les tirages payables, des montants qui défilent, un bandeau de bannière qui glisse, des fenêtres qui apparaissent en fondu (User Story 5, FR-013 à FR-019). Les sons d'interface vont dans la révision de [005](../005-son/spec.md).
+- Q: Les nuages du fond bougent-ils ? → A: Non : le fond est une seule illustration (ADR 0007) ; la découper reviendrait à refaire des visuels. Les lueurs suffisent à faire vivre le ciel.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Voir qui l'on a obtenu (Priority: P1)
@@ -117,6 +122,33 @@ tous les boutons répondent aux mêmes endroits qu'avant.
 
 ---
 
+### User Story 5 - Un écran de tirage vivant (Priority: P3)
+
+*Révision du 2026-11-09.* Au repos, l'écran respire : l'orbe lévite et son éclat pulse,
+des lueurs montent dans le ciel, le bouton d'un tirage payable est entouré d'un halo.
+Quand un montant change, il défile ; quand le joueur change de bannière, le bandeau
+glisse ; une fenêtre apparaît en fondu. Rien de cela ne change les règles ni ne retarde
+un appui.
+
+**Why this priority**: l'utilisateur trouve l'écran trop statique ; le jeu reste
+complet sans ces animations.
+
+**Independent Test**: écran ouvert, sans rien toucher : deux images prises à 1 s
+d'écart diffèrent autour de l'orbe, et tous les parcours d'avant passent à l'identique ;
+avec « réduire les animations » demandé par le système, les deux images sont identiques.
+
+**Acceptance Scenarios**:
+
+1. **Given** l'écran de tirage au repos, **When** le joueur ne touche rien, **Then** l'orbe monte et descend lentement de quelques pixels, son éclat pulse et des lueurs montent dans le ciel, derrière l'interface.
+2. **Given** assez de pièces pour un tirage, **When** l'écran est au repos, **Then** le bouton de ce tirage porte un halo qui respire ; un tirage que le joueur ne peut pas payer n'en a pas.
+3. **Given** un tirage ou un échange, **When** le solde ou les éclats changent, **Then** le montant défile de l'ancienne valeur à la nouvelle et son icône rebondit ; la valeur finale est exacte.
+4. **Given** l'écran de tirage, **When** le joueur touche ◀ ou ▶, **Then** le contenu du bandeau entre en glissant depuis le côté de la flèche touchée.
+5. **Given** l'écran de tirage, **When** une fenêtre s'ouvre (taux, collection, fiche, confirmation), **Then** elle apparaît en fondu et ses boutons répondent dès l'ouverture.
+6. **Given** l'orbe en pleine lévitation, **When** un tirage commence, **Then** la révélation part de l'orbe à sa position de repos ; l'ambiance reprend au retour sur l'écran.
+7. **Given** le système de l'appareil demande de réduire les animations, **When** l'écran s'affiche, **Then** il reste fixe et les changements (montants, bandeau, fenêtres) sont instantanés ; la révélation (004) est inchangée.
+
+---
+
 ### Edge Cases
 
 - **Illustration indisponible** (fichier manquant ou illisible) : l'élément s'affiche comme avant (pastille de sa rareté et initiale), le jeu continue sans erreur.
@@ -126,6 +158,8 @@ tous les boutons répondent aux mêmes endroits qu'avant.
 - **Appui pendant l'entrée de la présentation** : l'appui ne la ferme qu'une fois l'illustration entrée (un double appui sur « Passer » ne doit pas la faire disparaître à l'insu du joueur).
 - **Écran agrandi ou haute densité** : les illustrations et les textes restent nets, sans flou d'agrandissement.
 - **Collection complète** : 20 portraits, aucune silhouette.
+- **Montant qui change pendant qu'il défile** (révision du 2026-11-09) : le défilement repart de la valeur affichée vers la nouvelle ; la valeur finale est celle de la partie.
+- **Onglet masqué puis rouvert** : l'ambiance reprend où elle en était, sans rattrapage accéléré.
 
 ## Requirements *(mandatory)*
 
@@ -143,6 +177,13 @@ tous les boutons répondent aux mêmes endroits qu'avant.
 - **FR-010**: Si une illustration ne peut pas être affichée, l'élément MUST s'afficher comme avant (pastille et initiale) sans interrompre le jeu.
 - **FR-011**: Les visuels MUST être des créations propres au projet (aucune image d'un tiers) et respecter la charte ; un contrôle automatique MUST refuser un visuel hors format.
 - **FR-012**: Cette feature MUST NOT changer les règles : taux, tirage, pity, éclats, bannières et sauvegarde restent ceux de 001–006 ; les zones d'appui restent aux mêmes places (sauf la présentation plein écran, nouvelle).
+- **FR-013**: *(Révision du 2026-11-09.)* Au repos, l'écran de tirage MUST montrer une ambiance animée en boucle : orbe en lévitation lente (quelques pixels, cycle de 2 à 4 s) dont l'éclat pulse, et lueurs qui montent dans le ciel, derrière l'interface.
+- **FR-014**: Un bouton de tirage que le joueur peut payer MUST porter un halo qui respire ; un bouton qu'il ne peut pas payer MUST NOT en porter.
+- **FR-015**: Quand le solde ou les éclats changent, le montant affiché MUST défiler jusqu'à la nouvelle valeur en 0,6 s au plus et son icône rebondir ; à la fin, la valeur affichée MUST être exactement celle de la partie.
+- **FR-016**: Changer de bannière MUST faire entrer le contenu du bandeau en glissant depuis le côté de la flèche touchée, en 0,25 s au plus.
+- **FR-017**: Une fenêtre MUST apparaître en fondu en 0,2 s au plus ; ses boutons MUST répondre dès l'ouverture.
+- **FR-018**: Ces animations MUST NOT retarder ni empêcher un appui, déplacer une zone qu'on touche, ni consommer le hasard du tirage ; la révélation MUST reprendre l'orbe à sa position de repos.
+- **FR-019**: Si le système de l'appareil demande de réduire les animations, FR-013 à FR-017 MUST céder la place à un écran fixe et à des changements instantanés.
 
 ### Key Entities
 
@@ -160,12 +201,15 @@ tous les boutons répondent aux mêmes endroits qu'avant.
 - **SC-004**: L'écran de tirage est prêt à jouer en moins de 3 s après l'ouverture du jeu (illustrations chargées comprises), mesuré sur le jeu construit dans l'environnement des tests de bout en bout.
 - **SC-005**: Pour une même suite de tirages, solde, collection, pity, éclats et sauvegarde sont identiques à ceux d'avant la feature.
 - **SC-006**: Affiché en double densité, un contour d'illustration reste net (pas d'agrandissement d'une image plus petite que son affichage).
+- **SC-007**: *(Révision du 2026-11-09.)* Au repos, deux images de l'écran prises à 1 s d'écart diffèrent autour de l'orbe ; avec « réduire les animations », elles sont identiques.
+- **SC-008**: Tous les parcours de bout en bout d'avant la révision passent sans changement de leurs attentes, et l'écran reste prêt en moins de 3 s (SC-004).
 
 ## Assumptions
 
 - Le style est celui demandé par l'utilisateur : cartoon, gros contour encre, mais détaillé ; la charte (`docs/art/charte.md`) le fixe pour tous les visuels.
 - Les illustrations sont dessinées pour le projet (vectoriel) ; l'univers et la DA restent provisoires (constitution VI) : elles pourront être refaites avec l'univers définitif.
-- Les illustrations sont fixes : c'est le jeu qui les anime (entrée, rebond, scintillement).
+- Les illustrations sont fixes : c'est le jeu qui les anime (entrée, rebond, scintillement, lévitation de l'orbe).
+- « Réduire les animations » est le réglage d'accessibilité du système de l'appareil ; le jeu n'ajoute pas son propre réglage (révision du 2026-11-09).
 - La présentation plein écran ne concerne que les tirages ; un échange d'éclats reste sans mise en scène (004, hypothèse conservée).
 - Pas de galerie séparée ni de fiche détaillée d'un élément (hors périmètre de 003, inchangé).
 - Pas de nom de jeu ni d'écran titre : le nom du jeu reste à choisir (roadmap).

@@ -6,7 +6,9 @@ mergée et jouable.
 
 ## En cours
 
-_Rien : prochaine étape à choisir avec l'utilisateur (« Plus tard »)._
+- **Écran vivant** (révisions de 007 et 005, 2026-11-09) : ambiance animée de l'écran de
+  tirage (orbe qui lévite, lueurs, halo des tirages payables, montants qui défilent,
+  bandeau qui glisse, fenêtres en fondu) et sons d'interface. Aucune règle ne change.
 
 ## Ensuite — le gacha
 
