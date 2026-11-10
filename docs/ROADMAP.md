@@ -29,6 +29,16 @@ résultat du tirage ; le joueur devine ce qu'il a eu avant de voir les cartes.
 ## Plus tard — non spécifié, ne pas coder
 
 - Gameplay qui fait gagner la monnaie (et donne une utilité aux personnages).
+  **Idée de l'utilisateur (2026-11-10), à garder comme idée tant que le gacha n'est pas
+  fini** : faire évoluer le gacha en **roguelike de score**, pas d'aventure (ni PV ni
+  dégâts). Une partie enchaîne des étapes ; à chacune, il faut atteindre un **nombre de
+  points** pour continuer, et avancer rapporte des tirages. Le score tient surtout à la
+  **chance**, et des **augmentations** trouvées en cours de partie en donnent davantage
+  (principe proche de Balatro : seuils de score, modificateurs qui s'empilent). Questions
+  pour `/speckit-clarify` le moment venu : d'où viennent les points (les personnages
+  tirés ? un tirage en partie ?), rôle de la collection dans le score, forme des
+  augmentations, ce qui reste d'une partie à l'autre, lien avec la monnaie actuelle.
+  Remplacera l'ancien prototype roguelike-combat (`legacy-v1`), écarté par l'ADR 0002.
 - Univers et DA définitive, visuels réels des personnages, nom du jeu.
 - Événements / bannières limitées dans le temps (mécanique de pression : ADR requis).
 - Progression d'un personnage (niveaux, étoiles, éveil).
