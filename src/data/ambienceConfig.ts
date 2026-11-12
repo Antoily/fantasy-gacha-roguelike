@@ -21,3 +21,15 @@ export const AMBIENCE = {
   // Anneaux du halo, du plus serré au plus large : écart au bouton (px) et opacité.
   haloRings: [[3, 1], [7, 0.6], [11, 0.3]],
 } as const;
+
+// Transitions de l'écran (FR-015 à FR-017), en ms : toutes sous les bornes de la spec.
+export const TRANSITIONS = {
+  // Montant qui défile (≤ 600) et rebond de son icône (agrandie de iconBounce).
+  roll: 600,
+  iconBounce: 1.3,
+  // Bandeau de bannière : glissement (≤ 250) depuis slideOffset px du côté de la flèche.
+  slide: 220,
+  slideOffset: 28,
+  // Fondu d'entrée d'une fenêtre (≤ 200).
+  fade: 120,
+} as const;

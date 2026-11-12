@@ -2,7 +2,9 @@ import Phaser from 'phaser';
 import { CATALOGUE } from '../data/catalogue';
 import type { Item } from '../data/catalogue';
 import { GACHA_CONFIG, RARITIES, SHARD_COST, type Rarity } from '../data/gachaConfig';
+import { TRANSITIONS } from '../data/ambienceConfig';
 import { formatAmount } from '../logic/format';
+import { rollAmount } from '../logic/motion';
 import type { PullResult } from '../logic/gacha';
 import { collectionEntries, isComplete, raritySummary, type CollectionEntry } from '../logic/collection';
 import {
@@ -51,6 +53,11 @@ export class GachaScene extends Phaser.Scene {
   private orb!: Phaser.GameObjects.Container;
   private sfx!: Sfx;
   private ambience!: Ambience;
+  private reducedMotion = false;
+  // Montants de l'en-tête tels qu'affichés, qui rattrapent la partie en défilant (FR-015).
+  private shown = { currency: 0, shards: 0 };
+  private rolls: Partial<Record<'currency' | 'shards', Phaser.Tweens.Tween>> = {};
+  private coinIcon: Phaser.GameObjects.Image | null = null;
   private muteIcon!: Phaser.GameObjects.Graphics;
   // Icônes illustrées du son (007), à la place du dessin quand elles existent.
   private muteImages: { on: Phaser.GameObjects.Image; off: Phaser.GameObjects.Image } | null = null;
@@ -83,7 +90,8 @@ export class GachaScene extends Phaser.Scene {
     this.sfx = new Sfx(this, data.settings.muted);
     this.drawHeader();
     this.drawOrb();
-    this.ambience = new Ambience(this, ambienceLayer, this.orb, prefersReducedMotion());
+    this.reducedMotion = prefersReducedMotion();
+    this.ambience = new Ambience(this, ambienceLayer, this.orb, this.reducedMotion);
     this.drawMuteButton();
     this.drawBannerSelector();
 
@@ -103,6 +111,9 @@ export class GachaScene extends Phaser.Scene {
     makeButton(this, GACHA.rates, 'Taux', COLORS.btn.secondary, () => this.showRates());
     makeButton(this, GACHA.reset, 'Recommencer', COLORS.btn.neutral, () => this.showResetConfirm());
 
+    this.shown = { currency: this.progression.currency, shards: this.progression.shards };
+    this.drawAmount('currency');
+    this.drawAmount('shards');
     this.refresh();
     // Les illustrations arrivent juste après l'écran (SC-004) : le portrait de la vedette suit.
     const onArt = () => this.refresh();
@@ -121,7 +132,8 @@ export class GachaScene extends Phaser.Scene {
     makePanel(this, h);
     const coinX = h.x + 26;
     const cy = h.y + h.h / 2;
-    if (!uiImage(this, 'icon-coin', coinX, cy, 30, 30)) {
+    this.coinIcon = uiImage(this, 'icon-coin', coinX, cy, 30, 30);
+    if (!this.coinIcon) {
       const coin = this.add.graphics();
       coin.fillStyle(COLORS.coin, 1).fillCircle(coinX, cy, 12);
       coin.lineStyle(STROKE.thin, COLORS.ink, 1).strokeCircle(coinX, cy, 12);
@@ -203,6 +215,21 @@ export class GachaScene extends Phaser.Scene {
     this.progression = cycleBanner(this.progression, step);
     this.persist();
     this.refresh();
+    this.slideBanner(step);
+  }
+
+  // Le contenu du bandeau entre depuis le côté de la flèche touchée (007, FR-016).
+  private slideBanner(step: 1 | -1) {
+    if (this.reducedMotion) return;
+    const offset = step * TRANSITIONS.slideOffset;
+    for (const target of [this.bannerName, this.bannerDetail, this.bannerPortrait]) {
+      if (!target) continue;
+      this.tweens.killTweensOf(target);
+      this.tweens.add({
+        targets: target, x: { from: target.x + offset, to: target.x }, alpha: { from: 0, to: 1 },
+        duration: TRANSITIONS.slide, ease: 'Cubic.Out',
+      });
+    }
   }
 
   private persistSettings() {
@@ -215,9 +242,7 @@ export class GachaScene extends Phaser.Scene {
 
   private refresh() {
     const p = this.progression;
-    this.currencyText.setText(formatAmount(p.currency));
-    this.shardsText.setText(formatAmount(p.shards));
-    this.shardIcon.setX(this.shardsText.x - this.shardsText.width - 16);
+    this.showAmounts();
     const left = pullsUntilPity(p);
     this.pityText.setText(left === 1
       ? 'Légendaire garanti au prochain tirage'
@@ -272,6 +297,61 @@ export class GachaScene extends Phaser.Scene {
     );
   }
 
+  // Montants (007, FR-015) : ils ne défilent que sur l'écran visible ; sous une fenêtre,
+  // l'ancien montant reste affiché et défile à la fermeture (closeModal).
+  private showAmounts() {
+    if (this.modalOpen) return;
+    this.rollTo('currency', this.progression.currency, this.coinIcon);
+    this.rollTo('shards', this.progression.shards,
+      this.shardIcon instanceof Phaser.GameObjects.Image ? this.shardIcon : null);
+  }
+
+  // Une fenêtre en remplace souvent une autre dans la même image (révélation → résultats) :
+  // on attend l'image suivante pour savoir si l'écran est vraiment revenu.
+  private showAmountsSoon() {
+    this.time.delayedCall(0, () => this.showAmounts());
+  }
+
+  private rollTo(key: 'currency' | 'shards', to: number, icon: Phaser.GameObjects.Image | null) {
+    // Un montant qui change en plein défilement repart de la valeur affichée.
+    const from = this.shown[key];
+    if (from === to) return;
+    this.rolls[key]?.remove();
+    const set = (n: number) => {
+      this.shown[key] = n;
+      this.drawAmount(key);
+    };
+    if (this.reducedMotion) {
+      set(to);
+      return;
+    }
+    this.rolls[key] = this.tweens.addCounter({
+      from: 0, to: 1, duration: TRANSITIONS.roll, ease: 'Cubic.Out',
+      onUpdate: tw => set(rollAmount(from, to, tw.getValue() ?? 0)),
+      onComplete: () => set(to),
+    });
+    if (!icon) return;
+    // Échelle de repos mémorisée : un rebond coupé en route ne doit pas la fausser.
+    const base = (icon.getData('baseScale') as number | undefined) ?? icon.scaleX;
+    icon.setData('baseScale', base);
+    this.tweens.killTweensOf(icon);
+    icon.setScale(base);
+    this.tweens.add({ targets: icon, scale: base * TRANSITIONS.iconBounce, duration: TRANSITIONS.roll / 4, yoyo: true, ease: 'Quad.Out' });
+  }
+
+  private drawAmount(key: 'currency' | 'shards') {
+    const n = this.shown[key];
+    // Signal pour l'e2e : le montant affiché, sans lire le canvas.
+    if (key === 'currency') {
+      this.currencyText.setText(formatAmount(n));
+      document.body.dataset.shownCurrency = String(n);
+      return;
+    }
+    this.shardsText.setText(formatAmount(n));
+    this.shardIcon.setX(this.shardsText.x - this.shardsText.width - 16);
+    document.body.dataset.shownShards = String(n);
+  }
+
   // Un bandeau par bloc de texte non vide, à la largeur du texte.
   private drawTextPlates() {
     const g = this.textPlates.clear().fillStyle(ART_FX.textPlate, ART_FX.textPlateAlpha);
@@ -298,8 +378,9 @@ export class GachaScene extends Phaser.Scene {
     this.progression = outcome.progression;
     // Sauvegardé AVANT d'afficher : débit et gains sont écrits ensemble (FR-011).
     this.persist();
-    this.refresh();
+    // Fenêtre d'abord : le solde ne défile qu'au retour sur l'écran (FR-015).
     this.showReveal(outcome.results, before);
+    this.refresh();
   }
 
   // Révélation (004) : le tirage est déjà décidé et sauvegardé ; l'animation ne fait
@@ -348,6 +429,7 @@ export class GachaScene extends Phaser.Scene {
           delete document.body.dataset.modal;
           this.modalOpen = false;
           this.ambience.setActive(true);
+          this.showAmountsSoon();
         }
         done();
         return;
@@ -403,13 +485,20 @@ export class GachaScene extends Phaser.Scene {
     this.ambience.setActive(false);
     document.body.dataset.modal = name;
     delete document.body.dataset.skip;
-    return makeModal(this);
+    const modal = makeModal(this);
+    // Fondu d'entrée (007, FR-017) : l'opacité seule change, les boutons répondent déjà.
+    // La révélation a sa propre entrée (la nuit tombe).
+    if (!this.reducedMotion && name !== 'reveal') {
+      this.tweens.add({ targets: modal, alpha: { from: 0, to: 1 }, duration: TRANSITIONS.fade });
+    }
+    return modal;
   }
 
   private closeModal(modal: Phaser.GameObjects.Container) {
     modal.destroy();
     this.modalOpen = false;
     this.ambience.setActive(true);
+    this.showAmountsSoon();
     delete document.body.dataset.modal;
     delete document.body.dataset.skip;
   }
@@ -612,8 +701,8 @@ export class GachaScene extends Phaser.Scene {
       this.progression = outcome.progression;
       // Sauvegardé avant d'afficher, comme un tirage.
       this.persist();
-      this.refresh();
       this.showResults([{ item: outcome.item, isNew: true, guaranteed: false, pity: false, shards: 0, featuredGuarantee: false }], before);
+      this.refresh();
     }).container);
     modal.add(makeButton(this, cancel!, 'Annuler', COLORS.btn.neutral, () => {
       this.closeModal(modal);
