@@ -29,7 +29,7 @@ import { playSplash } from '../ui/splash';
 import { Sfx } from '../ui/sfx';
 import { ART_FX, COLORS, CSS, FONT_SIZE, STROKE } from '../ui/theme';
 import {
-  fitWidth, makeButton, makeEmblem, makeModal, makeOrb, makePanel, makePortrait, makeResultCard, makeShardAmount,
+  fitWidth, makeButton, makeEmblem, setButtonSound, makeModal, makeOrb, makePanel, makePortrait, makeResultCard, makeShardAmount,
   makeShardIcon, makeSheet, textStyle, type Button,
 } from '../ui/widgets';
 
@@ -88,6 +88,7 @@ export class GachaScene extends Phaser.Scene {
     this.progression = data.progression;
     this.modalOpen = false;
     this.sfx = new Sfx(this, data.settings.muted);
+    setButtonSound(cue => this.sfx.play(cue));
     this.drawHeader();
     this.drawOrb();
     this.reducedMotion = prefersReducedMotion();
@@ -156,9 +157,11 @@ export class GachaScene extends Phaser.Scene {
     // Pendant une fenêtre, le voile le recouvre : il ne reçoit pas l'appui.
     makeButton(this, r, '', COLORS.btn.neutral, () => {
       this.sfx.setMuted(!this.sfx.isMuted);
+      // Le bruit d'appui confirme le son rétabli ; coupé, rien ne sonne (FR-011).
+      this.sfx.play('tap');
       this.persistSettings();
       this.drawMuteIcon();
-    });
+    }, undefined, null);
     this.muteIcon = this.add.graphics();
     const { x, y } = center(r);
     const on = uiImage(this, 'icon-sound-on', x, y, 30, 30);
@@ -200,7 +203,7 @@ export class GachaScene extends Phaser.Scene {
     this.bannerDetail = this.add.text(0, y + 10, '', textStyle(FONT_SIZE.micro, CSS.textDim)).setOrigin(0.5);
     const V = Phaser.Math.Vector2;
     for (const [r, step] of [[GACHA.bannerPrev, -1], [GACHA.bannerNext, 1]] as const) {
-      makeButton(this, r, '', COLORS.btn.neutral, () => this.onCycleBanner(step));
+      makeButton(this, r, '', COLORS.btn.neutral, () => this.onCycleBanner(step), undefined, 'swish');
       const c = center(r);
       if (uiImage(this, 'icon-arrow', c.x, c.y, 28, 28)?.setFlipX(step < 0)) continue;
       const tip = step * 6;
@@ -316,6 +319,8 @@ export class GachaScene extends Phaser.Scene {
     // Un montant qui change en plein défilement repart de la valeur affichée.
     const from = this.shown[key];
     if (from === to) return;
+    // Pièces ou éclats qui tintent le temps du défilement (005, FR-012).
+    this.sfx.play(key === 'currency' ? 'coins' : 'shards');
     this.rolls[key]?.remove();
     const set = (n: number) => {
       this.shown[key] = n;

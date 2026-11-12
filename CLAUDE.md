@@ -29,7 +29,7 @@ Gacha » est sous le tag `legacy-v1` et la branche `legacy` (ne pas supprimer). 
 construit d'abord **le gacha seul** ; le gameplay viendra après. Stack : Phaser 4 +
 TS 6 + Vite 8 sur Node 24, local-only (ADR 0004). Features livrées : 001 Tirage,
 002 Pity & doublons, 003 Collection, 004 Révélation, 005 Son, 006 Bannières,
-007 Illustrations (avec la révision 2 de 004).
+007 Illustrations (avec la révision 2 de 004), révision « écran vivant » de 007 et 005.
 
 ## Commandes
 
@@ -292,6 +292,11 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
   (`showAmountsSoon`) car une fenêtre en remplace souvent une autre dans la même image.
 - `pkill -f` après un `vite preview --port N` lancé dans la même commande tue le shell lui-même
   (sa ligne contient le motif, crochets ou pas) : arrêter le serveur dans une commande à part.
+- **Sons d'interface** : `makeButton` joue son appui (`tap`, `swish` pour les flèches, `null` pour
+  le bouton son qui confirme lui-même) *avant* l'action ; « Tirer » remet ensuite le journal à
+  zéro, donc les journaux attendus des tirages restent ceux d'avant.
+- Sur ikka, `npm test` en entier peut faire dépasser 5 s au test statistique de `rates.test.ts`
+  (13 workers sur un petit serveur) : le relancer seul ; la CI le passe.
 - Serveur ikka : bibliothèques de Chromium extraites dans `~/.local/opt/chromium-libs/root`
   (`LD_LIBRARY_PATH=…/usr/lib/x86_64-linux-gnu`), Node 24 dans `~/.local/opt/node-v24.*/bin`.
 

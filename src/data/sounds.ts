@@ -1,4 +1,5 @@
 import type { Rarity } from './gachaConfig';
+import { TRANSITIONS } from './ambienceConfig';
 import { REVEAL_TIMING } from './revealConfig';
 
 // Bruitages synthétisés (005, ADR 0006) : des « recettes » jouées par src/ui/sfx.ts.
@@ -17,10 +18,13 @@ export interface Tone {
   readonly gain: number;
 }
 
-export type SynthCue = 'suspense' | 'crack' | `tier:${Rarity}` | 'rise' | 'card' | 'star';
+// Sons d'interface (révision du 2026-11-09, FR-011 à FR-013) : appui, glissement de bannière,
+// pièces et éclats qui tintent pendant que leur montant défile.
+export type UiCue = 'tap' | 'swish' | 'coins' | 'shards';
+export type SynthCue = 'suspense' | 'crack' | `tier:${Rarity}` | 'rise' | 'card' | 'star' | UiCue;
 
 // Notes de do majeur (Hz).
-const C5 = 523.25, E5 = 659.25, G5 = 783.99, C6 = 1046.5, E6 = 1318.51, G6 = 1567.98, C7 = 2093;
+const C5 = 523.25, E5 = 659.25, G5 = 783.99, B5 = 987.77, C6 = 1046.5, E6 = 1318.51, G6 = 1567.98, C7 = 2093, E7 = 2637.02;
 
 const arpeggio = (notes: readonly number[], step: number, dur: number, wave: Wave, gain: number): Tone[] =>
   notes.map((freq, i) => ({ freq, at: i * step, dur, wave, gain }));
@@ -52,7 +56,20 @@ export const SOUND_RECIPES: Readonly<Record<SynthCue, readonly Tone[]>> = {
   // Cartes du ×10 (FR-004).
   card: [{ freq: 880, at: 0, dur: 40, wave: 'triangle', gain: 0.4 }],
   star: arpeggio([G5, C6], 120, 300, 'triangle', 0.5),
+  // Interface : gains bien sous ceux des paliers (0,25 à 0,5), pour rester en arrière-plan.
+  // Appui : un « pop » montant, très court (FR-011 : 0,1 s au plus).
+  tap: [{ freq: 520, to: 820, at: 0, dur: 45, wave: 'triangle', gain: 0.18 }],
+  // Bannière : un glissement rapide vers l'aigu, comme une page qu'on tourne.
+  swish: [{ freq: 260, to: 1100, at: 0, dur: 90, wave: 'sine', gain: 0.16 }],
+  // Pièces : le « si-mi » des pièces de jeu vidéo, trois fois, le temps du défilement.
+  coins: [0, 1, 2].flatMap(i => arpeggio([B5, E6], 80, 60, 'square', 0.08).map(t => ({ ...t, at: t.at + i * 180 }))),
+  // Éclats : un carillon cristallin qui monte.
+  shards: arpeggio([G6, C7, E7], 110, 220, 'sine', 0.14),
 };
+
+// Bornes de la spec, vérifiées par les tests : appui et glissement brefs, tintements pas plus
+// longs que le défilement de leur montant (007, FR-015).
+export const UI_SOUND_LIMITS = { tap: 100, swish: 100, coins: TRANSITIONS.roll, shards: TRANSITIONS.roll } as const;
 
 // Volume général des bruitages, et enveloppe qui évite les clics en début et fin de note.
 export const SOUND_MASTER_GAIN = 0.25;
