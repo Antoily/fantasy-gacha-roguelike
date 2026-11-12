@@ -30,6 +30,15 @@ export interface Button {
 // Bouton cerné de noir avec ombre portée pleine. Le sous-titre éventuel tient DANS la
 // case : une explication qui accompagne un bouton ne déborde pas dessous.
 // Réagit sur pointerup : un appui glissé hors du bouton ne déclenche rien.
+// Son d'un appui (005, révision du 2026-11-09 : FR-011), posé une fois par la scène : les
+// widgets ne dépendent pas du lecteur de sons.
+export type PressSound = 'tap' | 'swish';
+let pressSound: (cue: PressSound) => void = () => {};
+export function setButtonSound(play: (cue: PressSound) => void) {
+  pressSound = play;
+}
+
+// `sound` : null pour un bouton qui joue lui-même son retour (le bouton son).
 export function makeButton(
   scene: Phaser.Scene,
   r: Rect,
@@ -37,6 +46,7 @@ export function makeButton(
   fill: number,
   onClick: () => void,
   subtitle?: string,
+  sound: PressSound | null = 'tap',
 ): Button {
   const container = scene.add.container(0, 0);
   const g = scene.add.graphics();
@@ -68,6 +78,8 @@ export function makeButton(
   zone.on('pointerout', () => draw(false));
   zone.on('pointerup', () => {
     draw(false);
+    // Avant l'action : « Tirer » remet ensuite le journal des sons à zéro (dataset.sounds).
+    if (sound) pressSound(sound);
     onClick();
   });
 

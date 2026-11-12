@@ -141,3 +141,29 @@ test('sans audio, le jeu démarre et le tirage va jusqu’aux cartes (FR-008)', 
   await waitModal(page, 'results');
   await tap(page, RESULTS.ok);
 });
+
+// Révision du 2026-11-09 : sons d'interface (FR-011 à FR-013, SC-006).
+test('sons d’interface : appui, glissement, pièces au défilement (FR-011, FR-012)', async ({ page }) => {
+  await tap(page, GACHA.bannerNext);
+  expect(await sounds(page)).toBe('swish');
+  await tap(page, GACHA.rates);
+  expect(await sounds(page)).toBe('swish tap');
+
+  await load(page);
+  await pullOne(page, 'common', [DIRECT]);
+  await tap(page, RESULTS.ok);
+  // Le solde défile au retour sur l'écran (007, FR-015), et les pièces tintent avec lui.
+  await page.waitForFunction(() => document.body.dataset.sounds?.endsWith('coins'));
+  expect(await sounds(page)).toBe('suspense crack crack crack tier:common tap coins');
+});
+
+test('son coupé : aucun son d’interface ; rétabli, le bouton son le confirme (FR-013, SC-006)', async ({ page }) => {
+  await tap(page, GACHA.mute);
+  await tap(page, GACHA.bannerNext);
+  await tap(page, GACHA.rates);
+  expect(await sounds(page)).toBe('');
+  await load(page);
+  await tap(page, GACHA.mute);
+  expect(await muted(page)).toBe('0');
+  expect(await sounds(page)).toBe('tap');
+});

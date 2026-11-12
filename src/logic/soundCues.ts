@@ -1,8 +1,9 @@
 import type { Rarity } from '../data/gachaConfig';
 import { REVEAL_TIMING } from '../data/revealConfig';
+import type { UiCue } from '../data/sounds';
 import type { FlipSchedule, RevealPlan } from './reveal';
 
-export type Cue = 'suspense' | 'crack' | `tier:${Rarity}` | 'rise' | 'laugh' | 'card' | 'star';
+export type Cue = 'suspense' | 'crack' | `tier:${Rarity}` | 'rise' | 'laugh' | 'card' | 'star' | UiCue;
 
 export interface SoundCue {
   // Instant en ms depuis le début de la révélation, ou du retournement des cartes.

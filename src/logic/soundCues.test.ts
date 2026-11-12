@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { CATALOGUE } from '../data/catalogue';
 import { RARITIES, type Rarity } from '../data/gachaConfig';
 import { FLIP_TIMING, REVEAL_TIMING as T } from '../data/revealConfig';
-import { SOUND_RECIPES } from '../data/sounds';
+import { SOUND_RECIPES, UI_SOUND_LIMITS } from '../data/sounds';
 import type { PullResult } from './gacha';
 import { flipOrder, flipSchedule, planReveal, revealDuration, type RevealPlan } from './reveal';
 import { DEFAULT_SETTINGS, parseSettings, serializeSettings } from './settings';
@@ -67,6 +67,19 @@ describe('sons de la révélation (FR-001 à FR-003)', () => {
 
   it('chaque bruitage synthétisé a une recette non vide', () => {
     for (const [cue, tones] of Object.entries(SOUND_RECIPES)) expect(tones.length, cue).toBeGreaterThan(0);
+  });
+
+  // Révision du 2026-11-09 : FR-011 (appui et glissement brefs), FR-012 (tintement pas plus
+  // long que le défilement), et sons d'interface plus discrets que ceux du tirage.
+  it('sons d’interface : bornes de durée et volume sous celui du tirage', () => {
+    const end = (tones: readonly { at: number; dur: number }[]) => Math.max(...tones.map(t => t.at + t.dur));
+    const quietestReveal = Math.min(...(['tier:common', 'card', 'star'] as const).flatMap(c => SOUND_RECIPES[c].map(t => t.gain)));
+    for (const [cue, limit] of Object.entries(UI_SOUND_LIMITS) as [keyof typeof UI_SOUND_LIMITS, number][]) {
+      expect(end(SOUND_RECIPES[cue]), cue).toBeLessThanOrEqual(limit);
+      for (const t of SOUND_RECIPES[cue]) expect(t.gain, cue).toBeLessThan(quietestReveal);
+    }
+    expect(UI_SOUND_LIMITS.tap).toBe(100);
+    expect(UI_SOUND_LIMITS.swish).toBe(100);
   });
 });
 

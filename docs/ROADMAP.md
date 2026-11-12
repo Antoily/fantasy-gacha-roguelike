@@ -6,9 +6,7 @@ mergée et jouable.
 
 ## En cours
 
-- **Écran vivant** (révisions de 007 et 005, 2026-11-09) : ambiance animée de l'écran de
-  tirage (orbe qui lévite, lueurs, halo des tirages payables, montants qui défilent,
-  bandeau qui glisse, fenêtres en fondu) et sons d'interface. Aucune règle ne change.
+_Rien : prochaine étape à choisir avec l'utilisateur (« Plus tard »)._
 
 ## Ensuite — le gacha
 
@@ -50,6 +48,11 @@ résultat du tirage ; le joueur devine ce qu'il a eu avant de voir les cartes.
 
 ## Fait
 
+- 2026-11-12 — **Écran vivant** (révisions de 007 et 005, demande de l'utilisateur : « rendre un
+  peu de vie », sans nouvelle feature) : orbe qui lévite et luit, lueurs dans le ciel, halo des
+  tirages payables, montants qui défilent, bandeau qui glisse, fenêtres en fondu ; sons
+  d'interface (appui, glissement, pièces, éclats). Fixe si le système demande de réduire les
+  animations ; aucune règle ne change.
 - 2026-11-08 — **Police embarquée** (ADR 0008) : Fredoka SemiBold remplace Comic Sans MS,
   jugée « trop cheap » par l'utilisateur ; même rendu sur tout appareil, CI comprise.
 - 2026-11-08 — **Révision de 003** (retours de l'utilisateur en jeu) : un appui sur un
