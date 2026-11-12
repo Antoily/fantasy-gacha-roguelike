@@ -86,8 +86,8 @@ Vocabulaire : la « présentation » de la spec est la fenêtre `splash` du code
 ## Phase 9: Révision du 2026-11-09 (écran vivant)
 
 - [x] T021 Spec : User Story 5, FR-013 à FR-019, SC-007, SC-008 ; révision de 005 (sons d'interface)
-- [ ] T022 `src/logic/motion.ts` : `rollAmount()` + tests Vitest, mutations ; `src/data/ambienceConfig.ts` ; tokens du halo et des lueurs dans `theme.ts`
+- [x] T022 `src/logic/motion.ts` : `rollAmount()` + tests Vitest, mutations ; `src/data/ambienceConfig.ts` ; tokens du halo et des lueurs dans `theme.ts`
 - [x] T023 `src/ui/ambience.ts` : lévitation et pulsation de l'orbe, lueurs, halo des tirages payables ; arrêt et orbe au repos avant la révélation ; `dataset.motion`, `dataset.glow`
-- [ ] T024 `GachaScene` : montants qui défilent et icônes qui rebondissent, bandeau qui glisse, fondu des fenêtres ; réduire les animations
+- [x] T024 `GachaScene` : montants qui défilent et icônes qui rebondissent, bandeau qui glisse, fondu des fenêtres ; réduire les animations
 - [ ] T025 e2e : SC-007 (avec et sans `reducedMotion`), halo selon le solde, orbe au repos au départ de la révélation, captures après fondu ; mutations de la scène
 - [ ] T026 Relire les captures et une vidéo de l'écran au repos ; `CLAUDE.md`, `docs/ROADMAP.md`

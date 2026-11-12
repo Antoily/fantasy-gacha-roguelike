@@ -52,7 +52,7 @@ scripts/mutate-e2e.sh <fichier> '<ancien>' '<nouveau>' <spec e2e> [-g titre]   #
 
 ```
 src/data/     contenu : catalogue.ts (20 éléments), gachaConfig.ts (raretés, poids, coûts), revealConfig.ts (fausses pistes, durées), ambienceConfig.ts (écran vivant), sounds.ts (recettes des bruitages)
-src/logic/    TS pur, testé : rng, rates, gacha, banners, progression, save, format, collection, reveal, soundCues, settings (lint : ni phaser ni navigateur)
+src/logic/    TS pur, testé : rng, rates, gacha, banners, progression, save, format, collection, reveal, soundCues, settings, motion (lint : ni phaser ni navigateur)
 src/ui/       theme.ts (SEULES couleurs/polices), layout.ts (géométrie, partagée avec l'e2e), widgets.ts, reveal.ts (animation), sfx.ts (son),
               art.ts (chargement des visuels, vignettes), display.ts (échelle de rendu R), splash.ts (présentation plein écran),
               ambience.ts (écran vivant : orbe, lueurs, halo)
@@ -75,7 +75,8 @@ public/art/   SVG faits main (ADR 0007) : characters/<id>.svg + <id>.json (cadra
   l'animation est armé), `dataset.splash` (présentation affichée), `dataset.art = 'ready'` et
   `dataset.artMissing` (illustrations prêtes, ou en repli), `dataset.font` (`ready` ou
   `fallback`, police posée avant l'écran), `dataset.motion` (`full` ou `reduced`) et `dataset.glow`
-  (tirages qui portent le halo : `single ten`). L'e2e s'en sert pour vérifier l'enchaînement des écrans : sans lui, deux
+  (tirages qui portent le halo : `single ten`), `dataset.shownCurrency` / `shownShards` (montants
+  affichés, qui défilent jusqu'à la partie). L'e2e s'en sert pour vérifier l'enchaînement des écrans : sans lui, deux
   mutations de la 002 survivaient (une confirmation ouverte à tort que la logique
   refusait ensuite).
 - Playwright tourne avec **un seul worker** : les captures sont numérotées dans
@@ -286,6 +287,11 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
   un halo pourtant présent ne se voyait pas.
 - L'ambiance se tait sous toute fenêtre (`setActive`) : le test chronométré SC-003 de 004 est
   déjà au bord de sa limite sur le runner de la CI.
+- **Un montant ne défile que sur l'écran visible** : tirage et échange ouvrent leur fenêtre
+  *avant* le `refresh()`, et la fermeture relance le défilement à l'image suivante
+  (`showAmountsSoon`) car une fenêtre en remplace souvent une autre dans la même image.
+- `pkill -f` après un `vite preview --port N` lancé dans la même commande tue le shell lui-même
+  (sa ligne contient le motif, crochets ou pas) : arrêter le serveur dans une commande à part.
 - Serveur ikka : bibliothèques de Chromium extraites dans `~/.local/opt/chromium-libs/root`
   (`LD_LIBRARY_PATH=…/usr/lib/x86_64-linux-gnu`), Node 24 dans `~/.local/opt/node-v24.*/bin`.
 
