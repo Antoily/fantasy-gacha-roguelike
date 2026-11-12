@@ -29,6 +29,8 @@ export interface BurstConfig {
   // Gravité (px/s²) et freinage (part de vitesse perdue par seconde).
   readonly gravity?: number;
   readonly drag?: number;
+  // Apparition en fondu (ms) : sans elle, une particule naît pleine (explosions).
+  readonly fadeIn?: number;
 }
 
 // Convergence : les particules naissent sur un anneau et rejoignent le centre en
@@ -57,6 +59,7 @@ interface Particle {
   readonly spin: number;
   readonly gravity: number;
   readonly drag: number;
+  readonly fadeIn: number;
   // Convergence : départ et arrivée, la position suit une courbe plutôt que la vitesse.
   readonly home?: { readonly x0: number; readonly y0: number; readonly x1: number; readonly y1: number };
 }
@@ -119,6 +122,7 @@ export class Particles {
         spin: this.between(-8, 8),
         gravity: c.gravity ?? 0,
         drag: c.drag ?? 0,
+        fadeIn: c.fadeIn ?? 0,
       });
     }
   }
@@ -135,7 +139,7 @@ export class Particles {
         size: this.between(...c.size),
         color: this.pick(c.colors),
         shape: this.pick(c.shapes),
-        rot: a, spin: 0, gravity: 0, drag: 0,
+        rot: a, spin: 0, gravity: 0, drag: 0, fadeIn: 0,
         home: { x0, y0, x1: c.x, y1: c.y },
       });
     }
@@ -216,7 +220,7 @@ export class Particles {
     for (const p of this.parts) {
       const t = p.age / p.life;
       // Convergence : apparaît puis reste pleine ; le reste s'efface sur le dernier tiers.
-      const alpha = p.home ? Math.min(1, t * 4) : Math.min(1, (1 - t) * 3);
+      const alpha = p.home ? Math.min(1, t * 4) : Math.min(1, (1 - t) * 3, p.fadeIn ? p.age / p.fadeIn : 1);
       const s = p.home ? p.size * (1 - 0.6 * t) : p.size * (1 - 0.4 * t);
       switch (p.shape) {
         case 'dot':

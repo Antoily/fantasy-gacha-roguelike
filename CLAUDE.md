@@ -51,10 +51,11 @@ scripts/mutate-e2e.sh <fichier> '<ancien>' '<nouveau>' <spec e2e> [-g titre]   #
 ## Structure
 
 ```
-src/data/     contenu : catalogue.ts (20 éléments), gachaConfig.ts (raretés, poids, coûts), revealConfig.ts (fausses pistes, durées), sounds.ts (recettes des bruitages)
+src/data/     contenu : catalogue.ts (20 éléments), gachaConfig.ts (raretés, poids, coûts), revealConfig.ts (fausses pistes, durées), ambienceConfig.ts (écran vivant), sounds.ts (recettes des bruitages)
 src/logic/    TS pur, testé : rng, rates, gacha, banners, progression, save, format, collection, reveal, soundCues, settings (lint : ni phaser ni navigateur)
 src/ui/       theme.ts (SEULES couleurs/polices), layout.ts (géométrie, partagée avec l'e2e), widgets.ts, reveal.ts (animation), sfx.ts (son),
-              art.ts (chargement des visuels, vignettes), display.ts (échelle de rendu R), splash.ts (présentation plein écran)
+              art.ts (chargement des visuels, vignettes), display.ts (échelle de rendu R), splash.ts (présentation plein écran),
+              ambience.ts (écran vivant : orbe, lueurs, halo)
 src/scenes/   BootScene (lit la sauvegarde) → GachaScene (écran + fenêtres)
 tests/e2e/    parcours Playwright du quickstart, critère de merge
 public/sounds/ enregistrements CC0 seulement, chacun listé dans CREDITS.md (ADR 0006)
@@ -73,7 +74,8 @@ public/art/   SVG faits main (ADR 0007) : characters/<id>.svg + <id>.json (cadra
   `dataset.featuredLine` (ligne de garantie vedette), `dataset.skip = 'armed'` (l'appui qui passe
   l'animation est armé), `dataset.splash` (présentation affichée), `dataset.art = 'ready'` et
   `dataset.artMissing` (illustrations prêtes, ou en repli), `dataset.font` (`ready` ou
-  `fallback`, police posée avant l'écran). L'e2e s'en sert pour vérifier l'enchaînement des écrans : sans lui, deux
+  `fallback`, police posée avant l'écran), `dataset.motion` (`full` ou `reduced`) et `dataset.glow`
+  (tirages qui portent le halo : `single ten`). L'e2e s'en sert pour vérifier l'enchaînement des écrans : sans lui, deux
   mutations de la 002 survivaient (une confirmation ouverte à tort que la logique
   refusait ensuite).
 - Playwright tourne avec **un seul worker** : les captures sont numérotées dans
@@ -274,6 +276,18 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
   `apt-get download` des paquets manquants (`ldd` sur `chrome-headless-shell`), `dpkg-deb -x`
   dans un dossier, puis `LD_LIBRARY_PATH` vers son `usr/lib/x86_64-linux-gnu`. Node 24 : archive
   officielle de nodejs.org vérifiée par `SHASUMS256.txt`, dans `~/.local/opt`.
+
+## Leçons de l'écran vivant (2026-11-09)
+
+- **Lumière additive invisible sur fond clair** : le mélange ADD sur le ciel pastel sature au
+  blanc. Lueurs de l'ambiance en points colorés (mélange normal, `fadeIn`) ; l'additif reste
+  pour la nuit de la révélation.
+- Juger une lueur ou un halo sur une capture **à densité 2** : à densité 1 (captures de l'e2e),
+  un halo pourtant présent ne se voyait pas.
+- L'ambiance se tait sous toute fenêtre (`setActive`) : le test chronométré SC-003 de 004 est
+  déjà au bord de sa limite sur le runner de la CI.
+- Serveur ikka : bibliothèques de Chromium extraites dans `~/.local/opt/chromium-libs/root`
+  (`LD_LIBRARY_PATH=…/usr/lib/x86_64-linux-gnu`), Node 24 dans `~/.local/opt/node-v24.*/bin`.
 
 ## Conventions de code
 

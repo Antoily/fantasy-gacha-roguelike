@@ -14,6 +14,7 @@ import { presentations } from '../logic/presentation';
 import { flipSchedule, planReveal } from '../logic/reveal';
 import { SETTINGS_KEY, serializeSettings, type Settings } from '../logic/settings';
 import { SAVE_KEY, serializeSave, type SaveStatus } from '../logic/save';
+import { Ambience, prefersReducedMotion } from '../ui/ambience';
 import { ART_READY, uiImage } from '../ui/art';
 import { R } from '../ui/display';
 import {
@@ -49,6 +50,7 @@ export class GachaScene extends Phaser.Scene {
   private modalOpen = false;
   private orb!: Phaser.GameObjects.Container;
   private sfx!: Sfx;
+  private ambience!: Ambience;
   private muteIcon!: Phaser.GameObjects.Graphics;
   // Icônes illustrées du son (007), à la place du dessin quand elles existent.
   private muteImages: { on: Phaser.GameObjects.Image; off: Phaser.GameObjects.Image } | null = null;
@@ -74,11 +76,14 @@ export class GachaScene extends Phaser.Scene {
     // Rendu à la densité de l'écran (ADR 0007) : la scène reste en coordonnées 360 × 640.
     this.cameras.main.setZoom(R).centerOn(WIDTH / 2, HEIGHT / 2);
     uiImage(this, 'bg-main', WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT);
+    // Couche de l'ambiance (007, FR-013) : juste au-dessus du fond, sous toute l'interface.
+    const ambienceLayer = this.add.container(0, 0);
     this.progression = data.progression;
     this.modalOpen = false;
     this.sfx = new Sfx(this, data.settings.muted);
     this.drawHeader();
     this.drawOrb();
+    this.ambience = new Ambience(this, ambienceLayer, this.orb, prefersReducedMotion());
     this.drawMuteButton();
     this.drawBannerSelector();
 
@@ -253,6 +258,10 @@ export class GachaScene extends Phaser.Scene {
     const ten = canAfford(p, 10);
     this.singleButton.setEnabled(single);
     this.tenButton.setEnabled(ten);
+    this.ambience.setGlow(
+      [...(single ? [GACHA.pullSingle] : []), ...(ten ? [GACHA.pullTen] : [])],
+      [...(single ? ['single'] : []), ...(ten ? ['ten'] : [])],
+    );
     this.shortageText.setText(
       !single
         // Espaces insécables dans les guillemets : un « » ne doit jamais finir seul sur sa ligne.
@@ -338,12 +347,14 @@ export class GachaScene extends Phaser.Scene {
         else {
           delete document.body.dataset.modal;
           this.modalOpen = false;
+          this.ambience.setActive(true);
         }
         done();
         return;
       }
       const index = queue[i]!;
       this.modalOpen = true;
+      this.ambience.setActive(false);
       document.body.dataset.modal = 'splash';
       delete document.body.dataset.skip;
       document.body.dataset.splash = results[index]!.item.id;
@@ -389,6 +400,7 @@ export class GachaScene extends Phaser.Scene {
   // il vérifie l'enchaînement des écrans, pas seulement la sauvegarde.
   private openModal(name: string): Phaser.GameObjects.Container {
     this.modalOpen = true;
+    this.ambience.setActive(false);
     document.body.dataset.modal = name;
     delete document.body.dataset.skip;
     return makeModal(this);
@@ -397,6 +409,7 @@ export class GachaScene extends Phaser.Scene {
   private closeModal(modal: Phaser.GameObjects.Container) {
     modal.destroy();
     this.modalOpen = false;
+    this.ambience.setActive(true);
     delete document.body.dataset.modal;
     delete document.body.dataset.skip;
   }
