@@ -114,6 +114,13 @@ export const ART_FX = {
   textPlateAlpha: 0.82,
 } as const;
 
+// Écran vivant (007, révision du 2026-11-09) : lueurs du ciel, éclat de l'orbe, halo des tirages.
+export const AMBIENCE_FX = {
+  motes: [palette.primary, palette.shard, rarity.ultra],
+  orbGlow: palette.paper,
+  halo: palette.primary,
+} as const;
+
 export const STROKE = { thin: 2, base: 3, thick: 4 } as const;
 export const SHADOW_OFFSET = 4;
 export const RADIUS = 12;
