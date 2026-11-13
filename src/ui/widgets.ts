@@ -68,7 +68,8 @@ export function makeButton(
     g.fillStyle(enabled ? fill : COLORS.btn.disabled, 1).fillRoundedRect(r.x + dy, r.y + dy, r.w, r.h, RADIUS);
     g.lineStyle(STROKE.base, COLORS.ink, 1).strokeRoundedRect(r.x + dy, r.y + dy, r.w, r.h, RADIUS);
     title.setY(r.y + r.h / 2 - (subtitle ? 10 : 0) + dy).setColor(enabled ? CSS.text : CSS.textFaint);
-    sub?.setY(r.y + r.h / 2 + 14 + dy);
+    // Grisé avec le titre : un sous-titre resté foncé faisait croire le bouton actif.
+    sub?.setY(r.y + r.h / 2 + 14 + dy).setColor(enabled ? CSS.textDim : CSS.textFaint);
   };
   draw(false);
 

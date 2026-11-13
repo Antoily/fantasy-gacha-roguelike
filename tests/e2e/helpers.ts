@@ -135,3 +135,25 @@ export async function skipReveal(page: Page) {
   await waitModal(page, 'results');
   await page.waitForTimeout(150);
 }
+
+// Contraste (WCAG) entre le pixel le plus clair et le plus foncé d'une zone de l'écran : un
+// texte recouvert par son propre bandeau, ou une lueur trop sombre sur la nuit, le fait chuter.
+// Le canvas WebGL ne se lit pas (getImageData) : on décode une capture dans la page.
+export async function contrastIn(page: Page, r: Rect): Promise<number> {
+  const png = await page.screenshot({ clip: { x: r.x, y: r.y, width: r.w, height: r.h } });
+  return page.evaluate(async b64 => {
+    const blob = await (await fetch(`data:image/png;base64,${b64}`)).blob();
+    const bmp = await createImageBitmap(blob);
+    const c = new OffscreenCanvas(bmp.width, bmp.height);
+    const ctx = c.getContext('2d')!;
+    ctx.drawImage(bmp, 0, 0);
+    const d = ctx.getImageData(0, 0, bmp.width, bmp.height).data;
+    const lin = (v: number) => (v /= 255) <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+    let lo = 1, hi = 0;
+    for (let i = 0; i < d.length; i += 4) {
+      const l = 0.2126 * lin(d[i]!) + 0.7152 * lin(d[i + 1]!) + 0.0722 * lin(d[i + 2]!);
+      lo = Math.min(lo, l); hi = Math.max(hi, l);
+    }
+    return (hi + 0.05) / (lo + 0.05);
+  }, png.toString('base64'));
+}
