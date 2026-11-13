@@ -42,6 +42,10 @@ joueur devine ce qu'il a eu avant de voir les cartes, et un tirage rare devient 
 - Q: Combien de suspense avant l'explosion (0,9 s jusqu'ici) ? → A: Environ 1,6 s, en trois temps : l'écran plonge dans la nuit, l'orbe aspire l'énergie et se fissure en trois étapes, tout se fige un instant, puis elle éclate. Le tirage complet reste dans les bornes de FR-010.
 - Q: Quelles particules en plus ? → A (proposé par Claude, à valider sur le jeu) : au moins deux fois plus de particules à chaque palier et à chaque carte, des lueurs et des traînées, les éclats de verre de l'orbe brisée, un cercle magique qui prend la couleur du palier, une pluie plus dense pour Légendaire et Ultra rare.
 
+### Révision 3 du 2026-11-13 (immersion visuelle, avec la révision de 007)
+
+- Q: Que faut-il améliorer ? → A (demande de l'utilisateur : expérience gacha « la plus parfaite et la plus immersive possible », rien de statique, sans nouvelle feature ; choix laissé à Claude d'après une critique de direction artistique, [recherche](../007-illustrations/research-immersion.md), lots A et B) : une nuit qui tombe sans voile gris, un suspense lisible (cœur visible, fissures, gel), un palier fait de lumière qui reste en mouvement, un impact franc et une sortie sans retour de l'écran d'accueil, un leurre et une montée qui jouent la comédie, des cartes distribuées depuis l'orbe sur la nuit, une vedette au centre pendant que les autres s'assombrissent, un retournement en relief, des cadres de rareté (User Story 6, FR-018 à FR-024).
+
 
 
 ### User Story 1 - Deviner son meilleur résultat avant les cartes (Priority: P1)
@@ -145,6 +149,32 @@ une, la meilleure en dernier ; les 10 finissent visibles, à la même place qu'e
 
 ---
 
+### User Story 6 - Une révélation de cinéma (Priority: P2)
+
+*Révision 3 du 2026-11-13.* La nuit tombe d'un coup, le cœur bat en lumière, l'orbe se
+fissure puis éclate en un palier fait de lumière qui ne s'arrête jamais de bouger. Les
+cartes sont distribuées depuis l'orbe, sur la même nuit, se retournent en relief dans un
+cadre à la couleur de leur rareté ; la vedette prend le centre pendant que les autres
+s'assombrissent. Jamais l'écran d'accueil ne réapparaît entre deux temps.
+
+**Why this priority**: la critique du 2026-11-13 trouve le palier figé et « clipart », et des
+coupures nettes entre les temps ; le tirage reste complet sans ces retouches.
+
+**Independent Test**: captures image par image (horloge virtuelle) d'un ×1 Légendaire et d'un
+×10 : aucune image de l'écran d'accueil entre la révélation et les cartes ; deux images du
+palier à 200 ms d'écart diffèrent ; les cartes non vedettes sont plus sombres pendant le
+battement de la vedette.
+
+**Acceptance Scenarios**:
+
+1. **Given** un tirage, **When** la révélation s'ouvre, **Then** l'écran plonge dans la nuit sans passer par un voile clair.
+2. **Given** le suspense, **When** le cœur bat, **Then** ses pulsations se voient en lumière sur la nuit, et chaque fissure marque un à-coup.
+3. **Given** le palier révélé, **When** il reste à l'écran, **Then** il est fait de lumière et bouge sans cesse (rayons, pulsation) jusqu'à la suite.
+4. **Given** la fin de la révélation, **When** les cartes ou la présentation arrivent, **Then** la transition se fait par un éclair ou un fondu, sans réapparition de l'écran d'accueil.
+5. **Given** un ×10, **When** les cartes arrivent, **Then** elles sont distribuées depuis l'orbe sur la nuit, se retournent avec du relief, chacune dans un cadre de sa rareté, et la vedette passe au centre pendant que les autres s'assombrissent.
+
+---
+
 ### Edge Cases
 
 - **Résultat forcé par le pity ou par la garantie du ×10** : l'animation est celle de la rareté réellement obtenue ; elle ne révèle pas *pourquoi* (le badge « Garanti ! » de la carte le fait).
@@ -179,6 +209,13 @@ une, la meilleure en dernier ; les 10 finissent visibles, à la même place qu'e
 - **FR-015** *(révision 2026-10-26)*: Un ×10 sans rien au-dessus du Rare MUST se retourner en 3,5 s au plus ; si les créneaux des cartes rares dépassent la borne de FR-010 (4 s), les cartes ordinaires accélèrent et la vedette garde son temps fort.
 - **FR-016** *(révision 2026-10-30)*: Le suspense MUST durer environ 1,6 s et monter en trois temps, identiques pour tous les paliers (FR-002) : l'écran plonge dans la nuit et l'orbe gagne le centre au-dessus d'un cercle magique qui s'allume ; l'orbe aspire l'énergie de plus en plus vite et se fissure en trois étapes, une lumière **neutre** filtrant par les fissures (elle ne trahit aucun palier) ; tout se fige un court instant ; puis l'orbe éclate sur le premier palier montré. Les bornes de FR-010 restent valables.
 - **FR-017** *(révision 2026-10-30)*: À chaque palier montré et à chaque carte retournée, l'éclat MUST compter au moins deux fois plus de particules que dans la révision du 2026-10-26, avec des lueurs et des traînées ; l'orbe brisée projette des éclats de verre et le cercle magique prend la couleur du palier ; la pluie de Légendaire et d'Ultra rare MUST être plus dense qu'avant.
+- **FR-018** *(révision 3, 2026-11-13)*: La révélation MUST plonger dans la nuit sans voile clair intermédiaire, et le cœur qui bat MUST se voir sur la nuit.
+- **FR-019** *(révision 3)*: Le palier révélé MUST être rendu en lumière (halo, rayons, cœur lumineux à la couleur du palier) et rester en mouvement continu jusqu'à la suite ; plus le palier est haut, plus l'effet est ample.
+- **FR-020** *(révision 3)*: L'éclatement MUST marquer un impact franc (flash, onde, secousse dès Légendaire), et la sortie vers les cartes ou la présentation MUST se faire sans laisser voir l'écran de tirage.
+- **FR-021** *(révision 3)*: Leurre et montée MUST se lire comme une mise en scène : le faux palier se dégonfle visiblement avant de retomber, la montée aspire avant de monter.
+- **FR-022** *(révision 3)*: Au ×10, les cartes MUST être distribuées depuis l'orbe, sur la nuit de la révélation, et se retourner avec un effet de relief.
+- **FR-023** *(révision 3)*: Pendant le battement de la vedette, elle MUST passer au premier plan et les autres cartes MUST s'assombrir nettement (précise FR-014).
+- **FR-024** *(révision 3)*: Chaque carte MUST porter un cadre à la couleur de sa rareté, et aucun badge (« Garanti ! », « Nouveau ! ») ne MUST masquer le nom.
 
 ### Key Entities
 
@@ -198,6 +235,7 @@ Aucune donnée nouvelle à sauvegarder : le palier se déduit des résultats.
 - **SC-005**: Sur l'écran de référence (portrait 360 × 640), chaque palier est reconnaissable à sa couleur et à son ampleur, sans texte.
 - **SC-006**: Sur 10 000 tirages Rare ou mieux, la part de montées (FR-011) est de 25 % (à la marge statistique près) ; elle est nulle pour Commun et Peu commun.
 - **SC-007**: Sur 10 000 tirages au meilleur résultat Rare, la part de leurres (FR-012) est de 10 %, dont un cinquième en Ultra rare (à la marge statistique près) ; elle est nulle pour les autres paliers.
+- **SC-008** *(révision 3, 2026-11-13)*: Sur les captures image par image d'un ×1 et d'un ×10, aucune image ne montre l'écran de tirage entre la révélation et les cartes ; les durées de FR-010 et le temps jusqu'aux cartes (SC-003) restent dans leurs bornes.
 
 ## Assumptions
 
