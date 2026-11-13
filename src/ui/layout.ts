@@ -71,6 +71,9 @@ export const RESULTS = {
   single: { x: (WIDTH - 260) / 2, y: 112, w: 260, h: 420 },
   singleArt: { pad: 12, h: 272 },
   ok: { x: MARGIN * 2, y: 568, w: CONTENT_W - 2 * MARGIN, h: 44 },
+  // « Garanti ! » des petites cartes : à cheval sur le coin haut gauche, au-dessus du buste,
+  // incliné (degrés) pour que son bout droit remonte : posé à droite, il coupait le nom.
+  sticker: { dx: -2, dy: -7, tilt: -8 },
 } as const;
 
 // Révélation (004) : l'orbe quitte sa place pour le centre de l'écran, où éclatent
