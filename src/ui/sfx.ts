@@ -1,16 +1,19 @@
 import Phaser from 'phaser';
 import {
-  LAUGH, SOUND_ATTACK_MS, SOUND_MASTER_GAIN, SOUND_RECIPES, SOUND_RELEASE_MS, type Tone,
+  DEFLATE, LAUGH, LAUGH_DUCK, SOUND_CHOKES, SOUND_RECIPES, SOUND_STOP_FADE_MS, type Tone,
 } from '../data/sounds';
 import type { Cue } from '../logic/soundCues';
+import { createBus, duckVoice, fadeVoice, scheduleTones, type Bus, type Voice } from './synth';
 
-// Lecteur des sons du tirage (005, ADR 0006). Les bruitages sont synthétisés sur le
-// contexte Web Audio de Phaser ; le rire est un fichier chargé par BootScene.
+// Lecteur des sons du tirage (005, ADR 0006). Les bruitages sont synthétisés (src/ui/synth.ts)
+// sur le contexte Web Audio de Phaser ; le rire est un fichier chargé par BootScene, joué ici
+// dans le même bus pour que la coupure et le limiteur le tiennent aussi.
 // Rien ici ne doit pouvoir bloquer le jeu (FR-008) : sans audio, il se tait.
 export class Sfx {
   private muted: boolean;
-  private readonly live = new Set<OscillatorNode>();
-  private laugh: Phaser.Sound.BaseSound | null = null;
+  // Toutes les sources qui sonnent ou vont sonner : notes, souffles et rire.
+  private readonly live = new Set<Voice>();
+  private bus: { ctx: AudioContext; bus: Bus } | null = null;
 
   constructor(private readonly scene: Phaser.Scene, muted: boolean) {
     this.muted = muted;
@@ -38,28 +41,43 @@ export class Sfx {
     const log = document.body.dataset.sounds;
     document.body.dataset.sounds = log ? `${log} ${cue}` : cue;
     try {
-      if (cue === 'laugh') this.playLaugh();
-      else this.synth(SOUND_RECIPES[cue]);
+      const ctx = this.context();
+      if (!ctx) return;
+      if (ctx.state === 'suspended') void ctx.resume();
+      const now = ctx.currentTime;
+      // Montée et rire étouffent le faux palier qui sonne encore (FR-019) ; le vrai palier
+      // baisse le rire qui sonne encore, pour se faire entendre dessous.
+      if (cue === 'rise' || cue === 'laugh') this.choke(now, SOUND_CHOKES[cue]);
+      if (cue.startsWith('tier:')) this.each(v => v.name === 'laugh', v => duckVoice(v, now, LAUGH_DUCK.ms, LAUGH_DUCK.gain));
+      if (cue === 'laugh') {
+        this.playLaugh(ctx, now);
+        this.synth(ctx, DEFLATE, 'deflate');
+      } else {
+        this.synth(ctx, SOUND_RECIPES[cue], cue);
+      }
     } catch {
       // Contexte audio refusé ou fermé : le jeu continue en silence.
     }
   }
 
-  // Passer l'animation coupe aussitôt ce qui sonne encore (FR-005).
+  // Passer l'animation ou couper le son éteint ce qui sonne encore (FR-005, FR-016) : fondu
+  // de 25 ms plutôt qu'un arrêt net, qui claque. Le compteur tombe à zéro tout de suite,
+  // puisque plus rien ne peut se faire entendre au-delà du fondu.
   stopAll() {
-    this.live.forEach(osc => {
+    const ctx = this.context();
+    const now = ctx?.currentTime ?? 0;
+    this.live.forEach(voice => {
       try {
-        osc.stop();
+        fadeVoice(voice, now, SOUND_STOP_FADE_MS);
       } catch {
-        // Déjà arrêté.
+        // Contexte fermé : la voix ne sonne plus de toute façon.
       }
     });
     this.live.clear();
-    this.laugh?.stop();
     this.showLive();
   }
 
-  // Nombre de notes en train de sonner, lu par l'e2e : passer doit le ramener à 0.
+  // Nombre de sources en train de sonner, lu par l'e2e : passer doit le ramener à 0.
   private showLive() {
     document.body.dataset.soundsLive = String(this.live.size);
   }
@@ -69,42 +87,53 @@ export class Sfx {
     return sound.context ?? null;
   }
 
-  private synth(tones: readonly Tone[]) {
-    const ctx = this.context();
-    if (!ctx) return;
-    if (ctx.state === 'suspended') void ctx.resume();
-    const now = ctx.currentTime;
-    const attack = SOUND_ATTACK_MS / 1000;
-    const release = SOUND_RELEASE_MS / 1000;
-    for (const tone of tones) {
-      const start = now + tone.at / 1000;
-      const end = start + tone.dur / 1000;
-      const osc = ctx.createOscillator();
-      osc.type = tone.wave;
-      osc.frequency.setValueAtTime(tone.freq, start);
-      if (tone.to !== undefined) osc.frequency.exponentialRampToValueAtTime(tone.to, end);
-      // Enveloppe : attaque et relâche courtes, sans quoi chaque note claque.
-      const gain = ctx.createGain();
-      const peak = tone.gain * SOUND_MASTER_GAIN;
-      gain.gain.setValueAtTime(0, start);
-      gain.gain.linearRampToValueAtTime(peak, start + attack);
-      gain.gain.setValueAtTime(peak, end);
-      gain.gain.linearRampToValueAtTime(0, end + release);
-      osc.connect(gain).connect(ctx.destination);
-      osc.onended = () => {
-        this.live.delete(osc);
-        this.showLive();
-      };
-      this.live.add(osc);
+  private output(ctx: AudioContext): Bus {
+    if (this.bus?.ctx !== ctx) this.bus = { ctx, bus: createBus(ctx) };
+    return this.bus.bus;
+  }
+
+  private each(match: (v: Voice) => boolean, act: (v: Voice) => void) {
+    this.live.forEach(v => {
+      if (match(v)) act(v);
+    });
+  }
+
+  private choke(now: number, { ms, pitch }: { ms: number; pitch: number }) {
+    this.each(v => v.name.startsWith('tier:'), v => {
+      fadeVoice(v, now, ms, pitch);
+      this.live.delete(v);
+    });
+    this.showLive();
+  }
+
+  private track(voice: Voice) {
+    voice.src.onended = () => {
+      this.live.delete(voice);
       this.showLive();
-      osc.start(start);
-      osc.stop(end + release + 0.01);
+    };
+    this.live.add(voice);
+    this.showLive();
+  }
+
+  private synth(ctx: AudioContext, tones: readonly Tone[], name: string) {
+    // Chaque voix est suivie dès sa création : si une suivante plante, celles déjà
+    // programmées restent coupables.
+    const bus = this.output(ctx);
+    for (const tone of tones) {
+      for (const voice of scheduleTones(ctx, [tone], ctx.currentTime, bus.synth, name)) this.track(voice);
     }
   }
 
-  private playLaugh() {
-    if (!this.scene.cache.audio.exists(LAUGH.key)) return;
-    this.laugh ??= this.scene.sound.add(LAUGH.key, { volume: LAUGH.gain });
-    this.laugh.play();
+  // Le rire passe par le lecteur (et non par scene.sound) : même bus, même coupure.
+  private playLaugh(ctx: AudioContext, now: number) {
+    const buffer: unknown = this.scene.cache.audio.get(LAUGH.key);
+    if (!(buffer instanceof AudioBuffer)) return;
+    const src = ctx.createBufferSource();
+    src.buffer = buffer;
+    const gain = ctx.createGain();
+    gain.gain.value = LAUGH.gain;
+    src.connect(gain).connect(this.output(ctx).limiter);
+    src.start(now);
+    this.track({ name: 'laugh', src, gain, pitch: src.playbackRate });
   }
 }

@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { CATALOGUE } from '../data/catalogue';
 import { RARITIES, type Rarity } from '../data/gachaConfig';
 import { FLIP_TIMING, REVEAL_TIMING as T } from '../data/revealConfig';
-import { SOUND_RECIPES, UI_SOUND_LIMITS } from '../data/sounds';
+import {
+  SOUND_RECIPES, UI_SOUND_LIMITS, recipeEnd, recipeEnergy, toneEnergy, type Tone,
+} from '../data/sounds';
 import type { PullResult } from './gacha';
 import { flipOrder, flipSchedule, planReveal, revealDuration, type RevealPlan } from './reveal';
 import { DEFAULT_SETTINGS, parseSettings, serializeSettings } from './settings';
@@ -70,16 +72,60 @@ describe('sons de la révélation (FR-001 à FR-003)', () => {
   });
 
   // Révision du 2026-11-09 : FR-011 (appui et glissement brefs), FR-012 (tintement pas plus
-  // long que le défilement), et sons d'interface plus discrets que ceux du tirage.
-  it('sons d’interface : bornes de durée et volume sous celui du tirage', () => {
-    const end = (tones: readonly { at: number; dur: number }[]) => Math.max(...tones.map(t => t.at + t.dur));
-    const quietestReveal = Math.min(...(['tier:common', 'card', 'star'] as const).flatMap(c => SOUND_RECIPES[c].map(t => t.gain)));
+  // long que le défilement). Révision du 2026-11-13 : fin audible, relâche comprise.
+  it('sons d’interface : bornes de durée, relâche comprise', () => {
     for (const [cue, limit] of Object.entries(UI_SOUND_LIMITS) as [keyof typeof UI_SOUND_LIMITS, number][]) {
-      expect(end(SOUND_RECIPES[cue]), cue).toBeLessThanOrEqual(limit);
-      for (const t of SOUND_RECIPES[cue]) expect(t.gain, cue).toBeLessThan(quietestReveal);
+      expect(recipeEnd(SOUND_RECIPES[cue]), cue).toBeLessThanOrEqual(limit);
     }
     expect(UI_SOUND_LIMITS.tap).toBe(100);
     expect(UI_SOUND_LIMITS.swish).toBe(100);
+  });
+
+  // FR-015 : l'interface reste sous le tirage en énergie perçue, pas seulement en gain de
+  // crête (trois tintements longs à gain faible passaient devant un tic de carte).
+  it('sons d’interface plus discrets que le plus discret des sons du tirage, en énergie', () => {
+    const quietestReveal = Math.min(...(['tier:common', 'card', 'star'] as const).map(c => recipeEnergy(SOUND_RECIPES[c])));
+    for (const cue of Object.keys(UI_SOUND_LIMITS) as (keyof typeof UI_SOUND_LIMITS)[]) {
+      expect(recipeEnergy(SOUND_RECIPES[cue]), cue).toBeLessThan(quietestReveal);
+    }
+  });
+
+  it('énergie : durée, gain, forme d’onde et décroissance comptent', () => {
+    const square: Tone = { wave: 'square', freq: 440, at: 0, dur: 1000, gain: 1, release: 0 };
+    // Plateau d'une seconde à amplitude 1 : ~1 (moins la moitié de l'attaque de 5 ms).
+    expect(toneEnergy(square)).toBeCloseTo(1, 2);
+    expect(toneEnergy({ ...square, gain: 0.5 })).toBeCloseTo(0.25, 2);
+    expect(toneEnergy({ ...square, dur: 500 })).toBeCloseTo(0.5, 2);
+    expect(toneEnergy({ ...square, wave: 'sine' })).toBeCloseTo(0.5, 2);
+    expect(toneEnergy({ wave: 'noise', at: 0, dur: 1000, gain: 1, release: 0 })).toBeCloseTo(1 / 3, 2);
+    // Décroissance de 300 ms vers 0 : ∫ e^(-2x/τ) = τ/2 avec τ = 0,1 s.
+    expect(toneEnergy({ ...square, decay: 300 })).toBeCloseTo(0.05, 2);
+    expect(toneEnergy({ ...square, decay: 300, sustain: 1 })).toBeCloseTo(1, 2);
+    // Crescendo linéaire de 0 à 1 : ∫ x² = 1/3.
+    expect(toneEnergy({ ...square, gain: 0, gainTo: 1 })).toBeCloseTo(1 / 3, 2);
+    // Relâche : g² × relâche / 10.
+    expect(toneEnergy({ ...square, release: 1000 }) - toneEnergy(square)).toBeCloseTo(0.1, 2);
+    expect(recipeEnergy([square, square])).toBeCloseTo(2 * toneEnergy(square), 6);
+  });
+
+  // FR-014 : enveloppes et filtres plausibles dans toutes les recettes.
+  it('recettes : décroissance positive, filtres dans l’audible, pas de crescendo décroissant', () => {
+    for (const [cue, tones] of Object.entries(SOUND_RECIPES)) {
+      for (const t of tones) {
+        if (t.decay !== undefined) expect(t.decay, cue).toBeGreaterThan(0);
+        expect(t.decay !== undefined && t.gainTo !== undefined, `${cue} : décroissance ou crescendo, pas les deux`).toBe(false);
+        if (t.sustain !== undefined) expect(t.sustain >= 0 && t.sustain <= 1, cue).toBe(true);
+        if (t.release !== undefined) expect(t.release, cue).toBeGreaterThan(0);
+        if (t.filter) expect(Math.max(t.filter.freq, t.filter.to ?? 0), cue).toBeLessThanOrEqual(18000);
+      }
+    }
+  });
+
+  // Les queues des recettes, relâche comprise : la sirène se tait avant l'éclatement, et chaque
+  // palier a fini de sonner avant la fin de son animation.
+  it('fins audibles : rien ne déborde de l’animation', () => {
+    expect(recipeEnd(SOUND_RECIPES.suspense)).toBeLessThan(T.suspense);
+    for (const r of ALL) expect(recipeEnd(SOUND_RECIPES[`tier:${r}`]), r).toBeLessThanOrEqual(T.final[r]);
   });
 });
 
