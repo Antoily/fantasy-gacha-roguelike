@@ -593,9 +593,10 @@ export class GachaScene extends Phaser.Scene {
       modal.add(this.add.text(right, y + 11, formatPercent(ratePercent(r.id)), textStyle(FONT_SIZE.body)).setOrigin(1, 0.5));
       y += 34;
     }
+    // « 40e » et non « 40ᵉ » : la police embarquée n'a pas le glyphe en exposant (trou dans le texte).
     const rules = this.add.text(left, y + 6,
       '×10 : au moins un Rare ou mieux garanti.\n'
-      + `Légendaire ou mieux garanti au plus tard au ${GACHA_CONFIG.pityThreshold}ᵉ tirage ; `
+      + `Légendaire ou mieux garanti au plus tard au ${GACHA_CONFIG.pityThreshold}e tirage ; `
       + 'le compteur repart de zéro à chaque Légendaire ou Ultra rare.',
       { ...textStyle(FONT_SIZE.body, CSS.textDim), wordWrap: { width: right - left }, lineSpacing: 2 });
     modal.add(rules);
