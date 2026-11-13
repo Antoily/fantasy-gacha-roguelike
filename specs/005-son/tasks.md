@@ -58,3 +58,11 @@ branchement scène par scène, puis l'e2e.
 - [x] T014 Spec : User Story 5, FR-011 à FR-013, SC-006
 - [x] T015 `src/data/sounds.ts` : recettes `tap`, `swish`, `coins`, `shards` ; `src/ui/widgets.ts` : `setButtonSound` ; `GachaScene` : branchement, tintement au défilement des montants
 - [x] T016 e2e : journal (`tap`, `swish`, `coins`) son actif, vide son coupé ; mutations de la scène
+
+## Phase 9: Révision du 2026-11-13 (immersion sonore)
+
+- [x] T017 Spec : User Story 6, FR-014 à FR-024, SC-007 à SC-009 ; recherche `research-immersion.md`
+- [ ] T018 Lot A : bruit, filtres, décroissance, bus et limiteur, rire dans le bus, coupures en fondu, étouffement ; test d'énergie de l'interface (muté)
+- [ ] T019 Lot B : suspense qui grossit et bat, fissures, impact et Commun revoicé, montée transposée, leurre qui se dégonfle, paillettes
+- [ ] T020 Lot C : cartes sur leur face en échelle montante, vedette, fanfare `splash` (e2e mis à jour), pièces selon le sens, souffle de bannière, éclair de passage, latence de sortie
+- [ ] T021 Mesures avant / après (rendu hors navigateur), relecture des captures ; `CLAUDE.md`, `docs/ROADMAP.md`

@@ -98,3 +98,28 @@ Spec : User Story 5, FR-011 à FR-013, SC-006.
 
 Constitution : I (pas de mécanisme), II, V (journal vérifié et muté), VI (recettes en
 données). ✅
+
+## Révision du 2026-11-13 (immersion sonore)
+
+Spec : User Story 6, FR-014 à FR-024, SC-007 à SC-009. Recherche détaillée (mesures,
+recettes, niveaux cibles, pièges) : [research-immersion.md](research-immersion.md) ; ses
+retouches A1–C6 sont la feuille de route technique.
+
+- **Lot A, moteur** (`sfx.ts`, type `Tone`) : bruit blanc d'un `AudioBuffer` calculé une fois
+  par `mulberry32` à graine fixe, filtres, décroissance, crescendo ; bus maître avec limiteur ;
+  rire joué par le lecteur dans le même bus ; fondu de 25 ms à l'arrêt ; étouffement des voix
+  du faux palier (montée, leurre). Les sources de bruit comptent dans `soundsLive`.
+- **Lot B, révélation** (`sounds.ts`, `revealConfig.ts`, `reveal.ts`) : battements partagés
+  par `REVEAL_TIMING.beats`, fissures, `impact(k)`, Commun revoicé, montée transposée,
+  dégonflement du leurre, paillettes (instants tirés une fois à graine fixe).
+- **Lot C, cartes et interface** : `play(cue, variant?)` (la variante n'entre pas dans le
+  journal), `cardRecipe` sur la face des cartes, vedette, `splash` (seul jeton nouveau du
+  journal), pièces selon le sens, souffle de bannière, éclair de passage vers les cartes,
+  avance de latence.
+- **Tests** : le contrôle « interface plus discrète » passe des gains de note à une énergie
+  (Σ gain² × durée), validé par mutation ; fins audibles bornées relâche comprise ; journaux
+  attendus de `son.spec.ts` mis à jour pour `splash` seulement.
+
+Constitution : I (aucun mécanisme), II (spec révisée d'abord), IV (hasard du tirage intact :
+bruit et paillettes à graine fixe), V (bornes et journal testés, mutations), VI (recettes en
+données). ✅
