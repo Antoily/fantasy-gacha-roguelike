@@ -135,3 +135,18 @@ Constitution : I (aucun mécanisme : rien ne change dans les règles), II (spec 
 d'abord), IV (hasard du tirage intact : décor à graine propre, SC-005 et suite de
 référence de `gacha.test.ts` inchangés), V (`rollAmount` testé et muté, ambiance
 couverte par l'e2e et mutée), VI (durées en données, couleurs dans le thème). ✅
+
+## Révision du 2026-11-13 (immersion visuelle)
+
+Spec : User Story 6, FR-020 à FR-026, SC-009. Recherche : [research-immersion.md](research-immersion.md), lots C
+(présentation : C1, C2), D (accueil : D1 à D4) et E (fenêtres : E1 à E4).
+
+- **Lot C** (`splash.ts`, clés `splash*` d'`ART_FX`) : silhouette, éclair, couleur, rayons, nom qui se pose.
+- **Lot D** (`ambience.ts`, `widgets.makeButton`, `AMBIENCE_FX`) : écrasement à l'appui (dessin seul, la zone ne bouge pas),
+  reflet périodique, scintillement plus marqué, teinte de la vedette ; message de pénurie lisible.
+- **Lot E** (méthodes de fenêtres de `GachaScene`, `art.ts`, nouveau bloc `WINDOW_FX`) : ouverture en échelle (le conteneur
+  est mis à l'échelle autour du centre du panneau, les zones atteignent leur place de `layout.ts` en fin d'ouverture ; l'e2e
+  attend la fin via un signal), silhouettes reconnaissables, fiche et échange mis en scène, « 40e ».
+- Ordre de merge : D, C, E (lots indépendants), puis 004 lots A et B. Réduire les animations : rendu fixe partout.
+
+Constitution : I, II, IV, V, VI. ✅

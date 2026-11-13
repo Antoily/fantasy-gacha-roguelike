@@ -6,7 +6,10 @@ mergée et jouable.
 
 ## En cours
 
-_Rien : prochaine étape à choisir avec l'utilisateur (« Plus tard »)._
+- **Immersion** (révisions de 004, 005 et 007, 2026-11-13) : d'après deux critiques (direction
+  artistique, sound design), révélation de cinéma, cartes distribuées sur la nuit, présentation
+  en silhouette puis couleur, accueil et fenêtres animés, sons riches et synchrones. Aucune règle
+  ne change. Recherches : `specs/007-illustrations/research-immersion.md`, `specs/005-son/research-immersion.md`.
 
 ## Ensuite — le gacha
 
