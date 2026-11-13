@@ -257,8 +257,11 @@ export function makeResultCard(
   c.add(makeBadge(scene, r.x + 6, r.y + 70, badge, result.isNew, 0));
   if (result.shards > 0) c.add(makeShardAmount(scene, r.x + r.w - 8, r.y + 79, `+${result.shards}`, 1));
   // Pastille façon autocollant, à cheval sur le bord : la ligne du bas est déjà pleine
-  // quand un résultat forcé est aussi un doublon.
-  if (result.pity || result.featuredGuarantee) c.add(makeSticker(scene, r.x + r.w - 6, r.y - 7, 'Garanti !'));
+  // quand un résultat forcé est aussi un doublon ; à gauche, elle ne couvre plus le nom.
+  if (result.pity || result.featuredGuarantee) {
+    const k = RESULTS.sticker;
+    c.add(makeSticker(scene, r.x + k.dx, r.y + k.dy, 'Garanti !', 0).setAngle(k.tilt));
+  }
   return c;
 }
 
@@ -315,15 +318,18 @@ export function makeShardAmount(
   return c;
 }
 
-function makeSticker(scene: Phaser.Scene, rightX: number, topY: number, label: string): Phaser.GameObjects.Container {
-  const c = scene.add.container(0, 0);
+// Ancrée en (x, topY) : originX 1 = bord droit, 0 = bord gauche. Le conteneur est posé sur
+// l'ancre pour qu'une inclinaison pivote autour d'elle.
+function makeSticker(scene: Phaser.Scene, x: number, topY: number, label: string, originX = 1): Phaser.GameObjects.Container {
+  const c = scene.add.container(x, topY);
   const t = scene.add.text(0, 0, label, textStyle(FONT_SIZE.tiny));
   const w = t.width + 12;
   const h = t.height + 4;
+  const left = -originX * w;
   const g = scene.add.graphics();
-  g.fillStyle(COLORS.badgePity, 1).fillRoundedRect(rightX - w, topY, w, h, h / 2);
-  g.lineStyle(STROKE.thin, COLORS.ink, 1).strokeRoundedRect(rightX - w, topY, w, h, h / 2);
-  t.setPosition(rightX - w + 6, topY + 2);
+  g.fillStyle(COLORS.badgePity, 1).fillRoundedRect(left, 0, w, h, h / 2);
+  g.lineStyle(STROKE.thin, COLORS.ink, 1).strokeRoundedRect(left, 0, w, h, h / 2);
+  t.setPosition(left + 6, 2);
   c.add([g, t]);
   return c;
 }
