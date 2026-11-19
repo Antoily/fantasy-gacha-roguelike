@@ -323,6 +323,10 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
   pas et le jeu tourne au ralenti (une révélation de 2,1 s de jeu en prenait 7,2 réelles). Les
   bornes de durée (SC-002, SC-003 de 004) se mesurent avec `msUntilModal` (horloge du jeu posée
   par la scène) ; elles échouaient en temps réel sur la CI sans faute du jeu.
+- **Horloge virtuelle et tweens** : le gestionnaire de tweens de Phaser lit `Date.now`, pas
+  `performance.now` (les minuteries `time.delayedCall`, elles, suivent le pas du jeu). Pour filmer
+  image par image, remplacer les deux, sinon les tweens avancent en temps réel et se décalent des
+  minuteries (un nom posé avant l'éclair qui le précède).
 
 ## Leçons de l'accueil vivant (lot D, 2026-11-19)
 
