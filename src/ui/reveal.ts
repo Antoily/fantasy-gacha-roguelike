@@ -527,14 +527,17 @@ export function playReveal(
     });
     loop({ targets: orbit, angle: 360, duration: m.orbit, repeat: -1 });
     if (ultra) {
-      // Ultra rare : les rayons passent par toutes les couleurs de rareté, en boucle.
+      // Ultra rare : rayons, halo et cœur passent par toutes les couleurs de rareté, en boucle
+      // (les rayons décalés entre eux) ; sinon l'additif fondait l'arc-en-ciel dans le rose.
       const hue = { v: 0 };
+      const at = (p: number) => mix(ultra[Math.floor(p) % ultra.length]!, ultra[(Math.floor(p) + 1) % ultra.length]!, p % 1);
+      const washes = [...haloBox.list, ...core.list.slice(0, 2)] as Phaser.GameObjects.Image[];
       loop({
         targets: hue, v: ultra.length, duration: m.hueCycle, repeat: -1,
-        onUpdate: () => rays.forEach((ray, j) => {
-          const p = hue.v + j;
-          tinted(ray, mix(ultra[Math.floor(p) % ultra.length]!, ultra[(Math.floor(p) + 1) % ultra.length]!, p % 1));
-        }),
+        onUpdate: () => {
+          rays.forEach((ray, j) => tinted(ray, at(hue.v + j)));
+          washes.forEach(w => tinted(w, at(hue.v)));
+        },
       });
     }
 
