@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { RARITIES, type Rarity } from '../data/gachaConfig';
-import { REVEAL_TIMING } from '../data/revealConfig';
+import { REVEAL_MOTION, REVEAL_TIMING } from '../data/revealConfig';
 import type { PullResult } from '../logic/gacha';
 import type { FlipSchedule, RevealKind, RevealPlan } from '../logic/reveal';
 import { crackTimes, flipCues, revealCues, type Cue } from '../logic/soundCues';
@@ -8,13 +8,15 @@ import { orbSize, uiImage } from './art';
 import { GACHA, HEIGHT, REVEAL, WIDTH, resultCardRect, type Rect } from './layout';
 import { Particles, type Shape } from './particles';
 import { ART_FX, COLORS, CSS, FONT_SIZE, RADIUS, REVEAL_FX, STROKE } from './theme';
-import { makeOrb, textStyle } from './widgets';
+import { R } from './display';
+import { makeEmblem, makeOrb, textStyle } from './widgets';
 
 // Minuteries et tweens d'une mise en scène, gardés pour tout arrêter d'un coup quand
 // le joueur passe (FR-006) : sans ça, un rappel en retard rouvrirait une fenêtre.
 export class Sequence {
   private readonly timers: Phaser.Time.TimerEvent[] = [];
   private readonly tweens: Phaser.Tweens.Tween[] = [];
+  private readonly cleanups: (() => void)[] = [];
 
   constructor(private readonly scene: Phaser.Scene) {}
 
@@ -28,11 +30,17 @@ export class Sequence {
     return t;
   }
 
+  // Ménage à faire quand la mise en scène s'arrête, fin naturelle ou appui.
+  onStop(fn: () => void) {
+    this.cleanups.push(fn);
+  }
+
   stop() {
     this.timers.forEach(t => t.remove(false));
     this.tweens.forEach(t => t.stop());
     this.timers.length = 0;
     this.tweens.length = 0;
+    this.cleanups.splice(0).forEach(fn => fn());
   }
 }
 
@@ -121,80 +129,240 @@ export function celebrateSingle(
   return pivot;
 }
 
+// Textures de lumière (révision 3, lot A) : blanches, peintes une fois au pixel près puis
+// teintées. Une Image teintée en mélange additif ne coûte presque rien, là où un Graphics
+// redessiné à chaque image pèserait sur le runner de la CI (rendu logiciel) ; et un
+// dégradé fait une lumière sans bord net, que des disques pleins ne donnent pas.
+type LightTexture = 'glow' | 'ray' | 'ring' | 'star';
+const LIGHT_SIZE: Record<LightTexture, readonly [number, number]> = {
+  glow: [64, 64], ray: [128, 24], ring: [96, 96], star: [32, 32],
+};
+// Opacité de chaque texture en (u, v) ∈ [0, 1]² ; le rayon part du bord gauche.
+const LIGHT_ALPHA: Record<LightTexture, (u: number, v: number) => number> = {
+  glow: (u, v) => Math.max(0, 1 - 2 * Math.hypot(u - 0.5, v - 0.5)) ** 1.8,
+  // Anneau fin à 86 % du rayon : sa taille d'affichage se règle en conséquence (RING_PEAK).
+  ring: (u, v) => Math.exp(-(((2 * Math.hypot(u - 0.5, v - 0.5) - RING_PEAK) / 0.06) ** 2)),
+  // Faisceau qui s'évase en s'éloignant du cœur et s'éteint vers sa pointe.
+  ray: (u, v) => {
+    const across = (2 * Math.abs(v - 0.5)) / (0.12 + 0.88 * u);
+    return Math.max(0, 1 - across * across) * (1 - u) ** 1.2 * Math.min(1, u * 10);
+  },
+  // Étincelle à quatre branches et cœur doux.
+  star: (u, v) => {
+    const dx = 2 * Math.abs(u - 0.5);
+    const dy = 2 * Math.abs(v - 0.5);
+    const branch = Math.max(Math.exp(-dx * 12) * (1 - dy), Math.exp(-dy * 12) * (1 - dx));
+    return Math.min(1, branch + 0.6 * Math.max(0, 1 - Math.hypot(dx, dy)) ** 3);
+  },
+};
+const RING_PEAK = 0.86;
+const lightKey = (name: LightTexture) => `fx-${name}`;
+
+function lightTextures(scene: Phaser.Scene) {
+  const base = REVEAL_FX.light;
+  for (const name of Object.keys(LIGHT_SIZE) as LightTexture[]) {
+    if (scene.textures.exists(lightKey(name))) continue;
+    // Peinte à l'échelle de rendu : nette à densité 2 (007, ADR 0007).
+    const w = Math.round(LIGHT_SIZE[name][0] * R);
+    const h = Math.round(LIGHT_SIZE[name][1] * R);
+    const tex = scene.textures.createCanvas(lightKey(name), w, h);
+    if (!tex) continue;
+    const ctx = tex.getContext();
+    const img = ctx.createImageData(w, h);
+    for (let py = 0; py < h; py++) {
+      for (let px = 0; px < w; px++) {
+        const i = 4 * (py * w + px);
+        img.data[i] = (base >> 16) & 0xff;
+        img.data[i + 1] = (base >> 8) & 0xff;
+        img.data[i + 2] = base & 0xff;
+        img.data[i + 3] = Math.round(255 * LIGHT_ALPHA[name]((px + 0.5) / w, (py + 0.5) / h));
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    tex.refresh();
+  }
+}
+
+// Une lumière additive teintée, de taille (w, h) en px d'écran.
+function light(
+  scene: Phaser.Scene, name: LightTexture, x: number, y: number, w: number, h: number, color: number, alpha = 1,
+) {
+  return scene.add.image(x, y, lightKey(name)).setDisplaySize(w, h).setTint(color).setAlpha(alpha)
+    .setBlendMode(Phaser.BlendModes.ADD);
+}
+
+// Mélange de deux couleurs (0 : a, 1 : b), canal par canal.
+function mix(a: number, b: number, k: number): number {
+  const ch = (shift: number) => Math.round(((a >> shift) & 0xff) * (1 - k) + ((b >> shift) & 0xff) * k) << shift;
+  return ch(16) | ch(8) | ch(0);
+}
+
+// Tous les objets d'un conteneur, enfants des enfants compris : pour arrêter leurs tweens
+// avant de les détruire (leçon 004 : un tween en cours écrase ce qu'on repose).
+function descendants(c: Phaser.GameObjects.Container): Phaser.GameObjects.GameObject[] {
+  return c.list.flatMap(o => (o instanceof Phaser.GameObjects.Container ? [o, ...descendants(o)] : [o]));
+}
+
 // Joue un déroulé calculé par la logique (src/logic/reveal.ts) : la scène ne décide de
 // rien, elle montre `plan.steps` dans l'ordre aux instants de REVEAL_TIMING, puis
 // appelle onDone. Les sons (005) suivent le même calendrier, sur les mêmes minuteries :
 // passer l'animation annule aussi ceux qui restaient à jouer. Aucun hasard ici : `Phaser.Math.Between` lirait Math.random et
-// décalerait le hasard scripté de l'e2e (research R6).
+// décalerait le hasard scripté de l'e2e (research R6) ; la secousse est faite main pour la
+// même raison (`cameras.main.shake` le lit aussi).
+// Révision 3 (lot A, FR-018 à FR-021) : nuit directe, cœur qui bat en lumière, fissures à
+// à-coups, gel, impact franc, palier fait de lumière et toujours en mouvement, fausses pistes
+// jouées, sortie dans un voile de lumière. Les durées restent celles de REVEAL_TIMING.
 export function playReveal(
   scene: Phaser.Scene,
   modal: Phaser.GameObjects.Container,
   plan: RevealPlan,
+  armMs: number,
   onCue: (cue: Cue) => void,
   onDone: () => void,
 ): Sequence {
+  lightTextures(scene);
   const seq = new Sequence(scene);
   const { x, y } = REVEAL.center;
   const t = REVEAL_TIMING;
+  const m = REVEAL_MOTION;
+  const or = GACHA.orb.r;
+  const neutral = ART_FX.crackLight;
 
-  // Nuit (révision 2, FR-016) : l'écran plonge dans le noir pendant que l'orbe arrive.
+  // Nuit directe (FR-018) : aucun voile papier dessous (openModal), la nuit tombe d'un coup.
   const night = uiImage(scene, 'bg-reveal', WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT)
     ?? scene.add.rectangle(0, 0, WIDTH, HEIGHT, ART_FX.night, ART_FX.nightAlpha).setOrigin(0);
   night.setAlpha(0);
-  seq.tween({ targets: night, alpha: 1, duration: 300, ease: 'Quad.easeOut' });
+  seq.tween({ targets: night, alpha: 1, duration: m.nightIn, ease: 'Quad.easeIn' });
+  // Voile d'encre du gel : la nuit fonce juste avant l'éclat.
+  const dusk = scene.add.rectangle(0, 0, WIDTH, HEIGHT, REVEAL_FX.dusk, 1).setOrigin(0).setAlpha(0);
+
+  // Plateau : ce qui bouge avec l'impact (gel, coup de poing, secousse), pivot au centre de
+  // l'écran. La nuit reste fixe dessous : une secousse ne découvre jamais l'écran de tirage.
+  // La caméra porte l'échelle de rendu R : on ne la touche pas.
+  const stage = scene.add.container(WIDTH / 2, HEIGHT / 2);
+  const layer = scene.add.container(-WIDTH / 2, -HEIGHT / 2);
+  stage.add(layer);
+
   // Cercle magique sous l'orbe : il s'allume, tourne de plus en plus vite, puis prend la
   // couleur du palier. Lumière neutre jusque-là : le suspense ne trahit rien (FR-002).
   const circle = uiImage(scene, 'magic-circle', x, y, REVEAL.circle, REVEAL.circle);
   const circleScale = circle?.scaleX ?? 1;
-  circle?.setAlpha(0).setTint(ART_FX.crackLight);
-
+  circle?.setAlpha(0).setTint(neutral);
+  // Lumière qui filtre par les fissures, derrière l'orbe (neutre, FR-016).
+  const glowSize = GACHA.orb.r * REVEAL.orbScale * 3.2;
+  const crackGlow = light(scene, 'glow', x, y, glowSize, glowSize, neutral, 0);
+  const crackGlowScale = crackGlow.scaleX;
+  // Effets du palier (halo, rayons, ondes, orbite), centrés.
   const fx = scene.add.container(x, y);
-  const orb = makeOrb(scene, GACHA.orb.r).setPosition(GACHA.orb.x, GACHA.orb.y);
+  // Anneau du battement autour de l'orbe agrandie.
+  const ringSize = (2 * (or * REVEAL.orbScale + 6)) / RING_PEAK;
+  const beatRing = light(scene, 'ring', x, y, ringSize, ringSize, REVEAL_FX.heartbeat, 0);
+  const ringScale = beatRing.scaleX;
+  // Orbe : `holder` porte la place, l'échelle et le tremblement ; `orb`, les pulsations.
+  const holder = scene.add.container(GACHA.orb.x, GACHA.orb.y);
+  const orb = makeOrb(scene, or);
+  holder.add(orb);
   // Ce qui dessine l'orbe intacte, masqué quand elle éclate.
   const sphere = [...orb.list] as unknown as Phaser.GameObjects.Components.Visible[];
   // Fissures : trois calques de plus en plus fendus, dans la lumière neutre.
-  const size = orbSize(GACHA.orb.r);
+  const size = orbSize(or);
   const cracks = (['orb-cracks-1', 'orb-cracks-2', 'orb-cracks-3'] as const)
-    .map(name => uiImage(scene, name, 0, 0, size, size)?.setVisible(false).setTint(ART_FX.crackLight) ?? null);
-  // Cœur lumineux qui remplace l'orbe brisée : la couleur du palier.
-  const core = scene.add.graphics();
-  orb.add([...cracks.filter(c => c !== null), core]);
-  const flash = scene.add.rectangle(0, 0, WIDTH, HEIGHT, COLORS.panel, 1).setOrigin(0).setAlpha(0);
+    .map(name => uiImage(scene, name, 0, 0, size, size)?.setVisible(false).setTint(neutral) ?? null);
+  // Le cœur qui bat (lueur neutre posée sur l'orbe), puis le cœur lumineux du palier.
+  const heart = light(scene, 'glow', 0, 0, or * 2.4, or * 2.4, neutral, 0);
+  const core = scene.add.container(0, 0);
+  orb.add([...cracks.filter(c => c !== null), heart, core]);
+  layer.add([...(circle ? [circle] : []), crackGlow, fx, beatRing, holder]);
+  const particles = new Particles(scene, layer, 1);
+  // Impact : éclair neutre, puis la couleur du palier qui s'éteint (FR-020).
+  const flash = scene.add.rectangle(0, 0, WIDTH, HEIGHT, REVEAL_FX.flash, 1).setOrigin(0).setAlpha(0);
+  const tintFlash = scene.add.rectangle(0, 0, WIDTH, HEIGHT, neutral, 1).setOrigin(0).setAlpha(0)
+    .setBlendMode(Phaser.BlendModes.ADD);
   const label = scene.add.text(x, REVEAL.labelY, '', { ...textStyle(FONT_SIZE.title), stroke: CSS.outline, strokeThickness: 6 })
     .setOrigin(0.5).setAlpha(0);
+  // « Touche pour passer » n'apparaît qu'une fois l'appui armé, puis respire.
   const hint = scene.add.text(x, REVEAL.hintY, 'Touche pour passer', textStyle(FONT_SIZE.small, CSS.textFaint))
-    .setOrigin(0.5);
-  modal.add([night, ...(circle ? [circle] : []), fx, orb, flash]);
-  const particles = new Particles(scene, modal, 1);
-  modal.add([label, hint]);
-  // Halo qui bat autour de l'orbe, de plus en plus vite : le cœur du joueur.
-  const halo = scene.add.graphics().setPosition(x, y).setAlpha(0);
-  halo.lineStyle(STROKE.thick, REVEAL_FX.heartbeat, 1).strokeCircle(0, 0, GACHA.orb.r * REVEAL.orbScale + 6);
-  modal.addAt(halo, modal.getIndex(orb));
+    .setOrigin(0.5).setAlpha(0);
+  modal.add([night, dusk, stage, flash, tintFlash, label, hint]);
+  seq.at(armMs, () => seq.tween({
+    targets: hint, alpha: REVEAL_FX.hintAlpha[1], duration: m.hintIn, onComplete: () => seq.tween({
+      targets: hint, alpha: REVEAL_FX.hintAlpha[0], duration: m.hintPulse, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+    }),
+  }));
+
+  // Secousse faite main, déterministe : le plateau oscille et s'amortit.
+  let jolting: Phaser.Tweens.Tween | null = null;
+  const jolt = (amp: number, ms: number) => {
+    jolting?.stop();
+    const p = { v: 0 };
+    jolting = seq.tween({
+      targets: p, v: 1, duration: ms,
+      onUpdate: () => {
+        const k = amp * (1 - p.v);
+        stage.setPosition(WIDTH / 2 + k * Math.sin(p.v * 37), HEIGHT / 2 + k * Math.cos(p.v * 29));
+      },
+      onComplete: () => stage.setPosition(WIDTH / 2, HEIGHT / 2),
+    });
+  };
 
   // Suspense en trois temps, identique pour tous les paliers (FR-002, FR-016) : l'orbe gagne
-  // le centre au-dessus du cercle et aspire l'énergie ; elle se fissure trois fois en
-  // tremblant de plus en plus ; tout se fige ; puis elle éclate.
-  seq.tween({ targets: orb, x, y, scale: REVEAL.orbScale, duration: 400, ease: 'Cubic.easeOut' });
+  // le centre au-dessus du cercle, en traînant de la lumière, et aspire l'énergie ; son cœur
+  // bat ; elle se fissure trois fois par à-coups ; tout se fige ; puis elle éclate.
+  seq.tween({
+    targets: holder, x, y, scale: REVEAL.orbScale, duration: m.orbIn, ease: 'Back.easeOut', easeParams: [1.2],
+  });
+  // Traînée de lueurs une fois la nuit tombée : en additif sur le ciel pastel, elles saturaient au blanc.
+  for (let i = 1; i < 4; i++) {
+    seq.at(m.nightIn * (0.4 + 0.3 * i), () => particles.burst({
+      x: holder.x, y: holder.y, count: 2, colors: [neutral], shapes: ['glow'],
+      speed: [0, 20], size: [10, 16], life: [260, 420], spawnRadius: [0, or * 0.5],
+    }));
+  }
   let spin: Phaser.Tweens.Tween | null = null;
   if (circle) {
     seq.tween({ targets: circle, alpha: 0.85, duration: 500, delay: 200 });
     spin = seq.tween({ targets: circle, angle: REVEAL.circleTurn, duration: t.suspense - t.freeze, ease: 'Cubic.easeIn' });
   }
   let shake = seq.tween({
-    targets: orb, angle: { from: -2, to: 2 }, duration: 80, yoyo: true, repeat: -1, delay: 400,
+    targets: holder, angle: { from: -2, to: 2 }, duration: 80, yoyo: true, repeat: -1, delay: m.orbIn,
   });
+  for (const beat of m.beats) {
+    seq.at(Math.round(t.suspense * beat), () => {
+      // Battement en lumière (FR-018) : un anneau part de l'orbe, son cœur s'allume, elle enfle.
+      beatRing.setScale(ringScale).setAlpha(REVEAL_FX.heartbeatAlpha);
+      seq.tween({ targets: beatRing, scale: ringScale * REVEAL.heartRing, alpha: 0, duration: m.beat, ease: 'Quad.easeOut' });
+      heart.setAlpha(REVEAL_FX.heartGlowAlpha);
+      seq.tween({ targets: heart, alpha: 0, duration: m.beat, ease: 'Quad.easeOut' });
+      seq.tween({ targets: orb, scale: REVEAL.beatScale, duration: m.beatPulse, yoyo: true, ease: 'Quad.easeOut' });
+    });
+  }
   crackTimes().forEach((at, i) => seq.at(at, () => {
-    // Fissure : le calque suivant, un à-coup, des éclats de verre ; le tremblement s'emballe.
+    // Fissure : le calque suivant, un à-coup (l'orbe sursaute, le plateau tressaille), la
+    // lumière derrière l'orbe monte d'un cran, un anneau fin part, des éclats de verre.
     cracks.forEach((c, j) => c?.setVisible(j === i));
     shake.stop();
     const amp = 3 + 2 * i;
-    orb.setAngle(amp * 1.6);
-    shake = seq.tween({ targets: orb, angle: { from: -amp, to: amp }, duration: 60 - 8 * i, yoyo: true, repeat: -1 });
+    holder.setAngle(amp * 1.6);
+    shake = seq.tween({ targets: holder, angle: { from: -amp, to: amp }, duration: 60 - 8 * i, yoyo: true, repeat: -1 });
+    seq.tween({
+      targets: holder, scale: { from: REVEAL.orbScale * REVEAL.crackJolt, to: REVEAL.orbScale },
+      duration: m.crackJolt, ease: 'Quad.easeOut',
+    });
+    jolt(REVEAL.crackShake[i]!, m.crackJolt);
+    seq.tween({
+      targets: crackGlow, alpha: REVEAL_FX.crackGlowAlpha[i]!, scale: crackGlowScale * REVEAL.crackGlowScale[i]!,
+      duration: m.crackGlowIn, ease: 'Quad.easeOut',
+    });
+    const ring = light(scene, 'ring', x, y, ringSize, ringSize, neutral, 0.8);
+    layer.addAt(ring, layer.getIndex(holder));
+    seq.tween({
+      targets: ring, scale: ringScale * REVEAL.crackRingScale, alpha: 0, duration: m.crackRing, ease: 'Quad.easeOut',
+      onComplete: () => ring.destroy(),
+    });
     particles.burst({
-      x, y, count: 8 + 6 * i, colors: [ART_FX.glass, ART_FX.crackLight], shapes: ['shard', 'spark'],
+      x, y, count: 8 + 6 * i, colors: [ART_FX.glass, neutral], shapes: ['shard', 'spark'],
       speed: [90, 220], size: [2.5, 4.5], life: [300, 520],
-      spawnRadius: [GACHA.orb.r * 0.6, GACHA.orb.r * REVEAL.orbScale], gravity: 300, drag: 1,
+      spawnRadius: [or * 0.6, or * REVEAL.orbScale], gravity: 300, drag: 1,
     });
   }));
   const charge = {
@@ -202,86 +370,181 @@ export function playReveal(
     radius: [110, 210] as const, size: [2, 4] as const, life: [280, 420] as const,
   };
   seq.at(150, () => particles.stream(() => particles.converge(charge, 1), 30, 180, t.suspense - t.freeze - 150));
-  // Temps figé : plus de tremblement ni d'aspiration, silence ; l'orbe se gonfle à peine.
+  // Temps figé : tout s'arrête net où il en est (particules, anneau, tremblement), la nuit
+  // fonce, le plateau avance d'un rien et la lumière des fissures monte.
   seq.at(t.suspense - t.freeze, () => {
     shake.stop();
-    orb.setAngle(0);
+    holder.setAngle(0);
+    jolting?.stop();
+    stage.setPosition(WIDTH / 2, HEIGHT / 2);
     particles.stopStreams();
+    particles.timeScale = 0;
     spin?.pause();
-    halo.setAlpha(0);
-    seq.tween({ targets: orb, scale: REVEAL.orbScale * 1.06, duration: t.freeze, ease: 'Quad.easeIn' });
+    scene.tweens.killTweensOf([beatRing, heart, orb, crackGlow]);
+    seq.tween({ targets: holder, scale: REVEAL.orbScale * REVEAL.freezeSwell, duration: t.freeze, ease: 'Quad.easeIn' });
+    seq.tween({ targets: stage, scale: REVEAL.freezeZoom, duration: t.freeze, ease: 'Quad.easeIn' });
+    seq.tween({ targets: dusk, alpha: REVEAL_FX.duskAlpha, duration: t.freeze });
+    seq.tween({ targets: crackGlow, alpha: 1, duration: t.freeze, ease: 'Quad.easeIn' });
   });
-  for (const beat of [0.3, 0.46, 0.6, 0.71, 0.8, 0.87]) {
-    seq.at(Math.round(t.suspense * beat), () => {
-      halo.setScale(1).setAlpha(REVEAL_FX.heartbeatAlpha);
-      seq.tween({ targets: halo, scale: 1.3, alpha: 0, duration: 220, ease: 'Quad.easeOut' });
-    });
-  }
+
+  // Palier affiché : ses boucles (rotation, respiration, couleurs) et ses lumières teintées,
+  // que la transition éteint ou fait virer.
+  const loops: Phaser.Tweens.Tween[] = [];
+  const loop = (config: Phaser.Types.Tweens.TweenBuilderConfig) => loops.push(seq.tween(config));
+  const stopLoops = () => loops.splice(0).forEach(l => l.stop());
+  const tints = new Map<Phaser.GameObjects.Image, number>();
+  let rays: Phaser.GameObjects.Image[] = [];
+  let rayBox: Phaser.GameObjects.Container | null = null;
+  let haloBox: Phaser.GameObjects.Container | null = null;
+  let emblem: Phaser.GameObjects.Image | Phaser.GameObjects.Graphics | null = null;
 
   let shattered = false;
   const burst = (rarity: Rarity, last: boolean) => {
     const k = rankOf(rarity);
     const color = COLORS.rarity[rarity];
+    const ultra = rarity === 'ultra' ? Object.values(COLORS.rarity) : null;
+    particles.timeScale = 1;
     // Premier éclat : l'orbe vole en éclats de verre (FR-017).
     if (!shattered) {
       shattered = true;
       sphere.forEach(o => o.setVisible(false));
       cracks.forEach(c => c?.setVisible(false));
+      heart.setAlpha(0);
+      beatRing.setAlpha(0);
+      seq.tween({ targets: crackGlow, alpha: 0, duration: 300, ease: 'Quad.easeOut' });
       particles.burst({
-        x, y, count: REVEAL.shards[k]!, colors: [ART_FX.glass, ART_FX.crackLight, color], shapes: ['shard'],
+        x, y, count: REVEAL.shards[k]!, colors: [ART_FX.glass, neutral, color], shapes: ['shard'],
         speed: [180, 440], size: [4, 8], life: [600, 1000],
-        spawnRadius: [10, GACHA.orb.r * REVEAL.orbScale * 0.8], gravity: 380, drag: 0.6,
+        spawnRadius: [10, or * REVEAL.orbScale * 0.8], gravity: 380, drag: 0.6,
       });
     }
+    // Une transition encore en cours (leurre qui se dégonfle) écraserait ce palier.
+    stopLoops();
     if (circle) {
       scene.tweens.killTweensOf(circle);
       circle.setTint(color).setAlpha(1).setScale(circleScale * 1.15);
       seq.tween({ targets: circle, scale: circleScale, duration: 400, ease: 'Cubic.easeOut' });
-      seq.tween({ targets: circle, angle: circle.angle + 40, duration: 3000 });
+      loop({ targets: circle, angle: circle.angle + 360, duration: (360 / m.rayTurn[0]) * 1000, repeat: -1 });
     }
-    // Une transition encore en cours (leurre qui se dégonfle) écraserait ce palier.
-    scene.tweens.killTweensOf([fx, orb, ...fx.list]);
+    scene.tweens.killTweensOf([fx, holder, orb, core, stage, dusk, flash, tintFlash, ...descendants(fx), ...descendants(core)]);
     fx.removeAll(true);
+    core.removeAll(true);
+    tints.clear();
     fx.setScale(1).setAlpha(1).setAngle(0).setPosition(x, y);
-    orb.setScale(REVEAL.orbScale).setAngle(0).setPosition(x, y);
+    holder.setScale(REVEAL.orbScale).setAngle(0).setPosition(x, y);
+    orb.setScale(1);
+    core.setScale(1).setAlpha(1);
 
-    const or = GACHA.orb.r;
-    core.clear();
-    core.fillStyle(color, 1).fillCircle(0, 0, or);
-    core.fillStyle(COLORS.panel, 0.35).fillCircle(-or * 0.22, -or * 0.22, or * 0.6);
-    core.fillStyle(COLORS.panel, 0.7).fillCircle(-or * 0.32, -or * 0.32, or * 0.22);
-    core.lineStyle(STROKE.thick, COLORS.ink, 1).strokeCircle(0, 0, or);
+    // Impact (FR-020) : éclair neutre qui vire à la couleur du palier, coup de poing dès Rare,
+    // secousse dès Légendaire ; la nuit reprend sa teinte.
     seq.tween({
-      targets: orb, scale: REVEAL.orbScale * REVEAL.pulse[k]!, duration: 180, yoyo: true, ease: 'Quad.easeOut',
+      targets: flash, alpha: REVEAL_FX.flashAlpha[k]!, duration: m.flashIn, ease: 'Quad.easeOut',
+      onComplete: () => seq.tween({ targets: flash, alpha: 0, duration: m.flashOut, ease: 'Quad.easeIn' }),
     });
-
-    // Rayons : plus nombreux et plus longs avec le rang (FR-004).
-    const rays = scene.add.graphics();
-    const n = REVEAL.rays[k]!;
-    const len = REVEAL.rayLength[k]!;
-    const spread = (Math.PI / n) * 0.45;
-    const V = Phaser.Math.Vector2;
-    for (let j = 0; j < n; j++) {
-      const a = (2 * Math.PI * j) / n;
-      const pts = [new V(0, 0),
-        new V(len * Math.cos(a - spread), len * Math.sin(a - spread)),
-        new V(len * Math.cos(a + spread), len * Math.sin(a + spread))];
-      rays.fillStyle(color, REVEAL_FX.rayAlpha).fillPoints(pts, true);
-      rays.lineStyle(STROKE.thin, COLORS.ink, 1).strokePoints(pts, true);
+    tintFlash.setFillStyle(color, 1).setAlpha(0);
+    seq.at(m.flashIn, () => {
+      tintFlash.setAlpha(REVEAL_FX.flashTintAlpha);
+      seq.tween({ targets: tintFlash, alpha: 0, duration: m.flashOut, ease: 'Quad.easeOut' });
+    });
+    stage.setScale(k >= 2 ? REVEAL.punch : stage.scale);
+    seq.tween({ targets: stage, scale: 1, duration: m.punch, ease: 'Quad.easeOut' });
+    if (REVEAL.shake[k]! > 0) jolt(REVEAL.shake[k]!, m.shake);
+    else {
+      jolting?.stop();
+      stage.setPosition(WIDTH / 2, HEIGHT / 2);
     }
-    rays.setScale(0);
-    fx.add(rays);
-    seq.tween({ targets: rays, scale: 1, duration: 260, ease: 'Back.easeOut' });
-    seq.tween({ targets: rays, angle: 20 + 10 * k, duration: 2000, ease: 'Linear' });
+    seq.tween({ targets: dusk, alpha: 0, duration: 400 });
 
-    // Onde de choc ; double à partir de Légendaire.
+    // Palier fait de lumière (FR-019), plus ample avec le rang : halo, rayons longs et fins
+    // qui tournent dans un sens, courts et larges dans l'autre, anneau, cœur à trois disques
+    // (couleur du palier vers la lumière neutre au centre), étincelles en orbite.
+    const tinted = (img: Phaser.GameObjects.Image, c: number) => {
+      tints.set(img, c);
+      return img.setTint(c);
+    };
+    const len = REVEAL.rayLength[k]!;
+    const halo = REVEAL_FX.halo;
+    haloBox = scene.add.container(0, 0, [
+      tinted(light(scene, 'glow', 0, 0, len * 2.6, len * 2.6, color, halo[0]), color),
+      tinted(light(scene, 'glow', 0, 0, len * 1.3, len * 1.3, color, halo[1]), color),
+    ]);
+    const n = REVEAL.rays[k]!;
+    const rayColor = (j: number) => (ultra ? ultra[j % ultra.length]! : color);
+    const long = scene.add.container(0, 0);
+    const short = scene.add.container(0, 0);
+    rays = [];
+    for (let j = 0; j < n; j++) {
+      const a = (360 * j) / n;
+      const ray = tinted(light(scene, 'ray', 0, 0, len, len * REVEAL.rayLong, rayColor(j), REVEAL_FX.rayLong), rayColor(j));
+      long.add(ray.setOrigin(0, 0.5).setAngle(a));
+      rays.push(ray);
+      if (j % 2 === 0) {
+        const sl = len * REVEAL.rayShort.length;
+        const wide = tinted(
+          light(scene, 'ray', 0, 0, sl, sl * REVEAL.rayShort.width, rayColor(j + 2), REVEAL_FX.rayShort), rayColor(j + 2),
+        );
+        short.add(wide.setOrigin(0, 0.5).setAngle(a + 180 / n));
+        rays.push(wide);
+      }
+    }
+    rayBox = scene.add.container(0, 0, [long, short]).setScale(0);
+    const edge = (2 * or * REVEAL.orbScale * 1.15) / RING_PEAK;
+    const ring = tinted(light(scene, 'ring', 0, 0, edge, edge, color, REVEAL_FX.ring), color);
+    const orbit = scene.add.container(0, 0);
+    const count = REVEAL.orbit.count[k]!;
+    const [r0, r1] = REVEAL.orbit.radius;
+    const sparkColors = ultra ?? [color, neutral];
+    for (let i = 0; i < count; i++) {
+      // Rayons et tailles étalés par le nombre d'or : réguliers sans être alignés.
+      const a = (2 * Math.PI * i) / count;
+      const r = r0 + (r1 - r0) * ((i * 0.618) % 1);
+      const s = 10 + 8 * ((i * 0.382) % 1);
+      const c = sparkColors[i % sparkColors.length]!;
+      const star = tinted(light(scene, 'star', r * Math.cos(a), r * Math.sin(a), s, s, c, REVEAL_FX.orbit), c);
+      orbit.add(star);
+      loop({
+        targets: star, alpha: 0.3, scale: star.scaleX * 0.6, duration: 300 + 40 * (i % 5), yoyo: true, repeat: -1,
+        ease: 'Sine.easeInOut', delay: 60 * i,
+      });
+    }
+    fx.add([haloBox, rayBox, ring, orbit]);
+    core.add([
+      tinted(light(scene, 'glow', 0, 0, or * 3, or * 3, color, REVEAL_FX.core[0]), color),
+      tinted(light(scene, 'glow', 0, 0, or * 2, or * 2, color, REVEAL_FX.core[1]), color),
+      tinted(light(scene, 'glow', 0, 0, or * 0.9, or * 0.9, neutral, REVEAL_FX.core[2]), neutral),
+    ]);
+    seq.tween({ targets: rayBox, scale: 1, duration: 260, ease: 'Back.easeOut' });
+    seq.tween({ targets: holder, scale: REVEAL.orbScale * REVEAL.pulse[k]!, duration: 180, yoyo: true, ease: 'Quad.easeOut' });
+    loop({ targets: long, angle: 360, duration: (360 / Math.abs(m.rayTurn[0])) * 1000, repeat: -1 });
+    loop({ targets: short, angle: -360, duration: (360 / Math.abs(m.rayTurn[1])) * 1000, repeat: -1 });
+    loop({
+      targets: [long, short], alpha: REVEAL_FX.rayBreath, duration: m.rayBreath, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+    });
+    loop({
+      targets: [core, haloBox], scale: REVEAL.coreBreath, duration: m.coreBreath, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+    });
+    loop({ targets: orbit, angle: 360, duration: m.orbit, repeat: -1 });
+    if (ultra) {
+      // Ultra rare : les rayons passent par toutes les couleurs de rareté, en boucle.
+      const hue = { v: 0 };
+      loop({
+        targets: hue, v: ultra.length, duration: m.hueCycle, repeat: -1,
+        onUpdate: () => rays.forEach((ray, j) => {
+          const p = hue.v + j;
+          tinted(ray, mix(ultra[Math.floor(p) % ultra.length]!, ultra[(Math.floor(p) + 1) % ultra.length]!, p % 1));
+        }),
+      });
+    }
+
+    // Onde de choc en lumière ; double à partir de Légendaire.
     const waves = k >= 3 ? 2 : 1;
     for (let w = 0; w < waves; w++) {
-      const wave = scene.add.graphics();
-      wave.lineStyle(STROKE.thick + k, color, REVEAL_FX.waveAlpha).strokeCircle(0, 0, REVEAL.wave[k]!);
-      wave.setScale(0.3);
+      const d = (2 * REVEAL.wave[k]!) / RING_PEAK;
+      const wave = light(scene, 'ring', 0, 0, d, d, w === 0 ? neutral : color, 1);
+      const s1 = wave.scaleX;
+      wave.setScale(s1 * 0.3);
       fx.add(wave);
-      seq.tween({ targets: wave, scale: 1, alpha: 0, duration: 650, delay: w * 250, ease: 'Cubic.easeOut' });
+      seq.tween({ targets: wave, scale: s1, alpha: 0, duration: m.wave, delay: w * m.waveGap, ease: 'Cubic.easeOut' });
     }
 
     // Explosion de particules : nombre, vitesse et formes montent avec le rang. Une
@@ -291,50 +554,93 @@ export function playReveal(
     particles.burst({
       x, y, count: REVEAL.burst[k]!, colors: k === 0 ? [color] : colorsOf(rarity), shapes: SHAPES[k]!,
       speed: [speed * 0.3, speed], size: [3, 5 + 1.5 * k], life: [500, 900 + 180 * k],
-      spawnRadius: [GACHA.orb.r * 0.6, GACHA.orb.r * REVEAL.orbScale], gravity: k >= 2 ? 260 : 60, drag: 1.1,
+      spawnRadius: [or * 0.6, or * REVEAL.orbScale], gravity: k >= 2 ? 260 : 60, drag: 1.1,
     });
     // Lueurs additives : la lumière du palier qui inonde la nuit.
     particles.burst({
       x, y, count: REVEAL.glows[k]!, colors: colorsOf(rarity), shapes: ['glow'],
-      speed: [30, 150], size: [8, 14 + 2 * k], life: [500, 950], spawnRadius: [0, GACHA.orb.r],
+      speed: [30, 150], size: [8, 14 + 2 * k], life: [500, 950], spawnRadius: [0, or],
     });
+    // Pluie d'étoiles pour les deux plus hauts paliers.
+    if (k >= 3) rain(particles, rarity, t.final[rarity], k === 4 ? 90 : 50);
 
-    // Éclair plein écran, secousse et pluie d'étoiles pour les deux plus hauts paliers.
-    if (k >= 3) {
-      flash.setFillStyle(color, 1);
-      seq.tween({ targets: flash, alpha: { from: 0, to: REVEAL_FX.flashAlpha }, duration: 140, yoyo: true });
-      seq.tween({ targets: [fx, orb], x: x + 2 * k, duration: 40, yoyo: true, repeat: 3, ease: 'Sine.easeInOut' });
-      rain(particles, rarity, t.final[rarity], k === 4 ? 90 : 50);
-    }
-
-    // Le nom de la rareté n'apparaît qu'au vrai palier : une fausse piste reste muette.
+    // Le nom de la rareté n'apparaît qu'au vrai palier : une fausse piste reste muette. Il
+    // rebondit deux fois, et l'emblème de la rareté se pose à sa gauche, en tampon.
     if (last) {
       label.setText(`${labelOf(rarity)}\u00a0!`).setScale(0.6);
-      seq.tween({ targets: label, alpha: 1, scale: 1, duration: 300, ease: 'Back.easeOut' });
+      const gap = 8;
+      const e = REVEAL.emblem;
+      label.setX(x + (e + gap) / 2);
+      seq.tween({ targets: label, alpha: 1, scale: 1, duration: m.labelIn, ease: 'Back.easeOut' });
+      seq.at(m.labelRebound, () => seq.tween({
+        targets: label, scale: REVEAL.labelRebound, duration: m.labelReboundMs / 2, yoyo: true, ease: 'Quad.easeOut',
+      }));
+      emblem = makeEmblem(scene, 0, 0, e, rarity);
+      emblem.setPosition(label.x - label.width / 2 - gap - e / 2, REVEAL.labelY).setAlpha(0);
+      modal.add(emblem);
+      const s0 = emblem.scaleX;
+      seq.at(m.emblemDelay, () => {
+        emblem?.setAlpha(1).setScale(s0 * REVEAL.emblemStamp);
+        seq.tween({ targets: emblem, scale: s0, duration: m.emblemIn, ease: 'Back.easeOut' });
+      });
     }
+  };
+
+  // Leurre, avant la transition : le cœur du faux palier a le hoquet (FR-021).
+  const hiccup = () => {
+    seq.tween({
+      targets: orb, scale: { from: 1 + REVEAL.hiccup, to: 1 - REVEAL.hiccup }, duration: m.hiccups / 6,
+      yoyo: true, repeat: 2, ease: 'Sine.easeInOut', onComplete: () => orb.setScale(1),
+    });
   };
 
   const transition = (kind: RevealKind) => {
     particles.stopStreams();
+    stopLoops();
+    scene.tweens.killTweensOf([holder, orb, core, ...(rayBox ? [rayBox] : []), ...(haloBox ? [haloBox] : [])]);
     if (kind === 'rise') {
-      // Montée : l'orbe se fend dans un éclair blanc et crache des étincelles.
-      particles.burst({
-        x, y, count: 30, colors: [REVEAL_FX.sparkle, ...REVEAL_FX.charge], shapes: ['spark'],
-        speed: [250, 480], size: [2, 4], life: [220, 420], drag: 2,
+      // Montée : l'orbe aspire tout (énergie, rayons, cœur), s'étire, puis éclate plus haut.
+      particles.stream(() => particles.converge({
+        x, y, colors: [neutral, ...REVEAL_FX.charge], shapes: ['spark', 'glow'],
+        radius: [90, 180], size: [2, 4], life: [140, 200],
+      }, 1), 140, 220, m.riseSuck);
+      const suck = { duration: m.riseSuck, ease: 'Quad.easeIn' };
+      seq.tween({ targets: core, scale: REVEAL.riseSuck, ...suck });
+      if (rayBox) seq.tween({ targets: rayBox, scale: REVEAL.riseSuck * 0.6, alpha: 0.5, ...suck });
+      if (haloBox) seq.tween({ targets: haloBox, scale: REVEAL.riseSuck, ...suck });
+      seq.tween({ targets: holder, angle: { from: -12, to: 12 }, duration: 50, yoyo: true, repeat: 1 });
+      seq.at(m.riseSuck, () => {
+        holder.setAngle(0);
+        const rest = t.transition - m.riseSuck;
+        seq.tween({ targets: holder, scaleY: REVEAL.orbScale * REVEAL.riseStretch, duration: rest, ease: 'Quad.easeIn' });
+        seq.tween({ targets: flash, alpha: 0.9, duration: rest, ease: 'Quad.easeIn' });
+        particles.burst({
+          x, y, count: 30, colors: [REVEAL_FX.sparkle, ...REVEAL_FX.charge], shapes: ['spark'],
+          speed: [250, 480], size: [2, 4], life: [220, 420], drag: 2,
+        });
       });
-      flash.setFillStyle(COLORS.panel, 1);
-      seq.tween({ targets: flash, alpha: { from: 0, to: 0.9 }, duration: t.transition / 2, yoyo: true });
-      seq.tween({ targets: orb, angle: { from: -12, to: 12 }, duration: 50, yoyo: true, repeat: 2 });
     } else {
-      // Leurre : l'effet se dégonfle, l'orbe retombe et l'énergie s'éteint en tombant.
+      // Leurre : la lumière vire à l'éteint, les rayons s'éteignent un à un, le tout se
+      // dégonfle et tombe ; l'énergie retombe en cendres.
       particles.fadeAll(t.transition);
       particles.burst({
         x, y, count: 24, colors: [REVEAL_FX.fizzle], shapes: ['dot'], speed: [20, 90],
-        angle: [0, Math.PI], spawnRadius: [10, GACHA.orb.r], size: [2, 4], life: [500, 800], gravity: 420,
+        angle: [0, Math.PI], spawnRadius: [10, or], size: [2, 4], life: [500, 800], gravity: 420,
       });
-      seq.tween({ targets: fx, scale: 0.2, alpha: 0, duration: t.transition, ease: 'Cubic.easeIn' });
+      const from = new Map(tints);
+      const p = { v: 0 };
+      seq.tween({
+        targets: p, v: 1, duration: m.fizzle,
+        onUpdate: () => from.forEach((c, img) => img.setTint(mix(c, REVEAL_FX.fizzle, p.v))),
+      });
+      const step = (t.transition - 60) / Math.max(1, rays.length);
+      rays.forEach((ray, j) => seq.tween({ targets: ray, alpha: 0, duration: 60, delay: j * step }));
+      const fall = { duration: t.transition, ease: 'Cubic.easeIn' };
+      seq.tween({ targets: [holder, fx], y: y + REVEAL.drop, ...fall });
+      seq.tween({ targets: holder, scale: REVEAL.orbScale * 0.8, ...fall });
+      seq.tween({ targets: core, alpha: 0.4, ...fall });
+      if (haloBox) seq.tween({ targets: haloBox, scale: 0.5, alpha: 0, ...fall });
       if (circle) seq.tween({ targets: circle, alpha: 0.3, duration: t.transition });
-      seq.tween({ targets: orb, scale: REVEAL.orbScale * 0.8, duration: t.transition, ease: 'Cubic.easeIn' });
     }
   };
 
@@ -343,17 +649,38 @@ export function playReveal(
     const last = i === plan.steps.length - 1;
     seq.at(time, () => {
       shake.stop();
-      halo.setAlpha(0);
       burst(rarity, last);
     });
     if (last) {
       time += t.final[rarity];
     } else {
+      if (plan.kind === 'lure') seq.at(time + t.fakeStep - m.hiccups, hiccup);
       seq.at(time + t.fakeStep, () => transition(plan.kind));
       time += t.fakeStep + t.transition;
     }
   });
-  seq.at(time, onDone);
+
+  // Sortie naturelle (FR-020) : un voile de lumière monte sur la fin, puis survit à la
+  // fenêtre et s'efface sur l'écran suivant (cartes ou présentation) : l'écran de tirage
+  // ne réapparaît jamais entre les deux. Un appui pour passer n'en a pas (SC-002).
+  let veil: Phaser.GameObjects.Rectangle | null = null;
+  seq.onStop(() => {
+    veil?.destroy();
+    veil = null;
+  });
+  seq.at(time - m.outro, () => {
+    veil = scene.add.rectangle(0, 0, WIDTH, HEIGHT, REVEAL_FX.flash, 1).setOrigin(0).setDepth(REVEAL.veilDepth).setAlpha(0);
+    seq.tween({ targets: veil, alpha: 1, duration: m.outro, ease: 'Quad.easeIn' });
+  });
+  seq.at(time, () => {
+    const v = veil;
+    veil = null;
+    onDone();
+    if (!v) return;
+    scene.tweens.killTweensOf(v);
+    v.setAlpha(1);
+    scene.tweens.add({ targets: v, alpha: 0, duration: m.outroFade, ease: 'Quad.easeOut', onComplete: () => v.destroy() });
+  });
   revealCues(plan).forEach(c => seq.at(c.at, () => onCue(c.cue)));
   return seq;
 }

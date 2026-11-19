@@ -460,7 +460,7 @@ export class GachaScene extends Phaser.Scene {
       this.showResults(results, ownedBefore, skipped ? undefined : plan.flipOrder,
         () => this.showSplashes(queue, results, counts, () => {}));
     };
-    const seq = playReveal(this, modal, plan, cue => this.sfx.play(cue), () => finish(false));
+    const seq = playReveal(this, modal, plan, SKIP_ARM_MS, cue => this.sfx.play(cue), () => finish(false));
     this.addSkipZone(modal, seq, SKIP_ARM_MS, () => finish(true));
   }
 
@@ -540,6 +540,9 @@ export class GachaScene extends Phaser.Scene {
     this.markModal(name);
     delete document.body.dataset.skip;
     const modal = makeModal(this);
+    // La révélation plonge dans la nuit sans voile papier (004, FR-018) : son voile reste
+    // là pour bloquer l'écran de tirage (FR-007), mais transparent.
+    if (name === 'reveal') (modal.list[0] as Phaser.GameObjects.Rectangle).setFillStyle(COLORS.scrim, 0);
     // Fondu d'entrée (007, FR-017) : l'opacité seule change, les boutons répondent déjà.
     // La révélation a sa propre entrée (la nuit tombe).
     if (!this.reducedMotion && name !== 'reveal') {

@@ -63,11 +63,12 @@ export const CSS = {
 
 export const SCRIM_ALPHA = 0.82;
 
+// Lumière neutre de la révélation : fissures, battement, éclair (FR-016, FR-018).
+const crackLight = 0xfff3d6;
+
 // Révélation (004) : opacités des effets ; leurs couleurs sont celles des raretés.
 export const REVEAL_FX = {
-  rayAlpha: 0.9,
   waveAlpha: 0.9,
-  flashAlpha: 0.65,
   // Dos des cartes du ×10 avant retournement.
   cardBack: palette.secondary,
   // Liseré de la carte vedette.
@@ -79,13 +80,35 @@ export const REVEAL_FX = {
   sparkle: palette.primary,
   // Leurre : l'énergie retombe, éteinte.
   fizzle: palette.inkFaint,
-  // Halo qui bat autour de l'orbe pendant le suspense.
-  heartbeat: palette.ink,
-  heartbeatAlpha: 0.5,
   // Lueur du dos d'une carte rare avant qu'elle se retourne.
   glowStroke: 6,
   // Cartes déjà retournées, assombries pendant que la vedette se prépare.
   dimAlpha: 0.35,
+  // Révision 3 (2026-11-13, lot A) : tout est lumière additive sur la nuit. Base blanche
+  // des textures de lumière (teintées ensuite), battement du cœur en lumière neutre
+  // (l'encre d'avant ne se voyait pas sur la nuit), lueur derrière les fissures.
+  light: palette.panel,
+  heartbeat: crackLight,
+  heartbeatAlpha: 0.7,
+  heartGlowAlpha: 0.35,
+  crackGlowAlpha: [0.25, 0.45, 0.7],
+  // Gel : la nuit fonce d'un voile d'encre.
+  dusk: palette.ink,
+  duskAlpha: 0.25,
+  // Impact : éclair neutre puis teinte du palier ; voile de sortie vers les cartes.
+  flash: crackLight,
+  flashAlpha: [0.45, 0.6, 0.8, 0.9, 0.9],
+  flashTintAlpha: 0.45,
+  // Palier en lumière (FR-019) : halo, cœur à trois disques, rayons longs et courts, anneau, orbite.
+  halo: [0.22, 0.4],
+  core: [0.4, 0.5, 0.8],
+  rayLong: 0.6,
+  rayShort: 0.75,
+  rayBreath: 0.6,
+  ring: 0.55,
+  orbit: 0.9,
+  // « Touche pour passer » : pulsation d'opacité une fois l'appui armé.
+  hintAlpha: [0.5, 1],
 } as const;
 
 // Illustrations (007) et révision 2 de la révélation (FR-016, FR-017).
@@ -97,7 +120,7 @@ export const ART_FX = {
   night,
   nightAlpha: 0.94,
   // Lumière des fissures, neutre (FR-016), et verre des éclats de l'orbe brisée.
-  crackLight: 0xfff3d6,
+  crackLight,
   glass: 0xe6f3ff,
   // Lueurs additives (forme « glow » des particules).
   glowAlpha: 0.55,
