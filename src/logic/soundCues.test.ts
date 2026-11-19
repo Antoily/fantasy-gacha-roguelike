@@ -111,7 +111,7 @@ describe('sons de la révélation (FR-001 à FR-003)', () => {
   it('fin audible : début + durée + relâche (par défaut SOUND_RELEASE_MS)', () => {
     const t: Tone = { wave: 'noise', at: 10, dur: 100, gain: 1, release: 30 };
     expect(recipeEnd([t])).toBe(140);
-    expect(recipeEnd([t, { ...t, at: 50, release: undefined }])).toBe(50 + 100 + SOUND_RELEASE_MS);
+    expect(recipeEnd([t, { wave: 'noise', at: 50, dur: 100, gain: 1 }])).toBe(50 + 100 + SOUND_RELEASE_MS);
   });
 
   // FR-014 : enveloppes et filtres plausibles dans toutes les recettes.
