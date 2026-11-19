@@ -274,8 +274,10 @@ export function playReveal(
   orb.add([...cracks.filter(c => c !== null), heart, core]);
   layer.add([...(circle ? [circle] : []), crackGlow, fx, beatRing, holder]);
   const particles = new Particles(scene, layer, 1);
-  // Impact : éclair neutre, puis la couleur du palier qui s'éteint (FR-020).
-  const flash = scene.add.rectangle(0, 0, WIDTH, HEIGHT, REVEAL_FX.flash, 1).setOrigin(0).setAlpha(0);
+  // Impact : éclair neutre, puis la couleur du palier qui s'éteint (FR-020). Additifs tous
+  // deux : en mélange normal, un éclair à mi-course voile la nuit de gris au lieu de l'éclairer.
+  const flash = scene.add.rectangle(0, 0, WIDTH, HEIGHT, REVEAL_FX.flash, 1).setOrigin(0).setAlpha(0)
+    .setBlendMode(Phaser.BlendModes.ADD);
   const tintFlash = scene.add.rectangle(0, 0, WIDTH, HEIGHT, neutral, 1).setOrigin(0).setAlpha(0)
     .setBlendMode(Phaser.BlendModes.ADD);
   const label = scene.add.text(x, REVEAL.labelY, '', { ...textStyle(FONT_SIZE.title), stroke: CSS.outline, strokeThickness: 6 })
@@ -498,7 +500,7 @@ export function playReveal(
       // Rayons et tailles étalés par le nombre d'or : réguliers sans être alignés.
       const a = (2 * Math.PI * i) / count;
       const r = r0 + (r1 - r0) * ((i * 0.618) % 1);
-      const s = 10 + 8 * ((i * 0.382) % 1);
+      const s = 14 + 10 * ((i * 0.382) % 1);
       const c = sparkColors[i % sparkColors.length]!;
       const star = tinted(light(scene, 'star', r * Math.cos(a), r * Math.sin(a), s, s, c, REVEAL_FX.orbit), c);
       orbit.add(star);
@@ -669,7 +671,9 @@ export function playReveal(
     veil = null;
   });
   seq.at(time - m.outro, () => {
-    veil = scene.add.rectangle(0, 0, WIDTH, HEIGHT, REVEAL_FX.flash, 1).setOrigin(0).setDepth(REVEAL.veilDepth).setAlpha(0);
+    // En lumière additive : un voile clair en mélange normal grisait la nuit à mi-course.
+    veil = scene.add.rectangle(0, 0, WIDTH, HEIGHT, REVEAL_FX.flash, 1).setOrigin(0).setDepth(REVEAL.veilDepth).setAlpha(0)
+      .setBlendMode(Phaser.BlendModes.ADD);
     seq.tween({ targets: veil, alpha: 1, duration: m.outro, ease: 'Quad.easeIn' });
   });
   seq.at(time, () => {

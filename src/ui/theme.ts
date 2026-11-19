@@ -100,7 +100,7 @@ export const REVEAL_FX = {
   flashAlpha: [0.45, 0.6, 0.8, 0.9, 0.9],
   flashTintAlpha: 0.45,
   // Palier en lumière (FR-019) : halo, cœur à trois disques, rayons longs et courts, anneau, orbite.
-  halo: [0.22, 0.4],
+  halo: [0.2, 0.3],
   core: [0.4, 0.5, 0.8],
   rayLong: 0.6,
   rayShort: 0.75,
