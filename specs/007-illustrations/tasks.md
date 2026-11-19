@@ -91,3 +91,11 @@ Vocabulaire : la « présentation » de la spec est la fenêtre `splash` du code
 - [x] T024 `GachaScene` : montants qui défilent et icônes qui rebondissent, bandeau qui glisse, fondu des fenêtres ; réduire les animations
 - [x] T025 e2e : SC-007 (avec et sans `reducedMotion`), halo selon le solde, orbe au repos au départ de la révélation, captures après fondu ; mutations de la scène
 - [x] T026 Relire les captures (écran au repos à densité 2, à trois instants ; bandeau en plein glissement) ; `CLAUDE.md`, `docs/ROADMAP.md`
+
+## Phase 10: Révision du 2026-11-13 (immersion visuelle)
+
+- [x] T027 Spec : User Story 6, FR-020 à FR-026, SC-009 ; recherche `research-immersion.md`
+- [ ] T028 Lot C : présentation en silhouette, éclair, couleur, rayons, nom qui se pose
+- [ ] T029 Lot D : boutons écrasés et reflet, scintillement, teinte de la vedette, message de pénurie lisible
+- [ ] T030 Lot E : fenêtres qui s'ouvrent, silhouettes reconnaissables, fiche et échange mis en scène, « 40e »
+- [ ] T031 Captures relues (densité 2), e2e et mutations ; `CLAUDE.md`, `docs/ROADMAP.md`

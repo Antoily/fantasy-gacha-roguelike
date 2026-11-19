@@ -82,3 +82,18 @@ tests/e2e/*.spec.ts             tirages existants : passer l'animation avant OK
 ## Complexity Tracking
 
 Aucune violation de la constitution à justifier.
+
+## Révision 3 du 2026-11-13 (immersion visuelle)
+
+Spec : User Story 6, FR-018 à FR-024, SC-008. Recherche : [critique de direction artistique](../007-illustrations/research-immersion.md),
+lots A (révélation : retouches A1 à A5) et B (cartes : B1 à B5), avec durées, amplitudes et easings.
+
+- **Lot A** (`src/ui/reveal.ts`, bloc `playReveal`, `particles.ts`, `REVEAL_FX` de `theme.ts`, `revealConfig.ts`) : nuit
+  directe, cœur lumineux, à-coups des fissures, palier en lumière animé, impact et sortie sans retour de l'accueil, leurre et
+  montée joués.
+- **Lot B** (`reveal.ts` bloc flip, `logic/reveal.ts`, `widgets.makeResultCard`, nouveau bloc `CARD_FX`) : distribution depuis
+  l'orbe sur la nuit, retournement en relief, vedette au centre, autres cartes assombries, cadres de rareté, badges dégagés.
+- Bornes inchangées (FR-010, SC-003 : test chronométré fragile sur la CI, à surveiller) ; aucun `Math.random` ; e2e par
+  signaux, captures image par image (horloge virtuelle à pas de 1/60 s).
+
+Constitution : I, II (spec révisée d'abord), IV (hasard du tirage intact), V, VI (jetons dans le thème, durées en données). ✅

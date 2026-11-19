@@ -35,6 +35,10 @@ de [004](../004-revelation/spec.md) (révision du 2026-10-30).
 - Q: L'écran de tirage est statique ; que faut-il animer ? → A (demande de l'utilisateur : « rendre un peu de vie », sans nouvelle feature, choix laissé à Claude) : une ambiance au repos (orbe qui lévite, lueurs dans le ciel), un halo sur les tirages payables, des montants qui défilent, un bandeau de bannière qui glisse, des fenêtres qui apparaissent en fondu (User Story 5, FR-013 à FR-019). Les sons d'interface vont dans la révision de [005](../005-son/spec.md).
 - Q: Les nuages du fond bougent-ils ? → A: Non : le fond est une seule illustration (ADR 0007) ; la découper reviendrait à refaire des visuels. Les lueurs suffisent à faire vivre le ciel.
 
+### Révision du 2026-11-13 (immersion visuelle, avec la révision 3 de 004)
+
+- Q: Que faut-il encore améliorer ? → A (demande de l'utilisateur : rien de statique, expérience « parfaite », sans nouvelle feature ; choix laissé à Claude d'après une critique de direction artistique, [recherche](research-immersion.md), lots C, D et E) : une présentation qui entre en silhouette puis en couleur avec rayons et nom qui se pose ; des boutons avec reflet et appui écrasé ; un ciel et une orbe qui scintillent vraiment ; une ambiance teintée par la bannière ; des fenêtres qui s'ouvrent avec du mouvement ; des silhouettes reconnaissables ; une fiche et un échange qui se mettent en scène (User Story 6, FR-020 à FR-026).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Voir qui l'on a obtenu (Priority: P1)
@@ -149,6 +153,30 @@ avec « réduire les animations » demandé par le système, les deux images son
 
 ---
 
+### User Story 6 - Tout l'écran respire (Priority: P2)
+
+*Révision du 2026-11-13.* Une présentation entre en silhouette, éclate en couleur sur des
+rayons et pose le nom ; les boutons brillent et s'écrasent sous le doigt ; l'orbe et le
+ciel scintillent ; la bannière choisie teinte l'ambiance ; chaque fenêtre s'ouvre avec du
+mouvement ; une silhouette de la collection laisse deviner son personnage.
+
+**Why this priority**: la critique du 2026-11-13 trouve l'accueil encore discret, les fenêtres
+plates, la présentation sans montée ; le jeu reste complet sans ces retouches.
+
+**Independent Test**: captures à densité 2 : présentation à trois instants (silhouette,
+éclair, couleur) ; bouton enfoncé écrasé ; deux bannières, deux teintes d'ambiance ; une
+fenêtre à mi-ouverture ; silhouettes de la collection reconnaissables.
+
+**Acceptance Scenarios**:
+
+1. **Given** un Légendaire ou un Ultra rare obtenu, **When** sa présentation s'ouvre, **Then** il apparaît d'abord en silhouette, puis un éclair le révèle en couleur sur des rayons, et son nom se pose avec un rebond.
+2. **Given** l'écran de tirage, **When** le joueur appuie sur un bouton, **Then** le bouton s'écrase brièvement ; un reflet passe régulièrement sur les tirages payables.
+3. **Given** une bannière de vedette, **When** elle devient active, **Then** l'ambiance (lueurs, éclat de l'orbe) prend la couleur de la rareté de la vedette.
+4. **Given** une fenêtre, **When** elle s'ouvre, **Then** son panneau entre avec un léger mouvement d'échelle, sans déplacer ses zones d'appui au-delà de l'animation.
+5. **Given** la collection, **When** un élément manque, **Then** sa silhouette laisse reconnaître sa forme.
+
+---
+
 ### Edge Cases
 
 - **Illustration indisponible** (fichier manquant ou illisible) : l'élément s'affiche comme avant (pastille de sa rareté et initiale), le jeu continue sans erreur.
@@ -184,6 +212,13 @@ avec « réduire les animations » demandé par le système, les deux images son
 - **FR-017**: Une fenêtre MUST apparaître en fondu en 0,2 s au plus ; ses boutons MUST répondre dès l'ouverture.
 - **FR-018**: Ces animations MUST NOT retarder ni empêcher un appui, déplacer une zone qu'on touche, ni consommer le hasard du tirage ; la révélation MUST reprendre l'orbe à sa position de repos.
 - **FR-019**: Si le système de l'appareil demande de réduire les animations, FR-013 à FR-017 MUST céder la place à un écran fixe et à des changements instantanés.
+- **FR-020**: *(Révision du 2026-11-13.)* La présentation plein écran MUST entrer en silhouette, puis se révéler en couleur par un éclair, sur des rayons lumineux en mouvement, et poser le nom avec un rebond ; aucun badge ne MUST masquer le nom.
+- **FR-021**: Un bouton MUST s'écraser visiblement à l'appui ; un reflet MUST passer régulièrement sur les tirages payables (FR-014).
+- **FR-022**: L'orbe et le ciel MUST scintiller de façon perceptible au repos (FR-013, plus marqué).
+- **FR-023**: L'ambiance (couleur des lueurs et de l'éclat de l'orbe) MUST prendre la couleur de la rareté de la vedette de la bannière active ; la bannière standard garde l'ambiance neutre.
+- **FR-024**: Une fenêtre MUST s'ouvrir avec un mouvement d'échelle et de fondu (0,25 s au plus) ; ses boutons MUST répondre là où `layout.ts` les place une fois l'ouverture finie.
+- **FR-025**: Dans la collection, la silhouette d'un élément manquant MUST laisser reconnaître sa forme (précise FR-004) ; la fiche et la carte d'un échange MUST entrer avec une mise en scène (illustration qui se pose, éclat).
+- **FR-026**: Les textes de l'écran MUST n'utiliser que des caractères que la police embarquée sait dessiner (pas d'exposant « ᵉ »), et tout message MUST rester lisible au-dessus de son bandeau.
 
 ### Key Entities
 
@@ -203,6 +238,7 @@ avec « réduire les animations » demandé par le système, les deux images son
 - **SC-006**: Affiché en double densité, un contour d'illustration reste net (pas d'agrandissement d'une image plus petite que son affichage).
 - **SC-007**: *(Révision du 2026-11-09.)* Au repos, deux images de l'écran prises à 1 s d'écart diffèrent autour de l'orbe ; avec « réduire les animations », elles sont identiques.
 - **SC-008**: Tous les parcours de bout en bout d'avant la révision passent sans changement de leurs attentes, et l'écran reste prêt en moins de 3 s (SC-004).
+- **SC-009**: *(Révision du 2026-11-13.)* Avec « réduire les animations », tous les ajouts de cette révision cèdent la place à un rendu fixe (FR-019) ; l'écran reste prêt en moins de 3 s (SC-004).
 
 ## Assumptions
 
