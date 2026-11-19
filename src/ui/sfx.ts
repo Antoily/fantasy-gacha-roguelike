@@ -52,7 +52,6 @@ export class Sfx {
     } catch {
       // Contexte fermé : plus rien ne sonne de toute façon.
     }
-    document.body.dataset.soundsLive = '0';
   }
 
   private output(): Mixer | null {
