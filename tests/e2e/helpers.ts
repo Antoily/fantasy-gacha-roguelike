@@ -135,3 +135,21 @@ export async function skipReveal(page: Page) {
   await waitModal(page, 'results');
   await page.waitForTimeout(150);
 }
+
+// Durée d'un enchaînement, en temps du jeu (dataset.clockTap / clockModal, posés par la scène) :
+// de l'appui à l'ouverture de l'une des fenêtres `names`. Ni le temps de Playwright (attente de
+// tap, sondage de waitModal) ni le ralenti d'une machine chargée n'y entrent : sur le runner de
+// la CI, les bornes de 0,5 s et 5,5 s échouaient en temps réel alors que la mise en scène les tenait.
+export async function msUntilModal(page: Page, names: readonly string[], act: () => Promise<void>): Promise<number> {
+  await page.evaluate(() => {
+    delete document.body.dataset.clockTap;
+    delete document.body.dataset.clockModal;
+  });
+  await act();
+  await page.waitForFunction(ns => ns.includes(document.body.dataset.modal ?? ''), [...names], { timeout: 30_000 });
+  return page.evaluate(() => {
+    const { clockTap, clockModal } = document.body.dataset;
+    if (clockTap === undefined || clockModal === undefined) throw new Error('horloge du jeu absente');
+    return Number(clockModal) - Number(clockTap);
+  });
+}
