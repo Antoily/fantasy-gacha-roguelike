@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BANNER, GACHA, bannerTextArea, renderScale } from './layout';
+import { BANNER, GACHA, SPLASH, SPLASH_TIMING, bannerTextArea, renderScale } from './layout';
 import { STROKE } from './theme';
 
 describe('échelle de rendu (007, ADR 0007)', () => {
@@ -37,5 +37,13 @@ describe('place des textes du bandeau de bannière', () => {
     expect(a.x).toBeGreaterThanOrEqual(b.x + STROKE.base);
     expect(a.x + a.w).toBeLessThanOrEqual(frameInner);
     expect(a.w).toBeGreaterThan(bannerTextArea(true).w + BANNER.portraitD);
+  });
+});
+
+// Révision du 2026-11-13 (FR-020) : la présentation entre en silhouette puis un éclair la
+// révèle. Un appui armé avant la fin de l'éclair fermerait un personnage encore jamais vu.
+describe('présentation : appui armé après l’éclair', () => {
+  it('SPLASH.armMs couvre la silhouette et l’éclair', () => {
+    expect(SPLASH.armMs).toBeGreaterThanOrEqual(SPLASH_TIMING.silhouette + SPLASH_TIMING.flash);
   });
 });

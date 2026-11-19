@@ -85,10 +85,10 @@ export function playSplash(
     T.raySpeed.forEach((speed, i) => seq.tween({
       targets: rays[i], angle: Math.sign(speed) * 360, duration: (360 / Math.abs(speed)) * 1000, repeat: -1,
     }));
-    for (const g of [...rays, halo]) g.setAlpha(0).setScale(0.3);
+    for (const g of [...rays, halo]) g.setAlpha(0).setScale(M.raysFrom);
     seq.tween({ targets: [...rays, halo], alpha: 1, scale: 1, duration: T.raysOpen, delay: flashAt, ease: 'Cubic.easeOut' });
     seq.tween({
-      targets: halo, scale: { from: 1, to: 1.12 }, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+      targets: halo, scale: { from: 1, to: M.halo }, duration: T.halo, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
       delay: flashAt + T.raysOpen,
     });
   }
@@ -146,8 +146,8 @@ export function playSplash(
       seq.tween({ targets: art, scale: 1, duration: T.pop, ease: 'Back.easeOut' });
       flash.setAlpha(1);
       seq.tween({ targets: flash, alpha: 0, duration: T.flash, ease: 'Quad.easeOut' });
-      shock.setAlpha(1).setScale(0.4);
-      seq.tween({ targets: shock, scale: 2.6, alpha: 0, duration: T.shock, ease: 'Cubic.easeOut' });
+      shock.setAlpha(1).setScale(M.shock[0]);
+      seq.tween({ targets: shock, scale: M.shock[1], alpha: 0, duration: T.shock, ease: 'Cubic.easeOut' });
       particles.burst({
         x, y, count: 70 + 30 * (rank - 3), colors, shapes: ['star', 'confetti', 'spark', 'glow'],
         speed: [120, 420], size: [3, 7], life: [700, 1400], spawnRadius: [20, 80], gravity: 160, drag: 1.2,

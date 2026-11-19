@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { CATALOGUE } from '../../src/data/catalogue';
 import type { Rarity } from '../../src/data/gachaConfig';
 import { collectionEntries } from '../../src/logic/collection';
-import { GACHA, RESULTS, SPLASH, collectionCellRect, dialogButtons, dialogRect, ratesDialogH } from '../../src/ui/layout';
+import { GACHA, RESULTS, SPLASH, SPLASH_TIMING, collectionCellRect, dialogButtons, dialogRect, ratesDialogH } from '../../src/ui/layout';
 import {
   FRESH, armedSkip, capture, installRng, load, loadWith, modal, passSplash, rarityRoll, scriptRng, start, tap, waitModal,
 } from './helpers';
@@ -28,33 +28,78 @@ test('écran habillé, toutes les illustrations chargées (US4, SC-001)', async 
   await capture(page, 'taux-emblemes');
 });
 
-test('×1 Légendaire : présentation armée à 400 ms, puis la carte (US2, FR-003)', async ({ page }) => {
-  // Instants exacts, relevés dans la page, de l'ouverture et de l'armement : un appui
-  // chronométré depuis le test arrive trop tard sur le rendu lent de la CI.
+// Relève dans la page les instants exacts de l'ouverture de la présentation, de ses phases
+// (silhouette, puis couleur après l'éclair) et de l'armement : un appui chronométré depuis
+// le test arrive trop tard sur le rendu lent de la CI.
+interface SplashLog { open?: number; colored?: number; armed?: number; phases: string[] }
+async function watchSplash(page: Page) {
   await page.evaluate(() => {
-    const w = window as unknown as { __splash: { open?: number; armed?: number } };
-    w.__splash = {};
+    const w = window as unknown as { __splash: SplashLog };
+    w.__splash = { phases: [] };
     new MutationObserver(() => {
       const d = document.body.dataset;
       if (d.modal !== 'splash') return;
-      w.__splash.open ??= performance.now();
-      if (d.skip === 'armed') w.__splash.armed ??= performance.now();
-    }).observe(document.body, { attributes: true, attributeFilter: ['data-modal', 'data-skip'] });
+      const log = w.__splash;
+      log.open ??= performance.now();
+      if (d.splashPhase && log.phases.at(-1) !== d.splashPhase) log.phases.push(d.splashPhase);
+      if (d.splashPhase === 'color') log.colored ??= performance.now();
+      if (d.skip === 'armed') log.armed ??= performance.now();
+    }).observe(document.body, { attributes: true, attributeFilter: ['data-modal', 'data-skip', 'data-splash-phase'] });
   });
+}
+const splashLog = (page: Page) => page.evaluate(() => (window as unknown as { __splash: Required<SplashLog> }).__splash);
+const SPLASH_ART = { x: SPLASH.art.x - 150, y: SPLASH.art.y - 180, width: 300, height: 360 };
+
+test('×1 Légendaire : silhouette, éclair, couleur, appui armé après l’éclair, puis la carte (FR-003, FR-020)', async ({ page }) => {
+  await watchSplash(page);
   await scriptRng(page, [rarityRoll('legendary'), 0, DIRECT]);
   await tap(page, GACHA.pullSingle);
   await page.waitForSelector('body[data-modal="splash"]', { timeout: 8_000 });
   expect(await splashId(page)).toBe(of('legendary')[0]!.id);
   await armedSkip(page);
-  // Un appui n'est accepté qu'une fois l'illustration entrée (cas limite de la spec).
-  const { open, armed } = await page.evaluate(() => (window as unknown as { __splash: { open: number; armed: number } }).__splash);
+  const { open, colored, armed, phases } = await splashLog(page);
+  // L'élément entre en silhouette ; l'éclair le révèle en couleur après SPLASH_TIMING.silhouette.
+  expect(phases).toEqual(['silhouette', 'color']);
+  expect(colored - open).toBeGreaterThanOrEqual(SPLASH_TIMING.silhouette * 0.8);
+  // Un appui n'est accepté qu'une fois l'illustration révélée (cas limite de la spec).
   expect(armed - open).toBeGreaterThanOrEqual(SPLASH.armMs * 0.8);
+  expect(armed).toBeGreaterThanOrEqual(colored);
+  // Au repos, la présentation reste vivante : rayons qui tournent, illustration qui respire.
+  const a = await page.screenshot({ clip: SPLASH_ART });
+  // Délai voulu : on mesure que le temps qui passe change l'image.
+  await page.waitForTimeout(1000);
+  expect((await page.screenshot({ clip: SPLASH_ART })).equals(a)).toBe(false);
   await capture(page, 'presentation-legendaire');
   await page.mouse.click(180, 600);
   await page.waitForSelector('body[data-modal="results"]', { timeout: 2_000 });
   expect(await splashId(page)).toBeNull();
-  await page.waitForTimeout(300);
+  expect(await page.evaluate(() => document.body.dataset.splashPhase ?? null)).toBeNull();
+  // Fin de la sortie en fondu de la présentation, par-dessus la carte.
+  await page.waitForTimeout(SPLASH_TIMING.exit + 300);
   await capture(page, 'x1-carte-illustree');
+});
+
+test.describe('réduire les animations', () => {
+  test.use({ reducedMotion: 'reduce' });
+
+  test('présentation fixe, d’emblée en couleur, appui toujours armé après le délai (SC-009)', async ({ page }) => {
+    expect(await page.evaluate(() => document.body.dataset.motion)).toBe('reduced');
+    await watchSplash(page);
+    await scriptRng(page, [rarityRoll('legendary'), 0, DIRECT]);
+    await tap(page, GACHA.pullSingle);
+    await page.waitForSelector('body[data-modal="splash"]', { timeout: 8_000 });
+    await armedSkip(page);
+    const { open, armed, phases } = await splashLog(page);
+    expect(phases).toEqual(['color']);
+    expect(armed - open).toBeGreaterThanOrEqual(SPLASH.armMs * 0.8);
+    const a = await page.screenshot();
+    await page.waitForTimeout(1000);
+    expect((await page.screenshot()).equals(a)).toBe(true);
+    await capture(page, 'presentation-fixe');
+    // La présentation se ferme d'un coup : la carte est seule à l'écran.
+    await page.mouse.click(180, 600);
+    await page.waitForSelector('body[data-modal="results"]', { timeout: 2_000 });
+  });
 });
 
 test('passer la révélation d’un Ultra rare : présenté quand même (FR-003)', async ({ page }) => {
@@ -65,7 +110,9 @@ test('passer la révélation d’un Ultra rare : présenté quand même (FR-003)
   await page.mouse.click(180, 320);
   await page.waitForSelector('body[data-modal="splash"]', { timeout: 2_000 });
   expect(await splashId(page)).toBe(of('ultra')[0]!.id);
-  await page.waitForTimeout(SPLASH.armMs + 200);
+  await armedSkip(page);
+  // Fin de la mise en scène : nom, emblème, ruban et badge posés.
+  await page.waitForTimeout(SPLASH_TIMING.badge + SPLASH_TIMING.badgePop);
   await capture(page, 'presentation-ultra');
 });
 
@@ -81,8 +128,8 @@ test('×10 avec deux Légendaires : deux présentations dans l’ordre de retour
   await page.waitForFunction(id => document.body.dataset.splash === id, of('legendary')[1]!.id);
   await passSplash(page);
   expect(await modal(page)).toBe('results');
-  await page.waitForTimeout(200);
-  await capture(page, 'x10-bustes');
+  // Les résultats répondent tout de suite, pendant que la présentation s'efface par-dessus
+  // (sortie de SPLASH_TIMING.exit) : elle ne doit plus capter les appuis.
   await tap(page, RESULTS.ok);
   expect(await modal(page)).toBeNull();
 });

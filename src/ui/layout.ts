@@ -132,6 +132,8 @@ export const SPLASH_TIMING = {
   pop: 420,
   raysOpen: 600,
   shock: 520,
+  // Halo qui bat derrière l'illustration (demi-cycle).
+  halo: 900,
   // Nom en tampon, 80 ms après l'éclair ; emblème qui tourne ; ruban qui monte ; badge.
   nameDelay: 80,
   name: 260,
@@ -154,6 +156,10 @@ export const SPLASH_TIMING = {
 // montée du ruban, respiration et lévitation (px) de l'illustration au repos.
 export const SPLASH_MOTION = {
   silhouetteFrom: 0.8,
+  // Rayons et halo qui s'ouvrent depuis le centre ; battement du halo ; onde de choc.
+  raysFrom: 0.3,
+  halo: 1.12,
+  shock: [0.4, 2.6],
   popFrom: 0.9,
   nameFrom: 1.5,
   ribbonRise: 12,

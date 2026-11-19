@@ -72,7 +72,8 @@ public/art/   SVG faits main (ADR 0007) : characters/<id>.svg + <id>.json (cadra
   montrés (`rare>legendary`) pendant `reveal` ; `dataset.sounds` (sons émis depuis le dernier tirage), `dataset.soundsLive`
   (notes en train de sonner), `dataset.muted`, `dataset.banner` (bannière active) et
   `dataset.featuredLine` (ligne de garantie vedette), `dataset.skip = 'armed'` (l'appui qui passe
-  l'animation est armé), `dataset.splash` (présentation affichée), `dataset.art = 'ready'` et
+  l'animation est armé), `dataset.splash` (présentation affichée) et `dataset.splashPhase`
+  (`silhouette` puis `color` après l'éclair), `dataset.art = 'ready'` et
   `dataset.artMissing` (illustrations prêtes, ou en repli), `dataset.font` (`ready` ou
   `fallback`, police posée avant l'écran), `dataset.motion` (`full` ou `reduced`), `dataset.glow`
   (tirages qui portent le halo et le reflet : `single ten`) et `dataset.ambienceTint` (rareté de la vedette
