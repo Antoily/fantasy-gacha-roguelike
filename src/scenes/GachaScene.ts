@@ -113,11 +113,12 @@ export class GachaScene extends Phaser.Scene {
     this.tenButton = makeButton(this, GACHA.pullTen,
       `Tirer ×10 — ${formatAmount(GACHA_CONFIG.costTen)}`, COLORS.btn.primary, () => this.onPull(10),
       'Un Rare ou mieux garanti');
+    // Les bandeaux AVANT les textes qu'ils portent : créés après, ils recouvraient le message de
+    // pénurie (ordre d'affichage = ordre de création), le seul qui dit quoi faire.
+    this.textPlates = this.add.graphics();
     this.shortageText = this.add.text(GACHA.pullSingle.x + GACHA.pullSingle.w / 2, GACHA.shortageMessageY, '',
       { ...textStyle(FONT_SIZE.body, CSS.textDim), align: 'center', wordWrap: { width: GACHA.pullSingle.w } })
       .setOrigin(0.5, 0);
-
-    this.textPlates = this.add.graphics();
     this.pityText = this.add.text(GACHA.orb.x, GACHA.pityLineY, '', textStyle(FONT_SIZE.body, CSS.textDim)).setOrigin(0.5);
     this.featuredText = this.add.text(GACHA.orb.x, GACHA.featuredLineY, '', textStyle(FONT_SIZE.body)).setOrigin(0.5);
     makeButton(this, GACHA.collection, 'Collection', COLORS.btn.secondary, () => this.showCollection());
@@ -610,9 +611,10 @@ export class GachaScene extends Phaser.Scene {
       modal.add(this.add.text(right, y + 11, formatPercent(ratePercent(r.id)), textStyle(FONT_SIZE.body)).setOrigin(1, 0.5));
       y += 34;
     }
+    // « 40e » et non « 40ᵉ » : la police embarquée n'a pas le glyphe en exposant (trou dans le texte).
     const rules = this.add.text(left, y + 6,
       '×10 : au moins un Rare ou mieux garanti.\n'
-      + `Légendaire ou mieux garanti au plus tard au ${GACHA_CONFIG.pityThreshold}ᵉ tirage ; `
+      + `Légendaire ou mieux garanti au plus tard au ${GACHA_CONFIG.pityThreshold}e tirage ; `
       + 'le compteur repart de zéro à chaque Légendaire ou Ultra rare.',
       { ...textStyle(FONT_SIZE.body, CSS.textDim), wordWrap: { width: right - left }, lineSpacing: 2 });
     modal.add(rules);
