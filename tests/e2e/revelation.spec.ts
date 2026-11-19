@@ -5,7 +5,8 @@ import { REVEAL_TIMING } from '../../src/data/revealConfig';
 import { flipOrder, flipSchedule } from '../../src/logic/reveal';
 import { GACHA, RESULTS, center } from '../../src/ui/layout';
 import {
-  FRESH, armedSkip, capture, installRng, load, loadWith, modal, rarityRoll, revealSteps, save, scriptRng, start, tap, waitModal,
+  FRESH, armedSkip, capture, installRng, load, loadWith, modal, msUntilModal, rarityRoll, revealSteps, save, scriptRng, start, tap,
+  waitModal,
 } from './helpers';
 
 // Scénarios de specs/004-revelation/quickstart.md, joués sur le build. Le hasard est
@@ -130,10 +131,9 @@ test('passer l’animation : cartes en moins de 0,5 s, rien de changé (US2, FR-
   await waitModal(page, 'reveal');
   const before = await save(page);
   await armedSkip(page);
-  const t0 = Date.now();
-  await page.mouse.click(180, 320);
-  await waitModal(page, 'results', 500);
-  expect(Date.now() - t0).toBeLessThan(500); // SC-002
+  const ms = await msUntilModal(page, ['results'], () => page.mouse.click(180, 320));
+  expect(ms).toBeLessThan(500); // SC-002
+  await waitModal(page, 'results');
   expect(await save(page)).toEqual(before); // SC-004
   await page.waitForTimeout(150);
   await capture(page, 'x10-passe');
@@ -187,10 +187,12 @@ test('rechargement pendant l’animation : tirage déjà sauvegardé, pas d’an
 });
 
 test('regardé jusqu’au bout avec le vrai hasard : cartes en moins de 5,5 s (SC-003)', async ({ page }) => {
-  const t0 = Date.now();
-  await tap(page, GACHA.pullSingle);
+  // Fin de la révélation : les cartes, ou la présentation d'un Légendaire tiré par le vrai
+  // hasard (son temps d'affichage n'est pas celui de l'animation).
+  const { x, y } = center(GACHA.pullSingle);
+  const ms = await msUntilModal(page, ['results', 'splash'], () => page.mouse.click(x, y));
+  expect(ms).toBeLessThan(5_500);
   await waitModal(page, 'results', 6_000);
-  expect(Date.now() - t0).toBeLessThan(5_500);
   await tap(page, RESULTS.ok);
   expect(await modal(page)).toBeNull();
 });

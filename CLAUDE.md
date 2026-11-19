@@ -76,7 +76,8 @@ public/art/   SVG faits main (ADR 0007) : characters/<id>.svg + <id>.json (cadra
   `dataset.artMissing` (illustrations prêtes, ou en repli), `dataset.font` (`ready` ou
   `fallback`, police posée avant l'écran), `dataset.motion` (`full` ou `reduced`) et `dataset.glow`
   (tirages qui portent le halo : `single ten`), `dataset.shownCurrency` / `shownShards` (montants
-  affichés, qui défilent jusqu'à la partie). L'e2e s'en sert pour vérifier l'enchaînement des écrans : sans lui, deux
+  affichés, qui défilent jusqu'à la partie). `dataset.clockTap` / `clockModal` : horloge du jeu (somme des pas de
+  Phaser) au dernier appui et à la dernière ouverture de fenêtre (`msUntilModal` dans l'e2e). L'e2e s'en sert pour vérifier l'enchaînement des écrans : sans lui, deux
   mutations de la 002 survivaient (une confirmation ouverte à tort que la logique
   refusait ensuite).
 - Playwright tourne avec **un seul worker** : les captures sont numérotées dans
@@ -299,6 +300,13 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
   (13 workers sur un petit serveur) : le relancer seul ; la CI le passe.
 - Serveur ikka : bibliothèques de Chromium extraites dans `~/.local/opt/chromium-libs/root`
   (`LD_LIBRARY_PATH=…/usr/lib/x86_64-linux-gnu`), Node 24 dans `~/.local/opt/node-v24.*/bin`.
+
+## Leçons de l'immersion (2026-11-19)
+
+- **Chronométrer en temps du jeu, pas en temps réel** : sur une machine chargée, Phaser borne son
+  pas et le jeu tourne au ralenti (une révélation de 2,1 s de jeu en prenait 7,2 réelles). Les
+  bornes de durée (SC-002, SC-003 de 004) se mesurent avec `msUntilModal` (horloge du jeu posée
+  par la scène) ; elles échouaient en temps réel sur la CI sans faute du jeu.
 
 ## Conventions de code
 

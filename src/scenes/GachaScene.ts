@@ -53,6 +53,11 @@ export class GachaScene extends Phaser.Scene {
   private orb!: Phaser.GameObjects.Container;
   private sfx!: Sfx;
   private ambience!: Ambience;
+  // Horloge du jeu : somme des pas de Phaser, celle des minuteries et des tweens. Les tests
+  // chronométrés la lisent (dataset.clockTap, dataset.clockModal) : sur une machine chargée,
+  // Phaser borne son pas et le jeu tourne au ralenti ; une mesure en temps réel jugeait la
+  // machine, pas la mise en scène.
+  private clockMs = 0;
   private reducedMotion = false;
   // Montants de l'en-tête tels qu'affichés, qui rattrapent la partie en défilant (FR-015).
   private shown = { currency: 0, shards: 0 };
@@ -88,6 +93,13 @@ export class GachaScene extends Phaser.Scene {
     this.progression = data.progression;
     this.modalOpen = false;
     this.sfx = new Sfx(this, data.settings.muted);
+    this.clockMs = 0;
+    this.events.on(Phaser.Scenes.Events.UPDATE, (_time: number, delta: number) => {
+      this.clockMs += delta;
+    });
+    this.input.on(Phaser.Input.Events.POINTER_UP, () => {
+      document.body.dataset.clockTap = String(Math.round(this.clockMs));
+    });
     setButtonSound(cue => this.sfx.play(cue));
     this.drawHeader();
     this.drawOrb();
@@ -429,7 +441,7 @@ export class GachaScene extends Phaser.Scene {
     const under = document.body.dataset.modal;
     const next = (i: number) => {
       if (i >= queue.length) {
-        if (under) document.body.dataset.modal = under;
+        if (under) this.markModal(under);
         else {
           delete document.body.dataset.modal;
           this.modalOpen = false;
@@ -442,7 +454,7 @@ export class GachaScene extends Phaser.Scene {
       const index = queue[i]!;
       this.modalOpen = true;
       this.ambience.setActive(false);
-      document.body.dataset.modal = 'splash';
+      this.markModal('splash');
       delete document.body.dataset.skip;
       document.body.dataset.splash = results[index]!.item.id;
       const modal = this.add.container(0, 0).setDepth(200);
@@ -485,10 +497,16 @@ export class GachaScene extends Phaser.Scene {
 
   // Le nom de la fenêtre ouverte est exposé dans le DOM pour le test de bout en bout :
   // il vérifie l'enchaînement des écrans, pas seulement la sauvegarde.
+  // Toute ouverture de fenêtre passe par ici : le nom et l'instant (horloge du jeu) pour l'e2e.
+  private markModal(name: string) {
+    document.body.dataset.modal = name;
+    document.body.dataset.clockModal = String(Math.round(this.clockMs));
+  }
+
   private openModal(name: string): Phaser.GameObjects.Container {
     this.modalOpen = true;
     this.ambience.setActive(false);
-    document.body.dataset.modal = name;
+    this.markModal(name);
     delete document.body.dataset.skip;
     const modal = makeModal(this);
     // Fondu d'entrée (007, FR-017) : l'opacité seule change, les boutons répondent déjà.
@@ -561,7 +579,7 @@ export class GachaScene extends Phaser.Scene {
       zone.destroy();
       hint.destroy();
       delete document.body.dataset.skip;
-      document.body.dataset.modal = 'results';
+      this.markModal('results');
       addOk();
     });
     // Appui pendant le retournement : tout se retourne, OK apparaît ; il ne ferme rien.
