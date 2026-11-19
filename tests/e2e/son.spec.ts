@@ -77,6 +77,23 @@ test('passer : plus aucun son après l’appui (FR-005, SC-003)', async ({ page 
   expect(await sounds(page)).toBe('suspense');
 });
 
+// Révision du 2026-11-13 (FR-016, SC-008) : le rire est joué dans le bus du lecteur et compte
+// parmi les sources vivantes ; il dure 1,9 s, donc sonne encore quand on passe juste après lui
+// (la sirène, elle, a pu finir avant l'appui sur une machine lente).
+test('passer pendant le rire : le rire se tait aussi (FR-016, SC-008)', async ({ page }) => {
+  await scriptRng(page, [rarityRoll('rare'), 0, 0.05, 0.5]);
+  await tap(page, GACHA.pullSingle);
+  await waitModal(page, 'reveal');
+  await page.waitForFunction(() => document.body.dataset.sounds?.split(' ').includes('laugh'));
+  expect(Number(await page.evaluate(() => document.body.dataset.soundsLive))).toBeGreaterThan(0);
+  await page.mouse.click(180, 320);
+  await waitModal(page, 'results');
+  expect(await page.evaluate(() => document.body.dataset.soundsLive)).toBe('0');
+  const heard = await sounds(page);
+  await page.waitForTimeout(T.final.rare);
+  expect(await sounds(page)).toBe(heard);
+});
+
 test('couper le son : silence, mémorisé, survit à « Recommencer » (FR-006, FR-007)', async ({ page }) => {
   expect(await muted(page)).toBe('0');
   await capture(page, 'son-actif');
