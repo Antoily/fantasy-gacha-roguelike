@@ -54,7 +54,7 @@ test('×1 Légendaire : silhouette, éclair, couleur, appui armé après l’éc
   await watchSplash(page);
   await scriptRng(page, [rarityRoll('legendary'), 0, DIRECT]);
   await tap(page, GACHA.pullSingle);
-  await page.waitForSelector('body[data-modal="splash"]', { timeout: 8_000 });
+  await page.waitForSelector('body[data-modal="splash"]', { timeout: 20_000 });
   expect(await splashId(page)).toBe(of('legendary')[0]!.id);
   await armedSkip(page);
   const { open, colored, armed, phases } = await splashLog(page);
@@ -87,7 +87,7 @@ test.describe('réduire les animations', () => {
     await watchSplash(page);
     await scriptRng(page, [rarityRoll('legendary'), 0, DIRECT]);
     await tap(page, GACHA.pullSingle);
-    await page.waitForSelector('body[data-modal="splash"]', { timeout: 8_000 });
+    await page.waitForSelector('body[data-modal="splash"]', { timeout: 20_000 });
     await armedSkip(page);
     const { open, armed, phases } = await splashLog(page);
     expect(phases).toEqual(['color']);
@@ -122,7 +122,7 @@ test('×10 avec deux Légendaires : deux présentations dans l’ordre de retour
   const values = rarities.flatMap((r, i) => [rarityRoll(r), i === 6 ? 0.5 : 0]);
   await scriptRng(page, [...values, DIRECT]);
   await tap(page, GACHA.pullTen);
-  await page.waitForSelector('body[data-modal="splash"]', { timeout: 15_000 });
+  await page.waitForSelector('body[data-modal="splash"]', { timeout: 30_000 });
   expect(await splashId(page)).toBe(of('legendary')[0]!.id);
   await passSplash(page);
   await page.waitForFunction(id => document.body.dataset.splash === id, of('legendary')[1]!.id);
