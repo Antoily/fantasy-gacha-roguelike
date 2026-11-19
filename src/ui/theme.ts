@@ -105,7 +105,18 @@ export const ART_FX = {
   artTint: 0.35,
   artHalo: 0.7,
   // Présentation : rayons, nom clair cerné d'encre, phrase sur un ruban crème.
-  splashRayAlpha: 0.35,
+  // Rayons et halo en mélange additif (révision du 2026-11-13, FR-020) : en mélange normal,
+  // l'orange du Légendaire brunissait sur la nuit. Deux couches de rayons, la seconde plus pâle.
+  splashRayAlpha: [0.22, 0.12],
+  splashHaloAlpha: 0.1,
+  // Rayons multicolores de l'Ultra rare : son rose, puis l'arc-en-ciel des raretés vives.
+  splashUltraRays: [rarity.ultra, rarity.rare, rarity.legendary, rarity.uncommon, palette.shard],
+  // Silhouette d'entrée : plus sombre que la nuit, cernée d'un liseré lumineux de la rareté.
+  splashSilhouette: 0x07050f,
+  splashRimAlpha: 0.85,
+  // Éclair qui révèle la couleur, et onde de choc qui part de l'illustration.
+  splashFlashAlpha: 0.9,
+  splashShockAlpha: 0.8,
   splashText: toCss(palette.panel),
   splashStroke: toCss(palette.ink),
   ribbon: palette.paper,

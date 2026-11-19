@@ -370,9 +370,11 @@ function makeSticker(scene: Phaser.Scene, x: number, topY: number, label: string
   return c;
 }
 
-export function makeBadge(scene: Phaser.Scene, x: number, y: number, label: string, isNew: boolean, originX: number) {
+export function makeBadge(
+  scene: Phaser.Scene, x: number, y: number, label: string, isNew: boolean, originX: number, size: number = FONT_SIZE.tiny,
+) {
   const c = scene.add.container(0, 0);
-  const t = scene.add.text(0, 0, label, textStyle(FONT_SIZE.tiny, isNew ? CSS.text : CSS.textDim));
+  const t = scene.add.text(0, 0, label, textStyle(size, isNew ? CSS.text : CSS.textDim));
   const w = t.width + 12;
   const h = t.height + 4;
   const left = x - originX * w;
