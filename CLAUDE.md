@@ -72,7 +72,8 @@ public/art/   SVG faits main (ADR 0007) : characters/<id>.svg + <id>.json (cadra
   montrés (`rare>legendary`) pendant `reveal` ; `dataset.sounds` (sons émis depuis le dernier tirage), `dataset.soundsLive`
   (notes en train de sonner), `dataset.muted`, `dataset.banner` (bannière active) et
   `dataset.featuredLine` (ligne de garantie vedette), `dataset.skip = 'armed'` (l'appui qui passe
-  l'animation est armé), `dataset.splash` (présentation affichée), `dataset.art = 'ready'` et
+  l'animation est armé), `dataset.splash` (présentation affichée) et `dataset.splashPhase`
+  (`silhouette` puis `color` après l'éclair), `dataset.art = 'ready'` et
   `dataset.artMissing` (illustrations prêtes, ou en repli), `dataset.font` (`ready` ou
   `fallback`, police posée avant l'écran), `dataset.motion` (`full` ou `reduced`), `dataset.glow`
   (tirages qui portent le halo et le reflet : `single ten`) et `dataset.ambienceTint` (rareté de la vedette
@@ -322,6 +323,10 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
   pas et le jeu tourne au ralenti (une révélation de 2,1 s de jeu en prenait 7,2 réelles). Les
   bornes de durée (SC-002, SC-003 de 004) se mesurent avec `msUntilModal` (horloge du jeu posée
   par la scène) ; elles échouaient en temps réel sur la CI sans faute du jeu.
+- **Horloge virtuelle et tweens** : le gestionnaire de tweens de Phaser lit `Date.now`, pas
+  `performance.now` (les minuteries `time.delayedCall`, elles, suivent le pas du jeu). Pour filmer
+  image par image, remplacer les deux, sinon les tweens avancent en temps réel et se décalent des
+  minuteries (un nom posé avant l'éclair qui le précède).
 
 ## Leçons de l'accueil vivant (lot D, 2026-11-19)
 

@@ -489,9 +489,11 @@ export class GachaScene extends Phaser.Scene {
       const modal = this.add.container(0, 0).setDepth(200);
       // Voile transparent : rien de ce qui est dessous ne réagit pendant la présentation.
       modal.add(this.add.rectangle(0, 0, WIDTH, HEIGHT, COLORS.ink, 0).setOrigin(0).setInteractive());
-      const seq = playSplash(this, modal, results[index]!, counts[index]!, () => {
-        seq.stop();
-        modal.destroy();
+      // La nuit tombe en fondu sur les résultats du ×10 ; une présentation qui suit une autre
+      // s'ouvre sous elle, qui s'efface par-dessus.
+      const options = { reduced: this.reducedMotion, fadeIn: i === 0 && under !== undefined };
+      const splash = playSplash(this, modal, results[index]!, counts[index]!, options, () => {
+        splash.leave();
         delete document.body.dataset.splash;
         delete document.body.dataset.skip;
         next(i + 1);

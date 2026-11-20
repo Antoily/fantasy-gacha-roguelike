@@ -111,10 +111,63 @@ export const SPLASH = {
   nameY: 470,
   rarityY: 506,
   blurb: { x: MARGIN * 2, y: 530, w: CONTENT_W - 2 * MARGIN, h: 52 },
-  badgeY: 84,
+  // « Nouveau ! » en haut à gauche, au-dessus de l'illustration : posé à 84 au centre, il
+  // couvrait la couronne de Roi Barbichon (révision du 2026-11-13, FR-020).
+  badge: { left: MARGIN + 4, y: 40, tilt: -0.12 },
   hintY: 612,
-  // Un appui ne ferme la présentation qu'une fois l'illustration entrée.
-  armMs: 400,
+  // Un appui ne ferme la présentation qu'une fois l'illustration entrée en couleur : après
+  // la silhouette et l'éclair (SPLASH_TIMING), sinon un double appui la ferait disparaître.
+  armMs: 450,
+} as const;
+
+// Mise en scène de la présentation (révision du 2026-11-13, FR-020), en ms depuis l'ouverture
+// sauf mention : silhouette, éclair qui révèle la couleur, nom qui se pose, détails qui suivent.
+export const SPLASH_TIMING = {
+  // Nuit qui tombe sur les résultats du ×10 (au ×1, la révélation était déjà de nuit).
+  enter: 160,
+  // Silhouette cernée de lumière, qui grandit en aspirant l'énergie ; l'éclair tombe à sa fin.
+  silhouette: 250,
+  flash: 180,
+  // Rebond de l'illustration en couleur, ouverture des rayons, onde de choc.
+  pop: 420,
+  raysOpen: 600,
+  shock: 520,
+  // Halo qui bat derrière l'illustration (demi-cycle).
+  halo: 900,
+  // Nom en tampon, 80 ms après l'éclair ; emblème qui tourne ; ruban qui monte ; badge.
+  nameDelay: 80,
+  name: 260,
+  emblemDelay: 150,
+  emblem: 400,
+  ribbonDelay: 230,
+  ribbon: 240,
+  badge: 500,
+  badgePop: 320,
+  // Repos : lévitation et respiration de l'illustration (demi-cycles), rotation des rayons
+  // en degrés par seconde (deux couches en contre-rotation).
+  levitate: 1600,
+  breathe: 1600,
+  raySpeed: [12, -7],
+  // Sortie : la présentation s'efface par-dessus l'écran suivant, l'illustration rentre vers la carte.
+  exit: 220,
+} as const;
+
+// Amplitudes de la mise en scène : taille de départ de la silhouette, du rebond et du nom,
+// montée du ruban, respiration et lévitation (px) de l'illustration au repos.
+export const SPLASH_MOTION = {
+  silhouetteFrom: 0.8,
+  // Rayons et halo qui s'ouvrent depuis le centre ; battement du halo ; onde de choc.
+  raysFrom: 0.3,
+  halo: 1.12,
+  shock: [0.4, 2.6],
+  popFrom: 0.9,
+  nameFrom: 1.5,
+  ribbonRise: 12,
+  breathe: 1.015,
+  levitate: 4,
+  exitScale: 0.92,
+  // Liseré de la silhouette : décalage (px) des copies lumineuses autour d'elle.
+  rim: 2.5,
 } as const;
 
 // Collection (003, remplace la liste d'échange de 002) : les 20 éléments en grille
