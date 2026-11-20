@@ -84,7 +84,7 @@ export type SoundVariant = CrackVariant | TierVariant;
 
 // Creux de la sirène à chaque fissure (FR-017) : −4 dB, le temps que le verre claque. Descente,
 // tenue et reprise en ms.
-export const SOUND_DIP = { gain: 0.63, down: 8, hold: 70, up: 40 } as const;
+export const SOUND_DIP = { gain: 0.5, down: 8, hold: 80, up: 40 } as const;
 
 // Suspense (FR-017) : la nuit qui tombe, puis une sirène qui grossit, et le cœur qui bat à
 // chaque pulsation du halo. Tout se tait au temps figé (`end`).
@@ -110,12 +110,12 @@ function suspenseRecipe(): Tone[] {
     // Couche mordante à l'octave, qui s'ouvre en montant : sur un téléphone, la sirène à 220 Hz
     // seule ne s'entend presque pas les premières 400 ms.
     {
-      wave: 'sawtooth', freq: 440, to: 1320, at: 0, dur: SUSPENSE_END, gain: 0.05, gainTo: 0.15, release: 20, dips,
+      wave: 'sawtooth', freq: 440, to: 1320, at: 0, dur: SUSPENSE_END, gain: 0.04, gainTo: 0.12, release: 20, dips,
       filter: { type: 'lowpass', freq: 1200, to: 4000 },
     },
     // La sirène, en crescendo (+6 dB) ; relâche courte : 130 ms de vrai silence au temps figé.
     // Dernière voix : les tests lisent sa durée.
-    { wave: 'triangle', freq: 220, to: 660, at: 0, dur: SUSPENSE_END, gain: 0.3, gainTo: 0.6, release: 20, dips },
+    { wave: 'triangle', freq: 220, to: 660, at: 0, dur: SUSPENSE_END, gain: 0.25, gainTo: 0.5, release: 20, dips },
   ];
 }
 
@@ -123,11 +123,13 @@ function suspenseRecipe(): Tone[] {
 // tintements aigus et « toc » grave ; de plus en plus fort d'une fissure à l'autre.
 export const CRACK_GAINS = [0.7, 0.85, 1] as const;
 function crackRecipe(index: number): Tone[] {
-  const k = CRACK_GAINS[Math.min(index, CRACK_GAINS.length - 1)]!;
+  // ×1,15 : à pleine force, la dernière fissure doit dominer la sirène, au plus fort de son crescendo.
+  const k = 1.15 * CRACK_GAINS[Math.min(index, CRACK_GAINS.length - 1)]!;
   return [
-    { wave: 'noise', at: 0, dur: 15, gain: 0.9 * k, decay: 20, release: 15, filter: { type: 'highpass', freq: 3000 } },
-    ...[4200, 5100, 6300].map((freq, i): Tone => ({ wave: 'sine', freq, at: 6 * i, dur: 20, gain: 0.22 * k, decay: 50, release: 40 })),
-    { wave: 'triangle', freq: 180, to: 120, at: 0, dur: 30, gain: 0.6 * k, decay: 30, release: 20 },
+    { wave: 'noise', at: 0, dur: 25, gain: 1 * k, decay: 25, release: 15, filter: { type: 'highpass', freq: 3000 } },
+    { wave: 'noise', at: 0, dur: 140, gain: 0.35 * k, decay: 110, filter: { type: 'bandpass', freq: 5000, q: 2 } },
+    ...[4200, 5100, 6300].map((freq, i): Tone => ({ wave: 'sine', freq, at: 8 * i, dur: 30, gain: 0.3 * k, decay: 90, release: 40 })),
+    { wave: 'triangle', freq: 180, to: 120, at: 0, dur: 40, gain: 0.6 * k, decay: 40, release: 20 },
     // L'ancien craquement qui tombe vers le grave, en dessous : le corps de la fissure.
     { wave: 'sawtooth', freq: 2600, to: 500, at: 0, dur: 70, gain: 0.22 * k, decay: 70 },
   ];
@@ -139,10 +141,10 @@ function crackRecipe(index: number): Tone[] {
 // secousse (même durée). Le pic tombe dans les 20 premières ms, avec l'éclair.
 export function impact(k: number): Tone[] {
   const tones: Tone[] = [
-    { wave: 'noise', at: 0, dur: 20, gain: 0.4 + 0.1 * k, decay: 15, release: 20, filter: { type: 'highpass', freq: 2000 } },
+    { wave: 'noise', at: 0, dur: 20, gain: 0.35 + 0.08 * k, decay: 15, release: 20, filter: { type: 'highpass', freq: 2000 } },
     { wave: 'noise', at: 0, dur: 150 + 60 * k, gain: 0.15 + 0.04 * k, decay: 80, filter: { type: 'bandpass', freq: 5000, q: 2 } },
-    { wave: 'sine', freq: 140, to: 48, at: 0, dur: 160 + 40 * k, gain: 0.4 + 0.1 * k, decay: 60 },
-    { wave: 'triangle', freq: 280, to: 96, at: 0, dur: 160 + 40 * k, gain: 0.4 + 0.1 * k, decay: 60 },
+    { wave: 'sine', freq: 140, to: 48, at: 0, dur: 160 + 40 * k, gain: 0.25 + 0.06 * k, decay: 60 },
+    { wave: 'triangle', freq: 280, to: 96, at: 0, dur: 160 + 40 * k, gain: 0.25 + 0.06 * k, decay: 60 },
   ];
   if (k >= 3) {
     tones.push({ wave: 'noise', at: 0, dur: REVEAL_MOTION.shake, gain: 0.3 + 0.1 * (k - 3), decay: REVEAL_MOTION.shake, filter: { type: 'lowpass', freq: 180 } });
@@ -152,7 +154,7 @@ export function impact(k: number): Tone[] {
 
 // Arpège d'un palier : chaque note frappe puis décroît vers `PLUCK_SUSTAIN` (au lieu du plateau
 // d'un orgue).
-const PLUCK_SUSTAIN = 0.45;
+const PLUCK_SUSTAIN = 0.6;
 const plucked = (tones: readonly OscTone[]): OscTone[] => tones.map(t => ({ ...t, decay: t.dur * 0.8, sustain: PLUCK_SUSTAIN }));
 
 // Paillettes (B6) : tintements aigus sur la pentatonique de do, pendant la pluie d'étoiles des
@@ -197,20 +199,21 @@ export const SOUND_RECIPES: Readonly<Record<SynthCue, readonly Tone[]>> = {
   // carré adouci, au-dessus du niveau du suspense.
   'tier:common': [
     ...impact(0),
-    { wave: 'triangle', freq: C6, at: 0, dur: 180, gain: 0.35, decay: 120 },
-    { wave: 'square', freq: C5, at: 0, dur: 180, gain: 0.2, decay: 150, sustain: PLUCK_SUSTAIN, filter: { type: 'lowpass', freq: 2500 } },
+    { wave: 'triangle', freq: C6, at: 0, dur: 380, gain: 0.85, decay: 300, sustain: 0.45 },
+    { wave: 'sine', freq: C7, at: 0, dur: 240, gain: 0.15, decay: 200 },
+    { wave: 'square', freq: C5, at: 0, dur: 380, gain: 0.3, decay: 300, sustain: PLUCK_SUSTAIN, filter: { type: 'lowpass', freq: 2500 } },
   ],
-  'tier:uncommon': [...impact(1), ...plucked(arpeggio([C5, E5], 90, 200, 'square', 0.3))],
-  'tier:rare': [...impact(2), ...plucked(arpeggio([C5, E5, G5], 90, 260, 'square', 0.35))],
+  'tier:uncommon': [...impact(1), ...plucked(arpeggio([C5, E5], 90, 380, 'square', 0.45))],
+  'tier:rare': [...impact(2), ...plucked(arpeggio([C5, E5, G5], 90, 420, 'square', 0.42))],
   'tier:legendary': [
     ...impact(3),
-    ...plucked(arpeggio([C5, E5, G5, C6], 90, 260, 'square', 0.35)),
+    ...plucked(arpeggio([C5, E5, G5, C6], 90, 420, 'square', 0.42)),
     ...[C5, E5, G5].map((freq): Tone => ({ freq, at: 360, dur: 700, wave: 'triangle', gain: 0.3 })),
     ...glitter(0x9117, 'legendary'),
   ],
   'tier:ultra': [
     ...impact(4),
-    ...plucked(arpeggio([C5, E5, G5, C6, E6, G6], 80, 260, 'square', 0.35)),
+    ...plucked(arpeggio([C5, E5, G5, C6, E6, G6], 80, 420, 'square', 0.42)),
     ...[C6, E6, G6].map((freq): Tone => ({ freq, at: 480, dur: 900, wave: 'triangle', gain: 0.3 })),
     ...shift(arpeggio([C7, G6, C7, G6], 120, 90, 'sine', 0.25), 600),
     ...glitter(0x9118, 'ultra'),
