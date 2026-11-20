@@ -460,7 +460,7 @@ export class GachaScene extends Phaser.Scene {
       this.showResults(results, ownedBefore, skipped ? undefined : plan.flipOrder,
         () => this.showSplashes(queue, results, counts, () => {}));
     };
-    const seq = playReveal(this, modal, plan, SKIP_ARM_MS, cue => this.sfx.play(cue), () => finish(false));
+    const seq = playReveal(this, modal, plan, SKIP_ARM_MS, (cue, variant) => this.sfx.play(cue, variant), () => finish(false));
     this.addSkipZone(modal, seq, SKIP_ARM_MS, () => finish(true));
   }
 

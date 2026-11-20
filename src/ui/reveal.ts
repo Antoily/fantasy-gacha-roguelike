@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
 import { RARITIES, type Rarity } from '../data/gachaConfig';
 import { REVEAL_MOTION, REVEAL_TIMING } from '../data/revealConfig';
+import type { SoundVariant } from '../data/sounds';
 import type { PullResult } from '../logic/gacha';
 import type { FlipSchedule, RevealKind, RevealPlan } from '../logic/reveal';
-import { crackTimes, flipCues, revealCues, type Cue } from '../logic/soundCues';
+import { beatTimes, crackTimes, flipCues, revealCues, type Cue } from '../logic/soundCues';
 import { orbSize, uiImage } from './art';
 import { GACHA, HEIGHT, REVEAL, WIDTH, resultCardRect, type Rect } from './layout';
 import { Particles, type Shape } from './particles';
@@ -217,7 +218,7 @@ export function playReveal(
   modal: Phaser.GameObjects.Container,
   plan: RevealPlan,
   armMs: number,
-  onCue: (cue: Cue) => void,
+  onCue: (cue: Cue, variant?: SoundVariant) => void,
   onDone: () => void,
 ): Sequence {
   lightTextures(scene);
@@ -328,8 +329,8 @@ export function playReveal(
   let shake = seq.tween({
     targets: holder, angle: { from: -2, to: 2 }, duration: 80, yoyo: true, repeat: -1, delay: m.orbIn,
   });
-  for (const beat of m.beats) {
-    seq.at(Math.round(t.suspense * beat), () => {
+  for (const at of beatTimes()) {
+    seq.at(at, () => {
       // Battement en lumière (FR-018) : un anneau part de l'orbe, son cœur s'allume, elle enfle.
       beatRing.setScale(ringScale).setAlpha(REVEAL_FX.heartbeatAlpha);
       seq.tween({ targets: beatRing, scale: ringScale * REVEAL.heartRing, alpha: 0, duration: m.beat, ease: 'Quad.easeOut' });
@@ -688,7 +689,7 @@ export function playReveal(
     v.setAlpha(1);
     scene.tweens.add({ targets: v, alpha: 0, duration: m.outroFade, ease: 'Quad.easeOut', onComplete: () => v.destroy() });
   });
-  revealCues(plan).forEach(c => seq.at(c.at, () => onCue(c.cue)));
+  revealCues(plan).forEach(c => seq.at(c.at, () => onCue(c.cue, c.variant)));
   return seq;
 }
 

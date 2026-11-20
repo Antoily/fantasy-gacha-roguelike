@@ -3,12 +3,13 @@ import { CATALOGUE } from '../data/catalogue';
 import { RARITIES, type Rarity } from '../data/gachaConfig';
 import { FLIP_TIMING, REVEAL_TIMING as T } from '../data/revealConfig';
 import {
-  SOUND_RECIPES, SOUND_RELEASE_MS, UI_SOUND_LIMITS, recipeEnd, recipeEnergy, toneEnergy, type Tone,
+  CRACK_GAINS, GLITTER, SOUND_RECIPES, SOUND_RELEASE_MS, UI_SOUND_LIMITS, impact, recipeEnd, recipeEnergy, soundRecipe,
+  toneEnd, toneEnergy, type OscTone, type Tone,
 } from '../data/sounds';
 import type { PullResult } from './gacha';
 import { flipOrder, flipSchedule, planReveal, revealDuration, type RevealPlan } from './reveal';
 import { DEFAULT_SETTINGS, parseSettings, serializeSettings } from './settings';
-import { crackTimes, flipCues, revealCues } from './soundCues';
+import { RISE_SEMITONES, beatTimes, crackTimes, flipCues, revealCues } from './soundCues';
 import { scriptedRng } from './testing';
 
 const res = (rarity: Rarity): PullResult =>
@@ -16,8 +17,9 @@ const res = (rarity: Rarity): PullResult =>
 const plan = (rarity: Rarity, u: number, v = 0.5): RevealPlan => planReveal([res(rarity)], scriptedRng([u, v]));
 const names = (p: RevealPlan) => revealCues(p).map(c => c.cue);
 const ALL: Rarity[] = RARITIES.map(r => r.id);
-// Début de toute révélation : la sirène, puis un craquement à chaque fissure (FR-016).
-const OPENING = [{ at: 0, cue: 'suspense' }, ...crackTimes().map(at => ({ at, cue: 'crack' }))];
+// Début de toute révélation : la sirène, puis un craquement à chaque fissure (FR-016), qui
+// porte son rang (FR-017 : de plus en plus fort).
+const OPENING = [{ at: 0, cue: 'suspense' }, ...crackTimes().map((at, index) => ({ at, cue: 'crack', variant: { kind: 'crack', index } }))];
 const OPEN = ['suspense', 'crack', 'crack', 'crack'];
 
 describe('sons de la révélation (FR-001 à FR-003)', () => {
@@ -40,8 +42,10 @@ describe('sons de la révélation (FR-001 à FR-003)', () => {
       ...OPENING,
       { at: T.suspense, cue: 'tier:rare' },
       { at: T.suspense + T.fakeStep, cue: 'rise' },
-      { at: T.suspense + T.fakeStep + T.transition, cue: 'tier:legendary' },
+      // Le vrai palier, un ton plus haut (FR-019).
+      { at: T.suspense + T.fakeStep + T.transition, cue: 'tier:legendary', variant: { kind: 'tier', semitones: RISE_SEMITONES } },
     ]);
+    expect(RISE_SEMITONES).toBe(2);
   });
 
   it('leurre : le rire quand l’effet se dégonfle, puis Rare', () => {
@@ -124,6 +128,89 @@ describe('sons de la révélation (FR-001 à FR-003)', () => {
         if (t.release !== undefined) expect(t.release, cue).toBeGreaterThan(0);
         if (t.filter) expect(Math.max(t.filter.freq, t.filter.to ?? 0), cue).toBeLessThanOrEqual(18000);
       }
+    }
+  });
+
+  // FR-017 : la sirène grossit, le cœur bat à chaque pulsation du halo, et tout se tait au
+  // temps figé (130 ms de vrai silence au moins).
+  it('suspense : crescendo, un battement par pulsation, rien dans le temps figé', () => {
+    const tones = SOUND_RECIPES.suspense;
+    const siren = tones.at(-1)! as OscTone;
+    expect(siren.gainTo! / siren.gain).toBeGreaterThanOrEqual(2);
+    // La sirène et sa couche s'arrêtent au temps figé, avec une relâche courte ; le reste
+    // (souffle, battements) s'est tu avant.
+    for (const t of tones) {
+      const frozen = t.at + t.dur === T.suspense - T.freeze ? T.suspense - 130 : T.suspense - T.freeze;
+      expect(toneEnd(t), JSON.stringify(t)).toBeLessThanOrEqual(frozen);
+    }
+    expect(siren.at + siren.dur).toBe(T.suspense - T.freeze);
+    // Un coup sourd (glissando vers le grave) à chaque battement, de plus en plus fort.
+    const thumps = tones.filter((t): t is OscTone => t.wave === 'sine' && t.to !== undefined && t.to < t.freq);
+    expect(thumps.map(t => t.at)).toEqual(beatTimes());
+    expect(thumps.map(t => t.gain)).toEqual([...thumps.map(t => t.gain)].sort((a, b) => a - b));
+    expect(thumps[0]!.gain).toBeLessThan(thumps.at(-1)!.gain);
+    // La sirène se creuse à chaque fissure, pour la laisser claquer.
+    expect(siren.dips).toEqual(crackTimes());
+    // Les battements tombent entre l'entrée et le temps figé, de plus en plus rapprochés.
+    const b = beatTimes();
+    expect(b[0]!).toBeGreaterThan(0);
+    for (let i = 2; i < b.length; i++) expect(b[i]! - b[i - 1]!).toBeLessThanOrEqual(b[i - 1]! - b[i - 2]!);
+  });
+
+  it('fissures : de plus en plus fortes, la dernière au niveau par défaut', () => {
+    const energies = crackTimes().map((_, index) => recipeEnergy(soundRecipe('crack', { kind: 'crack', index })));
+    expect(energies[0]!).toBeLessThan(energies[1]!);
+    expect(energies[1]!).toBeLessThan(energies[2]!);
+    expect(energies[2]).toBeCloseTo(recipeEnergy(SOUND_RECIPES.crack), 9);
+    expect(CRACK_GAINS.at(-1)).toBe(1);
+  });
+
+  // FR-018 : un impact dès l'éclat, plus fort avec le rang, un grondement dès Légendaire ;
+  // et chaque palier pèse plus que le précédent.
+  it('paliers : impact à l’éclat, croissant avec le rang ; grondement dès Légendaire', () => {
+    const peaks = [0, 1, 2, 3, 4].map(k => recipeEnergy(impact(k)));
+    for (let k = 1; k < 5; k++) expect(peaks[k]!, `k=${k}`).toBeGreaterThan(peaks[k - 1]!);
+    const rumble = (k: number) => impact(k).some(t => t.wave === 'noise' && t.filter?.type === 'lowpass');
+    expect([0, 1, 2, 3, 4].map(rumble)).toEqual([false, false, false, true, true]);
+    for (const r of ALL) {
+      const tones = SOUND_RECIPES[`tier:${r}`];
+      // Le transitoire part avec l'éclair.
+      expect(tones.some(t => t.at === 0 && t.wave === 'noise' && t.filter?.type === 'highpass'), r).toBe(true);
+    }
+    const energy = ALL.map(r => recipeEnergy(SOUND_RECIPES[`tier:${r}`]));
+    for (let i = 1; i < energy.length; i++) expect(energy[i]!, ALL[i]).toBeGreaterThan(energy[i - 1]!);
+  });
+
+  it('montée : le vrai palier transposé d’un ton, le bruit inchangé', () => {
+    const base = SOUND_RECIPES['tier:legendary'];
+    const up = soundRecipe('tier:legendary', { kind: 'tier', semitones: 2 });
+    expect(up).toHaveLength(base.length);
+    up.forEach((t, i) => {
+      const b = base[i]!;
+      if (t.wave === 'noise' || b.wave === 'noise') expect(t).toEqual(b);
+      else expect(t.freq / b.freq).toBeCloseTo(2 ** (2 / 12), 6);
+    });
+    // La montée finit, relâche comprise, à l'éclat suivant.
+    expect(recipeEnd(SOUND_RECIPES.rise)).toBeLessThanOrEqual(T.transition);
+    // Sans variante, ou avec celle d'un autre bruitage : la recette par défaut.
+    expect(soundRecipe('tier:rare')).toBe(SOUND_RECIPES['tier:rare']);
+    expect(soundRecipe('rise', { kind: 'tier', semitones: 2 })).toBe(SOUND_RECIPES.rise);
+  });
+
+  // B6 : les paillettes accompagnent la pluie d'étoiles (de +400 ms à 200 ms avant la fin),
+  // calculées une fois à graine fixe (identiques d'un chargement à l'autre).
+  it('paillettes : Légendaire et Ultra seulement, dans la pluie d’étoiles', () => {
+    const sparkles = (r: Rarity) => SOUND_RECIPES[`tier:${r}`].filter(t => t.wave === 'sine' && t.freq >= 2000 && t.dur <= 30);
+    expect(sparkles('rare')).toHaveLength(0);
+    for (const r of ['legendary', 'ultra'] as const) {
+      const s = sparkles(r);
+      const span = T.final[r] - GLITTER.beforeEnd - GLITTER.from;
+      expect(s.length, r).toBe(Math.round((GLITTER.perSecond[r] * span) / 1000));
+      for (const t of s) {
+        expect(t.at, r).toBeGreaterThanOrEqual(GLITTER.from);
+        expect(toneEnd(t), r).toBeLessThanOrEqual(T.final[r] - GLITTER.beforeEnd);
+      }
+      expect(new Set(s.map(t => t.at)).size, r).toBe(s.length);
     }
   });
 
