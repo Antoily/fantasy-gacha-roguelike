@@ -3,14 +3,14 @@ import { REVEAL_TIMING } from '../data/revealConfig';
 import type { SoundVariant, UiCue } from '../data/sounds';
 import type { FlipSchedule, RevealPlan } from './reveal';
 
-export type Cue = 'suspense' | 'crack' | `tier:${Rarity}` | 'rise' | 'laugh' | 'card' | 'star' | UiCue;
+export type Cue = 'suspense' | 'crack' | `tier:${Rarity}` | 'rise' | 'laugh' | 'card' | 'star' | 'splash' | UiCue;
 
 export interface SoundCue {
   // Instant en ms depuis le début de la révélation, ou du retournement des cartes.
   readonly at: number;
   readonly cue: Cue;
-  // Ce qui change le son sans changer son nom (rang d'une fissure, palier transposé) ; hors
-  // du journal (révision du 2026-11-13).
+  // Ce qui change le son sans changer son nom (rang d'une fissure, palier transposé, instants et
+  // rang de ce que le son accompagne) ; hors du journal (révision du 2026-11-13).
   readonly variant?: SoundVariant;
 }
 
@@ -44,8 +44,15 @@ export function revealCues(plan: RevealPlan): SoundCue[] {
   return cues;
 }
 
-// Retournement du ×10 : un petit bruit par carte ordinaire, un son marqué pour la
-// vedette, chacun quand la carte commence à tourner (FR-004).
-export function flipCues(schedule: FlipSchedule): SoundCue[] {
-  return schedule.steps.map(s => ({ at: s.at + s.anticipation, cue: s.star ? 'star' : 'card' }));
+// Retournement du ×10 : un son par carte ordinaire, un son marqué pour la vedette (FR-004).
+// Révision du 2026-11-13 (FR-020) : chacun part au début de l'anticipation (le dos qui tremble,
+// le cœur qui bat) et porte ses instants, pour que sa note tombe à l'apparition de la face,
+// une marche plus haut à chaque carte. `panOf` : panoramique de la carte `index` (sa colonne).
+export function flipCues(schedule: FlipSchedule, panOf: (index: number) => number = () => 0): SoundCue[] {
+  let step = 0;
+  return schedule.steps.map((s): SoundCue => s.star
+    ? { at: s.at, cue: 'star', variant: { kind: 'star', beat: s.anticipation, turn: s.turn, rarity: s.rarity } }
+    : { at: s.at, cue: 'card', variant: {
+      kind: 'card', anticipation: s.anticipation, turn: s.turn, rarity: s.rarity, step: step++, pan: panOf(s.index),
+    } });
 }

@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { RARITIES, type Rarity } from '../data/gachaConfig';
 import { CARD_MOTION, FLIP_TIMING, REVEAL_MOTION, REVEAL_TIMING } from '../data/revealConfig';
-import type { SoundVariant } from '../data/sounds';
+import { PAN_SPREAD, STAR_RAIN_MS, type SoundVariant } from '../data/sounds';
 import type { PullResult } from '../logic/gacha';
 import type { FlipSchedule, RevealKind, RevealPlan } from '../logic/reveal';
 import { glossBand } from '../logic/motion';
@@ -829,7 +829,7 @@ export function playFlip(
   results: readonly PullResult[],
   schedule: FlipSchedule,
   reduced: boolean,
-  onCue: (cue: Cue) => void,
+  onCue: (cue: Cue, variant?: SoundVariant) => void,
   onDone: (tapped: boolean) => void,
 ): { seq: Sequence; finish: (tapped: boolean) => void } {
   lightTextures(scene);
@@ -968,7 +968,8 @@ export function playFlip(
         seq.tween({ targets: c.flash, alpha: 0, duration: m.flash, ease: 'Quad.easeOut' });
         cardBurst(particles, r, c.rarity, isStar ? 1.6 : 1);
         if (k >= 2 || isStar) cardWave(scene, seq, modal, r, COLORS.rarity[c.rarity]);
-        if (isStar && k >= 3) rain(particles, c.rarity, 1200, k === 4 ? 35 : 20);
+        // Même durée que les paillettes de la vedette (src/data/sounds.ts).
+        if (isStar && k >= 3) rain(particles, c.rarity, STAR_RAIN_MS, k === 4 ? 35 : 20);
         const bounce = REVEAL.cardBounce[k]! + (isStar ? 0.06 : 0);
         seq.tween({ targets: c.shadow, x: near, y: near, duration: ms / 2, ease: 'Back.easeOut' });
         seq.tween({
@@ -1021,6 +1022,8 @@ export function playFlip(
     seq.at(step.at + step.anticipation, () => turn(card, step.turn, step.star));
   }
   seq.at(schedule.duration, () => finish(false));
-  flipCues(schedule).forEach(c => seq.at(c.at, () => onCue(c.cue)));
+  // Le son d'une carte vient de sa colonne (FR-020).
+  const panOf = (i: number) => (2 * (resultCardRect(i).x + resultCardRect(i).w / 2) / WIDTH - 1) * PAN_SPREAD;
+  flipCues(schedule, panOf).forEach(c => seq.at(c.at, () => onCue(c.cue, c.variant)));
   return { seq, finish };
 }

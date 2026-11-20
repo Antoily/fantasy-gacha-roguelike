@@ -32,7 +32,7 @@ export class Sfx {
     document.body.dataset.sounds = '';
   }
 
-  // La variante (rang d'une fissure, palier transposé) change le son, pas le journal.
+  // La variante (rang d'une fissure, palier transposé, instants, rang, sens) change le son, pas le journal.
   play(cue: Cue, variant?: SoundVariant) {
     if (this.muted) return;
     const log = document.body.dataset.sounds;
@@ -43,6 +43,15 @@ export class Sfx {
       mixer.play(cue, variant);
     } catch {
       // Contexte audio refusé ou fermé : le jeu continue en silence.
+    }
+  }
+
+  // Éteint en fondu ce qui sonne encore d'un bruitage (la fanfare quand la présentation ferme).
+  fade(cue: Cue, ms: number) {
+    try {
+      this.mixer?.mixer.fade(cue, ms);
+    } catch {
+      // Contexte fermé : plus rien ne sonne de toute façon.
     }
   }
 
