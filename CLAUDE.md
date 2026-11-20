@@ -343,6 +343,18 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
 - Une découpe géométrique (`glossBand`, `src/logic/motion.ts`) remplace un masque : les masques de
   Phaser 4 sont des filtres, un passage de rendu de plus à chaque image.
 
+## Leçons des fenêtres (lot E, 2026-11-20)
+
+- **Fenêtre animée, zones fixes** : `Opening` (`widgets.ts`) sort toutes les zones d'appui d'une fenêtre construite
+  dans une couche fixe, puis met le reste dans un conteneur centré sur le panneau, qui seul s'anime. À appeler une fois
+  la fenêtre construite (`this.opening(modal, pivot)` … `.finish()`). `dataset.opening` dure le temps de l'ouverture :
+  `capture()` l'attend ; `dataset.clockOpened` mesure sa durée en temps du jeu.
+- **Une fenêtre qui en remplace une autre dans la même image** ne doit pas repartir de la transparence : le fondu
+  laissait voir l'écran de tirage entre la collection et la fiche (vu sur capture, pas par les tests).
+- **Tester « répond pendant l'ouverture »** : `installManualClock` / `freeze` / `step` (`tests/e2e/helpers.ts`) arrêtent
+  le temps du jeu ; sans eux, l'appui tombe plus ou moins tard dans l'ouverture selon la machine. Viser le bord d'une case
+  que la cascade décale encore (la mise à l'échelle Back.Out rattrape trop vite pour servir de témoin).
+
 ## Conventions de code
 
 - TypeScript strict, pas de `any`. Imports relatifs.

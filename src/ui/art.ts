@@ -1,8 +1,10 @@
 import Phaser from 'phaser';
+import { SILHOUETTE } from '../data/ambienceConfig';
 import { CATALOGUE, type Item } from '../data/catalogue';
+import { opaqueBounds, silhouetteFrame } from '../logic/silhouette';
 import { R } from './display';
 import { ART } from './layout';
-import { ART_FX } from './theme';
+import { ART_FX, WINDOW_FX } from './theme';
 
 // Visuels de la feature 007 (ADR 0007) : les SVG de public/art sont rastérisés au
 // chargement à leur plus grande taille d'affichage × R, donc nets sous la caméra ×R.
@@ -135,13 +137,7 @@ function buildVignettes(scene: Phaser.Scene): string[] {
       ctx.drawImage(img, (cx - r) * s, (cy - r) * s, 2 * r * s, 2 * r * s, 0, 0, d, d);
     };
     vignette(scene, headKey(id), d, d, head);
-    // Silhouette : la même tête, peinte d'une seule teinte sombre (aucun détail visible).
-    vignette(scene, shadowKey(id), d, d, ctx => {
-      head(ctx);
-      ctx.globalCompositeOperation = 'source-in';
-      ctx.fillStyle = ART_FX.silhouetteCss;
-      ctx.fillRect(0, 0, d, d);
-    });
+    vignette(scene, shadowKey(id), d, d, ctx => silhouette(ctx, img, d));
     const b = crop.bust;
     const bw = ART.bust.w * R;
     const bh = ART.bust.h * R;
@@ -153,6 +149,47 @@ function buildVignettes(scene: Phaser.Scene): string[] {
     });
   }
   return missing;
+}
+
+// Silhouette d'un manquant (FR-004, FR-025) : le haut de la forme entière, d'une seule teinte
+// sombre (aucun détail visible), plus petite que le disque et cernée d'un liseré clair, pour que
+// coiffe, oreilles et accessoires se découpent sur le fond. Rien n'est dessiné hors du disque.
+function silhouette(ctx: CanvasRenderingContext2D, img: HTMLImageElement, d: number) {
+  const pw = SILHOUETTE.probeW;
+  const ph = Math.round((pw * img.height) / img.width);
+  const probe = canvas(pw, ph);
+  probe.ctx.drawImage(img, 0, 0, pw, ph);
+  const bounds = opaqueBounds(probe.ctx.getImageData(0, 0, pw, ph).data, pw, ph, SILHOUETTE.alphaMin);
+  if (!bounds) return;
+  const k = img.width / pw;
+  const { src, dst } = silhouetteFrame({ x: bounds.x * k, y: bounds.y * k, w: bounds.w * k, h: bounds.h * k }, d, SILHOUETTE.fill);
+  // La forme, peinte d'une teinte unie (source-in : seule l'opacité du dessin compte).
+  const tinted = (color: string) => {
+    const c = canvas(d, d);
+    c.ctx.imageSmoothingQuality = 'high';
+    c.ctx.drawImage(img, src.x, src.y, src.w, src.h, dst.x, dst.y, dst.w, dst.h);
+    c.ctx.globalCompositeOperation = 'source-in';
+    c.ctx.fillStyle = color;
+    c.ctx.fillRect(0, 0, d, d);
+    return c.el;
+  };
+  ctx.beginPath();
+  ctx.arc(d / 2, d / 2, d / 2, 0, 2 * Math.PI);
+  ctx.clip();
+  // Liseré d'un pixel de l'écran (R pixels de la texture) : la forme claire décalée tout autour.
+  const rim = tinted(WINDOW_FX.silhouetteRimCss);
+  for (let i = 0; i < 8; i++) {
+    const a = (i * Math.PI) / 4;
+    ctx.drawImage(rim, R * Math.cos(a), R * Math.sin(a));
+  }
+  ctx.drawImage(tinted(ART_FX.silhouetteCss), 0, 0);
+}
+
+function canvas(w: number, h: number) {
+  const el = document.createElement('canvas');
+  el.width = Math.round(w);
+  el.height = Math.round(h);
+  return { el, ctx: el.getContext('2d', { willReadFrequently: true })! };
 }
 
 function vignette(scene: Phaser.Scene, key: string, w: number, h: number, draw: (ctx: CanvasRenderingContext2D) => void) {

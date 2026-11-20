@@ -62,3 +62,30 @@ export const TRANSITIONS = {
   portraitPop: 260,
   portraitRing: { scale: 1.6, duration: 320 },
 } as const;
+
+// Fenêtres (007, révision du 2026-11-13 : FR-024, FR-025), en ms. Toute ouverture finit en
+// 250 ms au plus (FR-024) : le pouls du coût et la lévitation de la fiche, qui suivent, sont des
+// boucles, pas des ouvertures.
+export const WINDOW = {
+  // Le dessin du panneau passe de `from` à 1 autour de son centre, avec un léger dépassement
+  // (Back, `overshoot`) ; l'opacité suit TRANSITIONS.fade. Les zones d'appui ne bougent pas.
+  pop: { from: 0.94, duration: 180, overshoot: 1.4 },
+  // Taux : chaque ligne glisse de `shift` px en s'allumant, `stagger` ms après la précédente.
+  rows: { stagger: 30, duration: 120, shift: 8 },
+  // Collection : les cases arrivent rangée par rangée (10 rangées : 9 × step + duration ≤ 250),
+  // en montant de `rise` px ; les compteurs du résumé montent de 0 en `count` ms.
+  cascade: { step: 11, duration: 150, rise: 8 },
+  count: 200,
+  // Coût d'un manquant échangeable : il pulse jusqu'à `scale` (aller simple en `period` ms).
+  costPulse: { scale: 1.08, period: 600 },
+  // Fiche : l'illustration naît de la case touchée à l'échelle `from`, se pose en `fly` ms, puis
+  // flotte de ±`float` px (aller simple en `floatPeriod` ms).
+  sheet: { from: 0.6, fly: 240, float: 3, floatPeriod: 1500 },
+  // Échange : des éclats volent du compteur de l'en-tête jusqu'à la carte (`flight` ms chacun,
+  // `stagger` ms d'écart), et le montant dépensé s'élève de `rise` px en s'effaçant.
+  exchange: { count: 10, flight: 420, stagger: 24, spread: 18, rise: 22, label: 700 },
+} as const;
+
+// Silhouette d'un manquant (FR-025) : largeur de la forme en part du disque, opacité minimale
+// d'un pixel compté dans la forme (0–255), largeur de l'image réduite où on la mesure.
+export const SILHOUETTE = { fill: 0.84, alphaMin: 40, probeW: 100 } as const;

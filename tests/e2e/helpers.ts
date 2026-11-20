@@ -12,6 +12,8 @@ export const FRESH = { version: 3, currency: 9000, owned: {}, pity: 0, shards: 0
 
 let shot = 0;
 export async function capture(page: Page, name: string) {
+  // Une fenêtre qui s'ouvre encore (007, FR-024) : la capture montre son rendu final.
+  await page.waitForFunction(() => !document.body.dataset.opening, undefined, { timeout: 10_000 });
   shot++;
   await page.screenshot({ path: `test-results/captures/${String(shot).padStart(2, '0')}-${name}.png` });
 }
@@ -174,4 +176,83 @@ export async function contrastIn(page: Page, r: Rect): Promise<number> {
     }
     return (hi + 0.05) / (lo + 0.05);
   }, png.toString('base64'));
+}
+
+// Horloge pilotée à la main (même principe que « Filmer une animation », CLAUDE.md) : à installer
+// avant le chargement. `freeze(true)` arrête le temps du jeu ; `step(ms)` le fait avancer par
+// images de 1/60 s. Les tweens de Phaser lisent Date.now, les minuteries le pas du jeu : les deux
+// sont remplacés. Tant que le temps est arrêté, ne pas appeler waitModal (il attend des images).
+export async function installManualClock(page: Page) {
+  await page.addInitScript(() => {
+    const realNow = performance.now.bind(performance);
+    const realRaf = window.requestAnimationFrame.bind(window);
+    const epoch = Date.now() - realNow();
+    let manual = false, vt = 0, offset = 0;
+    let queue: FrameRequestCallback[] = [];
+    performance.now = () => (manual ? vt : realNow() + offset);
+    Date.now = () => Math.round(epoch + performance.now());
+    window.requestAnimationFrame = cb => {
+      if (manual) queue.push(cb);
+      else realRaf(() => (manual ? queue.push(cb) : cb(performance.now())));
+      return 1;
+    };
+    const w = window as unknown as { __freeze: (on: boolean) => void; __step: (ms: number) => void };
+    w.__freeze = on => {
+      if (on && !manual) {
+        vt = realNow() + offset;
+        manual = true;
+      } else if (!on && manual) {
+        offset = vt - realNow();
+        manual = false;
+        const q = queue;
+        queue = [];
+        q.forEach(c => realRaf(() => c(performance.now())));
+      }
+    };
+    w.__step = ms => {
+      vt += ms;
+      const q = queue;
+      queue = [];
+      q.forEach(c => c(vt));
+    };
+  });
+}
+
+export async function freeze(page: Page, on: boolean) {
+  await page.evaluate(o => (window as unknown as { __freeze: (on: boolean) => void }).__freeze(o), on);
+}
+
+export async function step(page: Page, ms: number) {
+  for (let left = ms; left > 0.01; left -= 1000 / 60) {
+    await page.evaluate(d => (window as unknown as { __step: (ms: number) => void }).__step(d), Math.min(1000 / 60, left));
+  }
+}
+
+// Part de chaque disque (centre, rayon, en coordonnées de l'écran) occupée par des pixels clairs
+// (luminance > 0,35) : le fond d'un portrait qui reste visible autour d'une silhouette. Une seule
+// capture pour tous : le rendu logiciel est lent.
+export async function lightShares(page: Page, discs: readonly { x: number; y: number; r: number }[]): Promise<number[]> {
+  const png = await page.screenshot();
+  return page.evaluate(async ([b64, ds]) => {
+    const blob = await (await fetch(`data:image/png;base64,${b64}`)).blob();
+    const bmp = await createImageBitmap(blob);
+    const c = new OffscreenCanvas(bmp.width, bmp.height);
+    const ctx = c.getContext('2d')!;
+    ctx.drawImage(bmp, 0, 0);
+    const d = ctx.getImageData(0, 0, bmp.width, bmp.height).data;
+    const k = bmp.width / 360;
+    const lin = (v: number) => (v /= 255) <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+    return ds.map(({ x: cx, y: cy, r }) => {
+      let inside = 0, light = 0;
+      for (let y = Math.floor((cy - r) * k); y < (cy + r) * k; y++) {
+        for (let x = Math.floor((cx - r) * k); x < (cx + r) * k; x++) {
+          if ((x + 0.5 - cx * k) ** 2 + (y + 0.5 - cy * k) ** 2 > (r * k) ** 2) continue;
+          const i = (y * bmp.width + x) * 4;
+          inside++;
+          if (0.2126 * lin(d[i]!) + 0.7152 * lin(d[i + 1]!) + 0.0722 * lin(d[i + 2]!) > 0.35) light++;
+        }
+      }
+      return light / inside;
+    });
+  }, [png.toString('base64'), discs] as const);
 }

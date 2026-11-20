@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { TRANSITIONS } from '../data/ambienceConfig';
+import { TRANSITIONS, WINDOW } from '../data/ambienceConfig';
 import type { Item } from '../data/catalogue';
 import { RARITIES, type Rarity } from '../data/gachaConfig';
 import type { PullResult } from '../logic/gacha';
@@ -142,6 +142,107 @@ export function makeModal(scene: Phaser.Scene): Phaser.GameObjects.Container {
   return container;
 }
 
+// Ouverture d'une fenêtre construite (007, révision du 2026-11-13 : FR-024). Le DESSIN seul
+// s'anime : les zones d'appui sont sorties dans une couche fixe au-dessus de lui, à leur place de
+// layout.ts dès la première image. Un appui pendant l'ouverture n'est jamais perdu, et l'e2e, qui
+// tape deux images après l'ouverture, vise toujours juste (leçon du lot D : `button.visual`).
+// Le dessin (`visual`) est un conteneur posé sur `pivot`, le centre du panneau : il passe de
+// WINDOW.pop.from à 1 autour de lui. `tween` ajoute un mouvement d'ouverture (cascade, lignes,
+// compteurs) dont la fin compte dans celle de l'ouverture ; `loop`, une boucle qui suit (pouls,
+// lévitation). Tout s'arrête avec la fenêtre. Mouvement réduit (FR-019) : rendu final d'emblée.
+export class Opening {
+  readonly visual: Phaser.GameObjects.Container;
+  private end = 0;
+  private readonly owned: Phaser.Tweens.Tween[] = [];
+  private timer: Phaser.Time.TimerEvent | null = null;
+  private settled = false;
+
+  // `onSettled(true)` à la fin du dernier mouvement d'ouverture, `onSettled(false)` si la fenêtre
+  // se ferme avant ; jamais en mouvement réduit.
+  constructor(
+    private readonly scene: Phaser.Scene,
+    modal: Phaser.GameObjects.Container,
+    pivot: { readonly x: number; readonly y: number },
+    readonly animate: boolean,
+    replacing: boolean,
+    private readonly onSettled: (complete: boolean) => void = () => {},
+  ) {
+    // Le voile (premier enfant, posé par makeModal) reste dessous, fixe : il bloque déjà tout.
+    const content = modal.list.slice(1);
+    const zones: Phaser.GameObjects.Zone[] = [];
+    for (const obj of content) collectZones(obj, zones);
+    for (const z of zones) {
+      const m = z.getWorldTransformMatrix();
+      z.parentContainer?.remove(z);
+      z.setPosition(m.tx, m.ty);
+    }
+    for (const obj of content) modal.remove(obj);
+    const inner = scene.add.container(-pivot.x, -pivot.y, content);
+    this.visual = scene.add.container(pivot.x, pivot.y, [inner]);
+    modal.add([this.visual, ...zones]);
+    modal.once(Phaser.GameObjects.Events.DESTROY, () => {
+      for (const t of this.owned) t.remove();
+      this.timer?.remove();
+      this.settle(false);
+    });
+    if (!animate) return;
+    const p = WINDOW.pop;
+    this.visual.setScale(p.from);
+    this.tween({ targets: this.visual, scale: 1, duration: p.duration, ease: 'Back.Out', easeParams: [p.overshoot] });
+    // Une fenêtre qui en remplace une autre dans la même image (collection → fiche) ne passe pas
+    // par la transparence : avec le fondu, l'écran de tirage apparaissait entre les deux.
+    if (replacing) {
+      scene.tweens.killTweensOf(modal);
+      modal.setAlpha(1);
+    }
+  }
+
+  tween(config: Phaser.Types.Tweens.TweenBuilderConfig & { readonly duration: number; readonly delay?: number }) {
+    if (!this.animate) return;
+    this.end = Math.max(this.end, (config.delay ?? 0) + config.duration);
+    this.owned.push(this.scene.tweens.add(config));
+  }
+
+  // Fait entrer `target` depuis un état de départ (décalage en px, opacité, échelle) jusqu'à
+  // son état actuel ; `then` à l'arrivée (ce qui suit l'entrée : éclat, boucle). Mouvement
+  // réduit : rien ne bouge et `then` n'est pas appelé.
+  enter(
+    target: Phaser.GameObjects.Container,
+    from: { readonly dx?: number; readonly dy?: number; readonly alpha?: number; readonly scale?: number },
+    delay: number,
+    duration: number,
+    ease = 'Cubic.Out',
+    then?: () => void,
+  ) {
+    if (!this.animate) return;
+    const { x, y, alpha, scale } = target;
+    target.setPosition(x + (from.dx ?? 0), y + (from.dy ?? 0)).setAlpha(from.alpha ?? alpha).setScale(from.scale ?? scale);
+    this.tween({ targets: target, x, y, alpha, scale, delay, duration, ease, ...(then ? { onComplete: then } : {}) });
+  }
+
+  loop(config: Phaser.Types.Tweens.TweenBuilderConfig) {
+    if (!this.animate) return;
+    this.owned.push(this.scene.tweens.add(config));
+  }
+
+  // À appeler une fois tous les mouvements d'ouverture posés.
+  finish() {
+    if (!this.animate) return;
+    this.timer = this.scene.time.delayedCall(this.end, () => this.settle(true));
+  }
+
+  private settle(complete: boolean) {
+    if (this.settled || !this.animate) return;
+    this.settled = true;
+    this.onSettled(complete);
+  }
+}
+
+function collectZones(obj: Phaser.GameObjects.GameObject, out: Phaser.GameObjects.Zone[]) {
+  if (obj instanceof Phaser.GameObjects.Zone) out.push(obj);
+  else if (obj instanceof Phaser.GameObjects.Container) for (const child of obj.list) collectZones(child, out);
+}
+
 // Orbe de l'écran de tirage, centrée sur l'origine du conteneur : la révélation (004)
 // la déplace et la fait grossir.
 export function makeOrb(scene: Phaser.Scene, r: number): Phaser.GameObjects.Container {
@@ -236,7 +337,8 @@ export function makePortrait(scene: Phaser.Scene, x: number, y: number, d: numbe
   g.fillStyle(owned ? COLORS.panel : COLORS.btn.disabled, 1).fillCircle(x, y, d / 2);
   if (owned) g.fillStyle(COLORS.rarity[item.rarity], ART_FX.artTint).fillCircle(x, y, d / 2);
   const ring = scene.add.graphics();
-  if (owned) ring.lineStyle(STROKE.thin, COLORS.rarity[item.rarity], 1).strokeCircle(x, y, d / 2 - 2);
+  // Anneau de la rareté, épais (révision du 2026-11-13, FR-025) : un possédé se repère d'un coup d'œil.
+  if (owned) ring.lineStyle(STROKE.base, COLORS.rarity[item.rarity], 1).strokeCircle(x, y, d / 2 - 2.5);
   ring.lineStyle(STROKE.thin, COLORS.ink, owned ? 1 : 0.45).strokeCircle(x, y, d / 2);
   c.add([g, scene.add.image(x, y, owned ? headKey(item.id) : shadowKey(item.id)).setDisplaySize(d, d), ring]);
   return c;
@@ -303,19 +405,26 @@ export function makeResultCard(
 
 // Fiche d'un possédé (003, révision du 2026-11-08) : l'illustration entière en grand, nom,
 // type et rareté, exemplaires, et la phrase de présentation, qu'aucun autre écran ne montre
-// pour les raretés sans présentation plein écran.
-export function makeSheet(scene: Phaser.Scene, item: Item, ownedCount: number): Phaser.GameObjects.Container {
+// pour les raretés sans présentation plein écran. `art` (fenêtre d'illustration) est centré sur
+// sa fenêtre, `image` sur `art` : la scène les met en scène (FR-025) autour de leur centre.
+export interface Sheet {
+  readonly container: Phaser.GameObjects.Container;
+  readonly art: Phaser.GameObjects.Container;
+  readonly image: Phaser.GameObjects.Image | Phaser.GameObjects.Container;
+}
+
+export function makeSheet(scene: Phaser.Scene, item: Item, ownedCount: number): Sheet {
   const c = scene.add.container(0, 0);
   const win = SHEET.art;
   const cx = win.x + win.w / 2;
-  c.add(artBackdrop(scene, win, item.rarity, RADIUS));
-  if (hasArt(scene, item)) {
-    const h = win.h - 8;
-    c.add(scene.add.image(cx, win.y + win.h / 2 + 2, artKey(item.id)).setDisplaySize(h * 0.8, h));
-  } else {
-    c.add(initialDisc(scene, cx, win.y + win.h / 2, 48, item, FONT_SIZE.title));
-  }
-  c.add(frame(scene, win, RADIUS));
+  const cy = win.y + win.h / 2;
+  const local = { x: -win.w / 2, y: -win.h / 2, w: win.w, h: win.h };
+  const h = win.h - 8;
+  const image = hasArt(scene, item)
+    ? scene.add.image(0, 2, artKey(item.id)).setDisplaySize(h * 0.8, h)
+    : initialDisc(scene, 0, 0, 48, item, FONT_SIZE.title);
+  const art = scene.add.container(cx, cy, [artBackdrop(scene, local, item.rarity, RADIUS), image, frame(scene, local, RADIUS)]);
+  c.add(art);
   const b = SHEET.blurb;
   c.add(fitWidth(scene.add.text(cx, SHEET.nameY, item.name, textStyle(FONT_SIZE.big)).setOrigin(0.5, 0), FONT_SIZE.big, b.w));
   c.add(makeRarityLine(scene, cx, SHEET.rarityY, `${kindLabel(item)} · ${rarityInfo(item.rarity).label}`, item.rarity,
@@ -324,7 +433,7 @@ export function makeSheet(scene: Phaser.Scene, item: Item, ownedCount: number): 
   c.add(makePanel(scene, b));
   c.add(scene.add.text(cx, b.y + b.h / 2, item.blurb,
     { ...textStyle(FONT_SIZE.body, CSS.textDim), align: 'center', wordWrap: { width: b.w - 24 } }).setOrigin(0.5));
-  return c;
+  return { container: c, art, image };
 }
 
 // Éclat (icône illustrée, ou losange en repli), centré en (x, y) ; size = demi-hauteur.

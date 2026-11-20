@@ -164,6 +164,19 @@ export const AMBIENCE_FX = {
   orbit: [palette.primary, palette.shard, palette.primary],
 } as const;
 
+// Fenêtres (007, révision du 2026-11-13 : FR-024, FR-025) : collection, fiche, échange.
+export const WINDOW_FX = {
+  // Liseré d'un manquant qu'on peut échanger tout de suite : la couleur des éclats.
+  affordableRim: palette.shard,
+  // Contour clair de la silhouette d'un manquant : la forme se détache du disque grisé.
+  silhouetteRimCss: toCss(palette.paper),
+  // Éclat qui accompagne l'illustration de la fiche quand elle se pose (s'ajoute à la rareté).
+  sheetBurst: palette.primary,
+  // Éclats dépensés qui volent vers la carte d'un échange, et leur éclat d'arrivée.
+  // Jamais de blanc : invisible sur la carte et le papier.
+  exchangeBurst: [palette.shard, palette.secondary, palette.primary],
+} as const;
+
 export const STROKE = { thin: 2, base: 3, thick: 4 } as const;
 export const SHADOW_OFFSET = 4;
 export const RADIUS = 12;
