@@ -1,6 +1,6 @@
 import {
-  DEFLATE, LAUGH, LAUGH_DUCK, SOUND_ATTACK_MS, SOUND_CHOKES, SOUND_LIMITER, SOUND_MASTER_GAIN, SOUND_RECIPES,
-  SOUND_RELEASE_MS, SOUND_STOP_FADE_MS, type Tone,
+  DEFLATE, LAUGH, LAUGH_DUCK, SOUND_ATTACK_MS, SOUND_CHOKES, SOUND_DIP, SOUND_LIMITER, SOUND_MASTER_GAIN,
+  SOUND_RELEASE_MS, SOUND_STOP_FADE_MS, soundRecipe, type SoundVariant, type Tone,
 } from '../data/sounds';
 import { mulberry32 } from '../logic/rng';
 import type { Cue } from '../logic/soundCues';
@@ -119,8 +119,22 @@ function scheduleTone(ctx: BaseAudioContext, tone: Tone, t0: number, dest: Audio
   gain.gain.linearRampToValueAtTime(tone.gain, start + SOUND_ATTACK_MS / 1000);
   if (tone.decay !== undefined) {
     gain.gain.setTargetAtTime(tone.gain * (tone.sustain ?? 0), start + SOUND_ATTACK_MS / 1000, tone.decay / 1000 / 3);
-  } else if (tone.gainTo !== undefined) {
-    gain.gain.linearRampToValueAtTime(tone.gainTo, end);
+  } else {
+    // Plateau ou crescendo, creusé à chaque `dips` : on enchaîne des rampes linéaires sur la
+    // même droite, abaissée de SOUND_DIP.gain le temps du creux.
+    const a = start + SOUND_ATTACK_MS / 1000;
+    const to = tone.gainTo ?? tone.gain;
+    const line = (x: number) => tone.gain + ((to - tone.gain) * (x - a)) / (end - a);
+    for (const d of tone.dips ?? []) {
+      const t1 = start + d / 1000;
+      const t2 = t1 + SOUND_DIP.down / 1000, t3 = t2 + SOUND_DIP.hold / 1000, t4 = t3 + SOUND_DIP.up / 1000;
+      if (t1 <= a || t4 >= end) continue;
+      gain.gain.linearRampToValueAtTime(line(t1), t1);
+      gain.gain.linearRampToValueAtTime(line(t2) * SOUND_DIP.gain, t2);
+      gain.gain.linearRampToValueAtTime(line(t3) * SOUND_DIP.gain, t3);
+      gain.gain.linearRampToValueAtTime(line(t4), t4);
+    }
+    if (tone.gainTo !== undefined || tone.dips?.length) gain.gain.linearRampToValueAtTime(to, end);
   }
   gain.gain.setTargetAtTime(0, end, release / 5);
   const cut = ctx.createGain();
@@ -179,7 +193,8 @@ export class Mixer {
     this.bus = createBus(ctx);
   }
 
-  play(cue: Cue) {
+  // `variant` change la recette (rang d'une fissure, palier transposé), pas le nom du bruitage.
+  play(cue: Cue, variant?: SoundVariant) {
     const now = this.ctx.currentTime;
     // Montée et rire étouffent le faux palier qui sonne encore (FR-019) ; le vrai palier
     // baisse le rire qui sonne encore, pour se faire entendre dessous.
@@ -191,7 +206,7 @@ export class Mixer {
       this.playLaugh(now);
       this.synth(DEFLATE, 'deflate', now);
     } else {
-      this.synth(SOUND_RECIPES[cue], cue, now);
+      this.synth(soundRecipe(cue, variant), cue, now);
     }
   }
 

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { LAUGH } from '../data/sounds';
+import { LAUGH, type SoundVariant } from '../data/sounds';
 import type { Cue } from '../logic/soundCues';
 import { Mixer } from './synth';
 
@@ -32,14 +32,15 @@ export class Sfx {
     document.body.dataset.sounds = '';
   }
 
-  play(cue: Cue) {
+  // La variante (rang d'une fissure, palier transposé) change le son, pas le journal.
+  play(cue: Cue, variant?: SoundVariant) {
     if (this.muted) return;
     const log = document.body.dataset.sounds;
     document.body.dataset.sounds = log ? `${log} ${cue}` : cue;
     try {
       const mixer = this.output();
       if (!mixer) return;
-      mixer.play(cue);
+      mixer.play(cue, variant);
     } catch {
       // Contexte audio refusé ou fermé : le jeu continue en silence.
     }

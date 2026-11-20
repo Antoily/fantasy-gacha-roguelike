@@ -19,6 +19,10 @@ export const REVEAL_TIMING = {
   // suspense, puis tout se fige sur ses `freeze` dernières ms avant l'éclatement.
   suspense: 1600,
   cracks: [0.45, 0.65, 0.82],
+  // Battements du cœur de l'orbe, de plus en plus rapprochés, que l'image (halo) et le son
+  // (révision du 2026-11-13, FR-017) partagent. Le 2ᵉ tombe sur la 1ʳᵉ fissure (0,45) : à
+  // 16 ms près, les deux coups faisaient un « flam ».
+  beats: [0.3, 0.45, 0.6, 0.71, 0.8, 0.87],
   freeze: 150,
   // Révélation du vrai palier : plus le palier est haut, plus elle dure.
   final: { common: 600, uncommon: 800, rare: 1100, legendary: 1500, ultra: 2000 } satisfies Record<Rarity, number>,
@@ -37,8 +41,7 @@ export const REVEAL_MOTION = {
   // « Touche pour passer » : fondu à l'armement, puis pulsation (demi-période).
   hintIn: 200,
   hintPulse: 700,
-  // Battements du cœur, en fractions du suspense : de plus en plus rapprochés.
-  beats: [0.3, 0.46, 0.6, 0.71, 0.8, 0.87],
+  // Battement du cœur (instants : REVEAL_TIMING.beats) : anneau et lueur, puis pulsation.
   beat: 260,
   beatPulse: 80,
   // Fissure : la lueur derrière l'orbe monte, un anneau fin s'étend, l'orbe sursaute.
