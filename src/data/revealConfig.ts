@@ -112,3 +112,29 @@ export const FLIP_TIMING = {
   max: number;
   maxModest: number;
 };
+
+// Rythme de la mise en scène des cartes (révision 3 du 2026-11-13, lot B), en ms. Tout tient
+// dans le calendrier de flipSchedule : la face apparaît toujours à mi-retournement
+// (at + anticipation + turn / 2), instant sur lequel le son des cartes se cale.
+export const CARD_MOTION = {
+  // Lueur de l'orbe pendant la distribution.
+  dealGlow: 260,
+  // Éclair de la face qui apparaît.
+  flash: 140,
+  // Vedette : voile d'encre sur les autres, voyage au centre, retour à sa case (après la fin).
+  dim: 250,
+  toCenter: 260,
+  back: 320,
+  undim: 200,
+  // OK qui arrive à la fin, indication qui s'efface.
+  okIn: 220,
+  hintOut: 150,
+  // Badge « Garanti ! » posé en tampon quand la carte se retourne.
+  stamp: 200,
+  // Reflet des Légendaire et Ultra rare : un passage toutes les `glossEvery` ms.
+  glossEvery: 2800,
+  glossSweep: 520,
+  // ×1 : rotation des rayons (degrés par seconde), flottement de l'illustration (période).
+  rayTurn: 12,
+  float: 2400,
+} as const;

@@ -1,14 +1,15 @@
 import Phaser from 'phaser';
 import { RARITIES, type Rarity } from '../data/gachaConfig';
-import { REVEAL_MOTION, REVEAL_TIMING } from '../data/revealConfig';
+import { CARD_MOTION, FLIP_TIMING, REVEAL_MOTION, REVEAL_TIMING } from '../data/revealConfig';
 import type { SoundVariant } from '../data/sounds';
 import type { PullResult } from '../logic/gacha';
 import type { FlipSchedule, RevealKind, RevealPlan } from '../logic/reveal';
+import { glossBand } from '../logic/motion';
 import { beatTimes, crackTimes, flipCues, revealCues, type Cue } from '../logic/soundCues';
 import { orbSize, uiImage } from './art';
-import { GACHA, HEIGHT, REVEAL, WIDTH, resultCardRect, type Rect } from './layout';
+import { GACHA, HEIGHT, RESULTS, REVEAL, WIDTH, resultCardRect, type Rect } from './layout';
 import { Particles, type Shape } from './particles';
-import { ART_FX, COLORS, CSS, FONT_SIZE, RADIUS, REVEAL_FX, STROKE } from './theme';
+import { ART_FX, CARD_FX, COLORS, CSS, FONT_SIZE, RADIUS, REVEAL_FX, STROKE } from './theme';
 import { R } from './display';
 import { makeEmblem, makeOrb, textStyle } from './widgets';
 
@@ -80,15 +81,54 @@ function cardWave(scene: Phaser.Scene, seq: Sequence, parent: Phaser.GameObjects
   seq.tween({ targets: wave, scale: 1.3, alpha: 0, duration: 450, ease: 'Cubic.easeOut', onComplete: () => wave.destroy() });
 }
 
-// Éclat d'une carte qui vient d'apparaître, selon sa rareté.
+// Éclat d'une carte qui vient d'apparaître, selon sa rareté. Les particules naissent sur le
+// bord (révision 3, B4) : au centre, les confettis cachaient l'illustration.
 function cardBurst(particles: Particles, r: Rect, rarity: Rarity, boost = 1) {
   const k = rankOf(rarity);
   particles.burst({
     x: r.x + r.w / 2, y: r.y + r.h / 2, count: Math.round(REVEAL.cardBurst[k]! * boost),
     colors: k === 0 ? [COLORS.rarity.common] : colorsOf(rarity), shapes: SHAPES[k]!,
     speed: [60, 120 + 50 * k * boost], size: [2.5, 4 + k], life: [350, 600 + 120 * k],
-    spawnRadius: [10, r.h / 2], gravity: k >= 2 ? 220 : 40, drag: 1.5,
+    spawnRadius: [r.h / 2, r.w / 2], gravity: k >= 2 ? 220 : 40, drag: 1.5,
   });
+}
+
+// Reflet qui balaie les cartes Légendaire et Ultra rare (révision 3, B5), tant que la fenêtre
+// vit : une bande oblique découpée à la forme de la carte (glossBand), sans masque. Ses tweens
+// meurent avec la fenêtre. Mouvement réduit : aucun.
+export function glossBest(
+  scene: Phaser.Scene, parent: Phaser.GameObjects.Container,
+  cards: readonly { readonly r: Rect; readonly rarity: Rarity }[], reduced: boolean,
+) {
+  if (reduced) return;
+  const k = RESULTS.gloss;
+  const m = CARD_MOTION;
+  cards.filter(c => rankOf(c.rarity) >= 3).forEach(({ r }, i) => {
+    const g = scene.add.graphics();
+    parent.add(g);
+    const sweep = { p: 0 };
+    scene.tweens.add({
+      targets: sweep, p: 1, duration: m.glossSweep, ease: 'Sine.easeInOut',
+      delay: m.glossSweep + i * 300, repeat: -1, repeatDelay: m.glossEvery - m.glossSweep,
+      onUpdate: () => {
+        const pts = glossBand(r, RADIUS, k.width, k.slant, sweep.p);
+        g.clear();
+        if (pts.length >= 3) {
+          g.fillStyle(CARD_FX.gloss, CARD_FX.glossAlpha).fillPoints(pts.map(([px, py]) => new Phaser.Math.Vector2(px, py)), true);
+        }
+      },
+      onRepeat: () => g.clear(),
+    });
+    g.once(Phaser.GameObjects.Events.DESTROY, () => scene.tweens.killTweensOf(sweep));
+  });
+}
+
+// Tweens en boucle d'un objet de fenêtre : arrêtés quand la fenêtre l'emporte.
+function loop(
+  scene: Phaser.Scene, target: Phaser.GameObjects.GameObject, config: Omit<Phaser.Types.Tweens.TweenBuilderConfig, 'targets'>,
+) {
+  scene.tweens.add({ ...config, targets: target });
+  target.once(Phaser.GameObjects.Events.DESTROY, () => scene.tweens.killTweensOf(target));
 }
 
 // Scintillement continu autour des cartes Légendaire et Ultra rare, tant que la fenêtre
@@ -109,24 +149,55 @@ export function sparkleBest(
   }
 }
 
-// Carte du ×1 : elle surgit avec l'éclat de sa rareté.
+// Carte du ×1 : elle surgit avec l'éclat de sa rareté. Issue d'un tirage (`night`), elle se
+// pose sur la nuit de la révélation (révision 3, B2) : dès Rare, des rayons de sa couleur
+// tournent derrière elle, et son illustration flotte. Les particules passent sous la carte,
+// seul le scintillement du bord reste dessus (B4). Mouvement réduit : rendu fixe.
 export function celebrateSingle(
   scene: Phaser.Scene, modal: Phaser.GameObjects.Container, card: Phaser.GameObjects.Container, r: Rect, rarity: Rarity,
+  opts: { readonly night: boolean; readonly reduced: boolean },
 ) {
   const k = rankOf(rarity);
   const cx = r.x + r.w / 2;
   const cy = r.y + r.h / 2;
+  const under = scene.add.container(0, 0);
   const pivot = scene.add.container(cx, cy);
   modal.remove(card);
   card.setPosition(-cx, -cy);
-  pivot.add(card).setScale(0.7);
-  modal.add(pivot);
-  const particles = new Particles(scene, modal, 3);
+  pivot.add(card);
+  modal.add([under, pivot]);
+  if (opts.night && k >= 2) {
+    const rays = scene.add.graphics().setPosition(cx, cy).setBlendMode(Phaser.BlendModes.ADD);
+    const n = RESULTS.singleRays;
+    const len = RESULTS.singleRayLength;
+    rays.fillStyle(COLORS.rarity[rarity], CARD_FX.singleRayAlpha);
+    for (let j = 0; j < n; j++) {
+      const a = (j / n) * 2 * Math.PI;
+      const w = Math.PI / n / 2;
+      rays.fillTriangle(0, 0, len * Math.cos(a - w), len * Math.sin(a - w), len * Math.cos(a + w), len * Math.sin(a + w));
+    }
+    under.add(rays);
+    if (!opts.reduced) loop(scene, rays, { angle: 360, duration: 360_000 / CARD_MOTION.rayTurn, repeat: -1 });
+  }
+  const art = card.getByName('art') as Phaser.GameObjects.Image | null;
+  if (art && opts.night && !opts.reduced) {
+    loop(scene, art, {
+      y: { from: art.y - RESULTS.float, to: art.y + RESULTS.float }, duration: CARD_MOTION.float / 2,
+      yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+    });
+  }
+  const particles = new Particles(scene, under, 3);
+  if (opts.reduced) {
+    sparkleBest(new Particles(scene, modal, 4), [{ r, rarity }]);
+    return pivot;
+  }
+  pivot.setScale(0.7);
   const seq = new Sequence(scene);
   seq.tween({ targets: pivot, scale: 1, duration: 260 + 40 * k, ease: 'Back.easeOut' });
   cardBurst(particles, r, rarity, 1.5);
-  if (k >= 2) cardWave(scene, seq, modal, r, COLORS.rarity[rarity]);
-  sparkleBest(particles, [{ r, rarity }]);
+  if (k >= 2) cardWave(scene, seq, under, r, COLORS.rarity[rarity]);
+  sparkleBest(new Particles(scene, modal, 4), [{ r, rarity }]);
+  glossBest(scene, modal, [{ r, rarity }], opts.reduced);
   return pivot;
 }
 
@@ -693,28 +764,40 @@ export function playReveal(
   return seq;
 }
 
-// Carte du ×10 montée sur un pivot centré, pour se retourner autour de son milieu.
+// Carte du ×10. `pivot` porte la place, l'échelle et l'inclinaison (distribution, voyage de la
+// vedette, battement) ; `body`, centré dedans, porte le retournement en relief (écrasement,
+// soulèvement), pour que les deux mouvements ne s'écrasent pas l'un l'autre (leçon 004).
 interface FlipCard {
   readonly r: Rect;
   readonly rarity: Rarity;
+  readonly home: { readonly x: number; readonly y: number };
   readonly pivot: Phaser.GameObjects.Container;
+  readonly body: Phaser.GameObjects.Container;
   readonly face: Phaser.GameObjects.Container;
   readonly back: readonly (Phaser.GameObjects.Graphics | Phaser.GameObjects.Text | Phaser.GameObjects.Image)[];
   // Lueur de la rareté autour du dos, pendant l'anticipation.
   readonly glow: Phaser.GameObjects.Graphics;
+  // Ombre d'encre qui s'écarte quand la carte se soulève (relief, B4).
+  readonly shadow: Phaser.GameObjects.Graphics;
+  // Éclair neutre sur la face qui apparaît.
+  readonly flash: Phaser.GameObjects.Rectangle;
 }
 
 function makeFlipCard(
   scene: Phaser.Scene, modal: Phaser.GameObjects.Container, r: Rect, face: Phaser.GameObjects.Container, rarity: Rarity,
 ): FlipCard {
-  const cx = r.x + r.w / 2;
-  const cy = r.y + r.h / 2;
-  const pivot = scene.add.container(cx, cy);
-  face.setPosition(-cx, -cy).setVisible(false);
+  const home = { x: r.x + r.w / 2, y: r.y + r.h / 2 };
+  const pivot = scene.add.container(home.x, home.y);
+  const body = scene.add.container(0, 0);
+  face.setPosition(-home.x, -home.y).setVisible(false);
   const glow = scene.add.graphics().setAlpha(0);
   const pad = REVEAL_FX.glowStroke / 2;
   glow.lineStyle(REVEAL_FX.glowStroke, COLORS.rarity[rarity], 1)
     .strokeRoundedRect(-r.w / 2 - pad, -r.h / 2 - pad, r.w + 2 * pad, r.h + 2 * pad, RADIUS + pad);
+  const off = RESULTS.shadow[0];
+  const shadow = scene.add.graphics().setPosition(off, off);
+  shadow.fillStyle(CARD_FX.shadow, CARD_FX.shadowAlpha).fillRoundedRect(-r.w / 2, -r.h / 2, r.w, r.h, RADIUS);
+  const flash = scene.add.rectangle(0, 0, r.w, r.h, CARD_FX.flash, 1).setAlpha(0).setBlendMode(Phaser.BlendModes.ADD);
   // Dos illustré (007) ; en repli, l'aplat et le « ? » d'avant.
   const art = uiImage(scene, 'card-back', 0, 0, r.w, r.h);
   let back: FlipCard['back'];
@@ -725,34 +808,86 @@ function makeFlipCard(
     g.lineStyle(STROKE.base, COLORS.ink, 1).strokeRoundedRect(-r.w / 2, -r.h / 2, r.w, r.h, RADIUS);
     back = [g, scene.add.text(0, 0, '?', textStyle(FONT_SIZE.title)).setOrigin(0.5)];
   }
-  pivot.add([glow, face, ...back]);
+  body.add([shadow, glow, face, ...back, flash]);
+  pivot.add(body);
   modal.add(pivot);
-  return { r, rarity, pivot, face, back, glow };
+  return { r, rarity, home, pivot, body, face, back, glow, shadow, flash };
 }
 
-// Retournement du ×10, une carte à la fois, au calendrier de la logique
-// (flipSchedule) : une carte rare tremble et s'allume avant de tourner, la vedette bat
-// comme un cœur pendant que les autres s'assombrissent. `finish` retourne tout d'un
-// coup (appui du joueur) ; onDone est appelé une seule fois, à la fin ou à l'appui.
+// Retournement du ×10, au calendrier de la logique (flipSchedule). Révision 3 (FR-022 à
+// FR-024) : les dos sont distribués depuis l'orbe, sur la nuit ; chaque carte se soulève en se
+// retournant (relief, ombre, éclair) ; une carte rare tremble et s'allume avant de tourner ;
+// avant la vedette, un voile d'encre assombrit les autres et elle gagne le centre, au premier
+// plan, bat, se retourne et éclate là, puis regagne sa case une fois tout fini. La face apparaît
+// toujours à mi-retournement (at + anticipation + turn / 2) : le son des cartes s'y cale.
+// `finish` retourne tout d'un coup (appui du joueur) ; onDone est appelé une seule fois.
+// Mouvement réduit : cartes posées d'emblée, vedette à sa place, aucun reflet.
 export function playFlip(
   scene: Phaser.Scene,
   modal: Phaser.GameObjects.Container,
   faces: readonly Phaser.GameObjects.Container[],
   results: readonly PullResult[],
   schedule: FlipSchedule,
+  reduced: boolean,
   onCue: (cue: Cue) => void,
   onDone: (tapped: boolean) => void,
 ): { seq: Sequence; finish: (tapped: boolean) => void } {
+  lightTextures(scene);
+  const m = CARD_MOTION;
   const cards = faces.map((face, i) => makeFlipCard(scene, modal, resultCardRect(i), face, results[i]!.item.rarity));
   const particles = new Particles(scene, modal, 2);
   const seq = new Sequence(scene);
   const starStep = schedule.steps[schedule.steps.length - 1]!;
   const star = cards[starStep.index]!;
+  const sc = RESULTS.starCenter;
+  // Rectangle de la vedette au centre, agrandie : son éclat et son onde partent de là.
+  const starRect: Rect = {
+    x: sc.x - (star.r.w * RESULTS.starScale) / 2, y: sc.y - (star.r.h * RESULTS.starScale) / 2,
+    w: star.r.w * RESULTS.starScale, h: star.r.h * RESULTS.starScale,
+  };
+  let starAway = false;
+
+  // Distribution depuis l'orbe (FR-022) : chaque dos part du centre de la révélation, petit et
+  // incliné, et vole jusqu'à sa case ; une lueur neutre marque l'orbe le temps de la donne.
+  if (!reduced) {
+    const { x, y } = REVEAL.center;
+    const size = GACHA.orb.r * 3;
+    const dealGlow = light(scene, 'glow', x, y, size, size, ART_FX.crackLight, 0);
+    modal.addAt(dealGlow, modal.getIndex(cards[0]!.pivot));
+    const dealEnd = schedule.deal[schedule.deal.length - 1]! + FLIP_TIMING.deal.flight;
+    seq.tween({
+      targets: dealGlow, alpha: CARD_FX.dealGlowAlpha, duration: m.dealGlow, ease: 'Quad.easeOut',
+      onComplete: () => seq.tween({
+        targets: dealGlow, alpha: 0, delay: Math.max(0, dealEnd - 2 * m.dealGlow), duration: m.dealGlow,
+        onComplete: () => dealGlow.destroy(),
+      }),
+    });
+    cards.forEach((c, i) => {
+      c.pivot.setPosition(x, y).setScale(RESULTS.dealScale).setAngle(i % 2 === 0 ? -RESULTS.dealTilt : RESULTS.dealTilt)
+        .setVisible(false);
+      seq.at(schedule.deal[i]!, () => {
+        c.pivot.setVisible(true);
+        particles.burst({
+          x, y, count: 4, colors: [ART_FX.crackLight, ...REVEAL_FX.charge], shapes: ['spark'],
+          speed: [80, 200], size: [1.5, 3], life: [200, 350], drag: 2,
+        });
+        seq.tween({
+          targets: c.pivot, x: c.home.x, y: c.home.y, scale: 1, angle: 0,
+          duration: FLIP_TIMING.deal.flight, ease: 'Cubic.easeOut',
+        });
+      });
+    });
+  }
 
   const show = (c: FlipCard) => {
     c.back.forEach(o => o.setVisible(false));
     c.glow.setAlpha(0);
     c.face.setVisible(true);
+  };
+  // « Garanti ! » se pose en tampon quand sa carte se retourne (B5).
+  const stamp = (c: FlipCard) => {
+    const sticker = c.face.getByName('sticker') as Phaser.GameObjects.Container | null;
+    if (sticker && !reduced) seq.tween({ targets: sticker, scale: { from: 1.6, to: 1 }, duration: m.stamp, ease: 'Back.easeOut' });
   };
   // Liseré de la couleur de la vedette, posé sous la carte (FR-008).
   let highlighted = false;
@@ -764,7 +899,7 @@ export function playFlip(
     const pad = REVEAL_FX.starStroke / 2;
     g.lineStyle(REVEAL_FX.starStroke, COLORS.rarity[star.rarity], 1)
       .strokeRoundedRect(-r.w / 2 - pad, -r.h / 2 - pad, r.w + 2 * pad, r.h + 2 * pad, RADIUS + pad);
-    star.pivot.addAt(g, 0);
+    star.body.addAt(g, 1);
   };
 
   // Anticipation : le dos tremble et la lueur de la rareté pulse ; l'énergie converge.
@@ -772,49 +907,74 @@ export function playFlip(
     const k = rankOf(c.rarity);
     seq.tween({ targets: c.glow, alpha: { from: 0.3, to: 1 }, duration: 120, yoyo: true, repeat: -1 });
     seq.tween({ targets: c.pivot, angle: { from: -1.5 * k, to: 1.5 * k }, duration: 50, yoyo: true, repeat: -1 });
-    const { x, y } = { x: c.r.x + c.r.w / 2, y: c.r.y + c.r.h / 2 };
     particles.stream(() => particles.converge({
-      x, y, colors: colorsOf(c.rarity), shapes: ['spark', 'dot'], radius: [60, 110], size: [2, 3], life: [200, 300],
+      x: c.home.x, y: c.home.y, colors: colorsOf(c.rarity), shapes: ['spark', 'dot'], radius: [60, 110], size: [2, 3],
+      life: [200, 300],
     }, 1), 15 + 10 * k, 30 + 15 * k, Math.max(0, ms - 200));
   };
 
-  // Vedette : les cartes déjà vues s'assombrissent, puis son dos bat comme un cœur.
+  // Voile d'encre entre la vedette et les autres (FR-023) : posé à la pause d'avant la vedette.
+  const dim = scene.add.rectangle(0, 0, WIDTH, HEIGHT, CARD_FX.dim, 1).setOrigin(0).setAlpha(0);
+  modal.add(dim);
+  seq.at(starStep.at - FLIP_TIMING.starPause, () => {
+    modal.bringToTop(dim);
+    modal.bringToTop(star.pivot);
+    modal.bringToTop(particles.graphics);
+    seq.tween({ targets: dim, alpha: CARD_FX.dimAlpha, duration: m.dim, ease: 'Quad.easeOut' });
+    if (reduced) return;
+    // La vedette quitte sa case pour le centre, agrandie, au premier plan.
+    starAway = true;
+    seq.tween({
+      targets: star.pivot, x: sc.x, y: sc.y, scale: RESULTS.starScale, angle: 0, duration: m.toCenter, ease: 'Cubic.easeOut',
+    });
+  });
+
+  // Vedette : son dos bat comme un cœur, l'énergie converge vers elle.
   const heartbeat = (c: FlipCard, ms: number) => {
     const k = rankOf(c.rarity);
-    cards.filter(o => o !== c).forEach(o =>
-      seq.tween({ targets: o.pivot, alpha: REVEAL_FX.dimAlpha, duration: 250, ease: 'Quad.easeOut' }));
-    modal.bringToTop(c.pivot);
-    modal.bringToTop(particles.graphics);
+    const base = starAway ? RESULTS.starScale : 1;
+    const at = starAway ? sc : c.home;
     seq.tween({ targets: c.glow, alpha: 1, duration: ms * 0.3 });
     const beats = k >= 3 ? 3 : 2;
     const beat = ms / beats;
     for (let b = 0; b < beats; b++) {
       seq.at(b * beat, () => seq.tween({
-        targets: c.pivot, scale: 1.08 + 0.02 * k, duration: beat * 0.3, yoyo: true, ease: 'Quad.easeOut',
+        targets: c.pivot, scale: base * (1.08 + 0.02 * k), duration: beat * 0.3, yoyo: true, ease: 'Quad.easeOut',
       }));
     }
-    const { x, y } = { x: c.r.x + c.r.w / 2, y: c.r.y + c.r.h / 2 };
     particles.stream(() => particles.converge({
-      x, y, colors: colorsOf(c.rarity), shapes: ['spark', 'dot'], radius: [80, 150], size: [2, 4], life: [250, 380],
+      x: at.x, y: at.y, colors: colorsOf(c.rarity), shapes: ['spark', 'dot'], radius: [80 * base, 150 * base], size: [2, 4],
+      life: [250, 380],
     }, 1), 20 + 10 * k, 60 + 20 * k, Math.max(0, ms - 300));
   };
 
+  // Retournement en relief (B4) : la carte s'écrase en se soulevant (étirée, montée, ombre qui
+  // s'écarte), la face apparaît à mi-course dans un éclair, puis elle retombe avec un rebond.
   const turn = (c: FlipCard, ms: number, isStar: boolean) => {
-    scene.tweens.killTweensOf([c.pivot, c.glow]);
-    c.pivot.setAngle(0).setScale(1);
+    scene.tweens.killTweensOf([c.pivot, c.glow, c.body, c.shadow]);
+    const base = isStar && starAway ? RESULTS.starScale : 1;
+    c.pivot.setAngle(0).setScale(base);
     const k = rankOf(c.rarity);
+    const [near, far] = RESULTS.shadow;
+    const r = isStar && starAway ? starRect : c.r;
+    seq.tween({ targets: c.shadow, x: far, y: far, duration: ms / 2, ease: 'Sine.easeIn' });
     seq.tween({
-      targets: c.pivot, scaleX: 0, duration: ms / 2, ease: 'Quad.easeIn',
+      targets: c.body, scaleX: 0, scaleY: RESULTS.liftScale, y: -RESULTS.lift, duration: ms / 2, ease: 'Sine.easeIn',
       onComplete: () => {
         show(c);
+        stamp(c);
         if (isStar) highlight();
-        cardBurst(particles, c.r, c.rarity, isStar ? 1.6 : 1);
-        if (k >= 2 || isStar) cardWave(scene, seq, modal, c.r, COLORS.rarity[c.rarity]);
+        c.flash.setAlpha(CARD_FX.flashAlpha);
+        seq.tween({ targets: c.flash, alpha: 0, duration: m.flash, ease: 'Quad.easeOut' });
+        cardBurst(particles, r, c.rarity, isStar ? 1.6 : 1);
+        if (k >= 2 || isStar) cardWave(scene, seq, modal, r, COLORS.rarity[c.rarity]);
         if (isStar && k >= 3) rain(particles, c.rarity, 1200, k === 4 ? 35 : 20);
         const bounce = REVEAL.cardBounce[k]! + (isStar ? 0.06 : 0);
-        seq.tween({ targets: c.pivot, scaleX: bounce, scaleY: bounce, duration: ms / 2, ease: 'Quad.easeOut', onComplete: () => {
-          seq.tween({ targets: c.pivot, scale: 1, duration: 120, ease: 'Quad.easeIn' });
-        } });
+        seq.tween({ targets: c.shadow, x: near, y: near, duration: ms / 2, ease: 'Back.easeOut' });
+        seq.tween({
+          targets: c.body, scaleX: bounce, scaleY: bounce, y: 0, duration: ms / 2, ease: 'Back.easeOut', easeParams: [1.4],
+          onComplete: () => seq.tween({ targets: c.body, scaleX: 1, scaleY: 1, duration: 120, ease: 'Quad.easeIn' }),
+        });
       },
     });
   };
@@ -825,16 +985,30 @@ export function playFlip(
     done = true;
     seq.stop();
     particles.stopStreams();
-    scene.tweens.killTweensOf(cards.flatMap(c => [c.pivot, c.glow]));
+    scene.tweens.killTweensOf(cards.flatMap(c => [c.pivot, c.glow, c.body, c.shadow, c.flash]));
+    scene.tweens.killTweensOf(dim);
+    const [near] = RESULTS.shadow;
     cards.forEach(c => {
       show(c);
-      c.pivot.setScale(1).setAngle(0);
-      // Fin naturelle : les cartes assombries reviennent en douceur ; à l'appui, d'un coup.
-      if (tapped) c.pivot.setAlpha(1);
-      else if (c.pivot.alpha < 1) scene.tweens.add({ targets: c.pivot, alpha: 1, duration: 200 });
+      c.body.setScale(1).setY(0);
+      c.shadow.setPosition(near, near);
+      c.flash.setAlpha(0);
+      c.pivot.setVisible(true).setAngle(0);
+      const sticker = c.face.getByName('sticker') as Phaser.GameObjects.Container | null;
+      sticker?.setScale(1);
+      // Fin naturelle : la vedette regagne sa case et le voile se retire en douceur ; à l'appui,
+      // tout se pose d'un coup.
+      if (c === star && starAway && !tapped) {
+        scene.tweens.add({ targets: c.pivot, x: c.home.x, y: c.home.y, scale: 1, duration: m.back, ease: 'Back.easeOut' });
+      } else {
+        c.pivot.setPosition(c.home.x, c.home.y).setScale(1);
+      }
     });
+    if (tapped || dim.alpha === 0) dim.destroy();
+    else scene.tweens.add({ targets: dim, alpha: 0, duration: m.undim, onComplete: () => dim.destroy() });
     highlight();
     sparkleBest(particles, cards);
+    glossBest(scene, modal, cards, reduced);
     onDone(tapped);
   };
 

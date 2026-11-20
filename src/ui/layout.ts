@@ -70,10 +70,26 @@ export const RESULTS = {
   // Carte du ×1 (007) : fenêtre d'illustration en haut, textes dessous.
   single: { x: (WIDTH - 260) / 2, y: 112, w: 260, h: 420 },
   singleArt: { pad: 12, h: 272 },
-  ok: { x: MARGIN * 2, y: 568, w: CONTENT_W - 2 * MARGIN, h: 44 },
+  // 8 px au moins sous la dernière rangée (révision 3, B5).
+  ok: { x: MARGIN * 2, y: 572, w: CONTENT_W - 2 * MARGIN, h: 44 },
   // « Garanti ! » des petites cartes : à cheval sur le coin haut gauche, au-dessus du buste,
   // incliné (degrés) pour que son bout droit remonte : posé à droite, il coupait le nom.
   sticker: { dx: -2, dy: -7, tilt: -8 },
+  // Révision 3 (lot B) : amplitudes de la mise en scène des cartes. Distribution depuis
+  // l'orbe (échelle et inclinaison de départ, degrés) ; relief du retournement (étirement,
+  // soulèvement, ombre qui s'écarte) ; vedette au centre ; OK qui monte ; reflet ; ×1.
+  dealScale: 0.4,
+  dealTilt: 8,
+  liftScale: 1.06,
+  lift: 6,
+  shadow: [4, 9],
+  starCenter: { x: WIDTH / 2, y: 318 },
+  starScale: 1.7,
+  okRise: 12,
+  gloss: { width: 18, slant: 24 },
+  singleRays: 12,
+  singleRayLength: 260,
+  float: 2,
 } as const;
 
 // Révélation (004) : l'orbe quitte sa place pour le centre de l'écran, où éclatent
