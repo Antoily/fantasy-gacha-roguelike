@@ -69,9 +69,14 @@ test.describe('mise en scène', () => {
       await tap(page, GACHA.collection);
       await waitModal(page, 'collection');
       await settled(page);
+      // Trois instants, pas deux : le coût pulse en aller-retour de 1,2 s, et deux images
+      // symétriques autour d'un extrême peuvent être identiques au pixel près (vu sur la CI).
       const a = await shot(page, cost);
-      await page.waitForTimeout(700);
-      const costMoves = !(await shot(page, cost)).equals(a);
+      let costMoves = false;
+      for (let i = 0; i < 3 && !costMoves; i++) {
+        await page.waitForTimeout(250);
+        costMoves = !(await shot(page, cost)).equals(a);
+      }
       await tap(page, cellOf('lulu-tempete'));
       await waitModal(page, 'fiche');
       await settled(page);
