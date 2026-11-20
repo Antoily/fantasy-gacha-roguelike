@@ -111,6 +111,8 @@ export const REVEAL_FX = {
   hintAlpha: [0.5, 1],
 } as const;
 
+const night = 0x1b1430;
+
 // Cartes de résultat (révision 3 du 2026-11-13, lot B : FR-022 à FR-024). Opacités ; les
 // couleurs sont celles des raretés, de l'encre et de la lumière neutre.
 export const CARD_FX = {
@@ -120,9 +122,9 @@ export const CARD_FX = {
   // Éclair neutre sur la face qui apparaît.
   flash: crackLight,
   flashAlpha: 0.8,
-  // Voile d'encre entre la vedette et les autres cartes (FR-023 : elles s'assombrissent
-  // vraiment ; l'alpha d'avant les délavait).
-  dim: palette.ink,
+  // Voile de nuit entre la vedette et les autres cartes (FR-023 : elles s'assombrissent
+  // vraiment ; l'alpha d'avant les délavait, l'encre brunissait le ciel violet).
+  dim: night,
   dimAlpha: 0.6,
   // Cadre de rareté (FR-024) : liseré intérieur et bandeau supérieur teinté, dès Peu commun.
   frame: 3,
@@ -136,7 +138,6 @@ export const CARD_FX = {
 } as const;
 
 // Illustrations (007) et révision 2 de la révélation (FR-016, FR-017).
-const night = 0x1b1430;
 export const ART_FX = {
   // Silhouette d'un élément manquant (FR-004) : encre adoucie, sur le disque grisé.
   silhouetteCss: toCss(palette.inkSoft),

@@ -173,7 +173,7 @@ export function celebrateSingle(
     rays.fillStyle(COLORS.rarity[rarity], CARD_FX.singleRayAlpha);
     for (let j = 0; j < n; j++) {
       const a = (j / n) * 2 * Math.PI;
-      const w = Math.PI / n / 2;
+      const w = Math.PI / n / 3;
       rays.fillTriangle(0, 0, len * Math.cos(a - w), len * Math.sin(a - w), len * Math.cos(a + w), len * Math.sin(a + w));
     }
     under.add(rays);
@@ -817,7 +817,7 @@ function makeFlipCard(
 // Retournement du ×10, au calendrier de la logique (flipSchedule). Révision 3 (FR-022 à
 // FR-024) : les dos sont distribués depuis l'orbe, sur la nuit ; chaque carte se soulève en se
 // retournant (relief, ombre, éclair) ; une carte rare tremble et s'allume avant de tourner ;
-// avant la vedette, un voile d'encre assombrit les autres et elle gagne le centre, au premier
+// avant la vedette, un voile de nuit assombrit les autres et elle gagne le centre, au premier
 // plan, bat, se retourne et éclate là, puis regagne sa case une fois tout fini. La face apparaît
 // toujours à mi-retournement (at + anticipation + turn / 2) : le son des cartes s'y cale.
 // `finish` retourne tout d'un coup (appui du joueur) ; onDone est appelé une seule fois.
@@ -913,7 +913,7 @@ export function playFlip(
     }, 1), 15 + 10 * k, 30 + 15 * k, Math.max(0, ms - 200));
   };
 
-  // Voile d'encre entre la vedette et les autres (FR-023) : posé à la pause d'avant la vedette.
+  // Voile de nuit entre la vedette et les autres (FR-023) : posé à la pause d'avant la vedette.
   const dim = scene.add.rectangle(0, 0, WIDTH, HEIGHT, CARD_FX.dim, 1).setOrigin(0).setAlpha(0);
   modal.add(dim);
   seq.at(starStep.at - FLIP_TIMING.starPause, () => {
