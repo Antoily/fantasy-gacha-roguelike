@@ -32,8 +32,9 @@ async function pullOne(page: Page, rarity: Rarity, reveal: readonly number[]) {
 }
 
 test('palier direct : suspense puis le son du palier (FR-001)', async ({ page }) => {
+  // Révision du 2026-11-13 (FR-021) : la présentation plein écran a sa fanfare.
   await pullOne(page, 'ultra', [DIRECT]);
-  expect(await sounds(page)).toBe('suspense crack crack crack tier:ultra');
+  expect(await sounds(page)).toBe('suspense crack crack crack tier:ultra splash');
   await tap(page, RESULTS.ok);
   await pullOne(page, 'common', [DIRECT]);
   expect(await sounds(page)).toBe('suspense crack crack crack tier:common');
@@ -41,7 +42,7 @@ test('palier direct : suspense puis le son du palier (FR-001)', async ({ page })
 
 test('montée : son de montée entre les deux paliers (FR-002)', async ({ page }) => {
   await pullOne(page, 'legendary', [0.1]);
-  expect(await sounds(page)).toBe('suspense crack crack crack tier:rare rise tier:legendary');
+  expect(await sounds(page)).toBe('suspense crack crack crack tier:rare rise tier:legendary splash');
 });
 
 test('leurre : le rire diabolique à la retombée (FR-003)', async ({ page }) => {
@@ -58,9 +59,10 @@ test('×10 : un bruit par carte, la vedette en dernier (FR-004)', async ({ page 
   for (let i = 0; i < 10; i++) values.push(rarityRoll(i === 3 ? 'legendary' : 'common'), 0);
   await scriptRng(page, [...values, DIRECT]);
   await tap(page, GACHA.pullTen);
-  await waitModal(page, 'results');
+  // Révélation, dix retournements et une présentation : long sur une machine chargée.
+  await waitModal(page, 'results', 30_000);
   await page.waitForTimeout(100);
-  expect(await sounds(page)).toBe(['suspense', 'crack', 'crack', 'crack', 'tier:legendary', ...Array<string>(9).fill('card'), 'star'].join(' '));
+  expect(await sounds(page)).toBe(['suspense', 'crack', 'crack', 'crack', 'tier:legendary', ...Array<string>(9).fill('card'), 'star', 'splash'].join(' '));
 });
 
 test('passer : plus aucun son après l’appui (FR-005, SC-003)', async ({ page }) => {
@@ -69,12 +71,15 @@ test('passer : plus aucun son après l’appui (FR-005, SC-003)', async ({ page 
   await waitModal(page, 'reveal');
   await armedSkip(page);
   await page.mouse.click(180, 320);
+  // La présentation de l'Ultra rare s'ouvre quand même (007), avec sa fanfare (FR-021) : rien
+  // d'autre de la révélation passée ne sonne, ni avant ni après qu'on la ferme.
+  await page.waitForFunction(() => document.body.dataset.modal === 'splash');
+  expect(await sounds(page)).toBe('suspense splash');
   await waitModal(page, 'results');
-  expect(await sounds(page)).toBe('suspense');
-  // La sirène du suspense sonnait encore : elle est coupée net.
+  // La sirène, puis la fanfare fermée, sont coupées net.
   expect(await page.evaluate(() => document.body.dataset.soundsLive)).toBe('0');
   await page.waitForTimeout(T.suspense + T.final.ultra);
-  expect(await sounds(page)).toBe('suspense');
+  expect(await sounds(page)).toBe('suspense splash');
 });
 
 // Révision du 2026-11-13 (FR-016, SC-008) : le rire est joué dans le bus du lecteur et compte
@@ -92,6 +97,21 @@ test('passer pendant le rire : le rire se tait aussi (FR-016, SC-008)', async ({
   const heard = await sounds(page);
   await page.waitForTimeout(T.final.rare);
   expect(await sounds(page)).toBe(heard);
+});
+
+// FR-021 : la fanfare s'éteint quand le joueur ferme la présentation (elle dure 1,6 s, l'appui
+// est armé à 450 ms : elle sonne encore).
+test('fermer la présentation éteint sa fanfare (FR-021)', async ({ page }) => {
+  await scriptRng(page, [rarityRoll('legendary'), 0, DIRECT]);
+  await tap(page, GACHA.pullSingle);
+  await waitModal(page, 'reveal');
+  await page.waitForFunction(() => document.body.dataset.modal === 'splash');
+  expect(await sounds(page)).toBe('suspense crack crack crack tier:legendary splash');
+  expect(Number(await page.evaluate(() => document.body.dataset.soundsLive))).toBeGreaterThan(0);
+  await armedSkip(page);
+  await page.mouse.click(180, 600);
+  await waitModal(page, 'results');
+  expect(await page.evaluate(() => document.body.dataset.soundsLive)).toBe('0');
 });
 
 test('couper le son : silence, mémorisé, survit à « Recommencer » (FR-006, FR-007)', async ({ page }) => {
@@ -142,7 +162,7 @@ test('un son qui plante ne perturbe pas le jeu (FR-008)', async ({ page }) => {
   });
   await load(page);
   await pullOne(page, 'ultra', [DIRECT]);
-  expect(await sounds(page)).toBe('suspense crack crack crack tier:ultra');
+  expect(await sounds(page)).toBe('suspense crack crack crack tier:ultra splash');
   await tap(page, RESULTS.ok);
   expect(errors).toEqual([]);
 });
