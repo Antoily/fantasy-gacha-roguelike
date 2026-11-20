@@ -291,6 +291,12 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
   qu'il n'atteint qu'avec sa relâche : un rendu qui démarre à 0 sous-estime les sons brefs.
   Précéder le rendu de 500 ms de silence. Il retarde aussi la sortie d'environ 6 ms (à compter
   dans les 30 ms de la coupure).
+- **Le limiteur pompe** (lot B) : un impact au transitoire fort fait baisser, pendant la relâche du
+  limiteur (150 ms), l'arpège qui le suit ; le palier perdait jusqu'à 3 LU malgré la couche
+  ajoutée. Tenir les corps graves et transitoires modérés, allonger l'arpège, et mesurer chaque
+  retouche au rendu (le gain des recettes ne dit pas le niveau perçu).
+- Un instant partagé par l'image et le son vit dans `REVEAL_TIMING` (fissures, battements) et se lit
+  par `crackTimes()` / `beatTimes()` : jamais recopié de part et d'autre.
 - **`cancelAndHoldAtTime` sur une enveloppe en cours** a tenu une valeur fausse dans Chromium
   (claquement à la coupure, vu au rendu) : chaque voix a un gain réservé aux coupures, dont on
   suit soi-même la rampe.
