@@ -113,6 +113,9 @@ export class GachaScene extends Phaser.Scene {
     this.tenButton = makeButton(this, GACHA.pullTen,
       `Tirer ×10 — ${formatAmount(GACHA_CONFIG.costTen)}`, COLORS.btn.primary, () => this.onPull(10),
       'Un Rare ou mieux garanti');
+    // Reflet des tirages payables (007, révision du 2026-11-13 : FR-021), montré par setGlow.
+    this.ambience.addGloss('single', GACHA.pullSingle, this.singleButton.visual, 0);
+    this.ambience.addGloss('ten', GACHA.pullTen, this.tenButton.visual, 1);
     // Les bandeaux AVANT les textes qu'ils portent : créés après, ils recouvraient le message de
     // pénurie (ordre d'affichage = ordre de création), le seul qui dit quoi faire.
     this.textPlates = this.add.graphics();
@@ -168,7 +171,7 @@ export class GachaScene extends Phaser.Scene {
   private drawMuteButton() {
     const r = GACHA.mute;
     // Pendant une fenêtre, le voile le recouvre : il ne reçoit pas l'appui.
-    makeButton(this, r, '', COLORS.btn.neutral, () => {
+    const button = makeButton(this, r, '', COLORS.btn.neutral, () => {
       this.sfx.setMuted(!this.sfx.isMuted);
       // Le bruit d'appui confirme le son rétabli ; coupé, rien ne sonne (FR-011).
       this.sfx.play('tap');
@@ -180,6 +183,8 @@ export class GachaScene extends Phaser.Scene {
     const on = uiImage(this, 'icon-sound-on', x, y, 30, 30);
     const off = uiImage(this, 'icon-sound-off', x, y, 30, 30);
     this.muteImages = on && off ? { on, off } : null;
+    // L'icône s'écrase avec le bouton (FR-021).
+    for (const icon of [this.muteIcon, on, off]) if (icon) button.attach(icon);
     this.drawMuteIcon();
   }
 
@@ -216,12 +221,17 @@ export class GachaScene extends Phaser.Scene {
     this.bannerDetail = this.add.text(0, y + 10, '', textStyle(FONT_SIZE.micro, CSS.textDim)).setOrigin(0.5);
     const V = Phaser.Math.Vector2;
     for (const [r, step] of [[GACHA.bannerPrev, -1], [GACHA.bannerNext, 1]] as const) {
-      makeButton(this, r, '', COLORS.btn.neutral, () => this.onCycleBanner(step), undefined, 'swish');
+      const button = makeButton(this, r, '', COLORS.btn.neutral, () => this.onCycleBanner(step), undefined, 'swish');
       const c = center(r);
-      if (uiImage(this, 'icon-arrow', c.x, c.y, 28, 28)?.setFlipX(step < 0)) continue;
+      // La flèche s'écrase avec son bouton (FR-021).
+      const arrow = uiImage(this, 'icon-arrow', c.x, c.y, 28, 28)?.setFlipX(step < 0);
+      if (arrow) {
+        button.attach(arrow);
+        continue;
+      }
       const tip = step * 6;
-      this.add.graphics().fillStyle(COLORS.ink, 1)
-        .fillPoints([new V(c.x + tip, c.y), new V(c.x - tip, c.y - 8), new V(c.x - tip, c.y + 8)], true);
+      button.attach(this.add.graphics().fillStyle(COLORS.ink, 1)
+        .fillPoints([new V(c.x + tip, c.y), new V(c.x - tip, c.y - 8), new V(c.x - tip, c.y + 8)], true));
     }
   }
 
@@ -246,6 +256,17 @@ export class GachaScene extends Phaser.Scene {
         duration: TRANSITIONS.slide, ease: 'Cubic.Out',
       });
     }
+    const vedette = activeBanner(this.progression).featured;
+    const portrait = this.bannerPortrait;
+    if (!vedette || !portrait) return;
+    // La vedette surgit, cernée d'un anneau de sa rareté qui s'élargit (révision du 2026-11-13).
+    this.tweens.add({ targets: portrait, scale: { from: 0, to: 1 }, duration: TRANSITIONS.portraitPop, ease: 'Back.Out' });
+    const ring = this.add.graphics().setPosition(GACHA.banner.x + BANNER.portraitX, portrait.y);
+    ring.lineStyle(STROKE.thick, COLORS.rarity[vedette.rarity], 1).strokeCircle(0, 0, BANNER.portraitD / 2);
+    this.tweens.add({
+      targets: ring, scale: TRANSITIONS.portraitRing.scale, alpha: 0, duration: TRANSITIONS.portraitRing.duration,
+      ease: 'Quad.Out', onComplete: () => ring.destroy(),
+    });
   }
 
   private persistSettings() {
@@ -275,9 +296,16 @@ export class GachaScene extends Phaser.Scene {
     const textX = area.x + area.w / 2;
     this.bannerName.setX(textX);
     this.bannerDetail.setX(textX);
+    // L'ambiance prend la couleur de la vedette (007, révision du 2026-11-13 : FR-023).
+    this.ambience.setTint(vedette?.rarity ?? null);
     if (vedette) {
       const count = p.owned[vedette.id] ?? 0;
-      this.bannerPortrait = makePortrait(this, b.x + BANNER.portraitX, b.y + b.h / 2, BANNER.portraitD, vedette, true);
+      // Portrait dans un conteneur centré sur lui : il surgit autour de son centre (slideBanner).
+      const px = b.x + BANNER.portraitX;
+      const py = b.y + b.h / 2;
+      this.bannerPortrait = this.add.container(px, py, [
+        makePortrait(this, px, py, BANNER.portraitD, vedette, true).setPosition(-px, -py),
+      ]);
       this.bannerName.setText(vedette.name);
       // « non obtenu » plutôt que « pas encore obtenu » (qui débordait avec Comic Sans MS) :
       // la ligne garde sa taille, même avec une police de repli plus large.

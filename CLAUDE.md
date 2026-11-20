@@ -74,8 +74,9 @@ public/art/   SVG faits main (ADR 0007) : characters/<id>.svg + <id>.json (cadra
   `dataset.featuredLine` (ligne de garantie vedette), `dataset.skip = 'armed'` (l'appui qui passe
   l'animation est armé), `dataset.splash` (présentation affichée), `dataset.art = 'ready'` et
   `dataset.artMissing` (illustrations prêtes, ou en repli), `dataset.font` (`ready` ou
-  `fallback`, police posée avant l'écran), `dataset.motion` (`full` ou `reduced`) et `dataset.glow`
-  (tirages qui portent le halo : `single ten`), `dataset.shownCurrency` / `shownShards` (montants
+  `fallback`, police posée avant l'écran), `dataset.motion` (`full` ou `reduced`), `dataset.glow`
+  (tirages qui portent le halo et le reflet : `single ten`) et `dataset.ambienceTint` (rareté de la vedette
+  qui teinte l'ambiance, ou `neutral`), `dataset.shownCurrency` / `shownShards` (montants
   affichés, qui défilent jusqu'à la partie). `dataset.clockTap` / `clockModal` : horloge du jeu (somme des pas de
   Phaser) au dernier appui et à la dernière ouverture de fenêtre (`msUntilModal` dans l'e2e). L'e2e s'en sert pour vérifier l'enchaînement des écrans : sans lui, deux
   mutations de la 002 survivaient (une confirmation ouverte à tort que la logique
@@ -321,6 +322,17 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
   pas et le jeu tourne au ralenti (une révélation de 2,1 s de jeu en prenait 7,2 réelles). Les
   bornes de durée (SC-002, SC-003 de 004) se mesurent avec `msUntilModal` (horloge du jeu posée
   par la scène) ; elles échouaient en temps réel sur la CI sans faute du jeu.
+
+## Leçons de l'accueil vivant (lot D, 2026-11-19)
+
+- **Bouton** : son dessin vit dans `button.visual`, un conteneur centré sur le bouton qui s'écrase à
+  l'appui ; la zone reste à côté, fixe. Une icône posée sur un bouton passe par `button.attach`,
+  sinon elle reste immobile pendant que le bouton s'écrase sous elle.
+- **Tester un effet d'écran au pixel près** : en mouvement réduit le rendu est fixe, donc deux
+  captures se comparent sans dépendre de l'instant (teinte de la vedette) ; un effet animé se
+  compare au même geste en mouvement réduit (`page.emulateMedia({ reducedMotion })` puis `load`).
+- Une découpe géométrique (`glossBand`, `src/logic/motion.ts`) remplace un masque : les masques de
+  Phaser 4 sont des filtres, un passage de rendu de plus à chaque image.
 
 ## Conventions de code
 

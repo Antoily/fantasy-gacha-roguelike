@@ -1,7 +1,9 @@
 import Phaser from 'phaser';
+import { TRANSITIONS } from '../data/ambienceConfig';
 import type { Item } from '../data/catalogue';
 import { RARITIES, type Rarity } from '../data/gachaConfig';
 import type { PullResult } from '../logic/gacha';
+import { prefersReducedMotion } from './ambience';
 import { artKey, bustKey, hasArt, headKey, orbSize, shadowKey, uiImage } from './art';
 import { R } from './display';
 import { ART, HEIGHT, RESULTS, SHEET, WIDTH, type Rect } from './layout';
@@ -24,7 +26,12 @@ export function makePanel(scene: Phaser.Scene, r: Rect, fill: number = COLORS.pa
 
 export interface Button {
   readonly container: Phaser.GameObjects.Container;
+  // Dessin du bouton, centré sur le bouton : c'est lui qui s'écrase à l'appui (la zone, à côté,
+  // ne bouge pas). Le reflet de l'ambiance et les icônes y sont posés.
+  readonly visual: Phaser.GameObjects.Container;
   setEnabled(enabled: boolean): void;
+  // Pose une icône ou un dessin (en coordonnées de l'écran) sur le bouton : il s'écrase avec lui.
+  attach(obj: Phaser.GameObjects.GameObject & Phaser.GameObjects.Components.Transform): void;
 }
 
 // Bouton cerné de noir avec ombre portée pleine. Le sous-titre éventuel tient DANS la
@@ -49,14 +56,19 @@ export function makeButton(
   sound: PressSound | null = 'tap',
 ): Button {
   const container = scene.add.container(0, 0);
-  const g = scene.add.graphics();
-  const title = scene.add.text(r.x + r.w / 2, r.y + r.h / 2 - (subtitle ? 10 : 0), label, textStyle(FONT_SIZE.button))
-    .setOrigin(0.5);
+  // Le dessin vit dans un conteneur centré sur le bouton, pour s'écraser autour de son centre ;
+  // ses enfants y sont décalés de (-cx, -cy) et gardent ainsi leurs coordonnées d'écran.
+  const cx = r.x + r.w / 2;
+  const cy = r.y + r.h / 2;
+  const g = scene.add.graphics().setPosition(-cx, -cy);
+  const titleDy = subtitle ? -10 : 0;
+  const title = scene.add.text(0, titleDy, label, textStyle(FONT_SIZE.button)).setOrigin(0.5);
   const sub = subtitle
-    ? scene.add.text(r.x + r.w / 2, r.y + r.h / 2 + 14, subtitle, textStyle(FONT_SIZE.small, CSS.textDim)).setOrigin(0.5)
+    ? scene.add.text(0, 14, subtitle, textStyle(FONT_SIZE.small, CSS.textDim)).setOrigin(0.5)
     : null;
+  const visual = scene.add.container(cx, cy, [g, title, ...(sub ? [sub] : [])]);
   const zone = scene.add.zone(r.x, r.y, r.w, r.h).setOrigin(0).setInteractive({ useHandCursor: true });
-  container.add([g, title, ...(sub ? [sub] : []), zone]);
+  container.add([visual, zone]);
 
   let enabled = true;
   const draw = (pressed: boolean) => {
@@ -67,18 +79,37 @@ export function makeButton(
     }
     g.fillStyle(enabled ? fill : COLORS.btn.disabled, 1).fillRoundedRect(r.x + dy, r.y + dy, r.w, r.h, RADIUS);
     g.lineStyle(STROKE.base, COLORS.ink, 1).strokeRoundedRect(r.x + dy, r.y + dy, r.w, r.h, RADIUS);
-    title.setY(r.y + r.h / 2 - (subtitle ? 10 : 0) + dy).setColor(enabled ? CSS.text : CSS.textFaint);
+    title.setPosition(dy, titleDy + dy).setColor(enabled ? CSS.text : CSS.textFaint);
     // Grisé avec le titre : un sous-titre resté foncé faisait croire le bouton actif.
-    sub?.setY(r.y + r.h / 2 + 14 + dy).setColor(enabled ? CSS.textDim : CSS.textFaint);
+    sub?.setPosition(dy, 14 + dy).setColor(enabled ? CSS.textDim : CSS.textFaint);
   };
   draw(false);
 
+  // Écrasement à l'appui (007, révision du 2026-11-13 : FR-021) : le dessin seul change
+  // d'échelle, la zone reste à sa place de layout.ts. Mouvement réduit : l'ombre seule (FR-019).
+  const animate = !prefersReducedMotion();
+  const p = TRANSITIONS.press;
+  const squash = (to: number, duration: number, ease: string, then?: () => void) => {
+    scene.tweens.killTweensOf(visual);
+    scene.tweens.add({ targets: visual, scale: to, duration, ease, ...(then ? { onComplete: then } : {}) });
+  };
+  // Le bouton d'une fenêtre disparaît avec elle, parfois au milieu de son rebond.
+  visual.once(Phaser.GameObjects.Events.DESTROY, () => scene.tweens.killTweensOf(visual));
+
   // Un bouton désactivé sort de la détection des clics (disableInteractive) : ces
   // gestionnaires ne s'exécutent alors jamais.
-  zone.on('pointerdown', () => draw(true));
-  zone.on('pointerout', () => draw(false));
+  zone.on('pointerdown', () => {
+    draw(true);
+    if (animate) squash(p.down, p.downMs, 'Quad.Out');
+  });
+  zone.on('pointerout', () => {
+    draw(false);
+    if (animate) squash(1, p.downMs, 'Quad.Out');
+  });
   zone.on('pointerup', () => {
     draw(false);
+    // Rebond : un dépassement rapide, puis le retour qui se pose.
+    if (animate) squash(p.up, p.upMs * 0.35, 'Quad.Out', () => squash(1, p.upMs * 0.65, 'Back.Out'));
     // Avant l'action : « Tirer » remet ensuite le journal des sons à zéro (dataset.sounds).
     if (sound) pressSound(sound);
     onClick();
@@ -86,11 +117,16 @@ export function makeButton(
 
   return {
     container,
+    visual,
     setEnabled(value: boolean) {
       enabled = value;
       if (value) zone.setInteractive({ useHandCursor: true });
       else zone.disableInteractive();
       draw(false);
+    },
+    attach(obj) {
+      obj.setPosition(obj.x - cx, obj.y - cy);
+      visual.add(obj);
     },
   };
 }

@@ -96,6 +96,6 @@ Vocabulaire : la « présentation » de la spec est la fenêtre `splash` du code
 
 - [x] T027 Spec : User Story 6, FR-020 à FR-026, SC-009 ; recherche `research-immersion.md`
 - [ ] T028 Lot C : présentation en silhouette, éclair, couleur, rayons, nom qui se pose
-- [ ] T029 Lot D : boutons écrasés et reflet, scintillement, teinte de la vedette, message de pénurie lisible
+- [x] T029 Lot D : boutons écrasés et reflet, scintillement, teinte de la vedette, message de pénurie lisible
 - [ ] T030 Lot E : fenêtres qui s'ouvrent, silhouettes reconnaissables, fiche et échange mis en scène, « 40e »
 - [ ] T031 Captures relues (densité 2), e2e et mutations ; `CLAUDE.md`, `docs/ROADMAP.md`

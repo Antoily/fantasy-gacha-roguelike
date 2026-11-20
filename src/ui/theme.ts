@@ -114,11 +114,20 @@ export const ART_FX = {
   textPlateAlpha: 0.82,
 } as const;
 
-// Écran vivant (007, révision du 2026-11-09) : lueurs du ciel, éclat de l'orbe, halo des tirages.
+// Écran vivant (007, révisions du 2026-11-09 et du 2026-11-13) : lueurs du ciel, éclat de
+// l'orbe, halo et reflet des tirages, étoiles en orbite.
 export const AMBIENCE_FX = {
-  motes: [palette.primary, palette.shard, rarity.ultra],
+  // Lueurs de la bannière standard (ambiance neutre) ; une bannière de vedette remplace la
+  // dernière par la couleur de sa rareté : une lueur sur trois (FR-023).
+  motes: [palette.primary, palette.shard, palette.secondary],
+  // Éclat de l'orbe sur la bannière standard ; sinon la couleur de la rareté de la vedette.
   orbGlow: palette.paper,
   halo: palette.primary,
+  // Reflet qui passe sur les tirages payables (FR-021).
+  gloss: palette.panel,
+  glossAlpha: 0.35,
+  // Étoiles en orbite ; la dernière prend la teinte de la vedette.
+  orbit: [palette.primary, palette.shard, palette.primary],
 } as const;
 
 export const STROKE = { thin: 2, base: 3, thick: 4 } as const;

@@ -31,6 +31,10 @@ export interface BurstConfig {
   readonly drag?: number;
   // Apparition en fondu (ms) : sans elle, une particule naît pleine (explosions).
   readonly fadeIn?: number;
+  // Scintillement (007, révision du 2026-11-13) : la taille oscille entre deux facteurs sur
+  // une période (ms), chaque particule à sa phase. Rotation (rad/s) : ±8 par défaut.
+  readonly twinkle?: { readonly period: number; readonly scale: Range };
+  readonly spin?: Range;
 }
 
 // Convergence : les particules naissent sur un anneau et rejoignent le centre en
@@ -60,6 +64,7 @@ interface Particle {
   readonly gravity: number;
   readonly drag: number;
   readonly fadeIn: number;
+  readonly twinkle?: { readonly period: number; readonly scale: Range; readonly phase: number };
   // Convergence : départ et arrivée, la position suit une courbe plutôt que la vitesse.
   readonly home?: { readonly x0: number; readonly y0: number; readonly x1: number; readonly y1: number };
 }
@@ -75,6 +80,13 @@ interface Stream {
 }
 
 const V = Phaser.Math.Vector2;
+
+// Facteur de taille d'une particule qui scintille, 1 sinon.
+function twinkleScale(p: Particle): number {
+  if (!p.twinkle) return 1;
+  const [lo, hi] = p.twinkle.scale;
+  return lo + (hi - lo) * (0.5 + 0.5 * Math.sin((2 * Math.PI * p.age) / p.twinkle.period + p.twinkle.phase));
+}
 
 export class Particles {
   private readonly g: Phaser.GameObjects.Graphics;
@@ -119,10 +131,11 @@ export class Particles {
         color: this.pick(c.colors),
         shape: this.pick(c.shapes),
         rot: this.between(0, Math.PI),
-        spin: this.between(-8, 8),
+        spin: this.between(...(c.spin ?? [-8, 8])),
         gravity: c.gravity ?? 0,
         drag: c.drag ?? 0,
         fadeIn: c.fadeIn ?? 0,
+        ...(c.twinkle ? { twinkle: { ...c.twinkle, phase: this.between(0, 2 * Math.PI) } } : {}),
       });
     }
   }
@@ -221,7 +234,7 @@ export class Particles {
       const t = p.age / p.life;
       // Convergence : apparaît puis reste pleine ; le reste s'efface sur le dernier tiers.
       const alpha = p.home ? Math.min(1, t * 4) : Math.min(1, (1 - t) * 3, p.fadeIn ? p.age / p.fadeIn : 1);
-      const s = p.home ? p.size * (1 - 0.6 * t) : p.size * (1 - 0.4 * t);
+      const s = (p.home ? p.size * (1 - 0.6 * t) : p.size * (1 - 0.4 * t)) * twinkleScale(p);
       switch (p.shape) {
         case 'dot':
           g.fillStyle(p.color, alpha).fillCircle(p.x, p.y, s);
@@ -272,7 +285,8 @@ export class Particles {
             pts.push(new V(p.x + r * Math.cos(a), p.y + r * Math.sin(a)));
           }
           g.fillStyle(p.color, alpha).fillPoints(pts, true);
-          if (s >= 4) g.lineStyle(STROKE.thin / 2, COLORS.ink, alpha).strokePoints(pts, true);
+          // Une étoile qui scintille garde son contour : sinon il clignoterait avec elle.
+          if ((p.twinkle ? p.size : s) >= 4) g.lineStyle(STROKE.thin / 2, COLORS.ink, alpha).strokePoints(pts, true);
           break;
         }
       }
