@@ -3,6 +3,7 @@ import { CATALOGUE } from '../data/catalogue';
 import type { Item } from '../data/catalogue';
 import { GACHA_CONFIG, RARITIES, SHARD_COST, type Rarity } from '../data/gachaConfig';
 import { TRANSITIONS, WINDOW } from '../data/ambienceConfig';
+import { CARD_MOTION } from '../data/revealConfig';
 import { formatAmount } from '../logic/format';
 import { rollAmount } from '../logic/motion';
 import type { PullResult } from '../logic/gacha';
@@ -24,7 +25,7 @@ import {
   bannerTextArea, center, ratesDialogH, collectionCellRect, dialogButtons, dialogRect, resultCardRect, type Rect,
 } from '../ui/layout';
 import { Particles } from '../ui/particles';
-import { celebrateSingle, playFlip, playReveal, sparkleBest, type Sequence } from '../ui/reveal';
+import { celebrateSingle, glossBest, playFlip, playReveal, sparkleBest, type Sequence } from '../ui/reveal';
 import { playSplash } from '../ui/splash';
 import { Sfx } from '../ui/sfx';
 import { ART_FX, COLORS, CSS, FONT_SIZE, RADIUS, STROKE, WINDOW_FX } from '../ui/theme';
@@ -455,12 +456,14 @@ export class GachaScene extends Phaser.Scene {
       const queue = presentations(results, plan.flipOrder);
       const counts = runningCounts(results, ownedBefore);
       if (results.length === 1) {
-        this.showSplashes(queue, results, counts, () => this.showResults(results, ownedBefore));
+        this.showSplashes(queue, results, counts, () => this.showResults(results, ownedBefore, { night: true }));
         return;
       }
       // Passer montre tout de suite toutes les cartes, déjà retournées (FR-006).
-      this.showResults(results, ownedBefore, skipped ? undefined : plan.flipOrder,
-        () => this.showSplashes(queue, results, counts, () => {}));
+      this.showResults(results, ownedBefore, {
+        night: true, flipOrder: skipped ? undefined : plan.flipOrder,
+        onShown: () => this.showSplashes(queue, results, counts, () => {}),
+      });
     };
     const seq = playReveal(this, modal, plan, SKIP_ARM_MS, (cue, variant) => this.sfx.play(cue, variant), () => finish(false));
     this.addSkipZone(modal, seq, SKIP_ARM_MS, () => finish(true));
@@ -536,7 +539,9 @@ export class GachaScene extends Phaser.Scene {
     document.body.dataset.clockModal = String(Math.round(this.clockMs));
   }
 
-  private openModal(name: string): Phaser.GameObjects.Container {
+  // `night` : la fenêtre se pose sur la nuit de la révélation (révision 3 de 004, B2), sans
+  // voile papier ni fondu d'entrée : rien de l'écran de tirage ne doit transparaître.
+  private openModal(name: string, night = false): Phaser.GameObjects.Container {
     this.modalOpen = true;
     this.ambience.setActive(false);
     this.markModal(name);
@@ -544,10 +549,14 @@ export class GachaScene extends Phaser.Scene {
     const modal = makeModal(this);
     // La révélation plonge dans la nuit sans voile papier (004, FR-018) : son voile reste
     // là pour bloquer l'écran de tirage (FR-007), mais transparent.
-    if (name === 'reveal') (modal.list[0] as Phaser.GameObjects.Rectangle).setFillStyle(COLORS.scrim, 0);
+    if (name === 'reveal' || night) (modal.list[0] as Phaser.GameObjects.Rectangle).setFillStyle(COLORS.scrim, 0);
+    if (night) {
+      modal.add(uiImage(this, 'bg-reveal', WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT)
+        ?? this.add.rectangle(0, 0, WIDTH, HEIGHT, ART_FX.night, 1).setOrigin(0));
+    }
     // Fondu d'entrée (007, FR-017) : l'opacité seule change, les boutons répondent déjà.
     // La révélation a sa propre entrée (la nuit tombe).
-    if (!this.reducedMotion && name !== 'reveal') {
+    if (!this.reducedMotion && name !== 'reveal' && !night) {
       this.tweens.add({ targets: modal, alpha: { from: 0, to: 1 }, duration: TRANSITIONS.fade });
     }
     return modal;
@@ -580,38 +589,52 @@ export class GachaScene extends Phaser.Scene {
 
   // `flipOrder` donné (×10 regardé jusqu'au bout) : les cartes arrivent face cachée et
   // se retournent dans cet ordre (FR-008). Sinon elles sont toutes visibles d'emblée.
+  // `night` : résultats d'un tirage, posés sur la nuit de la révélation (révision 3, B2) ;
+  // l'échange garde la fenêtre claire.
   private showResults(
-    results: PullResult[], ownedBefore: Readonly<Record<string, number>>, flipOrder?: readonly number[],
-    onShown: () => void = () => {},
+    results: PullResult[], ownedBefore: Readonly<Record<string, number>>,
+    opts: { readonly flipOrder?: readonly number[] | undefined; readonly onShown?: () => void; readonly night?: boolean } = {},
   ): Phaser.GameObjects.Container {
+    const { flipOrder, onShown = () => {}, night = false } = opts;
     const flip = flipOrder !== undefined && results.length > 1;
-    const modal = this.openModal(flip ? 'flip' : 'results');
+    const modal = this.openModal(flip ? 'flip' : 'results', night);
     const counts = runningCounts(results, ownedBefore);
-    const addOk = () =>
-      modal.add(makeButton(this, RESULTS.ok, 'OK', COLORS.btn.primary, () => this.closeModal(modal)).container);
+    const addOk = () => makeButton(this, RESULTS.ok, 'OK', COLORS.btn.primary, () => this.closeModal(modal));
+    // Titre clair cerné d'encre sur la nuit, foncé sur le papier.
+    const title = (x: number, y: number, s: string) => modal.add(this.add.text(x, y, s, night
+      ? { ...textStyle(FONT_SIZE.big, ART_FX.splashText), stroke: ART_FX.splashStroke, strokeThickness: 5 }
+      : textStyle(FONT_SIZE.big)).setOrigin(0.5));
     if (results.length === 1) {
       const r = RESULTS.single;
       // Titre entre l'en-tête et la carte agrandie (007), sans chevaucher l'en-tête.
-      modal.add(this.add.text(r.x + r.w / 2, r.y - 22, 'Tu as obtenu…', textStyle(FONT_SIZE.big)).setOrigin(0.5));
+      title(r.x + r.w / 2, r.y - 22, 'Tu as obtenu…');
       const card = makeResultCard(this, r, results[0]!, counts[0]!, true);
       modal.add(card);
-      celebrateSingle(this, modal, card, r, results[0]!.item.rarity);
-      addOk();
+      celebrateSingle(this, modal, card, r, results[0]!.item.rarity, { night, reduced: this.reducedMotion });
+      modal.add(addOk().container);
       return modal;
     }
-    modal.add(makePanel(this, RESULTS.panel, COLORS.background));
-    modal.add(this.add.text(RESULTS.panel.x + RESULTS.panel.w / 2, RESULTS.titleY, 'Tirage ×10', textStyle(FONT_SIZE.big))
-      .setOrigin(0.5));
+    if (!night) modal.add(makePanel(this, RESULTS.panel, COLORS.background));
+    title(RESULTS.panel.x + RESULTS.panel.w / 2, RESULTS.titleY, 'Tirage ×10');
     const faces = results.map((res, i) => makeResultCard(this, resultCardRect(i), res, counts[i]!));
     if (!flip) {
       modal.add(faces);
-      sparkleBest(new Particles(this, modal, 2), results.map((res, i) => ({ r: resultCardRect(i), rarity: res.item.rarity })));
-      addOk();
+      const cards = results.map((res, i) => ({ r: resultCardRect(i), rarity: res.item.rarity }));
+      sparkleBest(new Particles(this, modal, 2), cards);
+      glossBest(this, modal, cards, this.reducedMotion);
+      modal.add(addOk().container);
       onShown();
       return modal;
     }
     this.playFlip(modal, faces, results, flipOrder, () => {
-      addOk();
+      // OK arrive (B1) : son dessin monte en fondu, la zone répond déjà à sa place de layout.ts.
+      const ok = addOk();
+      modal.add(ok.container);
+      if (!this.reducedMotion) {
+        const { y } = ok.visual;
+        ok.visual.setY(y + RESULTS.okRise).setAlpha(0);
+        this.tweens.add({ targets: ok.visual, y, alpha: 1, duration: CARD_MOTION.okIn, ease: 'Back.easeOut' });
+      }
       onShown();
     });
     return modal;
@@ -625,16 +648,18 @@ export class GachaScene extends Phaser.Scene {
     addOk: () => void,
   ) {
     const hint = this.add.text(RESULTS.ok.x + RESULTS.ok.w / 2, RESULTS.ok.y + RESULTS.ok.h / 2,
-      'Touche pour tout retourner', textStyle(FONT_SIZE.small, CSS.textFaint)).setOrigin(0.5);
+      'Touche pour tout retourner', textStyle(FONT_SIZE.small, ART_FX.splashText)).setOrigin(0.5).setAlpha(0.8);
     modal.add(hint);
-    const flip = playFlip(this, modal, faces, results, flipSchedule(results, order), cue => this.sfx.play(cue), tapped => {
-      if (tapped) this.sfx.stopAll();
-      zone.destroy();
-      hint.destroy();
-      delete document.body.dataset.skip;
-      this.markModal('results');
-      addOk();
-    });
+    const flip = playFlip(this, modal, faces, results, flipSchedule(results, order), this.reducedMotion,
+      cue => this.sfx.play(cue), tapped => {
+        if (tapped) this.sfx.stopAll();
+        zone.destroy();
+        if (this.reducedMotion || tapped) hint.destroy();
+        else this.tweens.add({ targets: hint, alpha: 0, duration: CARD_MOTION.hintOut, onComplete: () => hint.destroy() });
+        delete document.body.dataset.skip;
+        this.markModal('results');
+        addOk();
+      });
     // Appui pendant le retournement : tout se retourne, OK apparaît ; il ne ferme rien.
     const zone = this.addSkipZone(modal, flip.seq, 0, () => flip.finish(true));
   }

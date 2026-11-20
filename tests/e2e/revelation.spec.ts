@@ -96,6 +96,7 @@ test('×10 : palier du meilleur, puis cartes une à une, OK à la fin (US5, FR-0
   expect(await revealSteps(page)).toBe('legendary');
   await waitModal(page, 'flip');
   const t0 = Date.now();
+  const flipAt = await clockModal(page);
   const fakeResults = rarities.map(r => ({ item: CATALOGUE.find(i => i.rarity === r)!, isNew: true, guaranteed: false, pity: false, shards: 0, featuredGuarantee: false }));
   const { steps, duration } = flipSchedule(fakeResults, flipOrder(fakeResults));
   const at = async (ms: number) => page.waitForTimeout(Math.max(0, ms - (Date.now() - t0)));
@@ -109,12 +110,16 @@ test('×10 : palier du meilleur, puis cartes une à une, OK à la fin (US5, FR-0
   await capture(page, 'x10-vedette-coeur');
   await at(star.at + star.anticipation + star.turn * 0.8);
   await capture(page, 'x10-vedette');
+  // Le Légendaire vedette ouvre sa présentation (007) dans la même image que les résultats :
+  // l'horloge lue à son ouverture est la fin du retournement (à sa fermeture, la scène la repose).
+  await page.waitForFunction(() => document.body.dataset.modal === 'splash');
+  const endAt = await clockModal(page);
   await waitModal(page, 'results');
-  // Marge large : les 4 captures prises pendant le retournement et le rendu logiciel des
-  // visuels de 007 ralentissent le runner de la CI (5,7 s mesurées pour 3,9 s prévues). La
-  // borne exacte de FR-010 est vérifiée par les tests unitaires de flipSchedule ; ici, on
-  // vérifie que la fin suit le calendrier.
-  expect(Date.now() - t0).toBeLessThan(duration + 3000);
+  // La fin suit le calendrier, mesurée en temps du jeu (horloge de la scène) : en temps réel,
+  // les captures et le rendu logiciel du runner de la CI dépassaient toute marge raisonnable.
+  // Marge : quelques images. La borne de FR-010 est vérifiée par les tests de flipSchedule.
+  expect(endAt - flipAt).toBeGreaterThanOrEqual(duration - 50);
+  expect(endAt - flipAt).toBeLessThan(duration + 200);
   await page.waitForTimeout(400);
   await capture(page, 'x10-fin');
   await tap(page, RESULTS.ok);
@@ -123,6 +128,8 @@ test('×10 : palier du meilleur, puis cartes une à une, OK à la fin (US5, FR-0
 
 // Dix communs (le dixième devient Rare par la garantie) : aucune présentation plein écran
 // (007) ne vient s'intercaler dans les mesures de temps.
+const clockModal = (page: Page) => page.evaluate(() => Number(document.body.dataset.clockModal));
+
 const TEN_COMMONS = [...Array.from({ length: 10 }, () => [rarityRoll('common'), 0]).flat(), DIRECT, 0.5];
 
 test('passer l’animation : cartes en moins de 0,5 s, rien de changé (US2, FR-006)', async ({ page }) => {

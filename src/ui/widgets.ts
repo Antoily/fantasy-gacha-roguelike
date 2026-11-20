@@ -8,7 +8,7 @@ import { artKey, bustKey, hasArt, headKey, orbSize, shadowKey, uiImage } from '.
 import { R } from './display';
 import { ART, HEIGHT, RESULTS, SHEET, WIDTH, type Rect } from './layout';
 import {
-  ART_FX, COLORS, CSS, FONT_FAMILY, FONT_SIZE, FONT_SIZE_MIN, RADIUS, SCRIM_ALPHA, SHADOW_OFFSET, STROKE,
+  ART_FX, CARD_FX, COLORS, CSS, FONT_FAMILY, FONT_SIZE, FONT_SIZE_MIN, RADIUS, SCRIM_ALPHA, SHADOW_OFFSET, STROKE,
 } from './theme';
 
 // `resolution` : le texte est rastérisé à l'échelle de rendu, net sous la caméra ×R.
@@ -357,6 +357,19 @@ export function makeResultCard(
   const info = rarityInfo(item.rarity);
   const c = scene.add.container(0, 0);
   c.add(makePanel(scene, r));
+  // Cadre de rareté (révision 3, FR-024) : dès Peu commun, un bandeau supérieur teinté et un
+  // liseré intérieur de la couleur de la rareté disent la prise avant qu'on lise.
+  if (info.rank >= 1) {
+    const color = COLORS.rarity[item.rarity];
+    const g = scene.add.graphics();
+    const band = large ? RESULTS.singleArt.pad + RESULTS.singleArt.h / 2 : ART.bust.h / 2 + 6;
+    g.fillStyle(color, CARD_FX.bandAlpha).fillRoundedRect(r.x, r.y, r.w, band,
+      { tl: RADIUS, tr: RADIUS, bl: 0, br: 0 });
+    const inset = STROKE.base / 2 + CARD_FX.frame / 2;
+    g.lineStyle(CARD_FX.frame, color, 1)
+      .strokeRoundedRect(r.x + inset, r.y + inset, r.w - 2 * inset, r.h - 2 * inset, RADIUS - inset);
+    c.add(g);
+  }
   const badge = result.isNew ? 'Nouveau !' : `Déjà possédé ×${ownedCount}`;
 
   if (large) {
@@ -366,7 +379,8 @@ export function makeResultCard(
     c.add(artBackdrop(scene, win, item.rarity, RADIUS - 4));
     if (hasArt(scene, item)) {
       const h = win.h - 8;
-      c.add(scene.add.image(cx, win.y + win.h / 2 + 2, artKey(item.id)).setDisplaySize(h * 0.8, h));
+      // Nommée : la carte du ×1 la fait flotter (révision 3).
+      c.add(scene.add.image(cx, win.y + win.h / 2 + 2, artKey(item.id)).setDisplaySize(h * 0.8, h).setName('art'));
     } else {
       c.add(initialDisc(scene, cx, win.y + win.h / 2, 34, item, FONT_SIZE.title));
     }
@@ -398,7 +412,8 @@ export function makeResultCard(
   // quand un résultat forcé est aussi un doublon ; à gauche, elle ne couvre plus le nom.
   if (result.pity || result.featuredGuarantee) {
     const k = RESULTS.sticker;
-    c.add(makeSticker(scene, r.x + k.dx, r.y + k.dy, 'Garanti !', 0).setAngle(k.tilt));
+    // Nommé : le retournement le pose en tampon (révision 3).
+    c.add(makeSticker(scene, r.x + k.dx, r.y + k.dy, 'Garanti !', 0).setAngle(k.tilt).setName('sticker'));
   }
   return c;
 }

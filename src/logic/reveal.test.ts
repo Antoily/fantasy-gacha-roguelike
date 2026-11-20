@@ -219,6 +219,40 @@ describe('retournement une à une (FR-008, FR-010)', () => {
   });
 
   it('×1 : rien à retourner', () => {
-    expect(flipSchedule(single('ultra'), [0])).toEqual({ steps: [], duration: 0 });
+    expect(flipSchedule(single('ultra'), [0])).toEqual({ steps: [], deal: [], duration: 0 });
+  });
+
+  // Révision 3 (FR-022) : distribution depuis l'orbe, dans l'ordre du tirage.
+  it('distribution : départs échelonnés dans l’ordre du tirage, aucune carte ne bouge avant d’être posée', () => {
+    const { flight, stagger } = FLIP_TIMING.deal;
+    const s = schedule(typical);
+    expect(s.deal).toEqual([...typical.keys()].map(i => i * stagger));
+    for (const x of s.steps) expect(x.at, String(x.index)).toBeGreaterThanOrEqual(s.deal[x.index]! + flight);
+    // La vedette posée en premier (indice 0) ou en dernier (indice 9) : même règle.
+    for (const star of [0, 9]) {
+      const ten = tenOf(typical.map((_, i) => (i === star ? 'legendary' : 'common')));
+      const t = schedule(ten);
+      for (const x of t.steps) expect(x.at).toBeGreaterThanOrEqual(t.deal[x.index]! + flight);
+    }
+  });
+
+  it('la première carte tourne dès qu’elle est posée, sans attendre toute la distribution', () => {
+    const s = schedule(typical);
+    expect(s.steps[0]!.at).toBe(FLIP_TIMING.deal.flight);
+  });
+
+  it('rien au-dessus du Rare : jamais plus de 3,5 s, distribution comprise (FR-015)', () => {
+    const modest: Rarity[] = ['common', 'uncommon', 'rare'];
+    const rng = mulberry32(11);
+    const draws = [tenOf(Array<Rarity>(10).fill('rare')), tenOf([...Array<Rarity>(9).fill('uncommon'), 'rare'])];
+    for (let n = 0; n < 2000; n++) {
+      const ten = tenOf(Array.from({ length: 10 }, () => modest[Math.floor(rng() * modest.length)]!));
+      if (ten.some(r => r.item.rarity === 'rare')) draws.push(ten);
+    }
+    for (const ten of draws) expect(schedule(ten).duration).toBeLessThanOrEqual(FLIP_TIMING.maxModest + 1e-9);
+    // Un Légendaire garde le plafond de 4 s : ses cartes ordinaires ne sont pas pressées pour rien.
+    const legend = schedule(tenOf([...Array<Rarity>(9).fill('rare'), 'legendary']));
+    expect(legend.duration).toBeGreaterThan(FLIP_TIMING.maxModest);
+    expect(legend.duration).toBeLessThanOrEqual(FLIP_TIMING.max + 1e-9);
   });
 });
