@@ -75,11 +75,12 @@ test.describe('mise en scène', () => {
       await tap(page, cellOf('lulu-tempete'));
       await waitModal(page, 'fiche');
       await settled(page);
-      // Délai voulu : laisser finir l'éclat d'arrivée, puis comparer deux instants.
-      await page.waitForTimeout(900);
-      const b = await shot(page, SHEET.art);
+      // Le cœur de l'illustration : l'éclat d'arrivée naît à plus de 60 px du centre et s'en éloigne.
+      const core = { x: SHEET.art.x + SHEET.art.w / 2 - 35, y: SHEET.art.y + SHEET.art.h / 2 - 35, w: 70, h: 70 };
+      const b = await shot(page, core);
+      // Délai voulu : comparer deux instants de la lévitation.
       await page.waitForTimeout(700);
-      return { costMoves, artMoves: !(await shot(page, SHEET.art)).equals(b) };
+      return { costMoves, artMoves: !(await shot(page, core)).equals(b) };
     };
     expect(await sheet()).toEqual({ costMoves: true, artMoves: true });
     await page.emulateMedia({ reducedMotion: 'reduce' });
