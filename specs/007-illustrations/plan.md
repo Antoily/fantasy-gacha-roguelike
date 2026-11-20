@@ -144,9 +144,12 @@ Spec : User Story 6, FR-020 à FR-026, SC-009. Recherche : [research-immersion.m
 - **Lot C** (`splash.ts`, clés `splash*` d'`ART_FX`) : silhouette, éclair, couleur, rayons, nom qui se pose.
 - **Lot D** (`ambience.ts`, `widgets.makeButton`, `AMBIENCE_FX`) : écrasement à l'appui (dessin seul, la zone ne bouge pas),
   reflet périodique, scintillement plus marqué, teinte de la vedette ; message de pénurie lisible.
-- **Lot E** (méthodes de fenêtres de `GachaScene`, `art.ts`, nouveau bloc `WINDOW_FX`) : ouverture en échelle (le conteneur
-  est mis à l'échelle autour du centre du panneau, les zones atteignent leur place de `layout.ts` en fin d'ouverture ; l'e2e
-  attend la fin via un signal), silhouettes reconnaissables, fiche et échange mis en scène, « 40e ».
+- **Lot E** (méthodes de fenêtres de `GachaScene`, `art.ts`, nouveau bloc `WINDOW_FX`, durées dans `WINDOW` de
+  `ambienceConfig.ts`) : ouverture en échelle et fondu autour du centre du panneau, 250 ms au plus (`Opening`, `widgets.ts`) ;
+  seul le dessin s'anime, les zones d'appui sont sorties dans une couche fixe et répondent à leur place de `layout.ts` dès la
+  première image (même principe que `button.visual` du lot D) ; `dataset.opening` le temps de l'ouverture (captures) et
+  `dataset.clockOpened` à sa fin (durée mesurée en temps du jeu). Silhouettes tirées du haut de la forme entière
+  (`src/logic/silhouette.ts`, testé et muté), fiche et échange mis en scène, « 40e » (fait par #45).
 - Ordre de merge : D, C, E (lots indépendants), puis 004 lots A et B. Réduire les animations : rendu fixe partout.
 
 Constitution : I, II, IV, V, VI. ✅

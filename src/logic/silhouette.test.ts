@@ -23,6 +23,11 @@ describe('opaqueBounds', () => {
     expect(opaqueBounds(image(4, 3, [[3, 2, 255]]), 4, 3, 40)).toEqual({ x: 3, y: 2, w: 1, h: 1 });
   });
 
+  it('une ligne continue compte jusqu’à son dernier pixel', () => {
+    const data = image(8, 2, [[3, 0, 255], [4, 0, 255]]);
+    expect(opaqueBounds(data, 8, 2, 40)).toEqual({ x: 3, y: 0, w: 2, h: 1 });
+  });
+
   it('image vide : aucune boîte', () => {
     expect(opaqueBounds(image(4, 4, []), 4, 4, 40)).toBeNull();
   });
