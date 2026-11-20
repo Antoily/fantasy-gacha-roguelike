@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { CATALOGUE } from '../data/catalogue';
 import type { Item } from '../data/catalogue';
 import { GACHA_CONFIG, RARITIES, SHARD_COST, type Rarity } from '../data/gachaConfig';
-import { TRANSITIONS } from '../data/ambienceConfig';
+import { TRANSITIONS, WINDOW } from '../data/ambienceConfig';
 import { formatAmount } from '../logic/format';
 import { rollAmount } from '../logic/motion';
 import type { PullResult } from '../logic/gacha';
@@ -27,10 +27,10 @@ import { Particles } from '../ui/particles';
 import { celebrateSingle, playFlip, playReveal, sparkleBest, type Sequence } from '../ui/reveal';
 import { playSplash } from '../ui/splash';
 import { Sfx } from '../ui/sfx';
-import { ART_FX, COLORS, CSS, FONT_SIZE, STROKE } from '../ui/theme';
+import { ART_FX, COLORS, CSS, FONT_SIZE, RADIUS, STROKE, WINDOW_FX } from '../ui/theme';
 import {
-  fitWidth, makeButton, makeEmblem, setButtonSound, makeModal, makeOrb, makePanel, makePortrait, makeResultCard, makeShardAmount,
-  makeShardIcon, makeSheet, textStyle, type Button,
+  Opening, fitWidth, makeButton, makeEmblem, setButtonSound, makeModal, makeOrb, makePanel, makePortrait, makeResultCard,
+  makeShardAmount, makeShardIcon, makeSheet, textStyle, type Button,
 } from '../ui/widgets';
 
 // Délai avant qu'un appui passe l'animation : un double appui sur « Tirer » ne doit
@@ -59,6 +59,8 @@ export class GachaScene extends Phaser.Scene {
   // machine, pas la mise en scène.
   private clockMs = 0;
   private reducedMotion = false;
+  // Image où la dernière fenêtre s'est fermée : une fenêtre ouverte dans la même la remplace.
+  private closedFrame = -1;
   // Montants de l'en-tête tels qu'affichés, qui rattrapent la partie en défilant (FR-015).
   private shown = { currency: 0, shards: 0 };
   private rolls: Partial<Record<'currency' | 'shards', Phaser.Tweens.Tween>> = {};
@@ -551,7 +553,23 @@ export class GachaScene extends Phaser.Scene {
     return modal;
   }
 
+  // Ouverture animée d'une fenêtre déjà construite (007, révision du 2026-11-13 : FR-024), autour
+  // de `pivot`, le centre de son panneau. Signaux pour l'e2e : `dataset.opening` (nom de la
+  // fenêtre) le temps qu'elle s'ouvre, puis `dataset.clockOpened` (horloge du jeu, comme
+  // clockModal). Les zones d'appui sont à leur place dès l'ouverture (voir Opening).
+  private opening(modal: Phaser.GameObjects.Container, pivot: { x: number; y: number }): Opening {
+    const name = document.body.dataset.modal ?? '';
+    const animate = !this.reducedMotion;
+    if (animate) document.body.dataset.opening = name;
+    const replacing = this.closedFrame === this.game.loop.frame;
+    return new Opening(this, modal, pivot, animate, replacing, complete => {
+      if (document.body.dataset.opening === name) delete document.body.dataset.opening;
+      if (complete) document.body.dataset.clockOpened = String(Math.round(this.clockMs));
+    });
+  }
+
   private closeModal(modal: Phaser.GameObjects.Container) {
+    this.closedFrame = this.game.loop.frame;
     modal.destroy();
     this.modalOpen = false;
     this.ambience.setActive(true);
@@ -565,7 +583,7 @@ export class GachaScene extends Phaser.Scene {
   private showResults(
     results: PullResult[], ownedBefore: Readonly<Record<string, number>>, flipOrder?: readonly number[],
     onShown: () => void = () => {},
-  ) {
+  ): Phaser.GameObjects.Container {
     const flip = flipOrder !== undefined && results.length > 1;
     const modal = this.openModal(flip ? 'flip' : 'results');
     const counts = runningCounts(results, ownedBefore);
@@ -579,7 +597,7 @@ export class GachaScene extends Phaser.Scene {
       modal.add(card);
       celebrateSingle(this, modal, card, r, results[0]!.item.rarity);
       addOk();
-      return;
+      return modal;
     }
     modal.add(makePanel(this, RESULTS.panel, COLORS.background));
     modal.add(this.add.text(RESULTS.panel.x + RESULTS.panel.w / 2, RESULTS.titleY, 'Tirage ×10', textStyle(FONT_SIZE.big))
@@ -590,12 +608,13 @@ export class GachaScene extends Phaser.Scene {
       sparkleBest(new Particles(this, modal, 2), results.map((res, i) => ({ r: resultCardRect(i), rarity: res.item.rarity })));
       addOk();
       onShown();
-      return;
+      return modal;
     }
     this.playFlip(modal, faces, results, flipOrder, () => {
       addOk();
       onShown();
     });
+    return modal;
   }
 
   private playFlip(
@@ -638,32 +657,43 @@ export class GachaScene extends Phaser.Scene {
     const left = rect.x + DIALOG.padding;
     const right = rect.x + rect.w - DIALOG.padding;
     let y = bodyY;
+    // Une ligne par rareté, puis les règles : elles entrent l'une après l'autre (FR-024).
+    const rows: Phaser.GameObjects.Container[] = [];
     for (const r of rarityTable()) {
-      modal.add(makeEmblem(this, left + 10, y + 11, 24, r.id));
-      modal.add(this.add.text(left + 30, y + 11, r.label, textStyle(FONT_SIZE.body)).setOrigin(0, 0.5));
-      modal.add(this.add.text(right, y + 11, formatPercent(ratePercent(r.id)), textStyle(FONT_SIZE.body)).setOrigin(1, 0.5));
+      rows.push(this.add.container(0, 0, [
+        makeEmblem(this, left + 10, y + 11, 24, r.id),
+        this.add.text(left + 30, y + 11, r.label, textStyle(FONT_SIZE.body)).setOrigin(0, 0.5),
+        this.add.text(right, y + 11, formatPercent(ratePercent(r.id)), textStyle(FONT_SIZE.body)).setOrigin(1, 0.5),
+      ]));
       y += 34;
     }
+    const notes = this.add.container(0, 0);
+    rows.push(notes);
+    modal.add(rows);
     // « 40e » et non « 40ᵉ » : la police embarquée n'a pas le glyphe en exposant (trou dans le texte).
     const rules = this.add.text(left, y + 6,
       '×10 : au moins un Rare ou mieux garanti.\n'
       + `Légendaire ou mieux garanti au plus tard au ${GACHA_CONFIG.pityThreshold}e tirage ; `
       + 'le compteur repart de zéro à chaque Légendaire ou Ultra rare.',
       { ...textStyle(FONT_SIZE.body, CSS.textDim), wordWrap: { width: right - left }, lineSpacing: 2 });
-    modal.add(rules);
+    notes.add(rules);
     if (vedette) {
       // Bannière vedette (006, FR-016) : sa chance par tirage et la règle du 50/50.
       y = rules.y + rules.height + 16;
       const label = rarityLabel(vedette.rarity);
-      modal.add(this.add.text(left, y, `Vedette\u00a0: ${vedette.name}`, textStyle(FONT_SIZE.body)));
-      modal.add(this.add.text(right, y, formatPercent(featuredRatePercent(vedette)), textStyle(FONT_SIZE.body)).setOrigin(1, 0));
-      modal.add(this.add.text(left, y + 26,
+      notes.add(this.add.text(left, y, `Vedette\u00a0: ${vedette.name}`, textStyle(FONT_SIZE.body)));
+      notes.add(this.add.text(right, y, formatPercent(featuredRatePercent(vedette)), textStyle(FONT_SIZE.body)).setOrigin(1, 0));
+      notes.add(this.add.text(left, y + 26,
         `Quand un ${label} tombe ici, une chance sur deux que ce soit ${vedette.name}. `
         + `Sinon, le prochain ${label} de cette bannière sera ${vedette.name}.`,
         { ...textStyle(FONT_SIZE.body, CSS.textDim), wordWrap: { width: right - left }, lineSpacing: 2 }));
     }
     const [close] = dialogButtons(rect, 1);
     modal.add(makeButton(this, close!, 'Fermer', COLORS.btn.secondary, () => this.closeModal(modal)).container);
+    const open = this.opening(modal, center(rect));
+    const w = WINDOW.rows;
+    rows.forEach((row, i) => open.enter(row, { dx: -w.shift, alpha: 0 }, i * w.stagger, w.duration));
+    open.finish();
   }
 
   // Collection (003) : tout le catalogue, et le seul endroit où dépenser ses éclats.
@@ -682,18 +712,44 @@ export class GachaScene extends Phaser.Scene {
     // Résumé par rareté : il sert aussi de légende aux couleurs des pastilles.
     const summary = raritySummary(p);
     const slot = panel.w / summary.length;
-    summary.forEach((s, i) => {
+    const counters = summary.map((s, i) => {
       const x = panel.x + slot * i + slot / 2;
       modal.add(makeEmblem(this, x - 16, COLLECTION.summaryY, 18, s.rarity));
-      modal.add(this.add.text(x - 5, COLLECTION.summaryY, `${s.owned}/${s.total}`, textStyle(FONT_SIZE.small))
-        .setOrigin(0, 0.5));
+      const t = this.add.text(x - 5, COLLECTION.summaryY, `${s.owned}/${s.total}`, textStyle(FONT_SIZE.small)).setOrigin(0, 0.5);
+      modal.add(t);
+      return { t, s };
     });
 
-    collectionEntries(p).forEach((entry, i) => modal.add(this.makeCollectionCell(collectionCellRect(i), entry, modal)));
+    // Coûts des manquants échangeables : ils pulsent ensemble, une fois la fenêtre ouverte.
+    const pulses: Phaser.GameObjects.Container[] = [];
+    const cells = collectionEntries(p).map((entry, i) => this.makeCollectionCell(collectionCellRect(i), entry, modal, pulses));
+    modal.add(cells);
     modal.add(makeButton(this, COLLECTION.close, 'Fermer', COLORS.btn.neutral, () => this.closeModal(modal)).container);
+
+    // Ouverture (FR-024) : le panneau s'ouvre, les cases arrivent rangée par rangée, les compteurs
+    // montent de zéro. Les zones des cases sont fixes dès la première image (Opening).
+    const open = this.opening(modal, center(panel));
+    const c = WINDOW.cascade;
+    cells.forEach((cell, i) => open.enter(cell, { dy: c.rise, alpha: 0 }, Math.floor(i / 2) * c.step, c.duration));
+    for (const { t, s } of counters) {
+      if (!open.animate || s.owned === 0) continue;
+      const k = { v: 0 };
+      t.setText(`0/${s.total}`);
+      open.tween({
+        targets: k, v: 1, duration: WINDOW.count,
+        onUpdate: () => t.setText(`${rollAmount(0, s.owned, k.v)}/${s.total}`),
+      });
+    }
+    if (pulses.length > 0) {
+      const pulse = WINDOW.costPulse;
+      open.loop({ targets: pulses, scale: pulse.scale, duration: pulse.period, yoyo: true, repeat: -1, ease: 'Sine.InOut' });
+    }
+    open.finish();
   }
 
-  private makeCollectionCell(r: Rect, entry: CollectionEntry, modal: Phaser.GameObjects.Container) {
+  private makeCollectionCell(
+    r: Rect, entry: CollectionEntry, modal: Phaser.GameObjects.Container, pulses: Phaser.GameObjects.Container[],
+  ) {
     const { item, count, cost, affordable } = entry;
     const owned = count > 0;
     const c = this.add.container(0, 0);
@@ -709,18 +765,29 @@ export class GachaScene extends Phaser.Scene {
       // Un possédé se montre en grand (FR-014).
       c.add(this.cellZone(r, () => {
         this.closeModal(modal);
-        this.showSheet(item, count);
+        this.showSheet(item, count, r);
       }));
       return c;
     }
     // Coût mis en évidence s'il est abordable, estompé sinon (FR-004).
-    c.add(makeShardAmount(this, textX, r.y + 30, formatAmount(cost), 0).setAlpha(affordable ? 1 : 0.4));
-    if (affordable) {
-      c.add(this.cellZone(r, () => {
-        this.closeModal(modal);
-        this.showExchangeConfirm(item);
-      }));
+    const amount = makeShardAmount(this, textX, r.y + 30, formatAmount(cost), 0);
+    if (!affordable) {
+      c.add(amount.setAlpha(0.4));
+      return c;
     }
+    // Échangeable tout de suite (FR-025) : liseré des éclats et coût qui pulse autour de son
+    // centre (pivot posé sur lui, le montant y garde ses coordonnées d'écran).
+    const bounds = amount.getBounds();
+    const pivot = this.add.container(bounds.centerX, bounds.centerY, [amount.setPosition(-bounds.centerX, -bounds.centerY)]);
+    pulses.push(pivot);
+    const inset = STROKE.base;
+    c.add(this.add.graphics().lineStyle(STROKE.thin, WINDOW_FX.affordableRim, 1)
+      .strokeRoundedRect(r.x + inset, r.y + inset, r.w - 2 * inset, r.h - 2 * inset, RADIUS - inset));
+    c.add(pivot);
+    c.add(this.cellZone(r, () => {
+      this.closeModal(modal);
+      this.showExchangeConfirm(item);
+    }));
     return c;
   }
 
@@ -732,17 +799,37 @@ export class GachaScene extends Phaser.Scene {
 
   // Fiche d'un possédé (003, révision du 2026-11-08) : elle ne fait que montrer ; « Retour »
   // rouvre la collection, comme « Annuler » sur un échange.
-  private showSheet(item: Item, count: number) {
+  // `from` : la case touchée, d'où naît l'illustration (FR-025).
+  private showSheet(item: Item, count: number, from: Rect) {
     const modal = this.openModal('fiche');
     // Signal pour l'e2e : l'élément montré, sans lire le canvas.
     document.body.dataset.fiche = item.id;
     modal.add(makePanel(this, RESULTS.panel, COLORS.background));
-    modal.add(makeSheet(this, item, count));
+    const { container, art, image } = makeSheet(this, item, count);
+    modal.add(container);
     modal.add(makeButton(this, SHEET.back, 'Retour', COLORS.btn.neutral, () => {
       delete document.body.dataset.fiche;
       this.closeModal(modal);
       this.showCollection();
     }).container);
+    const open = this.opening(modal, center(RESULTS.panel));
+    // L'illustration part de la case touchée, petite, et se pose à sa place ; un éclat de sa
+    // rareté l'accueille, puis elle flotte. Légendaire et Ultra rare scintillent sur le bord.
+    const w = WINDOW.sheet;
+    const home = { x: art.x, y: art.y };
+    const start = center(from);
+    open.enter(art, { dx: start.x - home.x, dy: start.y - home.y, alpha: 0, scale: w.from }, 0, w.fly, 'Cubic.Out', () => {
+      const particles = new Particles(this, modal, 4);
+      const rank = RARITIES.find(r => r.id === item.rarity)!.rank;
+      particles.burst({
+        x: home.x, y: home.y, count: 20 + 6 * rank, colors: [COLORS.rarity[item.rarity], WINDOW_FX.sheetBurst],
+        shapes: ['star', 'spark'], speed: [140, 260 + 30 * rank], size: [3, 6], life: [400, 700],
+        spawnRadius: [60, 120], drag: 1.6,
+      });
+      sparkleBest(particles, [{ r: SHEET.art, rarity: item.rarity }]);
+      open.loop({ targets: image, y: image.y - 2 * w.float, duration: w.floatPeriod, yoyo: true, repeat: -1, ease: 'Sine.InOut' });
+    });
+    open.finish();
   }
 
   private showExchangeConfirm(item: Item) {
@@ -759,13 +846,51 @@ export class GachaScene extends Phaser.Scene {
       this.progression = outcome.progression;
       // Sauvegardé avant d'afficher, comme un tirage.
       this.persist();
-      this.showResults([{ item: outcome.item, isNew: true, guaranteed: false, pity: false, shards: 0, featuredGuarantee: false }], before);
+      const shown = this.showResults(
+        [{ item: outcome.item, isNew: true, guaranteed: false, pity: false, shards: 0, featuredGuarantee: false }], before);
       this.refresh();
+      if (!this.reducedMotion) this.spendShards(shown, cost);
     }).container);
     modal.add(makeButton(this, cancel!, 'Annuler', COLORS.btn.neutral, () => {
       this.closeModal(modal);
       this.showCollection();
     }).container);
+    this.opening(modal, center(rect)).finish();
+  }
+
+  // Échange (FR-025) : le montant dépensé quitte le compteur de l'en-tête, ses éclats volent
+  // jusqu'à l'illustration de la carte et l'éclat part quand le dernier l'atteint. Surcouche de
+  // la fenêtre de résultats : la carte et OK répondent d'emblée ; tout s'arrête avec elle.
+  private spendShards(modal: Phaser.GameObjects.Container, cost: number) {
+    const e = WINDOW.exchange;
+    const from = { x: this.shardIcon.x, y: GACHA.header.y + GACHA.header.h / 2 };
+    const r = RESULTS.single;
+    const to = { x: r.x + r.w / 2, y: r.y + RESULTS.singleArt.pad + RESULTS.singleArt.h / 2 };
+    const tweens: Phaser.Tweens.Tween[] = [];
+    modal.once(Phaser.GameObjects.Events.DESTROY, () => tweens.forEach(t => t.remove()));
+    const label = makeShardAmount(this, from.x, from.y + 30, `-${formatAmount(cost)}`, 0.5, FONT_SIZE.button);
+    modal.add(label);
+    tweens.push(this.tweens.add({ targets: label, y: -e.rise, alpha: 0, duration: e.label, ease: 'Cubic.In' }));
+    const particles = new Particles(this, modal, 5);
+    for (let i = 0; i < e.count; i++) {
+      // Départ en tournesol autour du compteur (angle d'or) : réparti, sans hasard.
+      const a = i * 2.39996;
+      const d = e.spread * Math.sqrt((i + 1) / e.count);
+      const shard = makeShardIcon(this, 0, 0, 7).setPosition(from.x + d * Math.cos(a), from.y + d * Math.sin(a));
+      modal.add(shard);
+      const last = i === e.count - 1;
+      tweens.push(this.tweens.add({
+        targets: shard, x: to.x, y: to.y, scale: 0.6, delay: i * e.stagger, duration: e.flight, ease: 'Cubic.In',
+        onComplete: () => {
+          shard.destroy();
+          if (!last) return;
+          particles.burst({
+            x: to.x, y: to.y, count: 40, colors: WINDOW_FX.exchangeBurst, shapes: ['shard', 'star'],
+            speed: [140, 320], size: [3, 6.5], life: [450, 800], spawnRadius: [10, 40], drag: 1.6,
+          });
+        },
+      }));
+    }
   }
 
   private showResetConfirm() {
@@ -780,6 +905,7 @@ export class GachaScene extends Phaser.Scene {
       this.closeModal(modal);
     }).container);
     modal.add(makeButton(this, cancel!, 'Annuler', COLORS.btn.neutral, () => this.closeModal(modal)).container);
+    this.opening(modal, center(rect)).finish();
   }
 
   private showWarning() {
@@ -787,6 +913,7 @@ export class GachaScene extends Phaser.Scene {
       'Ta sauvegarde n’a pas pu être relue : nouvelle partie.');
     const [ok] = dialogButtons(rect, 1);
     modal.add(makeButton(this, ok!, 'OK', COLORS.btn.primary, () => this.closeModal(modal)).container);
+    this.opening(modal, center(rect)).finish();
   }
 }
 
