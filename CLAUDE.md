@@ -279,6 +279,20 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
   dans un dossier, puis `LD_LIBRARY_PATH` vers son `usr/lib/x86_64-linux-gnu`. Node 24 : archive
   officielle de nodejs.org vérifiée par `SHASUMS256.txt`, dans `~/.local/opt`.
 
+## Leçons du moteur son (révision « immersion sonore », lot A, 2026-11-19)
+
+- **Mesurer un son** : `src/ui/synth.ts` (`Mixer`) ne dépend pas de Phaser ; un rendu hors
+  navigateur (`OfflineAudioContext`, `ctx.suspend(t)` pour chaque appel) passe par le même code
+  que le jeu (bundle `rolldown --format iife` injecté dans une page du build). Mesures : LUFS
+  momentané (pondération K, 400 ms) et crêtes, méthode de `specs/005-son/research-immersion.md`.
+- **Le compresseur de Web Audio ajoute un gain de compensation** (~+5 dB au seuil −12, ratio 6),
+  qu'il n'atteint qu'avec sa relâche : un rendu qui démarre à 0 sous-estime les sons brefs.
+  Précéder le rendu de 500 ms de silence. Il retarde aussi la sortie d'environ 6 ms (à compter
+  dans les 30 ms de la coupure).
+- **`cancelAndHoldAtTime` sur une enveloppe en cours** a tenu une valeur fausse dans Chromium
+  (claquement à la coupure, vu au rendu) : chaque voix a un gain réservé aux coupures, dont on
+  suit soi-même la rampe.
+
 ## Leçons de l'écran vivant (2026-11-09)
 
 - **Lumière additive invisible sur fond clair** : le mélange ADD sur le ciel pastel sature au
