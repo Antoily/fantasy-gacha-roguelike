@@ -327,6 +327,10 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
   `performance.now` (les minuteries `time.delayedCall`, elles, suivent le pas du jeu). Pour filmer
   image par image, remplacer les deux, sinon les tweens avancent en temps réel et se décalent des
   minuteries (un nom posé avant l'éclair qui le précède).
+- **Lumière sur la nuit** (lot A de 004) : un `Graphics` ne se teinte pas et ses disques ont un bord
+  net ; la révélation peint une fois des textures blanches en dégradé (`lightTextures`, au pixel,
+  ×R) puis les teinte en `Image` additives. Éclair et voile de sortie en ADD aussi : en mélange
+  normal, à mi-course, ils grisaient la nuit au lieu de l'éclairer.
 
 ## Leçons de l'accueil vivant (lot D, 2026-11-19)
 

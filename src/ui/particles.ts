@@ -95,6 +95,8 @@ export class Particles {
   private readonly rng: Rng;
   private readonly parts: Particle[] = [];
   private readonly streams: Stream[] = [];
+  // Vitesse du temps des particules : 0 fige tout (gel avant l'éclatement, révision 3).
+  timeScale = 1;
 
   constructor(scene: Phaser.Scene, parent: Phaser.GameObjects.Container, seed = 1) {
     this.rng = mulberry32(seed);
@@ -192,7 +194,8 @@ export class Particles {
     return list[Math.floor(this.rng() * list.length)]!;
   }
 
-  private step(deltaMs: number) {
+  private step(realMs: number) {
+    const deltaMs = realMs * this.timeScale;
     // Un onglet en arrière-plan rend un énorme delta : on le borne pour ne pas téléporter.
     const dt = Math.min(deltaMs, 50) / 1000;
     for (let i = this.streams.length - 1; i >= 0; i--) {

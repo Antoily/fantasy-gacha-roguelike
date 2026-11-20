@@ -101,6 +101,37 @@ export const REVEAL = {
   cardBounce: [1, 1.04, 1.08, 1.12, 1.16],
   labelY: 510,
   hintY: 600,
+  // Révision 3 (2026-11-13, lot A) : amplitudes de la lumière et des à-coups.
+  // Suspense : pulsation de l'orbe à chaque battement, anneau du battement, lueur et anneau
+  // de chaque fissure, sursaut de l'orbe, zoom du gel.
+  beatScale: 1.03,
+  heartRing: 1.35,
+  crackGlowScale: [1, 1.12, 1.25],
+  crackRingScale: 1.6,
+  crackJolt: 1.07,
+  crackShake: [2, 3, 4],
+  freezeZoom: 1.03,
+  freezeSwell: 1.06,
+  // Impact : coup de poing dès Rare, secousse (px) dès Légendaire (FR-020).
+  punch: 1.035,
+  shake: [0, 0, 0, 6, 9],
+  // Palier en lumière (FR-019) : rayons longs et fins, courts et larges (largeur en part de la
+  // longueur), cœur qui respire, étincelles en orbite (nombre, rayons min et max en px).
+  rayLong: 0.2,
+  rayShort: { length: 0.6, width: 0.5 },
+  coreBreath: 1.08,
+  orbit: { count: [6, 7, 8, 10, 12], radius: [70, 110] },
+  emblem: 34,
+  labelRebound: 1.06,
+  emblemStamp: 1.8,
+  // Leurre : hoquets du cœur, chute ; montée : aspiration puis étirement.
+  hiccup: 0.06,
+  drop: 14,
+  riseSuck: 0.6,
+  riseStretch: 1.15,
+  // Voile de sortie : au-dessus de tout (fenêtres à 100, présentation à 200), il survit à la
+  // révélation et s'efface sur l'écran suivant.
+  veilDepth: 300,
   // Toute la fenêtre : un appui n'importe où passe l'animation (FR-006).
   skip: { x: 0, y: 0, w: WIDTH, h: HEIGHT },
 } as const;

@@ -27,6 +27,54 @@ export const REVEAL_TIMING = {
   transition: 300,
 } as const;
 
+// Rythme des effets de la révélation (révision 3 du 2026-11-13, lot A), en ms. Tous tiennent
+// dans les créneaux de REVEAL_TIMING : ni la durée totale (FR-010) ni l'instant des sons ne
+// bougent.
+export const REVEAL_MOTION = {
+  // Entrée : la nuit tombe d'un coup, l'orbe gagne le centre en dépassant un peu.
+  nightIn: 240,
+  orbIn: 400,
+  // « Touche pour passer » : fondu à l'armement, puis pulsation (demi-période).
+  hintIn: 200,
+  hintPulse: 700,
+  // Battements du cœur, en fractions du suspense : de plus en plus rapprochés.
+  beats: [0.3, 0.46, 0.6, 0.71, 0.8, 0.87],
+  beat: 260,
+  beatPulse: 80,
+  // Fissure : la lueur derrière l'orbe monte, un anneau fin s'étend, l'orbe sursaute.
+  crackGlowIn: 90,
+  crackRing: 160,
+  crackJolt: 120,
+  // Impact : éclair qui monte puis vire à la couleur du palier ; coup de poing ; secousse.
+  flashIn: 50,
+  flashOut: 280,
+  punch: 160,
+  shake: 280,
+  // Palier vivant (FR-019) : rotation des rayons (degrés par seconde, longs puis courts),
+  // respiration des rayons et du cœur, orbite des étincelles, cycle de couleurs de l'Ultra.
+  rayTurn: [25, -15],
+  rayBreath: 700,
+  coreBreath: 600,
+  orbit: 1800,
+  hueCycle: 1200,
+  wave: 650,
+  waveGap: 250,
+  // Nom du palier : second rebond, puis l'emblème se pose en tampon.
+  labelIn: 300,
+  labelRebound: 600,
+  labelReboundMs: 240,
+  emblemDelay: 120,
+  emblemIn: 220,
+  // Leurre : hoquets à la fin du faux palier, puis teinte éteinte et chute (dans `transition`).
+  hiccups: 240,
+  fizzle: 200,
+  // Montée : aspiration, puis étirement juste avant l'éclat du vrai palier.
+  riseSuck: 180,
+  // Sortie naturelle : voile de lumière sur la fin, qui s'efface sur l'écran suivant.
+  outro: 120,
+  outroFade: 220,
+} as const;
+
 // Retournement des cartes du ×10, une à une (révision du 2026-10-26) : le temps se
 // mérite. Une carte commune passe vite ; plus la rareté est haute, plus son dos
 // tremble et s'allume longtemps avant de se retourner (anticipation), et plus l'effet
