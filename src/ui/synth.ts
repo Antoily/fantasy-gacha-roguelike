@@ -207,8 +207,9 @@ export class Mixer {
 
   // `variant` change la recette (rang d'une fissure, palier transposé ; instants et rang de ce que
   // le son accompagne : cartes, vedette, présentation, sens des pièces), pas le nom du bruitage.
-  play(cue: Cue, variant?: SoundVariant) {
-    const now = this.ctx.currentTime;
+  // `delay` (s) : son programmé plus tard, déclenché en avance pour compenser la latence (FR-024).
+  play(cue: Cue, variant?: SoundVariant, delay = 0) {
+    const now = this.ctx.currentTime + delay;
     // Montée et rire étouffent le faux palier qui sonne encore (FR-019) ; le vrai palier
     // baisse le rire qui sonne encore, pour se faire entendre dessous. La fanfare d'une
     // présentation éteint la vedette.

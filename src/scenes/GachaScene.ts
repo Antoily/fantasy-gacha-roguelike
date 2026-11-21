@@ -471,7 +471,8 @@ export class GachaScene extends Phaser.Scene {
         onShown: () => this.showSplashes(queue, results, counts, () => {}),
       });
     };
-    const seq = playReveal(this, modal, plan, SKIP_ARM_MS, (cue, variant) => this.sfx.play(cue, variant), () => finish(false));
+    const seq = playReveal(this, modal, plan, SKIP_ARM_MS, (cue, variant, delay) => this.sfx.play(cue, variant, delay), () => finish(false),
+      this.sfx.leadMs);
     this.addSkipZone(modal, seq, SKIP_ARM_MS, () => finish(true));
   }
 
@@ -660,7 +661,7 @@ export class GachaScene extends Phaser.Scene {
       'Touche pour tout retourner', textStyle(FONT_SIZE.small, ART_FX.splashText)).setOrigin(0.5).setAlpha(0.8);
     modal.add(hint);
     const flip = playFlip(this, modal, faces, results, flipSchedule(results, order), this.reducedMotion,
-      (cue, v) => this.sfx.play(cue, v), tapped => {
+      (cue, v, delay) => this.sfx.play(cue, v, delay), tapped => {
         if (tapped) this.sfx.stopAll();
         zone.destroy();
         if (this.reducedMotion || tapped) hint.destroy();
@@ -668,7 +669,7 @@ export class GachaScene extends Phaser.Scene {
         delete document.body.dataset.skip;
         this.markModal('results');
         addOk();
-      });
+      }, this.sfx.leadMs);
     // Appui pendant le retournement : tout se retourne, OK apparaît ; il ne ferme rien.
     const zone = this.addSkipZone(modal, flip.seq, 0, () => flip.finish(true));
   }

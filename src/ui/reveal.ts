@@ -5,7 +5,7 @@ import { PAN_SPREAD, STAR_RAIN_MS, type SoundVariant } from '../data/sounds';
 import type { PullResult } from '../logic/gacha';
 import type { FlipSchedule, RevealKind, RevealPlan } from '../logic/reveal';
 import { glossBand } from '../logic/motion';
-import { beatTimes, crackTimes, flipCues, revealCues, type Cue } from '../logic/soundCues';
+import { advanced, beatTimes, crackTimes, flipCues, revealCues, type Cue, type SoundCue } from '../logic/soundCues';
 import { orbSize, uiImage } from './art';
 import { GACHA, HEIGHT, RESULTS, REVEAL, WIDTH, resultCardRect, type Rect } from './layout';
 import { Particles, type Shape } from './particles';
@@ -284,13 +284,26 @@ function descendants(c: Phaser.GameObjects.Container): Phaser.GameObjects.GameOb
 // Révision 3 (lot A, FR-018 à FR-021) : nuit directe, cœur qui bat en lumière, fissures à
 // à-coups, gel, impact franc, palier fait de lumière et toujours en mouvement, fausses pistes
 // jouées, sortie dans un voile de lumière. Les durées restent celles de REVEAL_TIMING.
+// Sons d'une mise en scène, déclenchés `lead` ms plus tôt et programmés pour sonner à leur
+// instant (latence de sortie, FR-024). Avec lead = 0, chacun part à son instant.
+function scheduleCues(
+  seq: Sequence, cues: readonly SoundCue[], lead: number,
+  onCue: (cue: Cue, variant?: SoundVariant, delay?: number) => void,
+) {
+  for (const c of cues) {
+    const { callAt, delay } = advanced(c.at, lead);
+    seq.at(callAt, () => onCue(c.cue, c.variant, delay));
+  }
+}
+
 export function playReveal(
   scene: Phaser.Scene,
   modal: Phaser.GameObjects.Container,
   plan: RevealPlan,
   armMs: number,
-  onCue: (cue: Cue, variant?: SoundVariant) => void,
+  onCue: (cue: Cue, variant?: SoundVariant, delay?: number) => void,
   onDone: () => void,
+  lead = 0,
 ): Sequence {
   lightTextures(scene);
   const seq = new Sequence(scene);
@@ -760,7 +773,7 @@ export function playReveal(
     v.setAlpha(1);
     scene.tweens.add({ targets: v, alpha: 0, duration: m.outroFade, ease: 'Quad.easeOut', onComplete: () => v.destroy() });
   });
-  revealCues(plan).forEach(c => seq.at(c.at, () => onCue(c.cue, c.variant)));
+  scheduleCues(seq, revealCues(plan), lead, onCue);
   return seq;
 }
 
@@ -829,8 +842,9 @@ export function playFlip(
   results: readonly PullResult[],
   schedule: FlipSchedule,
   reduced: boolean,
-  onCue: (cue: Cue, variant?: SoundVariant) => void,
+  onCue: (cue: Cue, variant?: SoundVariant, delay?: number) => void,
   onDone: (tapped: boolean) => void,
+  lead = 0,
 ): { seq: Sequence; finish: (tapped: boolean) => void } {
   lightTextures(scene);
   const m = CARD_MOTION;
@@ -1024,6 +1038,6 @@ export function playFlip(
   seq.at(schedule.duration, () => finish(false));
   // Le son d'une carte vient de sa colonne (FR-020).
   const panOf = (i: number) => (2 * (resultCardRect(i).x + resultCardRect(i).w / 2) / WIDTH - 1) * PAN_SPREAD;
-  flipCues(schedule, panOf).forEach(c => seq.at(c.at, () => onCue(c.cue, c.variant)));
+  scheduleCues(seq, flipCues(schedule, panOf), lead, onCue);
   return { seq, finish };
 }

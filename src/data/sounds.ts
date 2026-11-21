@@ -156,6 +156,17 @@ export function impact(k: number): Tone[] {
   return tones;
 }
 
+// Passage vers les cartes (FR-023) : un souffle bref qui retombe sous le voile de lumière qui
+// clôt la révélation (REVEAL_MOTION.outro, src/ui/reveal.ts), et finit avec elle. Le bruit n'a
+// pas de hauteur : la transposition d'une montée le laisse tel quel.
+const OUTRO_RELEASE = 20;
+export function outroBreath(rarity: Rarity): Tone[] {
+  return [{
+    wave: 'noise', at: REVEAL_TIMING.final[rarity] - REVEAL_MOTION.outro, dur: REVEAL_MOTION.outro - OUTRO_RELEASE,
+    gain: 0.1, gainTo: 0.03, release: OUTRO_RELEASE, filter: { type: 'lowpass', freq: 2000, to: 400 },
+  }];
+}
+
 const rankOf = (rarity: Rarity): number => RARITIES.find(r => r.id === rarity)!.rank;
 const panned = (tones: readonly Tone[], pan: number): Tone[] => (pan === 0 ? [...tones] : tones.map(t => ({ ...t, pan })));
 
@@ -385,21 +396,21 @@ export const SOUND_RECIPES: Readonly<Record<SynthCue, readonly Tone[]>> = {
   // le rang. Le Commun (60 % des tirages) récompense aussi : un pincement rond au-dessus d'un
   // carré adouci, au-dessus du niveau du suspense.
   'tier:common': [
-    ...impact(0),
+    ...impact(0), ...outroBreath('common'),
     { wave: 'triangle', freq: C6, at: 0, dur: 380, gain: 0.85, decay: 300, sustain: 0.45 },
     { wave: 'sine', freq: C7, at: 0, dur: 240, gain: 0.15, decay: 200 },
     { wave: 'square', freq: C5, at: 0, dur: 380, gain: 0.3, decay: 300, sustain: PLUCK_SUSTAIN, filter: { type: 'lowpass', freq: 2500 } },
   ],
-  'tier:uncommon': [...impact(1), ...plucked(arpeggio([C5, E5], 90, 380, 'square', 0.45))],
-  'tier:rare': [...impact(2), ...plucked(arpeggio([C5, E5, G5], 90, 420, 'square', 0.42))],
+  'tier:uncommon': [...impact(1), ...outroBreath('uncommon'), ...plucked(arpeggio([C5, E5], 90, 380, 'square', 0.45))],
+  'tier:rare': [...impact(2), ...outroBreath('rare'), ...plucked(arpeggio([C5, E5, G5], 90, 420, 'square', 0.42))],
   'tier:legendary': [
-    ...impact(3),
+    ...impact(3), ...outroBreath('legendary'),
     ...plucked(arpeggio([C5, E5, G5, C6], 90, 420, 'square', 0.42)),
     ...[C5, E5, G5].map((freq): Tone => ({ freq, at: 360, dur: 700, wave: 'triangle', gain: 0.3 })),
     ...glitter(0x9117, 'legendary'),
   ],
   'tier:ultra': [
-    ...impact(4),
+    ...impact(4), ...outroBreath('ultra'),
     ...plucked(arpeggio([C5, E5, G5, C6, E6, G6], 80, 420, 'square', 0.42)),
     ...[C6, E6, G6].map((freq): Tone => ({ freq, at: 480, dur: 900, wave: 'triangle', gain: 0.3 })),
     ...shift(arpeggio([C7, G6, C7, G6], 120, 90, 'sine', 0.25), 600),

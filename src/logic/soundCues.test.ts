@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { CATALOGUE } from '../data/catalogue';
 import { RARITIES, type Rarity } from '../data/gachaConfig';
-import { FLIP_TIMING, REVEAL_TIMING as T } from '../data/revealConfig';
+import { FLIP_TIMING, REVEAL_MOTION, REVEAL_TIMING as T } from '../data/revealConfig';
 import {
   CARD_LADDER, CRACK_GAINS, GLITTER, SHARDS_AFTER_COINS, SOUND_RECIPES, SOUND_RELEASE_MS, SPLASH_MAX_MS, STAR_RAIN_MS,
-  UI_SOUND_LIMITS, cardFaceAt, impact, recipeEnd, recipeEnergy, soundRecipe, splashRecipe, toneEnd, toneEnergy,
+  UI_SOUND_LIMITS, cardFaceAt, impact, outroBreath, recipeEnd, recipeEnergy, soundRecipe, splashRecipe, toneEnd, toneEnergy,
   type CardVariant, type OscTone, type SplashVariant, type StarVariant, type Tone,
 } from '../data/sounds';
 import type { PullResult } from './gacha';
 import { flipOrder, flipSchedule, planReveal, revealDuration, type RevealPlan } from './reveal';
 import { DEFAULT_SETTINGS, parseSettings, serializeSettings } from './settings';
-import { RISE_SEMITONES, beatTimes, crackTimes, flipCues, revealCues } from './soundCues';
+import { RISE_SEMITONES, advanced, beatTimes, crackTimes, flipCues, outputLead, revealCues } from './soundCues';
 import { scriptedRng } from './testing';
 
 const res = (rarity: Rarity): PullResult =>
@@ -249,6 +249,15 @@ describe('sons de la révélation (FR-001 à FR-003)', () => {
     expect(recipeEnd(SOUND_RECIPES.suspense)).toBeLessThan(T.suspense);
     for (const r of ALL) expect(recipeEnd(SOUND_RECIPES[`tier:${r}`]), r).toBeLessThanOrEqual(T.final[r]);
   });
+
+  it('souffle de passage vers les cartes : sous le voile de sortie, fini avec la révélation (FR-023)', () => {
+    for (const r of ALL) {
+      const [breath] = outroBreath(r);
+      expect(breath!.at, r).toBe(T.final[r] - REVEAL_MOTION.outro);
+      expect(toneEnd(breath!), r).toBe(T.final[r]);
+      expect(SOUND_RECIPES[`tier:${r}`], r).toContainEqual(breath);
+    }
+  });
 });
 
 describe('sons du retournement (FR-004, FR-020)', () => {
@@ -432,6 +441,27 @@ describe('réglages du son (FR-007)', () => {
   it('illisible ou mal typé : défaut', () => {
     for (const raw of ['{cassé', '42', 'null', '{}', '{"muted":"oui"}', '{"muted":1}']) {
       expect(parseSettings(raw), raw).toEqual({ muted: false });
+    }
+  });
+});
+
+// Révision du 2026-11-13, FR-024 : latence de sortie (casque sans fil).
+describe('avance de sortie (FR-024)', () => {
+  it('rien sous le seuil, la latence au-delà, bornée à 150 ms', () => {
+    expect(outputLead(0)).toBe(0);
+    expect(outputLead(40)).toBe(0);
+    expect(outputLead(41)).toBe(41);
+    expect(outputLead(120)).toBe(120);
+    expect(outputLead(250)).toBe(150);
+  });
+
+  it('déclenché plus tôt, programmé pour sonner à son instant ; jamais avant le début', () => {
+    expect(advanced(720, 120)).toEqual({ callAt: 600, delay: 120 });
+    expect(advanced(50, 120)).toEqual({ callAt: 0, delay: 50 });
+    expect(advanced(720, 0)).toEqual({ callAt: 720, delay: 0 });
+    for (const at of [0, 30, 500, 1600]) {
+      const { callAt, delay } = advanced(at, 150);
+      expect(callAt + delay).toBe(at);
     }
   });
 });

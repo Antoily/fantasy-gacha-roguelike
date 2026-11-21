@@ -138,3 +138,9 @@ export const CARD_MOTION = {
   rayTurn: 12,
   float: 2400,
 } as const;
+
+// Avance des sons des mises en scène (005, FR-024) : un casque sans fil retarde le son de 150 à
+// 250 ms. Au-delà de `threshold` ms annoncés par l'appareil, chaque son est déclenché d'autant
+// plus tôt, `max` au plus. Ici et non dans sounds.ts : soundCues.ts le lit, et sounds.ts lit
+// soundCues.ts au chargement (un import de valeur dans l'autre sens ferait un cycle).
+export const OUTPUT_LEAD = { threshold: 40, max: 150 } as const;

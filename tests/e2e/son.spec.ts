@@ -2,9 +2,11 @@ import { expect, test, type Page } from '@playwright/test';
 import type { Rarity } from '../../src/data/gachaConfig';
 import { REVEAL_TIMING } from '../../src/data/revealConfig';
 import { SETTINGS_KEY } from '../../src/logic/settings';
-import { CONFIRM_DIALOG_H, GACHA, RESULTS, dialogButtons, dialogRect } from '../../src/ui/layout';
+import { crackTimes } from '../../src/logic/soundCues';
+import { CONFIRM_DIALOG_H, GACHA, RESULTS, center, dialogButtons, dialogRect } from '../../src/ui/layout';
 import {
-  FRESH, armedSkip, capture, installRng, load, loadWith, rarityRoll, scriptRng, start, tap, waitModal,
+  FRESH, armedSkip, capture, freeze, installManualClock, installRng, load, loadWith, modal, rarityRoll, scriptRng, start, step, tap,
+  waitModal,
 } from './helpers';
 
 // Scénarios de specs/005-son/quickstart.md. La CI n'entend rien : on lit le journal des
@@ -203,4 +205,62 @@ test('son coupé : aucun son d’interface ; rétabli, le bouton son le confirme
   await tap(page, GACHA.mute);
   expect(await muted(page)).toBe('0');
   expect(await sounds(page)).toBe('tap');
+});
+
+// Révision du 2026-11-13, FR-024 : un casque sans fil annonce 120 ms de latence ; les sons
+// partent d'autant plus tôt, mais le journal (écrit à l'instant prévu) ne change pas, et passer
+// annule aussi les sons déjà programmés.
+test.describe('casque sans fil (FR-024)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(AudioContext.prototype, 'outputLatency', { configurable: true, get: () => 0.12 });
+    });
+    await load(page);
+  });
+
+  test('sons avancés de 120 ms, même journal', async ({ page }) => {
+    await pullOne(page, 'common', [DIRECT]);
+    expect(await page.evaluate(() => document.body.dataset.soundLead)).toBe('120');
+    expect(await sounds(page)).toBe('suspense crack crack crack tier:common');
+  });
+
+  test('le journal inscrit un son avancé à son instant prévu, pas à son déclenchement', async ({ page }) => {
+    await installManualClock(page);
+    await load(page);
+    await scriptRng(page, [rarityRoll('rare'), 0, DIRECT]);
+    // Temps du jeu figé : la révélation part à l'appui, chaque pas est exact.
+    await freeze(page, true);
+    const { x, y } = center(GACHA.pullSingle);
+    await page.mouse.click(x, y);
+    expect(await modal(page)).toBe('reveal');
+    const crack = crackTimes()[0]!;
+    const live = async () => Number(await page.evaluate(() => document.body.dataset.soundsLive));
+    await step(page, crack - 130);
+    const before = await live();
+    // Entre le déclenchement (crack − 120 ms) et l'instant prévu : les voix de la fissure sont
+    // déjà programmées (avance), mais elle n'est pas encore au journal.
+    await step(page, 70);
+    expect(await live()).toBeGreaterThan(before);
+    expect(await sounds(page)).toBe('suspense');
+    await step(page, 120);
+    expect(await sounds(page)).toBe('suspense crack');
+    await freeze(page, false);
+  });
+
+  test('passer annule aussi les sons programmés d’avance', async ({ page }) => {
+    await installManualClock(page);
+    await load(page);
+    await scriptRng(page, [rarityRoll('rare'), 0, DIRECT]);
+    await freeze(page, true);
+    const { x, y } = center(GACHA.pullSingle);
+    await page.mouse.click(x, y);
+    // Dans la fenêtre d'avance de la première fissure : déjà programmée, pas encore au journal.
+    await step(page, crackTimes()[0]! - 60);
+    expect(await page.evaluate(() => document.body.dataset.skip)).toBe('armed');
+    await page.mouse.click(180, 320);
+    await step(page, 300);
+    expect(await sounds(page)).toBe('suspense');
+    expect(await page.evaluate(() => document.body.dataset.soundsLive)).toBe('0');
+    await freeze(page, false);
+  });
 });

@@ -1,5 +1,5 @@
 import type { Rarity } from '../data/gachaConfig';
-import { REVEAL_TIMING } from '../data/revealConfig';
+import { OUTPUT_LEAD, REVEAL_TIMING } from '../data/revealConfig';
 import type { SoundVariant, UiCue } from '../data/sounds';
 import type { FlipSchedule, RevealPlan } from './reveal';
 
@@ -55,4 +55,17 @@ export function flipCues(schedule: FlipSchedule, panOf: (index: number) => numbe
     : { at: s.at, cue: 'card', variant: {
       kind: 'card', anticipation: s.anticipation, turn: s.turn, rarity: s.rarity, step: step++, pan: panOf(s.index),
     } });
+}
+
+// Avance (ms) qui compense la latence de sortie annoncée par l'appareil (FR-024) : rien sous
+// le seuil (haut-parleur, casque filaire), bornée au-delà.
+export function outputLead(latencyMs: number): number {
+  return latencyMs > OUTPUT_LEAD.threshold ? Math.min(latencyMs, OUTPUT_LEAD.max) : 0;
+}
+
+// Un son prévu à `at` : déclenché `lead` ms plus tôt (jamais avant le début), et programmé
+// `delay` ms après son déclenchement pour sonner à l'instant voulu.
+export function advanced(at: number, lead: number): { callAt: number; delay: number } {
+  const callAt = Math.max(0, at - lead);
+  return { callAt, delay: at - callAt };
 }
