@@ -300,7 +300,6 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
 - **`cancelAndHoldAtTime` sur une enveloppe en cours** a tenu une valeur fausse dans Chromium
   (claquement à la coupure, vu au rendu) : chaque voix a un gain réservé aux coupures, dont on
   suit soi-même la rampe.
-
 - **Cycle d'import data ↔ logic** : `sounds.ts` appelle `soundCues.ts` à son chargement (`beatTimes`) ;
   un import de **valeur** dans l'autre sens (une constante de `sounds.ts` lue par `soundCues.ts`) fait
   planter selon l'ordre de chargement (« Cannot access before initialization », vu dans l'e2e
