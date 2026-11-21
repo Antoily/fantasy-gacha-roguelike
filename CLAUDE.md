@@ -300,6 +300,15 @@ Skills installés dans `.claude/skills/speckit-*` (Spec Kit **v1.2.1**, épingl�
 - **`cancelAndHoldAtTime` sur une enveloppe en cours** a tenu une valeur fausse dans Chromium
   (claquement à la coupure, vu au rendu) : chaque voix a un gain réservé aux coupures, dont on
   suit soi-même la rampe.
+- **Cycle d'import data ↔ logic** : `sounds.ts` appelle `soundCues.ts` à son chargement (`beatTimes`) ;
+  un import de **valeur** dans l'autre sens (une constante de `sounds.ts` lue par `soundCues.ts`) fait
+  planter selon l'ordre de chargement (« Cannot access before initialization », vu dans l'e2e
+  seulement). Les constantes lues par la logique vont dans un fichier de données sans dépendance
+  (`revealConfig.ts`).
+- **Sons avancés (latence de sortie)** : `advanced(at, lead)` déclenche plus tôt et programme le son
+  à son instant ; le journal l'inscrit à l'instant prévu (`pendingLogs`, annulés par `stopAll`).
+  Tester la fenêtre d'avance avec l'horloge manuelle (`freeze` / `step`) : sans elle, l'appui qui
+  passe tombe avant qu'aucun son soit programmé et la mutation « passer n'annule pas » survit.
 
 ## Leçons de l'écran vivant (2026-11-09)
 

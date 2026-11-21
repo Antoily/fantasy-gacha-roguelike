@@ -4,6 +4,7 @@ import type { Item } from '../data/catalogue';
 import { GACHA_CONFIG, RARITIES, SHARD_COST, type Rarity } from '../data/gachaConfig';
 import { TRANSITIONS, WINDOW } from '../data/ambienceConfig';
 import { CARD_MOTION } from '../data/revealConfig';
+import { SHARDS_AFTER_COINS, SPLASH_FADE_MS } from '../data/sounds';
 import { formatAmount } from '../logic/format';
 import { rollAmount } from '../logic/motion';
 import type { PullResult } from '../logic/gacha';
@@ -26,7 +27,7 @@ import {
 } from '../ui/layout';
 import { Particles } from '../ui/particles';
 import { celebrateSingle, glossBest, playFlip, playReveal, sparkleBest, type Sequence } from '../ui/reveal';
-import { playSplash } from '../ui/splash';
+import { playSplash, splashSound } from '../ui/splash';
 import { Sfx } from '../ui/sfx';
 import { ART_FX, COLORS, CSS, FONT_SIZE, RADIUS, STROKE, WINDOW_FX } from '../ui/theme';
 import {
@@ -348,9 +349,10 @@ export class GachaScene extends Phaser.Scene {
   // l'ancien montant reste affiché et défile à la fermeture (closeModal).
   private showAmounts() {
     if (this.modalOpen) return;
-    this.rollTo('currency', this.progression.currency, this.coinIcon);
+    const coins = this.rollTo('currency', this.progression.currency, this.coinIcon);
+    // Éclats après les pièces quand les deux défilent : leurs tintements se suivent (FR-022).
     this.rollTo('shards', this.progression.shards,
-      this.shardIcon instanceof Phaser.GameObjects.Image ? this.shardIcon : null);
+      this.shardIcon instanceof Phaser.GameObjects.Image ? this.shardIcon : null, coins ? SHARDS_AFTER_COINS : 0);
   }
 
   // Une fenêtre en remplace souvent une autre dans la même image (révélation → résultats) :
@@ -359,12 +361,15 @@ export class GachaScene extends Phaser.Scene {
     this.time.delayedCall(0, () => this.showAmounts());
   }
 
-  private rollTo(key: 'currency' | 'shards', to: number, icon: Phaser.GameObjects.Image | null) {
+  // Vrai si le montant défile (et tinte).
+  private rollTo(key: 'currency' | 'shards', to: number, icon: Phaser.GameObjects.Image | null, delay = 0): boolean {
     // Un montant qui change en plein défilement repart de la valeur affichée.
     const from = this.shown[key];
-    if (from === to) return;
-    // Pièces ou éclats qui tintent le temps du défilement (005, FR-012).
-    this.sfx.play(key === 'currency' ? 'coins' : 'shards');
+    if (from === to) return false;
+    // Pièces ou éclats qui tintent le temps du défilement (005, FR-012) ; les pièces
+    // descendent quand le solde baisse, montent quand il monte (FR-022).
+    if (key === 'currency') this.sfx.play('coins', { kind: 'coins', dir: to < from ? 'down' : 'up' });
+    else this.sfx.play('shards', { kind: 'shards', delay });
     this.rolls[key]?.remove();
     const set = (n: number) => {
       this.shown[key] = n;
@@ -372,20 +377,21 @@ export class GachaScene extends Phaser.Scene {
     };
     if (this.reducedMotion) {
       set(to);
-      return;
+      return true;
     }
     this.rolls[key] = this.tweens.addCounter({
       from: 0, to: 1, duration: TRANSITIONS.roll, ease: 'Cubic.Out',
       onUpdate: tw => set(rollAmount(from, to, tw.getValue() ?? 0)),
       onComplete: () => set(to),
     });
-    if (!icon) return;
+    if (!icon) return true;
     // Échelle de repos mémorisée : un rebond coupé en route ne doit pas la fausser.
     const base = (icon.getData('baseScale') as number | undefined) ?? icon.scaleX;
     icon.setData('baseScale', base);
     this.tweens.killTweensOf(icon);
     icon.setScale(base);
     this.tweens.add({ targets: icon, scale: base * TRANSITIONS.iconBounce, duration: TRANSITIONS.roll / 4, yoyo: true, ease: 'Quad.Out' });
+    return true;
   }
 
   private drawAmount(key: 'currency' | 'shards') {
@@ -465,7 +471,8 @@ export class GachaScene extends Phaser.Scene {
         onShown: () => this.showSplashes(queue, results, counts, () => {}),
       });
     };
-    const seq = playReveal(this, modal, plan, SKIP_ARM_MS, (cue, variant) => this.sfx.play(cue, variant), () => finish(false));
+    const seq = playReveal(this, modal, plan, SKIP_ARM_MS, (cue, variant, delay) => this.sfx.play(cue, variant, delay), () => finish(false),
+      this.sfx.leadMs);
     this.addSkipZone(modal, seq, SKIP_ARM_MS, () => finish(true));
   }
 
@@ -497,7 +504,10 @@ export class GachaScene extends Phaser.Scene {
       // La nuit tombe en fondu sur les résultats du ×10 ; une présentation qui suit une autre
       // s'ouvre sous elle, qui s'efface par-dessus.
       const options = { reduced: this.reducedMotion, fadeIn: i === 0 && under !== undefined };
+      // Fanfare d'entrée (005, FR-021), éteinte en fondu quand le joueur ferme.
+      this.sfx.play('splash', splashSound(results[index]!.item.rarity, this.reducedMotion));
       const splash = playSplash(this, modal, results[index]!, counts[index]!, options, () => {
+        this.sfx.fade('splash', SPLASH_FADE_MS);
         splash.leave();
         delete document.body.dataset.splash;
         delete document.body.dataset.skip;
@@ -651,7 +661,7 @@ export class GachaScene extends Phaser.Scene {
       'Touche pour tout retourner', textStyle(FONT_SIZE.small, ART_FX.splashText)).setOrigin(0.5).setAlpha(0.8);
     modal.add(hint);
     const flip = playFlip(this, modal, faces, results, flipSchedule(results, order), this.reducedMotion,
-      cue => this.sfx.play(cue), tapped => {
+      (cue, v, delay) => this.sfx.play(cue, v, delay), tapped => {
         if (tapped) this.sfx.stopAll();
         zone.destroy();
         if (this.reducedMotion || tapped) hint.destroy();
@@ -659,7 +669,7 @@ export class GachaScene extends Phaser.Scene {
         delete document.body.dataset.skip;
         this.markModal('results');
         addOk();
-      });
+      }, this.sfx.leadMs);
     // Appui pendant le retournement : tout se retourne, OK apparaît ; il ne ferme rien.
     const zone = this.addSkipZone(modal, flip.seq, 0, () => flip.finish(true));
   }

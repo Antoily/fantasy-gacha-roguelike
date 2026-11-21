@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
-import { RARITIES } from '../data/gachaConfig';
+import { RARITIES, type Rarity } from '../data/gachaConfig';
+import type { SplashVariant } from '../data/sounds';
 import type { PullResult } from '../logic/gacha';
 import { artKey, hasArt, uiImage } from './art';
 import { HEIGHT, SPLASH, SPLASH_MOTION, SPLASH_TIMING, WIDTH } from './layout';
@@ -26,6 +27,17 @@ export interface Splash {
 const T = SPLASH_TIMING;
 const M = SPLASH_MOTION;
 const V = Phaser.Math.Vector2;
+
+// Le nom tombé en tampon touche « le sol » à 45 % de son entrée : la poussière d'étoiles part
+// de là, et le « ta-da » de la fanfare y tombe.
+const NAME_LANDS = 0.45;
+
+// Instants de la fanfare (005, FR-021), pris sur ceux de l'image : l'impact sur l'éclair, le
+// « ta-da » sur le nom. En mouvement réduit, tout est là d'emblée : l'impact part tout de suite.
+export function splashSound(rarity: Rarity, reduced: boolean): SplashVariant {
+  const flash = reduced ? 0 : T.silhouette;
+  return { kind: 'splash', rarity, flash, stamp: flash + T.nameDelay + T.name * NAME_LANDS };
+}
 
 // Phase pour l'e2e : `silhouette`, puis `color` après l'éclair (FR-020).
 const setPhase = (phase: 'silhouette' | 'color') => { document.body.dataset.splashPhase = phase; };
@@ -194,7 +206,7 @@ export function playSplash(
     name.setAlpha(0).setScale(M.nameFrom);
     seq.tween({ targets: name, scale: 1, duration: T.name, delay: stamp, ease: 'Back.easeOut' });
     seq.tween({ targets: name, alpha: 1, duration: T.name * 0.35, delay: stamp });
-    seq.at(stamp + T.name * 0.45, () => particles.burst({
+    seq.at(stamp + T.name * NAME_LANDS, () => particles.burst({
       x: WIDTH / 2, y: SPLASH.nameY + 16, count: 18, colors, shapes: ['spark', 'star'],
       speed: [60, 200], size: [2, 4], life: [300, 600], angle: [Math.PI, 2 * Math.PI], spawnRadius: [0, name.width / 2],
       gravity: 300, drag: 2,

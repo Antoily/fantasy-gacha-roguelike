@@ -113,16 +113,17 @@ function scheduleTone(ctx: BaseAudioContext, tone: Tone, t0: number, dest: Audio
   }
   // Enveloppe : attaque courte (sans quoi la note claque), puis décroissance naturelle,
   // crescendo ou plateau, et relâche exponentielle (τ = relâche / 5, à −43 dB à la fin).
+  const attack = (tone.attack ?? SOUND_ATTACK_MS) / 1000;
   const gain = ctx.createGain();
   gain.gain.value = 0;
   gain.gain.setValueAtTime(0, start);
-  gain.gain.linearRampToValueAtTime(tone.gain, start + SOUND_ATTACK_MS / 1000);
+  gain.gain.linearRampToValueAtTime(tone.gain, start + attack);
   if (tone.decay !== undefined) {
-    gain.gain.setTargetAtTime(tone.gain * (tone.sustain ?? 0), start + SOUND_ATTACK_MS / 1000, tone.decay / 1000 / 3);
+    gain.gain.setTargetAtTime(tone.gain * (tone.sustain ?? 0), start + attack, tone.decay / 1000 / 3);
   } else {
     // Plateau ou crescendo, creusé à chaque `dips` : on enchaîne des rampes linéaires sur la
     // même droite, abaissée de SOUND_DIP.gain le temps du creux.
-    const a = start + SOUND_ATTACK_MS / 1000;
+    const a = start + attack;
     const to = tone.gainTo ?? tone.gain;
     const line = (x: number) => tone.gain + ((to - tone.gain) * (x - a)) / (end - a);
     for (const d of tone.dips ?? []) {
@@ -138,7 +139,18 @@ function scheduleTone(ctx: BaseAudioContext, tone: Tone, t0: number, dest: Audio
   }
   gain.gain.setTargetAtTime(0, end, release / 5);
   const cut = ctx.createGain();
-  out.connect(gain).connect(cut).connect(dest);
+  out = out.connect(gain).connect(cut);
+  // Panoramique : le son d'une carte vient de sa colonne (FR-020). Le StereoPanner répartit une
+  // source mono à puissance constante : au centre, chaque côté reçoit 1/√2, soit −3 dB par
+  // rapport à une voix non placée (recopiée telle quelle à gauche et à droite) ; on les rend.
+  if (tone.pan !== undefined && tone.pan !== 0) {
+    const pan = ctx.createStereoPanner();
+    pan.pan.value = tone.pan;
+    const lift = ctx.createGain();
+    lift.gain.value = Math.SQRT2;
+    out = out.connect(lift).connect(pan);
+  }
+  out.connect(dest);
   if (src instanceof AudioBufferSourceNode) src.start(start, noiseCursor);
   else src.start(start);
   src.stop(end + release);
@@ -193,12 +205,15 @@ export class Mixer {
     this.bus = createBus(ctx);
   }
 
-  // `variant` change la recette (rang d'une fissure, palier transposé), pas le nom du bruitage.
-  play(cue: Cue, variant?: SoundVariant) {
-    const now = this.ctx.currentTime;
+  // `variant` change la recette (rang d'une fissure, palier transposé ; instants et rang de ce que
+  // le son accompagne : cartes, vedette, présentation, sens des pièces), pas le nom du bruitage.
+  // `delay` (s) : son programmé plus tard, déclenché en avance pour compenser la latence (FR-024).
+  play(cue: Cue, variant?: SoundVariant, delay = 0) {
+    const now = this.ctx.currentTime + delay;
     // Montée et rire étouffent le faux palier qui sonne encore (FR-019) ; le vrai palier
-    // baisse le rire qui sonne encore, pour se faire entendre dessous.
-    if (cue === 'rise' || cue === 'laugh') this.choke(now, SOUND_CHOKES[cue]);
+    // baisse le rire qui sonne encore, pour se faire entendre dessous. La fanfare d'une
+    // présentation éteint la vedette.
+    if (cue === 'rise' || cue === 'laugh' || cue === 'splash') this.choke(now, SOUND_CHOKES[cue]);
     if (cue.startsWith('tier:')) this.live.forEach(v => {
       if (v.name === 'laugh') duckVoice(v, now, LAUGH_DUCK.ms, LAUGH_DUCK.gain);
     });
@@ -210,6 +225,11 @@ export class Mixer {
     }
   }
 
+  // Éteint en `ms` ce qui sonne encore d'un bruitage (la fanfare quand on ferme la présentation).
+  fade(cue: Cue, ms: number) {
+    this.choke(this.ctx.currentTime, { of: cue, ms, pitch: 1 });
+  }
+
   // Fondu de 20 ms plutôt qu'un arrêt net, qui claque (FR-016). Le compteur tombe à zéro tout
   // de suite : plus rien ne peut se faire entendre au-delà du fondu.
   stopAll() {
@@ -219,9 +239,10 @@ export class Mixer {
     this.onLive(0);
   }
 
-  private choke(now: number, { ms, pitch }: { ms: number; pitch: number }) {
+  // Voix dont le nom commence par `of` (`tier:` pour tous les paliers).
+  private choke(now: number, { of, ms, pitch }: { of: string; ms: number; pitch: number }) {
     this.live.forEach(v => {
-      if (!v.name.startsWith('tier:')) return;
+      if (!v.name.startsWith(of)) return;
       fadeVoice(v, now, ms, pitch);
       this.live.delete(v);
     });

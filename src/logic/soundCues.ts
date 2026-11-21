@@ -1,16 +1,16 @@
 import type { Rarity } from '../data/gachaConfig';
-import { REVEAL_TIMING } from '../data/revealConfig';
+import { OUTPUT_LEAD, REVEAL_TIMING } from '../data/revealConfig';
 import type { SoundVariant, UiCue } from '../data/sounds';
 import type { FlipSchedule, RevealPlan } from './reveal';
 
-export type Cue = 'suspense' | 'crack' | `tier:${Rarity}` | 'rise' | 'laugh' | 'card' | 'star' | UiCue;
+export type Cue = 'suspense' | 'crack' | `tier:${Rarity}` | 'rise' | 'laugh' | 'card' | 'star' | 'splash' | UiCue;
 
 export interface SoundCue {
   // Instant en ms depuis le début de la révélation, ou du retournement des cartes.
   readonly at: number;
   readonly cue: Cue;
-  // Ce qui change le son sans changer son nom (rang d'une fissure, palier transposé) ; hors
-  // du journal (révision du 2026-11-13).
+  // Ce qui change le son sans changer son nom (rang d'une fissure, palier transposé, instants et
+  // rang de ce que le son accompagne) ; hors du journal (révision du 2026-11-13).
   readonly variant?: SoundVariant;
 }
 
@@ -44,8 +44,28 @@ export function revealCues(plan: RevealPlan): SoundCue[] {
   return cues;
 }
 
-// Retournement du ×10 : un petit bruit par carte ordinaire, un son marqué pour la
-// vedette, chacun quand la carte commence à tourner (FR-004).
-export function flipCues(schedule: FlipSchedule): SoundCue[] {
-  return schedule.steps.map(s => ({ at: s.at + s.anticipation, cue: s.star ? 'star' : 'card' }));
+// Retournement du ×10 : un son par carte ordinaire, un son marqué pour la vedette (FR-004).
+// Révision du 2026-11-13 (FR-020) : chacun part au début de l'anticipation (le dos qui tremble,
+// le cœur qui bat) et porte ses instants, pour que sa note tombe à l'apparition de la face,
+// une marche plus haut à chaque carte. `panOf` : panoramique de la carte `index` (sa colonne).
+export function flipCues(schedule: FlipSchedule, panOf: (index: number) => number = () => 0): SoundCue[] {
+  let step = 0;
+  return schedule.steps.map((s): SoundCue => s.star
+    ? { at: s.at, cue: 'star', variant: { kind: 'star', beat: s.anticipation, turn: s.turn, rarity: s.rarity } }
+    : { at: s.at, cue: 'card', variant: {
+      kind: 'card', anticipation: s.anticipation, turn: s.turn, rarity: s.rarity, step: step++, pan: panOf(s.index),
+    } });
+}
+
+// Avance (ms) qui compense la latence de sortie annoncée par l'appareil (FR-024) : rien sous
+// le seuil (haut-parleur, casque filaire), bornée au-delà.
+export function outputLead(latencyMs: number): number {
+  return latencyMs > OUTPUT_LEAD.threshold ? Math.min(latencyMs, OUTPUT_LEAD.max) : 0;
+}
+
+// Un son prévu à `at` : déclenché `lead` ms plus tôt (jamais avant le début), et programmé
+// `delay` ms après son déclenchement pour sonner à l'instant voulu.
+export function advanced(at: number, lead: number): { callAt: number; delay: number } {
+  const callAt = Math.max(0, at - lead);
+  return { callAt, delay: at - callAt };
 }

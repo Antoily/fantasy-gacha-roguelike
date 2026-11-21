@@ -2,9 +2,11 @@ import { expect, test, type Page } from '@playwright/test';
 import type { Rarity } from '../../src/data/gachaConfig';
 import { REVEAL_TIMING } from '../../src/data/revealConfig';
 import { SETTINGS_KEY } from '../../src/logic/settings';
-import { CONFIRM_DIALOG_H, GACHA, RESULTS, dialogButtons, dialogRect } from '../../src/ui/layout';
+import { crackTimes } from '../../src/logic/soundCues';
+import { CONFIRM_DIALOG_H, GACHA, RESULTS, center, dialogButtons, dialogRect } from '../../src/ui/layout';
 import {
-  FRESH, armedSkip, capture, installRng, load, loadWith, rarityRoll, scriptRng, start, tap, waitModal,
+  FRESH, armedSkip, capture, freeze, installManualClock, installRng, load, loadWith, modal, rarityRoll, scriptRng, start, step, tap,
+  waitModal,
 } from './helpers';
 
 // Scénarios de specs/005-son/quickstart.md. La CI n'entend rien : on lit le journal des
@@ -32,8 +34,9 @@ async function pullOne(page: Page, rarity: Rarity, reveal: readonly number[]) {
 }
 
 test('palier direct : suspense puis le son du palier (FR-001)', async ({ page }) => {
+  // Révision du 2026-11-13 (FR-021) : la présentation plein écran a sa fanfare.
   await pullOne(page, 'ultra', [DIRECT]);
-  expect(await sounds(page)).toBe('suspense crack crack crack tier:ultra');
+  expect(await sounds(page)).toBe('suspense crack crack crack tier:ultra splash');
   await tap(page, RESULTS.ok);
   await pullOne(page, 'common', [DIRECT]);
   expect(await sounds(page)).toBe('suspense crack crack crack tier:common');
@@ -41,7 +44,7 @@ test('palier direct : suspense puis le son du palier (FR-001)', async ({ page })
 
 test('montée : son de montée entre les deux paliers (FR-002)', async ({ page }) => {
   await pullOne(page, 'legendary', [0.1]);
-  expect(await sounds(page)).toBe('suspense crack crack crack tier:rare rise tier:legendary');
+  expect(await sounds(page)).toBe('suspense crack crack crack tier:rare rise tier:legendary splash');
 });
 
 test('leurre : le rire diabolique à la retombée (FR-003)', async ({ page }) => {
@@ -58,9 +61,10 @@ test('×10 : un bruit par carte, la vedette en dernier (FR-004)', async ({ page 
   for (let i = 0; i < 10; i++) values.push(rarityRoll(i === 3 ? 'legendary' : 'common'), 0);
   await scriptRng(page, [...values, DIRECT]);
   await tap(page, GACHA.pullTen);
-  await waitModal(page, 'results');
+  // Révélation, dix retournements et une présentation : long sur une machine chargée.
+  await waitModal(page, 'results', 30_000);
   await page.waitForTimeout(100);
-  expect(await sounds(page)).toBe(['suspense', 'crack', 'crack', 'crack', 'tier:legendary', ...Array<string>(9).fill('card'), 'star'].join(' '));
+  expect(await sounds(page)).toBe(['suspense', 'crack', 'crack', 'crack', 'tier:legendary', ...Array<string>(9).fill('card'), 'star', 'splash'].join(' '));
 });
 
 test('passer : plus aucun son après l’appui (FR-005, SC-003)', async ({ page }) => {
@@ -69,12 +73,15 @@ test('passer : plus aucun son après l’appui (FR-005, SC-003)', async ({ page 
   await waitModal(page, 'reveal');
   await armedSkip(page);
   await page.mouse.click(180, 320);
+  // La présentation de l'Ultra rare s'ouvre quand même (007), avec sa fanfare (FR-021) : rien
+  // d'autre de la révélation passée ne sonne, ni avant ni après qu'on la ferme.
+  await page.waitForFunction(() => document.body.dataset.modal === 'splash');
+  expect(await sounds(page)).toBe('suspense splash');
   await waitModal(page, 'results');
-  expect(await sounds(page)).toBe('suspense');
-  // La sirène du suspense sonnait encore : elle est coupée net.
+  // La sirène, puis la fanfare fermée, sont coupées net.
   expect(await page.evaluate(() => document.body.dataset.soundsLive)).toBe('0');
   await page.waitForTimeout(T.suspense + T.final.ultra);
-  expect(await sounds(page)).toBe('suspense');
+  expect(await sounds(page)).toBe('suspense splash');
 });
 
 // Révision du 2026-11-13 (FR-016, SC-008) : le rire est joué dans le bus du lecteur et compte
@@ -92,6 +99,21 @@ test('passer pendant le rire : le rire se tait aussi (FR-016, SC-008)', async ({
   const heard = await sounds(page);
   await page.waitForTimeout(T.final.rare);
   expect(await sounds(page)).toBe(heard);
+});
+
+// FR-021 : la fanfare s'éteint quand le joueur ferme la présentation (elle dure 1,6 s, l'appui
+// est armé à 450 ms : elle sonne encore).
+test('fermer la présentation éteint sa fanfare (FR-021)', async ({ page }) => {
+  await scriptRng(page, [rarityRoll('legendary'), 0, DIRECT]);
+  await tap(page, GACHA.pullSingle);
+  await waitModal(page, 'reveal');
+  await page.waitForFunction(() => document.body.dataset.modal === 'splash');
+  expect(await sounds(page)).toBe('suspense crack crack crack tier:legendary splash');
+  expect(Number(await page.evaluate(() => document.body.dataset.soundsLive))).toBeGreaterThan(0);
+  await armedSkip(page);
+  await page.mouse.click(180, 600);
+  await waitModal(page, 'results');
+  expect(await page.evaluate(() => document.body.dataset.soundsLive)).toBe('0');
 });
 
 test('couper le son : silence, mémorisé, survit à « Recommencer » (FR-006, FR-007)', async ({ page }) => {
@@ -142,7 +164,7 @@ test('un son qui plante ne perturbe pas le jeu (FR-008)', async ({ page }) => {
   });
   await load(page);
   await pullOne(page, 'ultra', [DIRECT]);
-  expect(await sounds(page)).toBe('suspense crack crack crack tier:ultra');
+  expect(await sounds(page)).toBe('suspense crack crack crack tier:ultra splash');
   await tap(page, RESULTS.ok);
   expect(errors).toEqual([]);
 });
@@ -183,4 +205,62 @@ test('son coupé : aucun son d’interface ; rétabli, le bouton son le confirme
   await tap(page, GACHA.mute);
   expect(await muted(page)).toBe('0');
   expect(await sounds(page)).toBe('tap');
+});
+
+// Révision du 2026-11-13, FR-024 : un casque sans fil annonce 120 ms de latence ; les sons
+// partent d'autant plus tôt, mais le journal (écrit à l'instant prévu) ne change pas, et passer
+// annule aussi les sons déjà programmés.
+test.describe('casque sans fil (FR-024)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(AudioContext.prototype, 'outputLatency', { configurable: true, get: () => 0.12 });
+    });
+    await load(page);
+  });
+
+  test('sons avancés de 120 ms, même journal', async ({ page }) => {
+    await pullOne(page, 'common', [DIRECT]);
+    expect(await page.evaluate(() => document.body.dataset.soundLead)).toBe('120');
+    expect(await sounds(page)).toBe('suspense crack crack crack tier:common');
+  });
+
+  test('le journal inscrit un son avancé à son instant prévu, pas à son déclenchement', async ({ page }) => {
+    await installManualClock(page);
+    await load(page);
+    await scriptRng(page, [rarityRoll('rare'), 0, DIRECT]);
+    // Temps du jeu figé : la révélation part à l'appui, chaque pas est exact.
+    await freeze(page, true);
+    const { x, y } = center(GACHA.pullSingle);
+    await page.mouse.click(x, y);
+    expect(await modal(page)).toBe('reveal');
+    const crack = crackTimes()[0]!;
+    const live = async () => Number(await page.evaluate(() => document.body.dataset.soundsLive));
+    await step(page, crack - 130);
+    const before = await live();
+    // Entre le déclenchement (crack − 120 ms) et l'instant prévu : les voix de la fissure sont
+    // déjà programmées (avance), mais elle n'est pas encore au journal.
+    await step(page, 70);
+    expect(await live()).toBeGreaterThan(before);
+    expect(await sounds(page)).toBe('suspense');
+    await step(page, 120);
+    expect(await sounds(page)).toBe('suspense crack');
+    await freeze(page, false);
+  });
+
+  test('passer annule aussi les sons programmés d’avance', async ({ page }) => {
+    await installManualClock(page);
+    await load(page);
+    await scriptRng(page, [rarityRoll('rare'), 0, DIRECT]);
+    await freeze(page, true);
+    const { x, y } = center(GACHA.pullSingle);
+    await page.mouse.click(x, y);
+    // Dans la fenêtre d'avance de la première fissure : déjà programmée, pas encore au journal.
+    await step(page, crackTimes()[0]! - 60);
+    expect(await page.evaluate(() => document.body.dataset.skip)).toBe('armed');
+    await page.mouse.click(180, 320);
+    await step(page, 300);
+    expect(await sounds(page)).toBe('suspense');
+    expect(await page.evaluate(() => document.body.dataset.soundsLive)).toBe('0');
+    await freeze(page, false);
+  });
 });
