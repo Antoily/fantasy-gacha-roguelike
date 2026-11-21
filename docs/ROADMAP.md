@@ -6,10 +6,7 @@ mergée et jouable.
 
 ## En cours
 
-- **Immersion** (révisions de 004, 005 et 007, 2026-11-13) : d'après deux critiques (direction
-  artistique, sound design), révélation de cinéma, cartes distribuées sur la nuit, présentation
-  en silhouette puis couleur, accueil et fenêtres animés, sons riches et synchrones. Aucune règle
-  ne change. Recherches : `specs/007-illustrations/research-immersion.md`, `specs/005-son/research-immersion.md`.
+_Rien : prochaine étape à choisir avec l'utilisateur (« Plus tard »)._
 
 ## Ensuite — le gacha
 
@@ -51,6 +48,15 @@ résultat du tirage ; le joueur devine ce qu'il a eu avant de voir les cartes.
 
 ## Fait
 
+- 2026-11-21 — **Immersion** (révisions de 004, 005 et 007, d'après deux critiques : direction
+  artistique, sound design ; recherches dans `specs/*/research-immersion.md`) : révélation en
+  lumière (nuit directe, cœur qui bat, palier de lumière, impact, sortie sans retour à l'accueil),
+  cartes distribuées sur la nuit avec relief et vedette au centre, présentation en silhouette puis
+  couleur, accueil vivant (boutons qui s'écrasent, reflets, étoiles, ambiance teintée par la
+  vedette), fenêtres qui s'ouvrent, silhouettes reconnaissables ; moteur son (souffle, filtres,
+  limiteur, coupures sans clic), suspense, fissures, impact, cartes en échelle montante, fanfare
+  de présentation, pièces selon le sens, sons avancés pour les casques sans fil. Tests
+  chronométrés mesurés en temps du jeu. Aucune règle ne change.
 - 2026-11-12 — **Écran vivant** (révisions de 007 et 005, demande de l'utilisateur : « rendre un
   peu de vie », sans nouvelle feature) : orbe qui lévite et luit, lueurs dans le ciel, halo des
   tirages payables, montants qui défilent, bandeau qui glisse, fenêtres en fondu ; sons

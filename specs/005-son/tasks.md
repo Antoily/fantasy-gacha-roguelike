@@ -65,4 +65,4 @@ branchement scène par scène, puis l'e2e.
 - [x] T018 Lot A : bruit, filtres, décroissance, bus et limiteur, rire dans le bus, coupures en fondu, étouffement ; test d'énergie de l'interface (muté). Le dégonflement du leurre (B5) est livré avec (même mécanisme)
 - [x] T019 Lot B : suspense qui grossit et bat, fissures, impact et Commun revoicé, montée transposée, paillettes (le leurre qui se dégonfle est fait en T018)
 - [x] T020 Lot C : cartes sur leur face en échelle montante, vedette, fanfare `splash` (e2e mis à jour), pièces selon le sens, souffle de bannière, éclair de passage, latence de sortie
-- [ ] T021 Mesures avant / après (rendu hors navigateur), relecture des captures ; `CLAUDE.md`, `docs/ROADMAP.md`
+- [x] T021 Mesures avant / après (rendu hors navigateur), relecture des captures ; `CLAUDE.md`, `docs/ROADMAP.md`
