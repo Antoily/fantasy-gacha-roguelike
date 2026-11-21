@@ -98,4 +98,4 @@ Vocabulaire : la « présentation » de la spec est la fenêtre `splash` du code
 - [x] T028 Lot C : présentation en silhouette, éclair, couleur, rayons, nom qui se pose
 - [x] T029 Lot D : boutons écrasés et reflet, scintillement, teinte de la vedette, message de pénurie lisible
 - [x] T030 Lot E : fenêtres qui s'ouvrent, silhouettes reconnaissables, fiche et échange mis en scène, « 40e »
-- [ ] T031 Captures relues (densité 2), e2e et mutations ; `CLAUDE.md`, `docs/ROADMAP.md`
+- [x] T031 Captures relues (densité 2), e2e et mutations ; `CLAUDE.md`, `docs/ROADMAP.md`

@@ -63,4 +63,4 @@ fausses pistes, le retournement, l'e2e et les captures.
 - [x] T014 Spec : User Story 6, FR-018 à FR-024, SC-008 ; recherche (007 `research-immersion.md`, lots A et B)
 - [x] T015 Lot A : nuit directe, cœur lumineux, fissures, palier en lumière animé, impact, sortie sans retour de l'accueil, leurre et montée
 - [ ] T016 Lot B : distribution depuis l'orbe, nuit gardée, relief, vedette au centre et autres assombries, cadres, badges dégagés
-- [ ] T017 Captures image par image (×1 Légendaire, ×10, leurre) relues ; e2e et mutations ; `CLAUDE.md`, `docs/ROADMAP.md`
+- [x] T017 Captures image par image (×1 Légendaire, ×10, leurre) relues ; e2e et mutations ; `CLAUDE.md`, `docs/ROADMAP.md`
